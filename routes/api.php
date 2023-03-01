@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterationController;
-use App\Http\Controllers\DeviceOrderController;
+use App\Http\Controllers\Devic\DeviceOrderController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Transaction\TransactionController;
 
