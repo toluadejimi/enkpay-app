@@ -212,6 +212,7 @@ try {
 
 
     $IP = $request->ip();
+    dd($ip);
     $StatusCode = $request->StatusCode;
     $StatusDescription = $request->StatusDescription;
     $SerialNumber = $request->SerialNumber;
