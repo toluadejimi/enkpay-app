@@ -212,7 +212,7 @@ try {
 
 
     $IP = $_SERVER['SERVER_ADDR'];
-    dd($IP);
+    
     $StatusCode = $request->StatusCode;
     $StatusDescription = $request->StatusDescription;
     $SerialNumber = $request->SerialNumber;
