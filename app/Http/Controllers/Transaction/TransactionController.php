@@ -211,7 +211,7 @@ public function cash_out_webhook(Request $request){
 try {
 
 
-    $IP = \Request::ip();
+    $IP = $_SERVER['SERVER_ADDR'];
     dd($IP);
     $StatusCode = $request->StatusCode;
     $StatusDescription = $request->StatusDescription;
