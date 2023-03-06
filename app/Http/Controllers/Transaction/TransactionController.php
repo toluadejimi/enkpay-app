@@ -309,7 +309,7 @@ public function balance_webhook(Request $request){
 
 
 
-                $IP = "127.0.0.2"; //$_SERVER['SERVER_ADDR'];
+                $IP = $_SERVER['SERVER_ADDR'];
 
                 $serial_number = $request->serial_number;
                 $amount = $request->amount;
