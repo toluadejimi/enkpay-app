@@ -206,8 +206,7 @@ public function cash_out_webhook(Request $request){
 
             try {
 
-
-                $IP = $_SERVER['SERVER_ADDR'];
+                $header = $request->header('errand-pay-header');
 
                 $StatusCode = $request->StatusCode;
                 $StatusDescription = $request->StatusDescription;
@@ -222,15 +221,13 @@ public function cash_out_webhook(Request $request){
                 $PostingType = $request->PostingType;
                 $TerminalID = $request->AdditionalDetails['TerminalID'];
 
-                $oip = env('ERIP');
-
-
+                $key = env('ERIP');
                 $trans_id = "ENK-".random_int(100000, 999999);
+                $verify1 = hash('sha512', $key);
 
 
 
-
-                if($IP == $oip){
+                if($verify1 == $header){
 
 
 
@@ -283,7 +280,7 @@ public function cash_out_webhook(Request $request){
 
                     return response()->json([
                         'status'  => false,
-                        'message' => 'IP not Authorized'
+                        'message' => 'Key not Authorized'
                     ], 500);
 
 
