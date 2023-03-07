@@ -315,24 +315,22 @@ public function balance_webhook(Request $request){
                 $serviceCode = $request->serviceCode;
                 $reference = $request->reference;
 
-
-
                 $oip = env('ERIP');
-
-
 
                 $trans_id = "ENK-".random_int(100000, 999999);
 
 
                 $user_id = User::where('serial_no', $serial_number)
-                ->first()->id;
+                ->first()->id ?? null;
 
+                if($user_id == null){
 
+                    return response()->json([
+                        'status'  => false,
+                        'message' => 'Serial_no not found on our system'
+                    ], 500);
 
-                if($IP == $oip){
-
-
-
+                }
 
 
                 if($serviceCode == 'CO1'){
@@ -483,15 +481,6 @@ public function balance_webhook(Request $request){
 
 
 
-
-
-
-            }
-
-            return response()->json([
-                'status'  => false,
-                'message' => 'IP not Authorized'
-            ], 500);
 
 
                 } catch (\Exception $th) {
