@@ -78,7 +78,7 @@ class RegisterationController extends Controller
                      "from" => "ENKWAVE",
                      "sms" => "Your Verification Code is $sms_code",
                      "type" => "plain",
-                     "channel" => "generic"
+                     "channel" => "DND"
 
                 );
 
