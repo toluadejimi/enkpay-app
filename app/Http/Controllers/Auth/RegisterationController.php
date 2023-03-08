@@ -76,7 +76,7 @@ class RegisterationController extends Controller
                     "api_key" => "TLxF6Jauos8AJq6pKztkbxaQJbQjZzs43vJLOsXk8fHcUez3mBolehZGGzTwnF",
                      "to" => $phone_no,
                      "from" => "ENKWAVE",
-                     "sms" => "Your Verification Code is $sms_code",
+                     "sms" => "Your Enkwave confirmation code is $sms_code. active for 5 minutes, one-time use only",
                      "type" => "plain",
                      "channel" => "DND"
 
