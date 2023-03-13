@@ -21,7 +21,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-4"></div>
-            <div class="col-md-4" style="background: url(&quot;{{url('')}}/public/assets/img/email%20barnner.webp&quot;) center;margin-bottom: 1px;"><img class="flex-sm-fill" style="width: 98%;transform: translate(1px);padding: 23px;height: 271px;padding-top: 48px;padding-bottom: 0px;padding-right: 29px;padding-left: 28px;margin-top: -13px;" src="{{url('')}}/public/assets/img/email%20barnner.webp" width="420" height="257"></div>
+            <div class="col-md-4" style="background: url(&quot;{{url('')}}/public/assets/img/email%20barnner.webp&quot;) center;margin-bottom: 0px;padding: 54px;padding-right: 15px;padding-left: 15px;"><img class="flex-sm-fill" style="width: 99%;transform: translate(1px);padding: 0px;height: 252px;padding-top: 0;padding-bottom: 0px;padding-right: 0;padding-left: 0;margin-top: -13px;" src="{{url('')}}/public/assets/img/email%20barnner.webp" width="382" height="271"></div>
             <div class="col"></div>
         </div>
     </div>
