@@ -5,15 +5,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>OTP CODE</title>
-    <link rel="stylesheet" href="{{url('')}}/assets/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{url('')}}/assets/css/dh-row-text-image-right.css">
-    <link rel="stylesheet" href="{{url('')}}/assets/css/Footer-Dark-icons.css">
-    <link rel="stylesheet" href="{{url('')}}/assets/css/Footer-with-social-media-icons.css">
+    <link rel="stylesheet" href="{{url('')}}/public/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{url('')}}/public/assets/css/dh-row-text-image-right.css">
+    <link rel="stylesheet" href="{{url('')}}/public/assets/css/Footer-Dark-icons.css">
+    <link rel="stylesheet" href="{{url('')}}/public/assets/css/Footer-with-social-media-icons.css">
 </head>
 
 <body>
     <div class="container text-start">
-        <div class="col text-center"><img style="text-align: center;width: 315px;padding: 46px;" src="{{url('')}}/assets/img/logo.png"></div>
+        <div class="col text-center"><img style="text-align: center;width: 315px;padding: 46px;" src="{{url('')}}/public/assets/img/logo.png"></div>
     </div>
     <div class="container">
         <div class="col">
@@ -21,7 +21,7 @@
         </div>
     </div>
     <div class="row clearmargin clearpadding row-image-txt">
-        <div class="col-xs-12 col-sm-6 col-md-6 clearmargin clearpadding col-sm-push-6"><img class="flex-sm-fill" style="width: 100%;transform: translate(1px);" src="{{url('')}}/assets/img/email_barnner.webp" width="360" height="414"></div>
+        <div class="col-xs-12 col-sm-6 col-md-6 clearmargin clearpadding col-sm-push-6"><img class="flex-sm-fill" style="width: 100%;transform: translate(1px);" src="{{url('')}}/public/assets/img/email_barnner.webp" width="360" height="414"></div>
         <div class="col-xs-12 col-sm-6 col-md-6 col-sm-pull-6" style="padding: 66px;padding-bottom: 0px;">
             <h1><strong>OTP CODE&nbsp;</strong></h1>
             <hr>
@@ -49,7 +49,7 @@
             <div style="text-align: center;"></div>
         </div>
     </div>
-    <script src="{{url('')}}/assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="{{url('')}}/public/assets/bootstrap/js/bootstrap.min.js"></script>
 </body>
 
 </html>
