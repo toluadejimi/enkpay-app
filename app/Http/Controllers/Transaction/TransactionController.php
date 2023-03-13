@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use Exception;
 use Laravel\Passport\Passport;
 use Laravel\Passport\HasApiTokens;
+use Mail;
 
 
 
@@ -690,3 +691,9 @@ public function fund_transfer_webhook(Request $request){
 
 
 }
+
+
+
+
+
+

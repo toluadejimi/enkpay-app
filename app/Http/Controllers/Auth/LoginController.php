@@ -31,10 +31,12 @@ public $failed = false;
 
 
 
-public function login(Request $request){
+public function phone_login(Request $request){
 
 
     try{
+
+
 
         $credentials = request(['phone', 'password']);
 
@@ -45,6 +47,74 @@ public function login(Request $request){
             return response()->json([
                 'status' => $this->failed,
                 'message' => 'Phone No or Password Incorrect'
+            ], 500);
+        }
+
+
+        $token = auth()->user()->createToken('API Token')->accessToken;
+
+        $user = User::select(
+        'id',
+        'first_name',
+        'last_name',
+        'phone',
+        'email',
+        'image',
+        'type',
+        'is_phone_verified',
+        'is_email_verified',
+        'gender',
+        'device_id',
+        'fcm_token',
+        'identification_type',
+        'identification_number',
+        'identification_image',
+        'is_kyc_verified',
+        'street',
+        'city',
+        'state',
+        'lga',
+        'bank_name',
+        'account_number',
+        'account_name',
+        'main_wallet',
+        'bonus_wallet',
+        'virtual_account',
+        'sms_code',
+        'status',
+        'dob')
+
+        ->where('id', Auth::id())->get();
+
+
+        return response()->json([
+            'status' => $this->success,
+            'data' => $user,
+            'token' => $token
+
+        ],200);
+
+} catch (\Exception $th) {
+    return $th->getMessage();
+}
+
+}
+
+
+public function email_login(Request $request){
+
+
+    try{
+
+        $credentials = request(['email', 'password']);
+
+        Passport::tokensExpireIn(Carbon::now()->addMinutes(15));
+        Passport::refreshTokensExpireIn(Carbon::now()->addMinutes(15));
+
+        if (!auth()->attempt($credentials)) {
+            return response()->json([
+                'status' => $this->failed,
+                'message' => 'Email or Password Incorrect'
             ], 500);
         }
 

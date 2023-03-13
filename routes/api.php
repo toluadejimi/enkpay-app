@@ -27,7 +27,9 @@ use App\Http\Controllers\Transaction\TransactionController;
 
 //Registration
 Route::post('verify-phone', [RegisterationController::class, 'phone_verification']);
+Route::post('verify-email', [RegisterationController::class, 'email_verification']);
 Route::post('resend-otp', [RegisterationController::class, 'resend_otp']);
+Route::post('resend-email-otp', [RegisterationController::class, 'resend_email_otp']);
 Route::post('verify-otp', [RegisterationController::class, 'verify_otp']);
 Route::post('register', [RegisterationController::class, 'register']);
 
@@ -57,7 +59,9 @@ Route::get('transaction-status', [TransactionController::class, 'transactiion_st
 
 
 //Login
-Route::post('login', [LoginController::class, 'login']);
+Route::post('phone-login', [LoginController::class, 'phone_login']);
+Route::post('email-login', [LoginController::class, 'email_login']);
+
 
 Route::group(['middleware' => ['auth:api','acess']], function(){
 

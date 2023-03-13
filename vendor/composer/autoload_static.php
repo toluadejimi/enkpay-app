@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit6871a634670bf77479f124fce4b9332b
+class ComposerStaticInitbc49ffe83fd19820b58c4bb33365838e
 {
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
@@ -370,8 +370,8 @@ class ComposerStaticInit6871a634670bf77479f124fce4b9332b
         ),
         'Psr\\Http\\Message\\' => 
         array (
-            0 => __DIR__ . '/..' . '/psr/http-factory/src',
-            1 => __DIR__ . '/..' . '/psr/http-message/src',
+            0 => __DIR__ . '/..' . '/psr/http-message/src',
+            1 => __DIR__ . '/..' . '/psr/http-factory/src',
         ),
         'Psr\\Http\\Client\\' => 
         array (
@@ -593,7 +593,10 @@ class ComposerStaticInit6871a634670bf77479f124fce4b9332b
         'App\\Http\\Controllers\\Auth\\LoginController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/LoginController.php',
         'App\\Http\\Controllers\\Auth\\RegisterationController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/RegisterationController.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
+        'App\\Http\\Controllers\\Device\\DeviceOrderController' => __DIR__ . '/../..' . '/app/Http/Controllers/Device/DeviceOrderController.php',
+        'App\\Http\\Controllers\\Transaction\\TransactionController' => __DIR__ . '/../..' . '/app/Http/Controllers/Transaction/TransactionController.php',
         'App\\Http\\Kernel' => __DIR__ . '/../..' . '/app/Http/Kernel.php',
+        'App\\Http\\Middleware\\Acess' => __DIR__ . '/../..' . '/app/Http/Middleware/Acess.php',
         'App\\Http\\Middleware\\Authenticate' => __DIR__ . '/../..' . '/app/Http/Middleware/Authenticate.php',
         'App\\Http\\Middleware\\EncryptCookies' => __DIR__ . '/../..' . '/app/Http/Middleware/EncryptCookies.php',
         'App\\Http\\Middleware\\PreventRequestsDuringMaintenance' => __DIR__ . '/../..' . '/app/Http/Middleware/PreventRequestsDuringMaintenance.php',
@@ -603,11 +606,16 @@ class ComposerStaticInit6871a634670bf77479f124fce4b9332b
         'App\\Http\\Middleware\\TrustProxies' => __DIR__ . '/../..' . '/app/Http/Middleware/TrustProxies.php',
         'App\\Http\\Middleware\\ValidateSignature' => __DIR__ . '/../..' . '/app/Http/Middleware/ValidateSignature.php',
         'App\\Http\\Middleware\\VerifyCsrfToken' => __DIR__ . '/../..' . '/app/Http/Middleware/VerifyCsrfToken.php',
+        'App\\Models\\OrderDevice' => __DIR__ . '/../..' . '/app/Models/OrderDevice.php',
+        'App\\Models\\PickUpLocation' => __DIR__ . '/../..' . '/app/Models/PickUpLocation.php',
+        'App\\Models\\TDevice' => __DIR__ . '/../..' . '/app/Models/TDevice.php',
+        'App\\Models\\Transaction' => __DIR__ . '/../..' . '/app/Models/Transaction.php',
         'App\\Models\\User' => __DIR__ . '/../..' . '/app/Models/User.php',
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
         'App\\Providers\\AuthServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AuthServiceProvider.php',
         'App\\Providers\\BroadcastServiceProvider' => __DIR__ . '/../..' . '/app/Providers/BroadcastServiceProvider.php',
         'App\\Providers\\EventServiceProvider' => __DIR__ . '/../..' . '/app/Providers/EventServiceProvider.php',
+        'App\\Providers\\HelperServiceProvider' => __DIR__ . '/../..' . '/app/Providers/HelperServiceProvider.php',
         'App\\Providers\\RouteServiceProvider' => __DIR__ . '/../..' . '/app/Providers/RouteServiceProvider.php',
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
         'Brick\\Math\\BigDecimal' => __DIR__ . '/..' . '/brick/math/src/BigDecimal.php',
@@ -6595,6 +6603,7 @@ class ComposerStaticInit6871a634670bf77479f124fce4b9332b
         'TijsVerkoyen\\CssToInlineStyles\\Css\\Property\\Property' => __DIR__ . '/..' . '/tijsverkoyen/css-to-inline-styles/src/Css/Property/Property.php',
         'TijsVerkoyen\\CssToInlineStyles\\Css\\Rule\\Processor' => __DIR__ . '/..' . '/tijsverkoyen/css-to-inline-styles/src/Css/Rule/Processor.php',
         'TijsVerkoyen\\CssToInlineStyles\\Css\\Rule\\Rule' => __DIR__ . '/..' . '/tijsverkoyen/css-to-inline-styles/src/Css/Rule/Rule.php',
+        'UltraMsg\\WhatsAppApi' => __DIR__ . '/..' . '/ultramsg/whatsapp-php-sdk/ultramsg.class.php',
         'UnhandledMatchError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
         'ValueError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
         'Webmozart\\Assert\\Assert' => __DIR__ . '/..' . '/webmozart/assert/src/Assert.php',
@@ -6956,10 +6965,10 @@ class ComposerStaticInit6871a634670bf77479f124fce4b9332b
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit6871a634670bf77479f124fce4b9332b::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit6871a634670bf77479f124fce4b9332b::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit6871a634670bf77479f124fce4b9332b::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit6871a634670bf77479f124fce4b9332b::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitbc49ffe83fd19820b58c4bb33365838e::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitbc49ffe83fd19820b58c4bb33365838e::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInitbc49ffe83fd19820b58c4bb33365838e::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInitbc49ffe83fd19820b58c4bb33365838e::$classMap;
 
         }, null, ClassLoader::class);
     }
