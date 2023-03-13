@@ -21,7 +21,7 @@
         </div>
     </div>
     <div class="row clearmargin clearpadding row-image-txt">
-        <div class="col-xs-12 col-sm-6 col-md-6 clearmargin clearpadding col-sm-push-6"><img class="flex-sm-fill" style="width: 100%;transform: translate(1px);" src="{{url('')}}/assets/img/email%20barnner.webp" width="360" height="414"></div>
+        <div class="col-xs-12 col-sm-6 col-md-6 clearmargin clearpadding col-sm-push-6"><img class="flex-sm-fill" style="width: 100%;transform: translate(1px);" src="{{url('')}}/assets/img/email_barnner.webp" width="360" height="414"></div>
         <div class="col-xs-12 col-sm-6 col-md-6 col-sm-pull-6" style="padding: 66px;padding-bottom: 0px;">
             <h1><strong>OTP CODE&nbsp;</strong></h1>
             <hr>
