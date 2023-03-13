@@ -192,6 +192,7 @@ class RegisterationController extends Controller
             $check_status = User::where('email', $email)->first()->status ?? null;
 
 
+
             if($check_email == $email && $check_status == 2){
 
                 return response()->json([
