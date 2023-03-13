@@ -31,8 +31,10 @@
             <div style="text-align: center;"></div>
             <footer class="text-center bg-dark">
                 <div class="container text-white py-4 py-lg-5" style="padding: 24px 12px;padding-bottom: 0px;margin-bottom: 0px;padding-top: 0px;padding-left: 0px;padding-right: 0px;margin-left: -4px;--bs-body-bg: #000000;background: #2a2a2a;text-align: left;">
-                    
                     <p class="text-muted mb-0" style="--bs-body-font-weight: normal;height: 0px;width: 566px;text-align: left;font-size: 11px;">Copyright © ENKWAVE</p>
+                </div>
+                <div class="container text-white py-4 py-lg-5" style="padding: 24px 12px;padding-bottom: 0px;margin-bottom: 0px;padding-top: 0px;padding-left: 0px;padding-right: 0px;margin-left: -4px;--bs-body-bg: #000000;background: #2a2a2a;text-align: left;">
+                    <p class="text-muted mb-0" style="--bs-body-font-weight: normal;height: 0px;width: 566px;text-align: left;font-size: 11px;"></p>
                 </div>
             </footer>
             <div style="text-align: center;"></div>
