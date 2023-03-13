@@ -187,9 +187,9 @@ class RegisterationController extends Controller
             $sms_code = random_int(1000, 9999);
 
 
-            $check_email_verification = User::where('email', $email)->first()->email ?? null;
-            $check_email = User::where('email', $email)->first()->email ?? null;
             $check_status = User::where('email', $email)->first()->status ?? null;
+            $check_email = User::where('email', $email)->first()->email ?? null;
+            $check_email_verification = User::where('email', $email)->first()->is_email_verified ?? null;
 
 
 
