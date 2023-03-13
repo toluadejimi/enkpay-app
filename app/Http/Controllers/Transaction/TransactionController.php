@@ -223,8 +223,11 @@ public function cash_out_webhook(Request $request){
                 $TerminalID = $request->AdditionalDetails['TerminalID'];
 
                 $key = env('ERIP');
+
                 $trans_id = "ENK-".random_int(100000, 999999);
                 $verify1 = hash('sha512', $key);
+
+                dd($key, $verify1);
 
 
 
@@ -235,12 +238,20 @@ public function cash_out_webhook(Request $request){
                     if($StatusCode == 00){
 
                         $main_wallet = User::where('serial_no', $SerialNumber)
-                        ->first()->main_wallet;
+                        ->first()->main_wallet ?? null;
 
                         $user_id = User::where('serial_no', $SerialNumber)
                         ->first()->id;
 
 
+                        if($main_wallet == null){
+
+                            return response()->json([
+                                'status'  => false,
+                                'message' => 'Customer not registred on Enkpay'
+                            ], 500);
+
+                        }
 
                         //credit
                         $updated_amount = $main_wallet + $Amount;
