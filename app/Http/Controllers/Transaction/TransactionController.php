@@ -240,10 +240,10 @@ public function cash_out_webhook(Request $request){
                         ->first()->main_wallet ?? null;
 
                         $user_id = User::where('serial_no', $SerialNumber)
-                        ->first()->id;
+                        ->first()->id ?? null;
 
 
-                        if($main_wallet == null){
+                        if($main_wallet == null && $user_id == null){
 
                             return response()->json([
                                 'status'  => false,
