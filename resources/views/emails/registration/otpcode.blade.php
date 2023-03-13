@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -22,7 +21,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-4"></div>
-            <div class="col-md-4" style="background: url(&quot;{{url('')}}/public/assets/img/email%20barnner.webp&quot;) center;"><img class="flex-sm-fill" style="width: 98%;transform: translate(1px);padding: 0px;height: 271px;padding-top: 38px;padding-bottom: 0px;" src="{{url('')}}/public/assets/img/email%20barnner.webp" width="420" height="257"></div>
+            <div class="col-md-4" style="background: url(&quot;{{url('')}}/public/assets/img/email%20barnner.webp&quot;) center;margin-bottom: 1px;"><img class="flex-sm-fill" style="width: 98%;transform: translate(1px);padding: 23px;height: 271px;padding-top: 48px;padding-bottom: 0px;padding-right: 29px;padding-left: 28px;margin-top: -13px;" src="{{url('')}}/public/assets/img/email%20barnner.webp" width="420" height="257"></div>
             <div class="col"></div>
         </div>
     </div>
@@ -33,7 +32,7 @@
                 <h1 style="font-size: 32px;"><strong>OTP CODE&nbsp;</strong></h1>
                 <p>Your one time password is</p>
                 <p style="font-size: 34px;font-weight: bold;">{{ $data1["sms_code"] }}</p>
-                <p class="text-muted mb-0" style="--bs-body-font-weight: normal;height: 0px;width: 566px;text-align: left;font-size: 11px;">Copyright ©  ENKWAVE</p>
+                <p class="text-muted mb-0" style="--bs-body-font-weight: normal;height: 0px;width: 566px;text-align: left;font-size: 11px;">Copyright © 2023 ENKWAVE</p>
                 <p style="color: var(--bs-black);text-align: left;background: #ffffff;"></p>
             </div>
             <div class="col-md-4"></div>
