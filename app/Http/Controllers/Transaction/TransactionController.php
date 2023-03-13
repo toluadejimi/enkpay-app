@@ -227,7 +227,6 @@ public function cash_out_webhook(Request $request){
                 $trans_id = "ENK-".random_int(100000, 999999);
                 $verify1 = hash('sha512', $key);
 
-                dd($key, $verify1);
 
 
 
