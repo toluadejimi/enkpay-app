@@ -277,6 +277,21 @@ public function cash_out_webhook(Request $request){
 
                         }
 
+                        $data = array(
+                            'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                            'subject' => "Account Credited",
+                            'toreceiver' => 'toluadejimi@gmail.com',
+                            'amount' => $Amount,
+                            'serial' => $SerialNumber,
+                        );
+
+                        Mail::send('emails.transaction.terminal-credit', ["data1" => $data], function ($message) use ($data) {
+                            $message->from($data['fromsender']);
+                            $message->to($data['toreceiver']);
+                            $message->subject($data['subject']);
+                        });
+
+
                         return response()->json([
                             'status' => true,
                             'message' => 'Tranasaction Successsfull'

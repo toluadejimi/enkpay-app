@@ -168,28 +168,6 @@ public function email_login(Request $request){
 
 }
 
-public function user_info(request $request){
-
-
-try{
-    $user = Auth::user();
-
-    return response()->json([
-        'status' => $this->success,
-        'data' => $user,
-
-    ],200);
-
-} catch (\Exception $th) {
-    return $th->getMessage();
-}
-
-
-}
-
-
-
-
 
 
 

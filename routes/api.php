@@ -6,6 +6,9 @@ use App\Http\Controllers\Auth\RegisterationController;
 use App\Http\Controllers\Device\DeviceOrderController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Transaction\TransactionController;
+use App\Http\Controllers\Auth\ProfileController;
+
+
 
 
 
@@ -65,7 +68,10 @@ Route::post('email-login', [LoginController::class, 'email_login']);
 
 Route::group(['middleware' => ['auth:api','acess']], function(){
 
-    Route::get('user-info', [LoginController::class, 'user_info']);
+
+
+    Route::get('user-info', [ProfileController::class, 'user_info']);
+    //Route::get('user-info', [LoginController::class, 'user_info']);
 
 
 
