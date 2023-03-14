@@ -1,4 +1,3 @@
-{{ $data1["sms_code"] }}
 <!DOCTYPE html>
 <html lang="en">
 
