@@ -32,7 +32,7 @@
                 <h1 style="font-size: 32px;"><strong>Credit from Terminal&nbsp;</strong></h1>
                 <p>Amount Credited</p>
                 <p style="font-size: 14px;font-weight: bold;">{{ $data1["serial"] }}</p>
-                <p style="font-size: 34px;font-weight: bold;">{{ $data1["amount"] }}</p>
+                <p style="font-size: 34px;font-weight: bold;">{{number_format($data1["amount"], 2)}}</p>
                 <p class="text-muted mb-0" style="--bs-body-font-weight: normal;height: 0px;width: 566px;text-align: left;font-size: 11px;">Copyright © 2023 ENKWAVE</p>
                 <p style="color: var(--bs-black);text-align: left;background: #ffffff;"></p>
             </div>
