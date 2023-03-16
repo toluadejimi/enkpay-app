@@ -16,6 +16,7 @@ use Carbon\Carbon;
 use Exception;
 use Laravel\Passport\Passport;
 use Laravel\Passport\HasApiTokens;
+use App\Models\ErrandKey;
 use Mail;
 
 
@@ -132,12 +133,23 @@ public function get_banks(){
 
 try {
 
-    $erran_api_key = errand_api_key();
+
+    $errand_key = ErrandKey::where('id', 1)->first()->errand_key ?? null;
+
+            if($errand_key == null){
+                $response1 = errand_api_key();
+                $update = ErrandKey::where('id', 1)
+                ->update([
+                    'errand_key' => $response1[0],
+                ]);
+            }
+
+
 
     $curl = curl_init();
 
     curl_setopt_array($curl, array(
-    CURLOPT_URL => 'https://stagingapi.errandpay.com/epagentservice/api/v1/GetAllBanks',
+    CURLOPT_URL => 'https://stagingapi.errandpay.com/epagentservice/api/v1/ApiGetBanks',
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING => '',
     CURLOPT_MAXREDIRS => 10,
@@ -146,7 +158,7 @@ try {
     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
     CURLOPT_CUSTOMREQUEST => 'GET',
     CURLOPT_HTTPHEADER => array(
-        "Authorization: Bearer $erran_api_key"
+        "Authorization: Bearer $errand_key"
     ),
     ));
 
@@ -157,36 +169,52 @@ try {
     $var = json_decode($var);
 
 
+    $result = $var->data;
+
+
+    if($var->code == 200){
+
+    return response()->json([
+        'status' => $this->success,
+        'data' => $result
+        ], 200);
+
+    }
 
 
 
-    $code = $var->code ?? null;
-
-        $response1 = $var->data ?? null;
-        $respose2 = 'ERA 001 Please try again later';
 
 
-        if($code == null){
-
-            return response()->json([
-                'status' => $this->failed,
-                'data' => $erran_api_key
-            ], 500);
 
 
-        }elseif($var->code == 200){
 
-            return response()->json([
-                'status' => $this->success,
-                'data' => $response1
-            ], 200);
+    // $code = $var->code ?? null;
 
-        }else{
-            return response()->json([
-                'status' => $this->failed,
-                'data' => $response2
-            ], 500);
-        }
+    //     $response1 = $var->data ?? null;
+    //     $respose2 = 'ERA 001 Please try again later';
+
+
+    //     if($code == null){
+
+    //         return response()->json([
+    //             'status' => $this->failed,
+    //             'data' => $erran_api_key
+    //         ], 500);
+
+
+    //     }elseif($var->code == 200){
+
+    //         return response()->json([
+    //             'status' => $this->success,
+    //             'data' => $response1
+    //         ], 200);
+
+    //     }else{
+    //         return response()->json([
+    //             'status' => $this->failed,
+    //             'data' => $response2
+    //         ], 500);
+    //     }
 
 
 
@@ -592,6 +620,8 @@ public function transactiion_status(Request $request){
     }
 
     }
+
+
 
 
 

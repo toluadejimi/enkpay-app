@@ -31,9 +31,11 @@ use App\Http\Controllers\Auth\ProfileController;
 //Registration
 Route::post('verify-phone', [RegisterationController::class, 'phone_verification']);
 Route::post('verify-email', [RegisterationController::class, 'email_verification']);
-Route::post('resend-otp', [RegisterationController::class, 'resend_otp']);
+Route::post('resend-phone-otp', [RegisterationController::class, 'resend_phone_otp']);
 Route::post('resend-email-otp', [RegisterationController::class, 'resend_email_otp']);
-Route::post('verify-otp', [RegisterationController::class, 'verify_otp']);
+Route::post('verify-phone-otp', [RegisterationController::class, 'verify_phone_otp']);
+Route::post('verify-email-otp', [RegisterationController::class, 'verify_email_otp']);
+
 Route::post('register', [RegisterationController::class, 'register']);
 
 
@@ -70,8 +72,14 @@ Route::group(['middleware' => ['auth:api','acess']], function(){
 
 
 
+    //Profile
     Route::get('user-info', [ProfileController::class, 'user_info']);
-    //Route::get('user-info', [LoginController::class, 'user_info']);
+    Route::post('update-kyc', [ProfileController::class, 'update_user']);
+    Route::post('verify-info', [ProfileController::class, 'verify_info']);
+    Route::post('update-account-info', [ProfileController::class, 'update_account_info']);
+
+
+
 
 
 

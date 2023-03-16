@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 
 
+
 if(!function_exists('main_account')){
 
     function errand_api_key(){
@@ -43,17 +44,17 @@ if(!function_exists('main_account')){
 
         $var = json_decode($var);
 
-        dd($var);
-
-
         $response1 = $var->data->accessToken ?? null;
+        $exp = $var->data->expiresIn ?? null;
+
         $respose2 = 'ERA 001 Please try again later';
-        $response3 =  $var->error->message ?? null;;
+        $response3 =  $var->error->message ?? null;
 
 
 
         if($var->code == 200){
-            return $response1 ;
+            return [$response1, $exp];
+
         }
 
         if($var->code == 400){

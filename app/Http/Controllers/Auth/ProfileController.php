@@ -18,6 +18,10 @@ use Carbon\Carbon;
 use Exception;
 use Laravel\Passport\Passport;
 use Laravel\Passport\HasApiTokens;
+use App\Models\ErrandKey;
+
+
+
 
 class ProfileController extends Controller
 {
@@ -46,6 +50,293 @@ public function user_info(request $request){
     }
 
 
+    public function update_user(request $request){
 
-    
+
+        try{
+
+
+
+
+
+            //$data1 = $response1[1]
+
+
+
+            $errand_key = ErrandKey::where('id', 1)->first()->errand_key ?? null;
+
+            if($errand_key == null){
+                $response1 = errand_api_key();
+                $update = ErrandKey::where('id', 1)
+                ->update([
+                    'errand_key' => $response1[0],
+                ]);
+            }
+
+
+
+            $databody = array(
+
+                'userId' => Auth::id(),
+                'customerBvn' => Auth::user()->identification_number,
+                'phoneNumber' => Auth::user()->phone,
+                'customerName' => Auth::user()->first_name. " " .Auth::user()->last_name,
+
+
+            );
+
+            $body = json_encode($databody);
+            $curl = curl_init();
+
+                curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/CreateVirtualAccount',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $body,
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/json',
+                    "Authorization: Bearer $errand_key"
+                ),
+                ));
+
+                $var = curl_exec($curl);
+                curl_close($curl);
+
+
+                $var = json_decode($var);
+
+                dd($var);
+
+
+
+
+
+
+
+
+
+
+        } catch (\Exception $th) {
+            return $th->getMessage();
+        }
+
+
+    }
+
+
+    public function update_info(request $request){
+
+        try{
+
+            $data = $request->all();
+
+
+            $update = User::where('id', Auth::id())
+            ->update([
+
+                'identification_type' => $request->$data['identification_type'],
+                'identification_number' => $request->$data['identification_number'],
+
+            ]);
+
+
+
+            $databody = array(
+
+                'userId' => Auth::id(),
+                'kycType' => "BVN",
+                'token' => Auth::user()->identification_type,
+                'bankCode' => null,
+
+                identification_number
+
+
+            );
+
+            $body = json_encode($databody);
+            $curl = curl_init();
+
+                curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://stagingapi.errandpay.com/epagentservice/api/v1/GetKycDetails',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $body,
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/json',
+                    "Authorization: Bearer $errand_key"
+                ),
+                ));
+
+                $var = curl_exec($curl);
+                curl_close($curl);
+
+
+                $var = json_decode($var);
+
+                dd($var);
+
+
+
+
+        } catch (\Exception $th) {
+            return $th->getMessage();
+        }
+
+    }
+
+
+    public function verify_info(request $request){
+
+        try{
+
+            $bank_code = $request->bank_code;
+            $account_number = $request->account_number;
+            $bvn = $request->bvn;
+
+
+
+            $databody = array(
+
+                'accountNumber' => $account_number,
+                'institutionCode' => $bank_code,
+                'channel' => "Bank",
+
+            );
+
+            $body = json_encode($databody);
+            $curl = curl_init();
+
+                curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://stagingapi.errandpay.com/epagentservice/api/v1/AccountNameVerification',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $body,
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/json',
+                ),
+                ));
+
+                $var = curl_exec($curl);
+                curl_close($curl);
+                $var = json_decode($var);
+
+
+                $get_string = User::where('id', Auth::id())
+                ->first()->first_name;
+                $get_string2 = User::where('id', Auth::id())
+                ->first()->last_name;
+
+                $verify_name = $var->data->name;
+
+                $first_name = strtoupper($get_string);
+                $last_name = strtoupper($get_string2);
+
+
+                if (str_contains($verify_name, $first_name) && str_contains($verify_name, $last_name) ) {
+
+                    $update = User::where('id', Auth::id())
+                    ->update([
+                    'is_identification_verified' => 1,
+                    'bvn' => $bvn,
+
+                    ]);
+
+                    return response()->json([
+                        'status' => $this->success,
+                        'message' => "Account has been successfully verified",
+
+                    ],200);
+                }
+
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => "Sorry we could not verify your account information",
+
+                ],500);
+
+
+
+
+
+
+
+
+
+
+
+
+        } catch (\Exception $th) {
+            return $th->getMessage();
+        }
+
+    }
+
+
+    public function update_account_info(request $request){
+
+
+        try{
+
+        $first_name = $request->first_name;
+        $last_name  = $request->last_name;
+        $address = $request->address;
+        $state = $request->state;
+        $city = $request->city;
+        $lga = $request->lga;
+
+
+        $update = User::where('id', Auth::id())
+        ->update([
+
+            'first_name' => $first_name,
+            'last_name' => $last_name,
+            'address_line1' => $address,
+            'state' => $state,
+            'city' => $city,
+            'lga' => $lga
+
+        ]);
+
+
+        return response()->json([
+            'status' => $this->success,
+            'message' => "Account has been successfully updated",
+
+        ],200);
+
+    } catch (\Exception $th) {
+        return $th->getMessage();
+    }
+
+
+
+
+    }
+
+
+
+
+
+
+
 }
+
+
+
+
+

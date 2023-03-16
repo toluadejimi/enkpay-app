@@ -297,11 +297,10 @@ class RegisterationController extends Controller
 
             $sms_code = random_int(1000, 9999);
 
-            $check_email_verification = User::where('email', $email)->first()->is_phone_verified ?? null;
             $check_email = User::where('email', $email)->first()->email ?? null;
 
 
-            if($check_email == $email && $check_email_verification == 0){
+            if($check_email == $email){
 
                 $update_code = User::where('email', $email)
                 ->update([
@@ -342,7 +341,7 @@ class RegisterationController extends Controller
 
 
 
-    public function resend_otp(Request $request){
+    public function resend_phone_otp(Request $request){
 
 
         try {
@@ -413,7 +412,7 @@ class RegisterationController extends Controller
     }
 
 
-    public function verify_number_otp(Request $request){
+    public function verify_phone_otp(Request $request){
 
 
 
@@ -465,7 +464,7 @@ class RegisterationController extends Controller
             $update = User::where('email', $email)
             ->update([
 
-                'is_phone_verified' => 1,
+                'is_email_verified' => 1,
 
             ]);
 
