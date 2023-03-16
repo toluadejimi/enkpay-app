@@ -270,16 +270,6 @@ public function user_info(request $request){
                 ],500);
 
 
-
-
-
-
-
-
-
-
-
-
         } catch (\Exception $th) {
             return $th->getMessage();
         }

@@ -7,6 +7,7 @@ use App\Http\Controllers\Device\DeviceOrderController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Transaction\TransactionController;
 use App\Http\Controllers\Auth\ProfileController;
+use App\Http\Controllers\VAS\AirtimeController;
 
 
 
@@ -80,13 +81,15 @@ Route::group(['middleware' => ['auth:api','acess']], function(){
 
 
 
-
-
-
-
     //Trasnaction
     Route::post('cash-out', [TransactionController::class, 'cash_out']);
     Route::get('get-banks', [TransactionController::class, 'get_banks']);
+
+
+
+    //Airtime
+    Route::post('buy-airtime', [AirtimeController::class, 'buy_airtime']);
+    Route::get('get-banks', [AirtimeController::class, 'get_banks']);
 
 
 

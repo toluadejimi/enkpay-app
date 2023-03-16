@@ -27,3 +27,51 @@ if(!function_exists('main_account')){
     }
 
 }
+
+if(!function_exists('bonus_account')){
+
+    function bonus_account(){
+        $user = Auth::user();
+        return $user->bonus_wallet;
+    }
+
+}
+
+
+if(!function_exists('user_email')){
+
+    function user_email(){
+        $user = Auth::user();
+        return $user->email;
+    }
+
+}
+
+
+if(!function_exists('user_phone')){
+
+    function user_phone(){
+        $user = Auth::user();
+        return $user->user_phone;
+    }
+
+}
+
+
+if(!function_exists('first_name')){
+
+    function first_name(){
+        $user = Auth::user();
+        return $user->first_name;
+    }
+
+}
+
+if(!function_exists('last_name')){
+
+    function last_name(){
+        $user = Auth::user();
+        return $user->last_name;
+    }
+
+}
