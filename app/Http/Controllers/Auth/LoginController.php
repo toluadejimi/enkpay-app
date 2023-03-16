@@ -127,43 +127,43 @@ public function email_login(Request $request){
 
         $token = auth()->user()->createToken('API Token')->accessToken;
 
-        $user = User::select(
-        'id',
-        'first_name',
-        'last_name',
-        'phone',
-        'email',
-        'image',
-        'type',
-        'is_phone_verified',
-        'is_email_verified',
-        'gender',
-        'device_id',
-        'fcm_token',
-        'identification_type',
-        'identification_number',
-        'identification_image',
-        'is_kyc_verified',
-        'street',
-        'city',
-        'state',
-        'lga',
-        'bank_name',
-        'account_number',
-        'account_name',
-        'main_wallet',
-        'bonus_wallet',
-        'virtual_account',
-        'sms_code',
-        'status',
-        'dob')
+        // $user = User::select(
+        // 'id',
+        // 'first_name',
+        // 'last_name',
+        // 'phone',
+        // 'email',
+        // 'image',
+        // 'type',
+        // 'is_phone_verified',
+        // 'is_email_verified',
+        // 'gender',
+        // 'device_id',
+        // 'fcm_token',
+        // 'identification_type',
+        // 'identification_number',
+        // 'identification_image',
+        // 'is_kyc_verified',
+        // 'street',
+        // 'city',
+        // 'state',
+        // 'lga',
+        // 'bank_name',
+        // 'account_number',
+        // 'account_name',
+        // 'main_wallet',
+        // 'bonus_wallet',
+        // 'virtual_account',
+        // 'sms_code',
+        // 'status',
+        // 'dob')
 
-        ->where('id', Auth::id())->get();
+        // ->where('id', Auth::id())->get();
 
 
         return response()->json([
             'status' => $this->success,
-            'data' => $user,
+            'data' => Auth()->user(),
             'token' => $token
 
         ],200);
