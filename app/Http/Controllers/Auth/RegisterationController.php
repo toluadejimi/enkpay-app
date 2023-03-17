@@ -39,10 +39,6 @@ class RegisterationController extends Controller
             $sms_code = random_int(1000, 9999);
 
 
-
-
-
-
             $check_phone_verification = User::where('phone', $phone_no)->first()->is_phone_verified ?? null;
             $check_phone = User::where('phone', $phone_no)->first()->phone ?? null;
             $check_status = User::where('phone', $phone_no)->first()->status ?? null;
@@ -351,16 +347,14 @@ class RegisterationController extends Controller
 
             $sms_code = random_int(1000, 9999);
 
-            $check_phone_verification = User::where('phone', $phone_no)->first()->is_phone_verified ?? null;
-            $check_phone = User::where('phone', $phone_no)->first()->phone ?? null;
 
 
-            if($check_phone == $phone_no && $check_phone_verification == 0){
 
                 $update_code = User::where('phone', $phone_no)
                 ->update([
                     'sms_code'=> $sms_code
                 ]);
+                
 
                 $curl = curl_init();
                 $data = array(
@@ -401,7 +395,6 @@ class RegisterationController extends Controller
                     'message' => 'OTP Code has been sent succesfully'
                 ],200);
 
-            }
 
 
 
