@@ -101,7 +101,10 @@ class DataController extends Controller
     public function buy_data(Request $request)
     {
 
-      
+
+        try{
+
+
         $auth = env('VTAUTH');
 
         $request_id = date('YmdHis') . Str::random(4);
@@ -116,27 +119,57 @@ class DataController extends Controller
 
         $amount = preg_replace('/[^0-9]/', '', $request->variation_code);
 
-        $transfer_pin = $request->pin;
-
-        $user_wallet_banlance = EMoney::where('user_id', Auth::user()->id)
-            ->first()->current_balance;
-
-        $getpin = Auth()->user();
-        $user_pin = $getpin->pin;
-
-        if (Hash::check($transfer_pin, $user_pin) == false) {
-            return back()->with('error', 'Invalid Pin');
+        if ($wallet == 'main_account') {
+            $user_wallet_banlance = main_account();
+        } else {
+            $user_wallet_banlance = bonus_account();
         }
 
-        if ($amount < 100) {
-            return back()->with('error', 'Amount must not be less than NGN 100');
+        $user_pin = Auth()->user()->pin;
+
+        if (Hash::check($pin, $user_pin) == false) {
+
+            return response()->json([
+
+                'status' => $this->failed,
+                'message' => 'Invalid Pin, Please try again',
+
+            ], 500);
         }
 
         if ($amount > $user_wallet_banlance) {
 
-            return back()->with('error', 'Insufficient Funds, Fund your wallet');
+            if (!empty(user_email())) {
+
+                $data = array(
+                    'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                    'subject' => "Low Balance",
+                    'toreceiver' => user_email(),
+                    'first_name' => first_name(),
+                    'amount' => $amount,
+                    'phone' => $phone,
+                    'balance' => $user_wallet_banlance,
+
+                );
+
+                Mail::send('emails.notify.lowbalalce', ["data1" => $data], function ($message) use ($data) {
+                    $message->from($data['fromsender']);
+                    $message->to($data['toreceiver']);
+                    $message->subject($data['subject']);
+                });
+            }
+
+            return response()->json([
+
+                'status' => $this->failed,
+                'message' => 'Insufficient Funds, Fund your wallet',
+
+            ], 500);
 
         }
+
+
+
 
         $curl = curl_init();
 
@@ -168,65 +201,90 @@ class DataController extends Controller
 
         $var = json_decode($var);
 
-        $trx_id = $var->requestId;
 
-        if ($var->response_description == 'TRANSACTION SUCCESSFUL') {
+        $trx_id = $var->requestId ?? null;
 
-            $user_amount = EMoney::where('user_id', Auth::id())
-                ->first()->current_balance;
+            if ($var->response_description == 'TRANSACTION SUCCESSFUL') {
 
-            $debit = $user_amount - $amount;
-            $update = EMoney::where('user_id', Auth::id())
-                ->update([
-                    'current_balance' => $debit,
-                ]);
+                $debit = $user_wallet_banlance - $amount;
 
-            $transaction = new Transaction();
-            $transaction->ref_trans_id = Str::random(10);
-            $transaction->user_id = Auth::id();
-            $transaction->transaction_type = "cash_out";
-            $transaction->type = "vas";
-            $transaction->debit = $amount;
-            $transaction->note = "Data Purchase to $phone";
-            $transaction->save();
+                if ($wallet == 'main_account') {
 
-            $email = User::where('id', Auth::id())
-                ->first()->email;
+                    $update = User::where('id', Auth::id())
+                        ->update([
+                            'main_wallet' => $debit,
+                        ]);
 
-            $f_name = User::where('id', Auth::id())
-                ->first()->f_name;
+                } else {
+                    $update = User::where('id', Auth::id())
+                        ->update([
+                            'bonus_wallet' => $debit,
+                        ]);
+                }
 
-            $client = new Client([
-                'base_uri' => 'https://api.elasticemail.com',
-            ]);
 
-            $res = $client->request('GET', '/v2/email/send', [
-                'query' => [
+                if ($wallet == 'main_account') {
 
-                    'apikey' => "$api_key",
-                    'from' => "$from",
-                    'fromName' => 'Cardy',
-                    'sender' => "$from",
-                    'senderName' => 'Cardy',
-                    'subject' => 'Airtime VTU Purchase',
-                    'to' => "$email",
-                    'bodyHtml' => view('airtime-notification', compact('f_name', 'amount', 'phone'))->render(),
-                    'encodingType' => 0,
+                    $balance = $user_wallet_banlance - $amount;
 
-                ],
-            ]);
+                } else {
 
-            $body = $res->getBody();
-            $array_body = json_decode($body);
+                    $balance = $user_wallet_banlance - $amount;
 
-            return back()->with('message', 'Data Purchase Successfull');
+                }
 
-        }return back()->with('error', "Failed!! Please try again later");
+                $transaction = new Transaction();
+                $transaction->user_id = Auth::id();
+                $transaction->ref_trans_id = $referenceCode;
+                $transaction->transaction_type = "DATA BUNDLE";
+                $transaction->type = "vas";
+                $transaction->balance = $balance;
+                $transaction->debit = $amount;
+                $transaction->status = 1;
+                $transaction->note = "Data Bundle Purchase to $phone";
+                $transaction->save();
+
+                if (!empty(user_email())) {
+                    //send email
+                    $data = array(
+                        'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                        'subject' => "Airtime Purchase",
+                        'toreceiver' => user_email(),
+                        'first_name' => first_name(),
+                        'amount' => $amount,
+                        'phone' => $phone,
+
+                    );
+
+                    Mail::send('emails.vas.airtime', ["data1" => $data], function ($message) use ($data) {
+                        $message->from($data['fromsender']);
+                        $message->to($data['toreceiver']);
+                        $message->subject($data['subject']);
+                    });
+
+                }
+
+                return response()->json([
+
+                    'status' => $this->success,
+                    'message' => 'Data Bundle Purchase Successfull',
+
+                ], 200);
+
+            }
+
+            return response()->json([
+
+                'status' => $this->failed,
+                'message' => 'Service unavilable please try again later',
+
+            ], 200);
+
+        } catch (\Exception$th) {
+            return $th->getMessage();
+        }
+
     }
-
-
-
-
 
 
 

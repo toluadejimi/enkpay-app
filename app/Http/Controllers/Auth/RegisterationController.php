@@ -52,7 +52,7 @@ class RegisterationController extends Controller
 
             return response()->json([
                 'status' => $this->success,
-                'lga' => $state,
+                'data' => $state,
 
             ], 200);
 
