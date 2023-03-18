@@ -148,7 +148,7 @@ class RegisterationController extends Controller
 
                     "api_key" => "TLxF6Jauos8AJq6pKztkbxaQJbQjZzs43vJLOsXk8fHcUez3mBolehZGGzTwnF",
                     "to" => $phone_no,
-                    "from" => "ENKWAVE",
+                    "from" => "N-Alert",
                     "sms" => "Your Verification Code is $sms_code",
                     "type" => "plain",
                     "channel" => "generic",
@@ -194,6 +194,8 @@ class RegisterationController extends Controller
     {
 
         try {
+
+
 
             $email = $request->email;
 
@@ -346,7 +348,7 @@ class RegisterationController extends Controller
 
                 "api_key" => "TLxF6Jauos8AJq6pKztkbxaQJbQjZzs43vJLOsXk8fHcUez3mBolehZGGzTwnF",
                 "to" => $phone_no,
-                "from" => "ENKWAVE",
+                "from" => "N-Alert",
                 "sms" => "Your Verification Code is $sms_code",
                 "type" => "plain",
                 "channel" => "generic",
@@ -458,6 +460,9 @@ class RegisterationController extends Controller
     {
 
         try {
+
+
+
 
             $phone_no = $request->phone_no;
             $first_name = $request->first_name;

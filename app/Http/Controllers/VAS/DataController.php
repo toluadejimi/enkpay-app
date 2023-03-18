@@ -111,13 +111,19 @@ class DataController extends Controller
 
         $serviceid = $request->service_id;
 
-        $biller_code = preg_replace('/[^0-9]/', '', $request->biller_code);
+        $biller_code = preg_replace('/[^0-9]/', '', $request->phone);
 
-        $phone = preg_replace('/[^0-9]/', '', $request->biller_code);
+        $phone = preg_replace('/[^0-9]/', '', $request->phone);
 
         $variation_code = $request->variation_code;
 
-        $amount = preg_replace('/[^0-9]/', '', $request->variation_code);
+        $amount = round($request->variation_amount);
+
+        $wallet = $request->wallet;
+
+        $pin = $request->pin;
+
+
 
         if ($wallet == 'main_account') {
             $user_wallet_banlance = main_account();
@@ -138,6 +144,7 @@ class DataController extends Controller
         }
 
         if ($amount > $user_wallet_banlance) {
+
 
             if (!empty(user_email())) {
 
@@ -285,9 +292,6 @@ class DataController extends Controller
         }
 
     }
-
-
-
 
 
 }

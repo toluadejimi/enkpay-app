@@ -9,6 +9,7 @@ use App\Http\Controllers\Transaction\TransactionController;
 use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\VAS\AirtimeController;
 use App\Http\Controllers\VAS\DataController;
+use App\Http\Controllers\VAS\PowerController;
 
 
 
@@ -71,6 +72,10 @@ Route::get('get-states', [RegisterationController::class, 'get_states']);
 //Get Lga
 Route::post('get-lga', [RegisterationController::class, 'get_lga']);
 
+//Get Eletric Compnay
+Route::get('electric-company', [PowerController::class, 'get_eletric_company']);
+
+
 
 
 
@@ -98,7 +103,16 @@ Route::group(['middleware' => ['auth:api','acess']], function(){
 
     //Airtime
     Route::post('buy-airtime', [AirtimeController::class, 'buy_airtime']);
-    Route::get('get-banks', [AirtimeController::class, 'get_banks']);
+
+
+    //Buy Data Bundle
+    Route::post('buy-data', [DataController::class, 'buy_data']);
+
+
+    //Power
+    Route::post('verify-account', [PowerController::class, 'verify_account']);
+
+
 
 
 
