@@ -127,7 +127,7 @@ class AirtimeController extends Controller
             $var = json_decode($var);
 
 
-            $trx_id = $var->requestId;
+            $trx_id = $var->requestId ?? null;
 
             if ($var->response_description == 'TRANSACTION SUCCESSFUL') {
 

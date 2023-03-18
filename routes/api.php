@@ -8,6 +8,8 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Transaction\TransactionController;
 use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\VAS\AirtimeController;
+use App\Http\Controllers\VAS\DataController;
+
 
 
 
@@ -59,7 +61,15 @@ Route::post('v1/transfer-request', [TransactionController::class, 'transfer_requ
 Route::get('transaction-status', [TransactionController::class, 'transactiion_status']);
 
 
+//Get Data Plans
+Route::get('get-data-plan', [DataController::class, 'get_data']);
 
+//Get State
+Route::get('get-states', [RegisterationController::class, 'get_states']);
+
+
+//Get Lga
+Route::post('get-lga', [RegisterationController::class, 'get_lga']);
 
 
 
@@ -70,7 +80,6 @@ Route::post('email-login', [LoginController::class, 'email_login']);
 
 
 Route::group(['middleware' => ['auth:api','acess']], function(){
-
 
 
     //Profile
