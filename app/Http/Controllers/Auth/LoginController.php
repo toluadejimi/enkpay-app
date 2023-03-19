@@ -9,6 +9,8 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Wallet;
+use App\Models\Feature;
+
 
 use App\Models\Transaction;
 use Illuminate\Support\Facades\Hash;
@@ -37,11 +39,25 @@ public function phone_login(Request $request){
     try{
 
 
+        $phone = $request->phone;
+
 
         $credentials = request(['phone', 'password']);
 
         Passport::tokensExpireIn(Carbon::now()->addMinutes(15));
         Passport::refreshTokensExpireIn(Carbon::now()->addMinutes(15));
+
+        $check_status = User::where('phone', $phone)->first()->status ?? null;
+
+
+        if ($check_status == 2) {
+
+            return response()->json([
+                'status' => $this->failed,
+                'message' => 'Your account has restricted on ENKPAY',
+            ], 500);
+
+        }
 
         if (!auth()->attempt($credentials)) {
             return response()->json([
@@ -51,48 +67,14 @@ public function phone_login(Request $request){
         }
 
 
+
+
         $token = auth()->user()->createToken('API Token')->accessToken;
 
-        // $user = User::select(
-        // 'id',
-        // 'first_name',
-        // 'last_name',
-        // 'phone',
-        // 'email',
-        // 'image',
-        // 'type',
-        // 'is_phone_verified',
-        // 'is_email_verified',
-        // 'gender',
-        // 'device_id',
-        // 'fcm_token',
-        // 'identification_type',
-        // 'identification_number',
-        // 'identification_image',
-        // 'is_kyc_verified',
-        // 'street',
-        // 'city',
-        // 'state',
-        // 'lga',
-        // 'bank_name',
-        // 'account_number',
-        // 'account_name',
-        // 'main_wallet',
-        // 'bonus_wallet',
-        // 'virtual_account',
-        // 'sms_code',
-        // 'status',
-        // 'dob')
-
-        // ->where('id', Auth::id())->get();
-
-        //$data = User::where('id', Auth::id()->get
 
         $user = Auth()->user();
+        $user['feature']=$features;
         $user['token']=$token;
-
-
-
 
 
         return response()->json([
@@ -113,10 +95,24 @@ public function email_login(Request $request){
 
     try{
 
+        $email = $request->email;
+
         $credentials = request(['email', 'password']);
 
         Passport::tokensExpireIn(Carbon::now()->addMinutes(15));
         Passport::refreshTokensExpireIn(Carbon::now()->addMinutes(15));
+
+        $check_status = User::where('email', $email)->first()->status ?? null;
+
+
+        if ($check_status == 2) {
+
+            return response()->json([
+                'status' => $this->failed,
+                'message' => 'Your account has restricted on ENKPAY',
+            ], 500);
+
+        }
 
         if (!auth()->attempt($credentials)) {
             return response()->json([
@@ -125,11 +121,18 @@ public function email_login(Request $request){
             ], 500);
         }
 
+        $features = Feature::select('name', 'status')->get();
+
+
 
         $token = auth()->user()->createToken('API Token')->accessToken;
 
         $user = Auth()->user();
+        $user['feature']=$features;
         $user['token']=$token;
+
+
+
 
 
         return response()->json([
