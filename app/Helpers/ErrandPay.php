@@ -44,6 +44,8 @@ if(!function_exists('main_account')){
 
         $var = json_decode($var);
 
+
+
         $response1 = $var->data->accessToken ?? null;
         $exp = $var->data->expiresIn ?? null;
 
@@ -53,7 +55,7 @@ if(!function_exists('main_account')){
 
 
         if($var->code == 200){
-            return [$response1, $exp];
+            return $response1;
 
         }
 

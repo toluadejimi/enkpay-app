@@ -62,6 +62,11 @@ Route::post('v1/transfer-request', [TransactionController::class, 'transfer_requ
 Route::get('transaction-status', [TransactionController::class, 'transactiion_status']);
 
 
+//Get Pool Banalce
+Route::get('pool-balance', [TransactionController::class, 'pool_account']);
+
+
+
 //Get Data Plans
 Route::get('get-data-plan', [DataController::class, 'get_data']);
 

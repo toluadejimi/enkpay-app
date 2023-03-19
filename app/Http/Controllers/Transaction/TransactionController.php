@@ -2,24 +2,13 @@
 
 namespace App\Http\Controllers\Transaction;
 
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Providers\RouteServiceProvider;
-use Illuminate\Support\Facades\Auth;
-use App\Models\User;
-use App\Models\Wallet;
-use App\Models\Transaction;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
-use Carbon\Carbon;
-use Exception;
-use Laravel\Passport\Passport;
-use Laravel\Passport\HasApiTokens;
 use App\Models\ErrandKey;
+use App\Models\Transaction;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Mail;
-
-
 
 class TransactionController extends Controller
 {
@@ -27,268 +16,218 @@ class TransactionController extends Controller
     public $success = true;
     public $failed = false;
 
+    public function cash_out(Request $request)
+    {
 
+        try {
+            $erran_api_key = errand_api_key();
 
-public function cash_out(Request $request){
+            $beneficiaryName = $request->beneficiaryName;
+            $bankName = $request->bankName;
+            $bankCode = $request->bankCode;
+            $beneficiaryAccount = $request->beneficiaryAccount;
+            $amount = $request->amount;
+            $institutionCode = $request->institutionCode;
+            $referenceCode = "ENK-" . random_int(1000000, 999999999);
 
-try {
-    $erran_api_key = errand_api_key();
-
-
-    $beneficiaryName = $request->beneficiaryName;
-    $bankName = $request->bankName;
-    $bankCode = $request->bankCode;
-    $beneficiaryAccount = $request->beneficiaryAccount;
-    $amount = $request->amount;
-    $institutionCode = $request->institutionCode;
-    $referenceCode = "ENK-".random_int(1000000, 999999999);
-
-
-
-
-        $curl = curl_init();
-        $data = array(
+            $curl = curl_init();
+            $data = array(
 
                 "beneficiaryName" => $beneficiaryName,
-                "bankName" => $bankName ,
-                "bankCode" =>  $bankCode,
+                "bankName" => $bankName,
+                "bankCode" => $bankCode,
                 "beneficiaryAccount" => $beneficiaryAccount,
                 "amount" => $beneficiaryAccount,
                 "referenceCode" => $referenceCode,
-                "institutionCode" =>  $institutionCode
+                "institutionCode" => $institutionCode,
 
+            );
 
-        );
+            $post_data = json_encode($data);
 
-        $post_data = json_encode($data);
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://stagingapi.errandpay.com/epagentservice/api/v1/PayBeneficiary',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $post_data,
+                CURLOPT_HTTPHEADER => array(
+                    "Authorization: Bearer $erran_api_key",
+                    'Content-Type: application/json',
+                ),
+            ));
 
-        curl_setopt_array($curl, array(
-        CURLOPT_URL => 'https://stagingapi.errandpay.com/epagentservice/api/v1/PayBeneficiary',
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 0,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'POST',
-        CURLOPT_POSTFIELDS => $post_data,
-        CURLOPT_HTTPHEADER => array(
-            "Authorization: Bearer $erran_api_key",
-            'Content-Type: application/json'
-        ),
-        ));
-
-        $var = curl_exec($curl);
-        curl_close($curl);
-        $var = json_decode($var);
+            $var = curl_exec($curl);
+            curl_close($curl);
+            $var = json_decode($var);
 
             $response1 = $var->data ?? null;
             $respose2 = 'ERA 001 Please try again later';
 
-            if($var->code == 200){
+            if ($var->code == 200) {
 
                 return response()->json([
                     'status' => $this->success,
-                    'data' => $response1
+                    'data' => $response1,
                 ], 200);
 
             }
 
             return response()->json([
                 'status' => $this->failed,
-                'data' => $response2
+                'data' => $response2,
             ], 500);
 
+            $main_account = main_account();
 
-
-
-
-
-
-    $main_account = main_account();
-
-    if($main_account < $amount){
-        return response()->json([
-            'status' => $this->failed,
-                'message' => 'Insufficent Funds'
-            ], 500);
-    }
-
-
-
-
-
-
-
-
-
-} catch (\Exception $th) {
-    return $th->getMessage();
-}
-
-}
-
-
-public function get_banks(){
-
-try {
-
-
-    $errand_key = ErrandKey::where('id', 1)->first()->errand_key ?? null;
-
-            if($errand_key == null){
-                $response1 = errand_api_key();
-                $update = ErrandKey::where('id', 1)
-                ->update([
-                    'errand_key' => $response1[0],
-                ]);
+            if ($main_account < $amount) {
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => 'Insufficent Funds',
+                ], 500);
             }
 
-
-
-    $curl = curl_init();
-
-    curl_setopt_array($curl, array(
-    CURLOPT_URL => 'https://stagingapi.errandpay.com/epagentservice/api/v1/ApiGetBanks',
-    CURLOPT_RETURNTRANSFER => true,
-    CURLOPT_ENCODING => '',
-    CURLOPT_MAXREDIRS => 10,
-    CURLOPT_TIMEOUT => 0,
-    CURLOPT_FOLLOWLOCATION => true,
-    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-    CURLOPT_CUSTOMREQUEST => 'GET',
-    CURLOPT_HTTPHEADER => array(
-        "Authorization: Bearer $errand_key"
-    ),
-    ));
-
-    $var = curl_exec($curl);
-
-
-    curl_close($curl);
-    $var = json_decode($var);
-
-
-    $result = $var->data;
-
-
-    if($var->code == 200){
-
-    return response()->json([
-        'status' => $this->success,
-        'data' => $result
-        ], 200);
+        } catch (\Exception$th) {
+            return $th->getMessage();
+        }
 
     }
 
+    public function get_banks()
+    {
 
+        try {
 
+            $errand_key = ErrandKey::where('id', 1)->first()->errand_key ?? null;
 
+            if ($errand_key == null) {
+                $response1 = errand_api_key();
+                $update = ErrandKey::where('id', 1)
+                    ->update([
+                        'errand_key' => $response1[0],
+                    ]);
+            }
 
+            $curl = curl_init();
 
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://stagingapi.errandpay.com/epagentservice/api/v1/ApiGetBanks',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'GET',
+                CURLOPT_HTTPHEADER => array(
+                    "Authorization: Bearer $errand_key",
+                ),
+            ));
 
+            $var = curl_exec($curl);
 
-    // $code = $var->code ?? null;
+            curl_close($curl);
+            $var = json_decode($var);
 
-    //     $response1 = $var->data ?? null;
-    //     $respose2 = 'ERA 001 Please try again later';
+            $result = $var->data;
 
+            if ($var->code == 200) {
 
-    //     if($code == null){
+                return response()->json([
+                    'status' => $this->success,
+                    'data' => $result,
+                ], 200);
 
-    //         return response()->json([
-    //             'status' => $this->failed,
-    //             'data' => $erran_api_key
-    //         ], 500);
+            }
 
+            // $code = $var->code ?? null;
 
-    //     }elseif($var->code == 200){
+            //     $response1 = $var->data ?? null;
+            //     $respose2 = 'ERA 001 Please try again later';
 
-    //         return response()->json([
-    //             'status' => $this->success,
-    //             'data' => $response1
-    //         ], 200);
+            //     if($code == null){
 
-    //     }else{
-    //         return response()->json([
-    //             'status' => $this->failed,
-    //             'data' => $response2
-    //         ], 500);
-    //     }
+            //         return response()->json([
+            //             'status' => $this->failed,
+            //             'data' => $erran_api_key
+            //         ], 500);
 
+            //     }elseif($var->code == 200){
 
+            //         return response()->json([
+            //             'status' => $this->success,
+            //             'data' => $response1
+            //         ], 200);
 
+            //     }else{
+            //         return response()->json([
+            //             'status' => $this->failed,
+            //             'data' => $response2
+            //         ], 500);
+            //     }
 
+        } catch (\Exception$th) {
+            return $th->getMessage();
+        }
 
-} catch (\Exception $th) {
-    return $th->getMessage();
-}
+    }
 
-}
+    public function cash_out_webhook(Request $request)
+    {
 
+        try {
 
+            $header = $request->header('errand-pay-header');
 
+            $StatusCode = $request->StatusCode;
+            $StatusDescription = $request->StatusDescription;
+            $SerialNumber = $request->SerialNumber;
+            $Amount = $request->Amount;
+            $Currency = $request->Currency;
+            $TransactionDate = $request->TransactionDate;
+            $TransactionTime = $request->TransactionTime;
+            $TransactionType = $request->TransactionType;
+            $ServiceCode = $request->ServiceCode;
+            $Fee = $request->Fee;
+            $PostingType = $request->PostingType;
+            $TerminalID = $request->AdditionalDetails['TerminalID'];
 
+            $key = env('ERIP');
 
-public function cash_out_webhook(Request $request){
+            $trans_id = "ENK-" . random_int(100000, 999999);
+            $verify1 = hash('sha512', $key);
 
+            if ($verify1 == $header) {
 
-            try {
+                if ($StatusCode == 00) {
 
-                $header = $request->header('errand-pay-header');
-
-                $StatusCode = $request->StatusCode;
-                $StatusDescription = $request->StatusDescription;
-                $SerialNumber = $request->SerialNumber;
-                $Amount = $request->Amount;
-                $Currency = $request->Currency;
-                $TransactionDate = $request->TransactionDate;
-                $TransactionTime = $request->TransactionTime;
-                $TransactionType = $request->TransactionType;
-                $ServiceCode = $request->ServiceCode;
-                $Fee = $request->Fee;
-                $PostingType = $request->PostingType;
-                $TerminalID = $request->AdditionalDetails['TerminalID'];
-
-                $key = env('ERIP');
-
-                $trans_id = "ENK-".random_int(100000, 999999);
-                $verify1 = hash('sha512', $key);
-
-
-
-
-                if($verify1 == $header){
-
-
-
-                    if($StatusCode == 00){
-
-                        $main_wallet = User::where('serial_no', $SerialNumber)
+                    $main_wallet = User::where('serial_no', $SerialNumber)
                         ->first()->main_wallet ?? null;
 
-                        $user_id = User::where('serial_no', $SerialNumber)
+                    $user_id = User::where('serial_no', $SerialNumber)
                         ->first()->id ?? null;
 
+                    if ($main_wallet == null && $user_id == null) {
 
-                        if($main_wallet == null && $user_id == null){
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'Customer not registred on Enkpay',
+                        ], 500);
 
-                            return response()->json([
-                                'status'  => false,
-                                'message' => 'Customer not registred on Enkpay'
-                            ], 500);
+                    }
 
-                        }
-
-                        //credit
-                        $updated_amount = $main_wallet + $Amount;
-                        $main_wallet = User::where('serial_no', $SerialNumber)
+                    //credit
+                    $updated_amount = $main_wallet + $Amount;
+                    $main_wallet = User::where('serial_no', $SerialNumber)
                         ->update([
                             'main_wallet' => $updated_amount,
                         ]);
 
-                        if($TransactionType == 'CashOut'){
-
+                    if ($TransactionType == 'CashOut') {
 
                         //update Transactions
                         $trasnaction = new Transaction();
@@ -303,452 +242,386 @@ public function cash_out_webhook(Request $request){
                         $trasnaction->status = 1;
                         $trasnaction->save();
 
-                        }
-
-                        $data = array(
-                            'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
-                            'subject' => "Account Credited",
-                            'toreceiver' => 'toluadejimi@gmail.com',
-                            'amount' => $Amount,
-                            'serial' => $SerialNumber,
-                        );
-
-                        Mail::send('emails.transaction.terminal-credit', ["data1" => $data], function ($message) use ($data) {
-                            $message->from($data['fromsender']);
-                            $message->to($data['toreceiver']);
-                            $message->subject($data['subject']);
-                        });
-
-
-                        return response()->json([
-                            'status' => true,
-                            'message' => 'Tranasaction Successsfull'
-                        ], 200);
-
-
-
-
                     }
+
+                    $data = array(
+                        'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                        'subject' => "Account Credited",
+                        'toreceiver' => 'toluadejimi@gmail.com',
+                        'amount' => $Amount,
+                        'serial' => $SerialNumber,
+                    );
+
+                    Mail::send('emails.transaction.terminal-credit', ["data1" => $data], function ($message) use ($data) {
+                        $message->from($data['fromsender']);
+                        $message->to($data['toreceiver']);
+                        $message->subject($data['subject']);
+                    });
+
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Tranasaction Successsfull',
+                    ], 200);
 
                 }
 
-                    return response()->json([
-                        'status'  => false,
-                        'message' => 'Key not Authorized'
-                    ], 500);
-
-
-
-
-
-
-
-                } catch (\Exception $th) {
-                    return $th->getMessage();
             }
 
-
-
-
-}
-
-
-public function balance_webhook(Request $request){
-
-
-            try {
-
-
-
-                $IP = $_SERVER['SERVER_ADDR'];
-
-                $serial_number = $request->serial_number;
-                $amount = $request->amount;
-                $pin = $request->pin;
-                $transaction_type = $request->transaction_type;
-                $serviceCode = $request->serviceCode;
-                $reference = $request->reference;
-
-                $oip = env('ERIP');
-
-                $trans_id = "ENK-".random_int(100000, 999999);
-
-
-                $user_id = User::where('serial_no', $serial_number)
-                ->first()->id ?? null;
-
-                if($user_id == null){
-
-                    return response()->json([
-                        'status'  => false,
-                        'message' => 'Serial_no not found on our system'
-                    ], 500);
-
-                }
-
-
-                if($serviceCode == 'CO1'){
-
-
-                    $status = User::where('serial_no', $serial_number)
-                    ->first()->is_active;
-
-
-                    $balance = User::where('serial_no', $serial_number)
-                    ->first()->main_wallet;
-
-
-                    $get_pin = User::where('serial_no', $serial_number)
-                    ->first()->pin;
-
-
-                    if($status == 1){
-                        $agent_status = "Active";
-                    }else{
-                        $agent_status = "InActive";
-
-                    }
-
-
-
-                    if (Hash::check($pin, $get_pin)) {
-                        $is_pin_valid = true;
-                    }else{
-                        $is_pin_valid = false;
-                    }
-
-
-                    return response()->json([
-
-                        'is_pin_valid' => $is_pin_valid,
-                        'balance' => number_format($balance, 2),
-                        'agent_status' => $agent_status
-
-                    ]);
-
-
-                }
-
-
-                if($serviceCode == 'FT1'){
-
-
-                    $status = User::where('serial_no', $serial_number)
-                    ->first()->is_active;
-
-
-                    $balance = User::where('serial_no', $serial_number)
-                    ->first()->main_wallet;
-
-
-                    $get_pin = User::where('serial_no', $serial_number)
-                    ->first()->pin;
-
-
-                    if($status == 1){
-                        $agent_status = "Active";
-                    }else{
-                        $agent_status = "InActive";
-
-                    }
-
-
-
-                    if (Hash::check($pin, $get_pin)) {
-                        $is_pin_valid = true;
-                    }else{
-                        $is_pin_valid = false;
-                    }
-
-
-                    if($is_pin_valid == true){
-
-
-                        //update Transactions
-                        $trasnaction = new Transaction();
-                        $trasnaction->user_id = $user_id;
-                        $trasnaction->ref_trans_id = $reference;
-                        $trasnaction->transaction_type = $transaction_type;
-                        $trasnaction->debit = $amount;
-                        $trasnaction->status = 0;
-                        $trasnaction->save();
-
-
-
-                    }
-
-
-                    return response()->json([
-
-                        'is_pin_valid' => $is_pin_valid,
-                        'balance' => number_format($balance, 2),
-                        'agent_status' => $agent_status
-
-                    ]);
-
-
-                }
-
-                if($serviceCode == 'BLE1'){
-
-
-                    $status = User::where('serial_no', $serial_number)
-                    ->first()->is_active;
-
-
-                    $balance = User::where('serial_no', $serial_number)
-                    ->first()->main_wallet;
-
-
-                    $get_pin = User::where('serial_no', $serial_number)
-                    ->first()->pin;
-
-
-                    if($status == 1){
-                        $agent_status = "Active";
-                    }else{
-                        $agent_status = "InActive";
-
-                    }
-
-
-
-                    if (Hash::check($pin, $get_pin)) {
-                        $is_pin_valid = true;
-                    }else{
-                        $is_pin_valid = false;
-                    }
-
-
-                    return response()->json([
-
-                        'is_pin_valid' => $is_pin_valid,
-                        'balance' => number_format($balance, 2),
-                        'agent_status' => $agent_status
-
-                    ]);
-
-
-                }
-
-
-
-
-
-
-
-                } catch (\Exception $th) {
-                    return $th->getMessage();
-            }
-
-
-
-
-}
-
-
-
-public function transactiion_status(Request $request){
-
-    try {
-
-        $ref_no = $request->ref_no;
-        //$b_code = $request->b_code;
-
-
-
-        $curl = curl_init();
-
-        curl_setopt_array($curl, array(
-        CURLOPT_URL => "https://api.errandpay.com/epagentservice/api/v1/GetStatus?reference=$ref_no&$b_code",
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 0,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'GET',
-        CURLOPT_HTTPHEADER => array(
-
-        ),
-        ));
-
-        $var = curl_exec($curl);
-
-
-        curl_close($curl);
-        $var = json_decode($var);
-
-
-
-
-
-        //    $code = $var->code ?? null;
-
-        //     $response1 = $var->data ?? null;
-        //     $respose2 = 'ERA 001 Please try again later';
-
-
-        //     if($code == null){
-
-        //         return response()->json([
-        //             'status' => $this->failed,
-        //             'data' => $erran_api_key
-        //         ], 500);
-
-
-        //     }elseif($var->code == 200){
-
-        //         return response()->json([
-        //             'status' => $this->success,
-        //             'data' => $response1
-        //         ], 200);
-
-        //     }else{
-        //         return response()->json([
-        //             'status' => $this->failed,
-        //             'data' => $response2
-        //         ], 500);
-        //     }
-
-
-
-
-
-    } catch (\Exception $th) {
-        return $th->getMessage();
-    }
-
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-public function fund_transfer_webhook(Request $request){
-
-    try {
-
-
-                $StatusCode = $request->StatusCode;
-                $StatusDescription = $request->StatusDescription;
-                $SerialNumber = $request->SerialNumber;
-                $Amount = $request->Amount;
-                $Currency = $request->Currency;
-                $TransactionReference = $request->TransactionReference;
-                $TransactionDate = $request->TransactionDate;
-                $TransactionTime = $request->TransactionTime;
-                $TransactionType = $request->TransactionType;
-                $ServiceCode = $request->ServiceCode;
-                $Fee = $request->Fee;
-                $PostingType = $request->PostingType;
-                $DestinationAccountName = $request->AdditionalDetails['DestinationAccountName'];
-                $DestinationAccountNumber = $request->AdditionalDetails['DestinationAccountNumber'];
-                $DestinationBankName = $request->AdditionalDetails['DestinationBankName'];
-
-
-
-
-
-
-        } catch (\Exception $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Key not Authorized',
+            ], 500);
+
+        } catch (\Exception$th) {
             return $th->getMessage();
         }
 
     }
 
+    public function balance_webhook(Request $request)
+    {
 
+        try {
 
+            $IP = $_SERVER['SERVER_ADDR'];
 
-    public function wallet_check(Request $request){
+            $serial_number = $request->serial_number;
+            $amount = $request->amount;
+            $pin = $request->pin;
+            $transaction_type = $request->transaction_type;
+            $serviceCode = $request->serviceCode;
+            $reference = $request->reference;
 
+            $oip = env('ERIP');
 
+            $trans_id = "ENK-" . random_int(100000, 999999);
 
+            $user_id = User::where('serial_no', $serial_number)
+                ->first()->id ?? null;
 
-        try{
+            if ($user_id == null) {
 
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Serial_no not found on our system',
+                ], 500);
+
+            }
+
+            if ($serviceCode == 'CO1') {
+
+                $status = User::where('serial_no', $serial_number)
+                    ->first()->is_active;
+
+                $balance = User::where('serial_no', $serial_number)
+                    ->first()->main_wallet;
+
+                $get_pin = User::where('serial_no', $serial_number)
+                    ->first()->pin;
+
+                if ($status == 1) {
+                    $agent_status = "Active";
+                } else {
+                    $agent_status = "InActive";
+
+                }
+
+                if (Hash::check($pin, $get_pin)) {
+                    $is_pin_valid = true;
+                } else {
+                    $is_pin_valid = false;
+                }
+
+                return response()->json([
+
+                    'is_pin_valid' => $is_pin_valid,
+                    'balance' => number_format($balance, 2),
+                    'agent_status' => $agent_status,
+
+                ]);
+
+            }
+
+            if ($serviceCode == 'FT1') {
+
+                $status = User::where('serial_no', $serial_number)
+                    ->first()->is_active;
+
+                $balance = User::where('serial_no', $serial_number)
+                    ->first()->main_wallet;
+
+                $get_pin = User::where('serial_no', $serial_number)
+                    ->first()->pin;
+
+                if ($status == 1) {
+                    $agent_status = "Active";
+                } else {
+                    $agent_status = "InActive";
+
+                }
+
+                if (Hash::check($pin, $get_pin)) {
+                    $is_pin_valid = true;
+                } else {
+                    $is_pin_valid = false;
+                }
+
+                if ($is_pin_valid == true) {
+
+                    //update Transactions
+                    $trasnaction = new Transaction();
+                    $trasnaction->user_id = $user_id;
+                    $trasnaction->ref_trans_id = $reference;
+                    $trasnaction->transaction_type = $transaction_type;
+                    $trasnaction->debit = $amount;
+                    $trasnaction->status = 0;
+                    $trasnaction->save();
+
+                }
+
+                return response()->json([
+
+                    'is_pin_valid' => $is_pin_valid,
+                    'balance' => number_format($balance, 2),
+                    'agent_status' => $agent_status,
+
+                ]);
+
+            }
+
+            if ($serviceCode == 'BLE1') {
+
+                $status = User::where('serial_no', $serial_number)
+                    ->first()->is_active;
+
+                $balance = User::where('serial_no', $serial_number)
+                    ->first()->main_wallet;
+
+                $get_pin = User::where('serial_no', $serial_number)
+                    ->first()->pin;
+
+                if ($status == 1) {
+                    $agent_status = "Active";
+                } else {
+                    $agent_status = "InActive";
+
+                }
+
+                if (Hash::check($pin, $get_pin)) {
+                    $is_pin_valid = true;
+                } else {
+                    $is_pin_valid = false;
+                }
+
+                return response()->json([
+
+                    'is_pin_valid' => $is_pin_valid,
+                    'balance' => number_format($balance, 2),
+                    'agent_status' => $agent_status,
+
+                ]);
+
+            }
+
+        } catch (\Exception$th) {
+            return $th->getMessage();
+        }
+
+    }
+
+    public function transactiion_status(Request $request)
+    {
+
+        try {
+
+            $ref_no = $request->ref_no;
+            //$b_code = $request->b_code;
+
+            $curl = curl_init();
+
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => "https://api.errandpay.com/epagentservice/api/v1/GetStatus?reference=$ref_no&$b_code",
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'GET',
+                CURLOPT_HTTPHEADER => array(
+
+                ),
+            ));
+
+            $var = curl_exec($curl);
+
+            curl_close($curl);
+            $var = json_decode($var);
+
+            //    $code = $var->code ?? null;
+
+            //     $response1 = $var->data ?? null;
+            //     $respose2 = 'ERA 001 Please try again later';
+
+            //     if($code == null){
+
+            //         return response()->json([
+            //             'status' => $this->failed,
+            //             'data' => $erran_api_key
+            //         ], 500);
+
+            //     }elseif($var->code == 200){
+
+            //         return response()->json([
+            //             'status' => $this->success,
+            //             'data' => $response1
+            //         ], 200);
+
+            //     }else{
+            //         return response()->json([
+            //             'status' => $this->failed,
+            //             'data' => $response2
+            //         ], 500);
+            //     }
+
+        } catch (\Exception$th) {
+            return $th->getMessage();
+        }
+
+    }
+
+    public function fund_transfer_webhook(Request $request)
+    {
+
+        try {
+
+            $StatusCode = $request->StatusCode;
+            $StatusDescription = $request->StatusDescription;
+            $SerialNumber = $request->SerialNumber;
+            $Amount = $request->Amount;
+            $Currency = $request->Currency;
+            $TransactionReference = $request->TransactionReference;
+            $TransactionDate = $request->TransactionDate;
+            $TransactionTime = $request->TransactionTime;
+            $TransactionType = $request->TransactionType;
+            $ServiceCode = $request->ServiceCode;
+            $Fee = $request->Fee;
+            $PostingType = $request->PostingType;
+            $DestinationAccountName = $request->AdditionalDetails['DestinationAccountName'];
+            $DestinationAccountNumber = $request->AdditionalDetails['DestinationAccountNumber'];
+            $DestinationBankName = $request->AdditionalDetails['DestinationBankName'];
+
+        } catch (\Exception$th) {
+            return $th->getMessage();
+        }
+
+    }
+
+    public function wallet_check(Request $request)
+    {
+
+        try {
 
             $serial_number = $request->serial_number;
             $pin = $request->pin;
             $transaction_type = "inward";
 
-
-
             $status = User::where('serial_no', $serial_number)
-            ->first()->is_active;
-
+                ->first()->is_active;
 
             $balance = User::where('serial_no', $serial_number)
-            ->first()->main_wallet;
-
+                ->first()->main_wallet;
 
             $get_pin = User::where('serial_no', $serial_number)
-            ->first()->pin;
+                ->first()->pin;
 
-
-            if($status == 1){
+            if ($status == 1) {
                 $agent_status = "Active";
-            }else{
+            } else {
                 $agent_status = "InActive";
 
             }
 
-
-
             if (Hash::check($pin, $get_pin)) {
                 $is_pin_valid = true;
-            }else{
+            } else {
                 $is_pin_valid = false;
             }
-
 
             return response()->json([
 
                 'status' => true,
                 'is_pin_valid' => $is_pin_valid,
                 'balance' => number_format($balance, 2),
-                'agent_status' => $agent_status
+                'agent_status' => $agent_status,
 
             ]);
 
-
-
-
-
-
-
-
-        } catch (\Exception $th) {
+        } catch (\Exception$th) {
             return $th->getMessage();
         }
 
-
-
-
-
     }
 
+    public function pool_account()
+    {
 
+        try {
 
+            $api = errand_api_key();
+
+            $curl = curl_init();
+
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiGetBalance',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'GET',
+                CURLOPT_HTTPHEADER => array(
+                    'Accept: application/json',
+                    'Content-Type: application/json',
+                    'epKey: ep_live_jFrIZdxqSzAdraLqbvhUfVYs',
+                    "Authorization: Bearer $api",
+                ),
+            ));
+
+            $var = curl_exec($curl);
+
+            curl_close($curl);
+
+            $var = json_decode($var);
+
+            $code = $var->code ?? null;
+
+            if($code == null){
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => "Network Issue, Please try again later",
+
+                ]);
+
+            }
+
+            if($var->code == 200){
+
+                return response()->json([
+
+                    'status' => true,
+                    'balance' => number_format($var->data->balance, 2),
+                    'account_number' => $var->data->accountNumber,
+
+                ]);
+            }
+
+        } catch (\Exception$th) {
+            return $th->getMessage();
+        }
+    }
 
 }
-
-
-
-
-
-
