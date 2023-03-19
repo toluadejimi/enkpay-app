@@ -34,7 +34,15 @@ public function user_info(request $request){
 
 
     try{
+
+        $GetToken = $request->header('Authorization');
+
+        $string = $GetToken;
+        $toBeRemoved = "Bearer ";
+        $token = str_replace($toBeRemoved, "", $string);
+
         $user = Auth::user();
+        $user['token']=$token;
 
         return response()->json([
             'status' => $this->success,
