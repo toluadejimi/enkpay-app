@@ -66,20 +66,20 @@ public function phone_login(Request $request){
             ], 500);
         }
 
-
-
+        $feature = Feature::select('name', 'status')->get();
 
         $token = auth()->user()->createToken('API Token')->accessToken;
 
 
         $user = Auth()->user();
-        $user['feature']=$features;
         $user['token']=$token;
 
 
         return response()->json([
             'status' => $this->success,
             'data' => $user,
+            'user' => $feature
+
 
         ],200);
 
@@ -121,14 +121,13 @@ public function email_login(Request $request){
             ], 500);
         }
 
-        $features = Feature::select('name', 'status')->get();
+        $feature = Feature::select('name', 'status')->get();
 
 
 
         $token = auth()->user()->createToken('API Token')->accessToken;
 
         $user = Auth()->user();
-        $user['feature']=$features;
         $user['token']=$token;
 
 
@@ -137,7 +136,8 @@ public function email_login(Request $request){
 
         return response()->json([
             'status' => $this->success,
-            'data' => $user
+            'data' => $user,
+            'user' => $feature
 
         ],200);
 
