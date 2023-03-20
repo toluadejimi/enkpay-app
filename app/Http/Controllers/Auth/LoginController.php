@@ -78,7 +78,7 @@ public function phone_login(Request $request){
         return response()->json([
             'status' => $this->success,
             'data' => $user,
-            'user' => $feature
+            'permission' => $feature
 
 
         ],200);
@@ -137,7 +137,7 @@ public function email_login(Request $request){
         return response()->json([
             'status' => $this->success,
             'data' => $user,
-            'user' => $feature
+            'permission' => $feature
 
         ],200);
 

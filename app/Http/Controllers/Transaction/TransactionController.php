@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\ErrandKey;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Models\Charge;
+
+use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Mail;
@@ -16,37 +19,144 @@ class TransactionController extends Controller
     public $success = true;
     public $failed = false;
 
-    public function cash_out(Request $request)
+
+
+
+
+    public function transfer_charges(){
+
+
+        try{
+
+
+
+            $transfer_charge = Charge::where('title', 'transfer_fee')
+            ->first()->amount;
+
+            return response()->json([
+                'status' => $this->success,
+                'data' => $transfer_charge,
+            ], 200);
+
+
+
+
+
+
+        }catch (\Exception$th) {
+            return $th->getMessage();
+        }
+
+
+
+
+    }
+
+    public function bank_transfer(Request $request)
     {
 
         try {
             $erran_api_key = errand_api_key();
 
-            $beneficiaryName = $request->beneficiaryName;
-            $bankName = $request->bankName;
-            $bankCode = $request->bankCode;
-            $beneficiaryAccount = $request->beneficiaryAccount;
+            $wallet = $request->wallet;
             $amount = $request->amount;
-            $institutionCode = $request->institutionCode;
+            $destinationAccountNumber = $request->account_number;
+            $destinationBankCode = $request->code;
+            $destinationAccountName = $request->customer_name;
+            $longitude = $request->longitude;
+            $latitude = $request->latitude;
+            $get_description = $request->narration;
+            $pin = $request->pin;
+
+
+
             $referenceCode = "ENK-" . random_int(1000000, 999999999);
+
+
+
+            $description = $get_description ?? "Fund for $destinationAccountName";
+
+
+
+            if ($wallet == 'main_account') {
+                $user_wallet_banlance = main_account();
+            } else {
+                $user_wallet_banlance = bonus_account();
+            }
+
+
+
+            $user_pin = Auth()->user()->pin;
+
+            if (Hash::check($pin, $user_pin) == false) {
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'Invalid Pin, Please try again',
+
+                ], 500);
+            }
+
+            if ($amount < 100) {
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'Amount must not be less than NGN 100',
+
+                ], 500);
+            }
+
+            if ($amount > $user_wallet_banlance) {
+
+                if (!empty(user_email())) {
+
+                    $data = array(
+                        'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                        'subject' => "Low Balance",
+                        'toreceiver' => user_email(),
+                        'first_name' => first_name(),
+                        'amount' => $amount,
+                        'balance' => $user_wallet_banlance,
+
+                    );
+
+                    Mail::send('emails.notify.lowbalalce', ["data1" => $data], function ($message) use ($data) {
+                        $message->from($data['fromsender']);
+                        $message->to($data['toreceiver']);
+                        $message->subject($data['subject']);
+                    });
+                }
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'Insufficient Funds, Fund your wallet',
+
+                ], 500);
+
+            }
+
+
 
             $curl = curl_init();
             $data = array(
 
-                "beneficiaryName" => $beneficiaryName,
-                "bankName" => $bankName,
-                "bankCode" => $bankCode,
-                "beneficiaryAccount" => $beneficiaryAccount,
-                "amount" => $beneficiaryAccount,
-                "referenceCode" => $referenceCode,
-                "institutionCode" => $institutionCode,
+                "amount" => $amount,
+                "destinationAccountNumber"=>$destinationAccountNumber,
+                "destinationBankCode" => $destinationBankCode,
+                "destinationAccountName" => $destinationAccountName,
+                "longitude" => $longitude,
+                "latitude" => $latitude,
+                "description" => $description
 
             );
 
             $post_data = json_encode($data);
 
             curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://stagingapi.errandpay.com/epagentservice/api/v1/PayBeneficiary',
+                CURLOPT_URL => 'https://stagingapi.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
@@ -62,34 +172,16 @@ class TransactionController extends Controller
             ));
 
             $var = curl_exec($curl);
+
+            dd($var);
+
             curl_close($curl);
+
             $var = json_decode($var);
 
-            $response1 = $var->data ?? null;
-            $respose2 = 'ERA 001 Please try again later';
+            dd($var);
 
-            if ($var->code == 200) {
 
-                return response()->json([
-                    'status' => $this->success,
-                    'data' => $response1,
-                ], 200);
-
-            }
-
-            return response()->json([
-                'status' => $this->failed,
-                'data' => $response2,
-            ], 500);
-
-            $main_account = main_account();
-
-            if ($main_account < $amount) {
-                return response()->json([
-                    'status' => $this->failed,
-                    'message' => 'Insufficent Funds',
-                ], 500);
-            }
 
         } catch (\Exception$th) {
             return $th->getMessage();
@@ -175,6 +267,77 @@ class TransactionController extends Controller
         }
 
     }
+
+
+    public function resolve_bank(request $request){
+
+        try{
+
+            $bank_code = $request->bank_code;
+            $account_number = $request->account_number;
+            //$bvn = $request->bvn;
+
+
+
+            $databody = array(
+
+                'accountNumber' => $account_number,
+                'institutionCode' => $bank_code,
+                'channel' => "Bank",
+
+            );
+
+            $body = json_encode($databody);
+            $curl = curl_init();
+
+                curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://stagingapi.errandpay.com/epagentservice/api/v1/AccountNameVerification',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $body,
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/json',
+                ),
+                ));
+
+                $var = curl_exec($curl);
+                curl_close($curl);
+                $var = json_decode($var);
+
+
+                $customer_name = $var->data->name ?? null;
+                $error = $var->error->message ?? null;
+
+
+                if($var->code == 200){
+
+                    return response()->json([
+                        'status' => $this->success,
+                        'customer_name' => $customer_name,
+
+                    ],200);
+
+                }
+
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => $error,
+
+                ],500);
+
+
+        } catch (\Exception $th) {
+            return $th->getMessage();
+        }
+
+    }
+
+
 
     public function cash_out_webhook(Request $request)
     {
@@ -597,7 +760,7 @@ class TransactionController extends Controller
 
             $code = $var->code ?? null;
 
-            if($code == null){
+            if ($code == null) {
 
                 return response()->json([
 
@@ -608,7 +771,7 @@ class TransactionController extends Controller
 
             }
 
-            if($var->code == 200){
+            if ($var->code == 200) {
 
                 return response()->json([
 
@@ -622,6 +785,27 @@ class TransactionController extends Controller
         } catch (\Exception$th) {
             return $th->getMessage();
         }
+    }
+
+    public function get_all_transactions(Request $request)
+    {
+
+        try {
+
+            $all_transactions = Transaction::where('user_id', Auth::id())
+                ->get();
+
+            return response()->json([
+
+                'status' => $this->success,
+                'data' => $all_transactions,
+
+            ]);
+
+        } catch (\Exception$th) {
+            return $th->getMessage();
+        }
+
     }
 
 }

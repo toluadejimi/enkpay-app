@@ -80,6 +80,11 @@ Route::post('get-lga', [RegisterationController::class, 'get_lga']);
 //Get Eletric Compnay
 Route::get('electric-company', [PowerController::class, 'get_eletric_company']);
 
+//Charges
+Route::get('transfer-charges', [TransactionController::class, 'transfer_charges']);
+
+
+
 
 
 
@@ -102,6 +107,8 @@ Route::group(['middleware' => ['auth:api','acess']], function(){
 
     //Trasnaction
     Route::post('cash-out', [TransactionController::class, 'cash_out']);
+    Route::post('resolve-bank', [TransactionController::class, 'resolve_bank']);
+
     Route::get('get-banks', [TransactionController::class, 'get_banks']);
 
 
@@ -116,6 +123,17 @@ Route::group(['middleware' => ['auth:api','acess']], function(){
 
     //Power
     Route::post('verify-account', [PowerController::class, 'verify_account']);
+
+
+    //Get all Transactions
+    Route::get('all-transaction', [TransactionController::class, 'get_all_transactions']);
+
+
+    //Bank Transfer
+    Route::post('bank-transfer', [TransactionController::class, 'bank_transfer']);
+
+
+
 
 
 
