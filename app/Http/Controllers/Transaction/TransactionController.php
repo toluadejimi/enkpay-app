@@ -288,7 +288,6 @@ class TransactionController extends Controller
                 curl_close($curl);
                 $var = json_decode($var);
 
-                dd($var, $databody);
 
 
                 $customer_name = $var->data->name ?? null;
