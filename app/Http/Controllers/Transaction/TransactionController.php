@@ -12,8 +12,6 @@ use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Mail;
-use GuzzleHttp\Client as GuzzleClient;
-
 
 class TransactionController extends Controller
 {
@@ -191,233 +189,62 @@ class TransactionController extends Controller
 
     }
 
-    public function get_banks(Request $request)
+    public function get_banks()
     {
 
         try {
 
-
-
-
-
             $account = select_account();
 
-            $headers = [
-                'Accept' => 'application/json',
-                'Content-Type' => 'application/json',
-                'Authorization' => 'Bearer FLWSECK-043cf4e9dd848683c6b157c234ba2fb8-X',
-            ];
-            $client = new GuzzleClient([
-                'headers' => $headers,
-            ]);
+            $errand_key = ErrandKey::where('id', 1)->first()->errand_key ?? null;
 
-            $body = '{
-            }';
+            if ($errand_key == null) {
+                $response1 = errand_api_key();
+                $update = ErrandKey::where('id', 1)
+                    ->update([
+                        'errand_key' => $response1[0],
+                    ]);
+            }
 
-            $response = $client->request('GET', 'https://api.flutterwave.com/v3/banks/NG', [
-                'body' => $body,
-            ]);
+            $curl = curl_init();
 
-            $body = $response->getBody();
-            $var = json_decode($body);
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiGetBanks',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'GET',
+                CURLOPT_HTTPHEADER => array(
+                    "Authorization: Bearer $errand_key",
+                ),
+            ));
 
+            $var = curl_exec($curl);
 
-            if($var->status == true){
+            curl_close($curl);
+            $var = json_decode($var);
+
+            $result = $var->data;
+
+            if ($var->code == 200) {
 
                 return response()->json([
-
                     'account' => $account,
-                    'banks' => $var->data,
-
-                    ], 200);
-
-                }
-
-                 return response()->json([
-
-                    'status' => $this->failedStatus,
-                    'message' => 'please try again later',
-
-                    ], 500);
-
-        } catch (\Exception$th) {
-             return $th->getMessage();
-        }
-
-
-            // $errand_key = ErrandKey::where('id', 1)->first()->errand_key ?? null;
-
-            // if ($errand_key == null) {
-            //     $response1 = errand_api_key();
-            //     $update = ErrandKey::where('id', 1)
-            //         ->update([
-            //             'errand_key' => $response1[0],
-            //         ]);
-            // }
-
-            // $curl = curl_init();
-
-            // curl_setopt_array($curl, array(
-            //     CURLOPT_URL => 'https://stagingapi.errandpay.com/epagentservice/api/v1/ApiGetBanks',
-            //     CURLOPT_RETURNTRANSFER => true,
-            //     CURLOPT_ENCODING => '',
-            //     CURLOPT_MAXREDIRS => 10,
-            //     CURLOPT_TIMEOUT => 0,
-            //     CURLOPT_FOLLOWLOCATION => true,
-            //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            //     CURLOPT_CUSTOMREQUEST => 'GET',
-            //     CURLOPT_HTTPHEADER => array(
-            //         "Authorization: Bearer $errand_key",
-            //     ),
-            // ));
-
-            // $var = curl_exec($curl);
-
-            // curl_close($curl);
-            // $var = json_decode($var);
-
-            // $result = $var->data;
-
-            // if ($var->code == 200) {
-
-                // return response()->json([
-                //     'status' => $this->success,
-                //     'data' => $result,
-                // ], 200);
-
-           // }
-
-            // $code = $var->code ?? null;
-
-            //     $response1 = $var->data ?? null;
-            //     $respose2 = 'ERA 001 Please try again later';
-
-            //     if($code == null){
-
-            //         return response()->json([
-            //             'status' => $this->failed,
-            //             'data' => $erran_api_key
-            //         ], 500);
-
-            //     }elseif($var->code == 200){
-
-            //         return response()->json([
-            //             'status' => $this->success,
-            //             'data' => $response1
-            //         ], 200);
-
-            //     }else{
-            //         return response()->json([
-            //             'status' => $this->failed,
-            //             'data' => $response2
-            //         ], 500);
-            //     }
-
-
-
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-    public function get_list_of_banks(){
-
-
-        try{
-
-
-
-
-
-
-
-        }catch( \Exception $e ){
-
-            return $e->getMessage();
-
-        }
-
-    }
-
-
-
-    public function account_verification(Request $request){
-
-        $account_number = $request->account_number;
-        $bank_code = $request->bank_code;
-
-        try{
-
-             $headers = [
-            'Accept' => 'application/json',
-            'Content-Type' => 'application/json',
-            'Authorization' => 'Bearer FLWSECK-043cf4e9dd848683c6b157c234ba2fb8-X',
-            ];
-
-            $client = new GuzzleClient([
-                'headers' => $headers,
-            ]);
-
-
-            $response = $client->request('POST', 'https://api.flutterwave.com/v3/accounts/resolve',
-            [
-                  'body' => json_encode([
-                       "account_number" => $account_number,
-                        "account_bank" => $bank_code,
-            ]),
-
-            ]);
-
-            $body = $response->getBody();
-            $result = json_decode($body);
-
-
-
-            $acc_name = $result->data->account_name ?? null;
-
-
-            if ($result->status == 'success') {
-
-
-                 return response()->json([
-
-                'status' => $this->successStatus,
-                'acc_name' => $acc_name,
-
+                    'data' => $var->data,
                 ], 200);
 
             }
 
-            if($result->status == 'error'){
 
 
-             return response()->json([
-
-                'status' => $this->failedStatus,
-                'message' => 'Check account number or bank for errors',
-
-                ], 500);
-
-            }
-
-        }catch( \Exception $e){
-
-            return $e->getMessage();
-
-
+        } catch (\Exception$th) {
+            return $th->getMessage();
         }
 
     }
-
-
 
 
     public function resolve_bank(request $request){
@@ -747,6 +574,7 @@ class TransactionController extends Controller
                     $agent_status = "InActive";
 
                 }
+
 
                 return response()->json([
 
