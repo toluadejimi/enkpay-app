@@ -192,6 +192,7 @@ class TransactionController extends Controller
     public function get_banks()
     {
 
+
         try {
 
             $account = select_account();
@@ -233,7 +234,7 @@ class TransactionController extends Controller
 
                 return response()->json([
                     'account' => $account,
-                    'data' => $var->data,
+                    'banks' => $var->data,
                 ], 200);
 
             }
@@ -269,7 +270,7 @@ class TransactionController extends Controller
             $curl = curl_init();
 
                 curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://stagingapi.errandpay.com/epagentservice/api/v1/AccountNameVerification',
+                CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/AccountNameVerification',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
@@ -286,6 +287,8 @@ class TransactionController extends Controller
                 $var = curl_exec($curl);
                 curl_close($curl);
                 $var = json_decode($var);
+
+                dd($var, $databody);
 
 
                 $customer_name = $var->data->name ?? null;
