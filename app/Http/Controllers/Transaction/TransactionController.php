@@ -579,7 +579,7 @@ class TransactionController extends Controller
 
             }
 
-            if ($serviceCode == 'CO1') {
+            if ($transaction_type == 'inward') {
 
                 $status = User::where('serial_no', $serial_number)
                     ->first()->is_active;
@@ -597,15 +597,9 @@ class TransactionController extends Controller
 
                 }
 
-                if (Hash::check($pin, $get_pin)) {
-                    $is_pin_valid = true;
-                } else {
-                    $is_pin_valid = false;
-                }
-
                 return response()->json([
 
-                    'is_pin_valid' => $is_pin_valid,
+                    'is_pin_valid' => true,
                     'balance' => number_format($balance, 2),
                     'agent_status' => $agent_status,
 
