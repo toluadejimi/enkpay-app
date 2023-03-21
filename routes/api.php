@@ -122,6 +122,11 @@ Route::group(['middleware' => ['auth:api','acess']], function(){
 
 
 
+    //Pin Verify
+    Route::post('verify-pin', [TransactionController::class, 'verify_pin']);
+
+
+
     Route::get('get-banks', [TransactionController::class, 'get_banks']);
 
 

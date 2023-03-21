@@ -364,11 +364,44 @@ class TransactionController extends Controller
         return $th->getMessage();
     }
 
-
-
-
     }
 
+
+
+
+
+    public function verify_pin(request $request){
+
+
+        try{
+
+            $pin = $request->pin;
+
+            $get_pin = User::where('id', Auth::id())
+            ->first()->pin;
+
+
+            if (Hash::check($pin, $get_pin)) {
+                return response()->json([
+                    'status' => $this->success,
+                    'data' => "Pin Verified",
+                ], 200);
+
+            } else {
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => "Invalid Pin pleas try again"
+                ], 500);
+            }
+
+
+
+
+        } catch (\Exception$th) {
+            return $th->getMessage();
+        }
+
+        }
 
 
     public function cash_out_webhook(Request $request)
