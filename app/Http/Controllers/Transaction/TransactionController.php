@@ -191,11 +191,16 @@ class TransactionController extends Controller
 
     }
 
-    public function get_banks()
+    public function get_banks(Request $request)
     {
 
         try {
 
+
+
+
+
+            $account = select_account();
 
             $headers = [
                 'Accept' => 'application/json',
@@ -221,8 +226,8 @@ class TransactionController extends Controller
 
                 return response()->json([
 
-                    'status' => $this->success,
-                    'banks' => $var,
+                    'account' => $account,
+                    'banks' => $var->data,
 
                     ], 200);
 

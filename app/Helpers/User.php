@@ -75,3 +75,31 @@ if(!function_exists('last_name')){
     }
 
 }
+
+
+if(!function_exists('select_account')){
+
+    function select_account(){
+
+        $account = User::where('id', Auth::id())->first();
+
+        // dd($account->main_wallet);
+        $account_array = array();
+        $account_array[0] =  [
+            "title"=>"Main Account",
+            "amount"=> $account->main_wallet,
+            "key" => "main_account"
+
+        ];
+        $account_array[1] =  [
+            "title"=>"Bonus Account",
+            "amount"=> $account->bonus_wallet,
+            "key" => "bonus_account"
+        ];
+
+        return  $account_array ;
+    }
+
+
+
+}
