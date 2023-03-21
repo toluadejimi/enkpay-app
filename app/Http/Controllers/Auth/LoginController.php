@@ -66,7 +66,7 @@ public function phone_login(Request $request){
             ], 500);
         }
 
-        $feature = Feature::select('name', 'status')->get();
+        $feature = Feature::where('id', 1)->first();
 
         $token = auth()->user()->createToken('API Token')->accessToken;
 
@@ -121,7 +121,7 @@ public function email_login(Request $request){
             ], 500);
         }
 
-        $feature = Feature::select('name', 'status')->get();
+        $feature = Feature::where('id', 1)->first();
 
 
 
