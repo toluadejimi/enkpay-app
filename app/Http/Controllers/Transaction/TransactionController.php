@@ -319,6 +319,58 @@ class TransactionController extends Controller
 
 
 
+
+
+
+    public function resolve_enkpay_account(request $request){
+
+
+    try{
+
+        $phone = $request->phone;
+
+        $get_phone = User::where('phone', $phone)->first()->phone ?? null ;
+        $customer_f_name = User::where('phone', $phone)->first()->first_name ?? null;
+        $customer_l_name = User::where('phone', $phone)->first()->last_name ?? null;
+        $customer_name = $customer_f_name ?? null. " ".$customer_l_name ?? null;
+
+
+        if($get_phone == null){
+
+            return response()->json([
+                'status' => $this->failed,
+                'message' => "Customer not registred on Enkpay"
+            ], 500);
+
+        }
+
+        if($phone == $get_phone){
+
+            return response()->json([
+                'status' => $this->failed,
+                'message' => "You can not send money to yourself"
+            ], 500);
+
+        }
+
+        return response()->json([
+            'status' => $this->success,
+            'customer_name' => $customer_name,
+        ], 200);
+
+
+
+    } catch (\Exception$th) {
+        return $th->getMessage();
+    }
+
+
+
+
+    }
+
+
+
     public function cash_out_webhook(Request $request)
     {
 
