@@ -44,8 +44,6 @@ if(!function_exists('main_account')){
 
         $var = json_decode($var);
 
-        dd($var);
-
 
 
         $response1 = $var->data->accessToken ?? null;

@@ -58,6 +58,11 @@ class TransactionController extends Controller
         try {
             $erran_api_key = errand_api_key();
 
+
+            $epkey = env('EPKEY');
+
+
+
             $wallet = $request->wallet;
             $amount = $request->amount;
             $destinationAccountNumber = $request->account_number;
@@ -140,6 +145,32 @@ class TransactionController extends Controller
 
 
 
+            //Debit
+            $debit = $user_wallet_banlance - $amount;
+
+            if ($wallet == 'main_account') {
+
+                $update = User::where('id', Auth::id())
+                ->update([
+                    'main_wallet' => $debit
+                ]);
+
+
+            } else {
+
+                $update = User::where('id', Auth::id())
+                ->update([
+                    'bonus_wallet' => $debit
+                ]);
+            }
+
+
+
+
+            dd($user_wallet_banlance);
+
+
+
             $curl = curl_init();
             $data = array(
 
@@ -156,7 +187,7 @@ class TransactionController extends Controller
             $post_data = json_encode($data);
 
             curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://stagingapi.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
+                CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
@@ -167,19 +198,52 @@ class TransactionController extends Controller
                 CURLOPT_POSTFIELDS => $post_data,
                 CURLOPT_HTTPHEADER => array(
                     "Authorization: Bearer $erran_api_key",
+                    "EpKey: $epkey",
                     'Content-Type: application/json',
                 ),
             ));
 
             $var = curl_exec($curl);
 
-            dd($var);
 
             curl_close($curl);
 
             $var = json_decode($var);
 
+
             dd($var);
+
+            $message = $var->error->message ?? null;
+
+
+
+            if($var->code == 400){
+
+                $data = array(
+                    'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                    'subject' => "Low Balance",
+                    'toreceiver' => "toluadejimi@gmail.com",
+                    'message' => $message,
+
+                );
+
+                Mail::send('emails.notify.error', ["data1" => $data], function ($message) use ($data) {
+                    $message->from($data['fromsender']);
+                    $message->to($data['toreceiver']);
+                    $message->subject($data['subject']);
+                });
+            }
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'Service not reachable, please try again later',
+
+                ], 500);
+
+
+
+
 
 
 
@@ -390,7 +454,7 @@ class TransactionController extends Controller
             } else {
                 return response()->json([
                     'status' => $this->failed,
-                    'message' => "Invalid Pin pleas try again"
+                    'message' => "Invalid pin please try again"
                 ], 500);
             }
 
@@ -402,6 +466,9 @@ class TransactionController extends Controller
         }
 
         }
+
+
+
 
 
     public function cash_out_webhook(Request $request)
