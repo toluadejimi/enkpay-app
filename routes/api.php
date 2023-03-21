@@ -54,6 +54,7 @@ Route::post('lga-pickup', [DeviceOrderController::class, 'lga_pick_up_location']
 
 //webhooks
 Route::post('v1/cash-out-webhook', [TransactionController::class, 'cash_out_webhook']);
+Route::post('v1/cash-in', [TransactionController::class, 'cash_in_webhook']);
 Route::post('v1/wallet-check', [TransactionController::class, 'balance_webhook']);
 Route::post('v1/transfer-request', [TransactionController::class, 'transfer_request']);
 
@@ -82,6 +83,11 @@ Route::get('electric-company', [PowerController::class, 'get_eletric_company']);
 
 //Charges
 Route::get('transfer-charges', [TransactionController::class, 'transfer_charges']);
+
+//Get Token
+Route::get('get-token', [TransactionController::class, 'get_token']);
+
+
 
 
 
