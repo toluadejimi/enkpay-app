@@ -157,13 +157,9 @@ class VirtualaccountController extends Controller
             $Fee = $request->Fee;
             $PostingType = $request->PostingType;
             $TransactionReference = $request->TransactionReference;
-            $sender_account_no = $request -> originatorAccountNumber;
-            $sender_name = $request -> originatorAccountName;
-            $sender_bank = $request -> originatorBank;
-
-
-
-
+            $sender_account_no = $request->originatorAccountNumber;
+            $sender_name = $request->originatorAccountName;
+            $sender_bank = $request->originatorBank;
 
 
             $key = env('ERIP');
