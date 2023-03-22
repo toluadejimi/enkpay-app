@@ -9,7 +9,6 @@ use App\Models\Transaction;
 use App\Models\User;
 use Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Mail;
 
@@ -19,14 +18,12 @@ class TransactionController extends Controller
     public $success = true;
     public $failed = false;
 
-
-
     public function bank_transfer(Request $request)
     {
 
         try {
 
-           $erran_api_key = errand_api_key();
+            $erran_api_key = errand_api_key();
 
             $epkey = env('EPKEY');
 
@@ -43,8 +40,9 @@ class TransactionController extends Controller
             $referenceCode = "ENK-" . random_int(1000000, 999999999);
 
             $transfer_charges = Charge::where('id', 1)->first()->amount;
-            $user_email = user_email();
 
+            $user_email = user_email();
+            $first_name = first_name();
 
             $description = $get_description ?? "Fund for $destinationAccountName";
 
@@ -106,8 +104,6 @@ class TransactionController extends Controller
 
             }
 
-
-
             //Debit
             $debit = $user_wallet_banlance - $amount;
 
@@ -164,8 +160,6 @@ class TransactionController extends Controller
 
             $var = json_decode($var);
 
-
-
             $message = $var->error->message ?? null;
 
             $trans_id = "ENK-" . random_int(100000, 999999);
@@ -193,7 +187,7 @@ class TransactionController extends Controller
                 $trasnaction->status = 0;
                 $trasnaction->save();
 
-                if($user_email !== null){
+                if ($user_email !== null) {
 
                     $data = array(
                         'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
@@ -210,21 +204,35 @@ class TransactionController extends Controller
                     });
                 }
 
-
-
                 return response()->json([
 
                     'status' => $this->success,
                     'reference' => $TransactionReference,
-                    'message' => "Transaction Processing"
+                    'message' => "Transaction Processing",
 
                 ], 200);
 
-            }
+            } else {
 
+                //credit
+                $credit = $user_wallet_banlance + $amount;
 
+                if ($wallet == 'main_account') {
 
-            if ($var->code == 400) {
+                    $update = User::where('id', Auth::id())
+                        ->update([
+                            'main_wallet' => $credit,
+                        ]);
+
+                }
+
+                if ($wallet == 'bonus_account') {
+
+                    $update = User::where('id', Auth::id())
+                        ->update([
+                            'bonus_wallet' => $credit,
+                        ]);
+                }
 
                 $data = array(
                     'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
@@ -239,17 +247,15 @@ class TransactionController extends Controller
                     $message->to($data['toreceiver']);
                     $message->subject($data['subject']);
                 });
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'Service not reachable, please try again later',
+
+                ], 500);
+
             }
-
-
-
-
-            return response()->json([
-
-                'status' => $this->failed,
-                'message' => 'Service not reachable, please try again later',
-
-            ], 500);
 
         } catch (\Exception$th) {
             return $th->getMessage();
@@ -266,11 +272,8 @@ class TransactionController extends Controller
 
             $errand_key = ErrandKey::where('id', 1)->first()->errand_key ?? null;
 
-
             $transfer_charge = Charge::where('title', 'transfer_fee')
-            ->first()->amount;
-
-
+                ->first()->amount;
 
             if ($errand_key == null) {
                 $response1 = errand_api_key();
@@ -306,7 +309,7 @@ class TransactionController extends Controller
             if ($var->code == 200) {
 
                 return response()->json([
-                    
+
                     'account' => $account,
                     'transfer_charge' => $transfer_charge,
                     'banks' => $var->data,
