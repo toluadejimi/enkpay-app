@@ -157,9 +157,18 @@ class VirtualaccountController extends Controller
             $Fee = $request->Fee;
             $PostingType = $request->PostingType;
             $TransactionReference = $request->TransactionReference;
+            $sender_account_no = $request -> originatorAccountNumber;
+            $sender_name = $request -> originatorAccountName;
+            $sender_bank = $request -> originatorBank;
+
+
+
+
 
 
             $key = env('ERIP');
+
+            $deposit_charges = Charge::where('id', 2)->first()->amount;
 
             $trans_id = "ENK-" . random_int(100000, 999999);
             $verify1 = hash('sha512', $key);
@@ -205,7 +214,8 @@ class VirtualaccountController extends Controller
                 }
 
                     //credit
-                    $updated_amount = $main_wallet + $Amount;
+                    $enkpay_debit = $Amount - $deposit_charges;
+                    $updated_amount = $main_wallet + $enkpay_debit;
                     $main_wallet = User::where('v_account_no', $VirtualCustomerAccount)
                         ->update([
                             'main_wallet' => $updated_amount,
@@ -219,9 +229,15 @@ class VirtualaccountController extends Controller
                         $trasnaction->ref_trans_id = $trans_id;
                         $trasnaction->e_ref = $TransactionReference;
                         $trasnaction->transaction_type = $TransactionType;
-                        $trasnaction->credit = $Amount;
+                        $trasnaction->credit = $enkpay_debit;
                         $trasnaction->note = "Credit received from Transfer";
                         $trasnaction->fee = $Fee;
+                        $trasnaction->e_charges = $deposit_charges;
+                        $trasnaction->trx_date = $TransactionDate;
+                        $trasnaction->trx_time = $TransactionTime;
+                        $trasnaction->sender_name = $sender_name;
+                        $trasnaction->sender_bank = $sender_bank;
+                        $trasnaction->sender_account_no = $sender_account_no;
                         $trasnaction->balance = $updated_amount;
                         $trasnaction->status = 1;
                         $trasnaction->save();
