@@ -10,6 +10,9 @@ use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\VAS\AirtimeController;
 use App\Http\Controllers\VAS\DataController;
 use App\Http\Controllers\VAS\PowerController;
+use App\Http\Controllers\Virtual\VirtualaccountController;
+
+
 
 
 
@@ -54,7 +57,7 @@ Route::post('lga-pickup', [DeviceOrderController::class, 'lga_pick_up_location']
 
 //webhooks
 Route::post('v1/cash-out-webhook', [TransactionController::class, 'cash_out_webhook']);
-Route::post('v1/cash-in', [TransactionController::class, 'cash_in_webhook']);
+Route::post('v1/cash-in', [VirtualaccountController::class, 'cash_in_webhook']);
 Route::post('v1/wallet-check', [TransactionController::class, 'balance_webhook']);
 Route::post('v1/transfer-request', [TransactionController::class, 'transfer_request']);
 
@@ -87,6 +90,12 @@ Route::get('transfer-charges', [TransactionController::class, 'transfer_charges'
 //Get Token
 Route::get('get-token', [TransactionController::class, 'get_token']);
 
+//Get All virtual acount
+Route::get('all-virtual-account', [VirtualaccountController::class, 'get_created_account']);
+
+
+
+
 
 
 
@@ -108,10 +117,6 @@ Route::group(['middleware' => ['auth:api','acess']], function(){
     Route::post('update-kyc', [ProfileController::class, 'update_user']);
     Route::post('verify-info', [ProfileController::class, 'verify_info']);
     Route::post('update-account-info', [ProfileController::class, 'update_account_info']);
-
-
-
-
 
 
 
@@ -150,6 +155,9 @@ Route::group(['middleware' => ['auth:api','acess']], function(){
     //Bank Transfer
     Route::post('bank-transfer', [TransactionController::class, 'bank_transfer']);
 
+
+    //Virtual Acccount
+    Route::post('create-account', [VirtualaccountController::class, 'create_account']);
 
 
 

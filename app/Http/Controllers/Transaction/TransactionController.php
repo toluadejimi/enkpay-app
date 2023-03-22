@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Transaction;
 
 use App\Http\Controllers\Controller;
+use App\Models\Charge;
 use App\Models\ErrandKey;
 use App\Models\Transaction;
 use App\Models\User;
-use App\Models\Charge;
-
 use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Mail;
 
@@ -19,36 +19,22 @@ class TransactionController extends Controller
     public $success = true;
     public $failed = false;
 
+    public function transfer_charges()
+    {
 
-
-
-
-    public function transfer_charges(){
-
-
-        try{
-
-
+        try {
 
             $transfer_charge = Charge::where('title', 'transfer_fee')
-            ->first()->amount;
+                ->first()->amount;
 
             return response()->json([
                 'status' => $this->success,
                 'data' => $transfer_charge,
             ], 200);
 
-
-
-
-
-
-        }catch (\Exception$th) {
+        } catch (\Exception$th) {
             return $th->getMessage();
         }
-
-
-
 
     }
 
@@ -56,118 +42,104 @@ class TransactionController extends Controller
     {
 
         try {
-            $erran_api_key = errand_api_key();
-
-
-            $epkey = env('EPKEY');
 
 
 
-            $wallet = $request->wallet;
-            $amount = $request->amount;
-            $destinationAccountNumber = $request->account_number;
-            $destinationBankCode = $request->code;
-            $destinationAccountName = $request->customer_name;
-            $longitude = $request->longitude;
-            $latitude = $request->latitude;
-            $get_description = $request->narration;
-            $pin = $request->pin;
 
+                $erran_api_key = errand_api_key();
 
+                $epkey = env('EPKEY');
 
-            $referenceCode = "ENK-" . random_int(1000000, 999999999);
+                $wallet = $request->wallet;
+                $amount = $request->amount;
+                $destinationAccountNumber = $request->account_number;
+                $destinationBankCode = $request->code;
+                $destinationAccountName = $request->customer_name;
+                $longitude = $request->longitude;
+                $latitude = $request->latitude;
+                $get_description = $request->narration;
+                $pin = $request->pin;
 
+                $referenceCode = "ENK-" . random_int(1000000, 999999999);
 
+                $description = $get_description ?? "Fund for $destinationAccountName";
 
-            $description = $get_description ?? "Fund for $destinationAccountName";
-
-
-
-            if ($wallet == 'main_account') {
-                $user_wallet_banlance = main_account();
-            } else {
-                $user_wallet_banlance = bonus_account();
-            }
-
-
-
-            $user_pin = Auth()->user()->pin;
-
-            if (Hash::check($pin, $user_pin) == false) {
-
-                return response()->json([
-
-                    'status' => $this->failed,
-                    'message' => 'Invalid Pin, Please try again',
-
-                ], 500);
-            }
-
-            if ($amount < 100) {
-
-                return response()->json([
-
-                    'status' => $this->failed,
-                    'message' => 'Amount must not be less than NGN 100',
-
-                ], 500);
-            }
-
-            if ($amount > $user_wallet_banlance) {
-
-                if (!empty(user_email())) {
-
-                    $data = array(
-                        'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
-                        'subject' => "Low Balance",
-                        'toreceiver' => user_email(),
-                        'first_name' => first_name(),
-                        'amount' => $amount,
-                        'balance' => $user_wallet_banlance,
-
-                    );
-
-                    Mail::send('emails.notify.lowbalalce', ["data1" => $data], function ($message) use ($data) {
-                        $message->from($data['fromsender']);
-                        $message->to($data['toreceiver']);
-                        $message->subject($data['subject']);
-                    });
+                if ($wallet == 'main_account') {
+                    $user_wallet_banlance = main_account();
+                } else {
+                    $user_wallet_banlance = bonus_account();
                 }
 
-                return response()->json([
+                $user_pin = Auth()->user()->pin;
 
-                    'status' => $this->failed,
-                    'message' => 'Insufficient Funds, Fund your wallet',
+                if (Hash::check($pin, $user_pin) == false) {
 
-                ], 500);
+                    return response()->json([
 
-            }
+                        'status' => $this->failed,
+                        'message' => 'Invalid Pin, Please try again',
 
+                    ], 500);
+                }
 
+                if ($amount < 100) {
 
-            //Debit
-            $debit = $user_wallet_banlance - $amount;
+                    return response()->json([
 
-            if ($wallet == 'main_account') {
+                        'status' => $this->failed,
+                        'message' => 'Amount must not be less than NGN 100',
 
-                $update = User::where('id', Auth::id())
-                ->update([
-                    'main_wallet' => $debit
-                ]);
+                    ], 500);
+                }
 
+                if ($amount > $user_wallet_banlance) {
 
-            } else {
+                    if (!empty(user_email())) {
 
-                $update = User::where('id', Auth::id())
-                ->update([
-                    'bonus_wallet' => $debit
-                ]);
-            }
+                        $data = array(
+                            'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                            'subject' => "Low Balance",
+                            'toreceiver' => user_email(),
+                            'first_name' => first_name(),
+                            'amount' => $amount,
+                            'balance' => $user_wallet_banlance,
 
+                        );
 
+                        Mail::send('emails.notify.lowbalalce', ["data1" => $data], function ($message) use ($data) {
+                            $message->from($data['fromsender']);
+                            $message->to($data['toreceiver']);
+                            $message->subject($data['subject']);
+                        });
+                    }
 
+                    return response()->json([
 
-            dd($user_wallet_banlance);
+                        'status' => $this->failed,
+                        'message' => 'Insufficient Funds, Fund your wallet',
+
+                    ], 500);
+
+                }
+
+                DB::beginTransaction();
+                //Debit
+                $debit = $user_wallet_banlance - $amount;
+
+                if ($wallet == 'main_account') {
+
+                    $update = User::where('id', Auth::id())
+                        ->update([
+                            'main_wallet' => $debit,
+                        ]);
+
+                } else {
+
+                    $update = User::where('id', Auth::id())
+                        ->update([
+                            'bonus_wallet' => $debit,
+                        ]);
+                }
 
 
 
@@ -175,12 +147,12 @@ class TransactionController extends Controller
             $data = array(
 
                 "amount" => $amount,
-                "destinationAccountNumber"=>$destinationAccountNumber,
+                "destinationAccountNumber" => $destinationAccountNumber,
                 "destinationBankCode" => $destinationBankCode,
                 "destinationAccountName" => $destinationAccountName,
                 "longitude" => $longitude,
                 "latitude" => $latitude,
-                "description" => $description
+                "description" => $description,
 
             );
 
@@ -205,19 +177,13 @@ class TransactionController extends Controller
 
             $var = curl_exec($curl);
 
-
             curl_close($curl);
 
             $var = json_decode($var);
 
-
-            dd($var);
-
             $message = $var->error->message ?? null;
 
-
-
-            if($var->code == 400){
+            if ($var->code == 400) {
 
                 $data = array(
                     'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
@@ -234,18 +200,14 @@ class TransactionController extends Controller
                 });
             }
 
-                return response()->json([
+            DB::rollBack();
 
-                    'status' => $this->failed,
-                    'message' => 'Service not reachable, please try again later',
+            return response()->json([
 
-                ], 500);
+                'status' => $this->failed,
+                'message' => 'Service not reachable, please try again later',
 
-
-
-
-
-
+            ], 500);
 
         } catch (\Exception$th) {
             return $th->getMessage();
@@ -253,9 +215,14 @@ class TransactionController extends Controller
 
     }
 
+
+
+
+
+
+
     public function get_banks()
     {
-
 
         try {
 
@@ -303,24 +270,20 @@ class TransactionController extends Controller
 
             }
 
-
-
         } catch (\Exception$th) {
             return $th->getMessage();
         }
 
     }
 
+    public function resolve_bank(request $request)
+    {
 
-    public function resolve_bank(request $request){
-
-        try{
+        try {
 
             $bank_code = $request->bank_code;
             $account_number = $request->account_number;
             //$bvn = $request->bvn;
-
-
 
             $databody = array(
 
@@ -333,7 +296,7 @@ class TransactionController extends Controller
             $body = json_encode($databody);
             $curl = curl_init();
 
-                curl_setopt_array($curl, array(
+            curl_setopt_array($curl, array(
                 CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/AccountNameVerification',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
@@ -346,104 +309,87 @@ class TransactionController extends Controller
                 CURLOPT_HTTPHEADER => array(
                     'Content-Type: application/json',
                 ),
-                ));
+            ));
 
-                $var = curl_exec($curl);
-                curl_close($curl);
-                $var = json_decode($var);
+            $var = curl_exec($curl);
+            curl_close($curl);
+            $var = json_decode($var);
 
+            $customer_name = $var->data->name ?? null;
+            $error = $var->error->message ?? null;
 
-
-                $customer_name = $var->data->name ?? null;
-                $error = $var->error->message ?? null;
-
-
-                if($var->code == 200){
-
-                    return response()->json([
-                        'status' => $this->success,
-                        'customer_name' => $customer_name,
-
-                    ],200);
-
-                }
+            if ($var->code == 200) {
 
                 return response()->json([
-                    'status' => $this->failed,
-                    'message' => $error,
+                    'status' => $this->success,
+                    'customer_name' => $customer_name,
 
-                ],500);
+                ], 200);
 
+            }
 
-        } catch (\Exception $th) {
+            return response()->json([
+                'status' => $this->failed,
+                'message' => $error,
+
+            ], 500);
+
+        } catch (\Exception$th) {
             return $th->getMessage();
         }
 
     }
 
+    public function resolve_enkpay_account(request $request)
+    {
 
+        try {
 
+            $phone = $request->phone;
 
+            $get_phone = User::where('phone', $phone)->first()->phone ?? null;
+            $customer_f_name = User::where('phone', $phone)->first()->first_name ?? null;
+            $customer_l_name = User::where('phone', $phone)->first()->last_name ?? null;
+            $customer_name = $customer_f_name ?? null . " " . $customer_l_name ?? null;
 
+            if ($get_phone == null) {
 
-    public function resolve_enkpay_account(request $request){
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => "Customer not registred on Enkpay",
+                ], 500);
 
+            }
 
-    try{
+            if ($phone == $get_phone) {
 
-        $phone = $request->phone;
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => "You can not send money to yourself",
+                ], 500);
 
-        $get_phone = User::where('phone', $phone)->first()->phone ?? null ;
-        $customer_f_name = User::where('phone', $phone)->first()->first_name ?? null;
-        $customer_l_name = User::where('phone', $phone)->first()->last_name ?? null;
-        $customer_name = $customer_f_name ?? null. " ".$customer_l_name ?? null;
-
-
-        if($get_phone == null){
+            }
 
             return response()->json([
-                'status' => $this->failed,
-                'message' => "Customer not registred on Enkpay"
-            ], 500);
+                'status' => $this->success,
+                'customer_name' => $customer_name,
+            ], 200);
 
+        } catch (\Exception$th) {
+            return $th->getMessage();
         }
-
-        if($phone == $get_phone){
-
-            return response()->json([
-                'status' => $this->failed,
-                'message' => "You can not send money to yourself"
-            ], 500);
-
-        }
-
-        return response()->json([
-            'status' => $this->success,
-            'customer_name' => $customer_name,
-        ], 200);
-
-
-
-    } catch (\Exception$th) {
-        return $th->getMessage();
-    }
 
     }
 
+    public function verify_pin(request $request)
+    {
 
-
-
-
-    public function verify_pin(request $request){
-
-
-        try{
+        try {
 
             $pin = $request->pin;
 
             $get_pin = User::where('id', Auth::id())
-            ->first()->pin;
-
+                ->first()->pin;
 
             if (Hash::check($pin, $get_pin)) {
                 return response()->json([
@@ -454,22 +400,15 @@ class TransactionController extends Controller
             } else {
                 return response()->json([
                     'status' => $this->failed,
-                    'message' => "Invalid pin please try again"
+                    'message' => "Invalid pin please try again",
                 ], 500);
             }
-
-
-
 
         } catch (\Exception$th) {
             return $th->getMessage();
         }
 
-        }
-
-
-
-
+    }
 
     public function cash_out_webhook(Request $request)
     {
@@ -576,110 +515,7 @@ class TransactionController extends Controller
 
     }
 
-    public function cash_in_webhook(Request $request)
-    {
-
-        try {
-
-
-
-            $header = $request->header('errand-pay-header');
-
-            $StatusCode = $request->StatusCode;
-            $StatusDescription = $request->StatusDescription;
-            $VirtualCustomerAccount = $request->VirtualCustomerAccount;
-            $Amount = $request->Amount;
-            $Currency = $request->Currency;
-            $TransactionDate = $request->TransactionDate;
-            $TransactionTime = $request->TransactionTime;
-            $TransactionType = $request->TransactionType;
-            $ServiceCode = $request->ServiceCode;
-            $Fee = $request->Fee;
-            $PostingType = $request->PostingType;
-            $TransactionReference = $request->TransactionReference;
-
-            $key = env('ERIP');
-
-            $trans_id = "ENK-" . random_int(100000, 999999);
-            $verify1 = hash('sha512', $key);
-
-            if ($verify1 == $header) {
-
-                if ($StatusCode == 00) {
-
-                    $main_wallet = User::where('v_account_no', $VirtualCustomerAccount)
-                        ->first()->main_wallet ?? null;
-
-                    $user_id = User::where('v_account_no', $VirtualCustomerAccount)
-                        ->first()->id ?? null;
-
-                    if ($main_wallet == null && $user_id == null) {
-
-                        return response()->json([
-                            'status' => false,
-                            'message' => 'V Account not registred on Enkpay',
-                        ], 500);
-
-                    }
-
-                    //credit
-                    $updated_amount = $main_wallet + $Amount;
-                    $main_wallet = User::where('v_account_no', $VirtualCustomerAccount)
-                        ->update([
-                            'main_wallet' => $updated_amount,
-                        ]);
-
-                    if ($TransactionType == 'FundWallet') {
-
-                        //update Transactions
-                        $trasnaction = new Transaction();
-                        $trasnaction->user_id = $user_id;
-                        $trasnaction->ref_trans_id = $trans_id;
-                        $trasnaction->e_ref = $TransactionReference;
-                        $trasnaction->transaction_type = $TransactionType;
-                        $trasnaction->credit = $Amount;
-                        $trasnaction->note = "Credit received from Transfer";
-                        $trasnaction->fee = $Fee;
-                        $trasnaction->balance = $updated_amount;
-                        $trasnaction->status = 1;
-                        $trasnaction->save();
-
-                    }
-
-                    $data = array(
-                        'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
-                        'subject' => "Virtual Account Credited",
-                        'toreceiver' => 'toluadejimi@gmail.com',
-                        'amount' => $Amount,
-                        'serial' => $user_id,
-                    );
-
-                    Mail::send('emails.transaction.terminal-credit', ["data1" => $data], function ($message) use ($data) {
-                        $message->from($data['fromsender']);
-                        $message->to($data['toreceiver']);
-                        $message->subject($data['subject']);
-                    });
-
-                    return response()->json([
-                        'status' => true,
-                        'message' => 'Tranasaction Successsfull',
-                    ], 200);
-
-                }
-
-            }
-
-            return response()->json([
-                'status' => false,
-                'message' => 'Key not Authorized',
-            ], 500);
-
-        } catch (\Exception$th) {
-            return $th->getMessage();
-        }
-
-    }
-
+    
 
     public function balance_webhook(Request $request)
     {
@@ -728,7 +564,6 @@ class TransactionController extends Controller
                     $agent_status = "InActive";
 
                 }
-
 
                 return response()->json([
 
@@ -833,7 +668,6 @@ class TransactionController extends Controller
         try {
 
             $ref_no = $request->ref_no;
-            //$b_code = $request->b_code;
 
             $curl = curl_init();
 
@@ -856,31 +690,6 @@ class TransactionController extends Controller
             curl_close($curl);
             $var = json_decode($var);
 
-            //    $code = $var->code ?? null;
-
-            //     $response1 = $var->data ?? null;
-            //     $respose2 = 'ERA 001 Please try again later';
-
-            //     if($code == null){
-
-            //         return response()->json([
-            //             'status' => $this->failed,
-            //             'data' => $erran_api_key
-            //         ], 500);
-
-            //     }elseif($var->code == 200){
-
-            //         return response()->json([
-            //             'status' => $this->success,
-            //             'data' => $response1
-            //         ], 200);
-
-            //     }else{
-            //         return response()->json([
-            //             'status' => $this->failed,
-            //             'data' => $response2
-            //         ], 500);
-            //     }
 
         } catch (\Exception$th) {
             return $th->getMessage();
@@ -1022,6 +831,9 @@ class TransactionController extends Controller
         }
     }
 
+
+
+
     public function get_all_transactions(Request $request)
     {
 
@@ -1035,15 +847,13 @@ class TransactionController extends Controller
                 'status' => $this->success,
                 'data' => $all_transactions,
 
-            ]);
+            ], 200);
 
         } catch (\Exception$th) {
             return $th->getMessage();
         }
 
     }
-
-
 
     public function get_token(Request $request)
     {
@@ -1064,28 +874,5 @@ class TransactionController extends Controller
         }
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

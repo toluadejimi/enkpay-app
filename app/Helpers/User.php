@@ -57,6 +57,15 @@ if(!function_exists('user_phone')){
 
 }
 
+if(!function_exists('user_bvn')){
+
+    function user_bvn(){
+        $user = Auth::user();
+        return $user->identification_number;
+    }
+
+}
+
 
 if(!function_exists('first_name')){
 
@@ -72,6 +81,16 @@ if(!function_exists('last_name')){
     function last_name(){
         $user = Auth::user();
         return $user->last_name;
+    }
+
+}
+
+
+if(!function_exists('user_status')){
+
+    function user_status(){
+        $user = Auth::user();
+        return $user->status;
     }
 
 }
