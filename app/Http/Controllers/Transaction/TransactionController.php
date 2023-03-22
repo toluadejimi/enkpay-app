@@ -19,129 +19,112 @@ class TransactionController extends Controller
     public $success = true;
     public $failed = false;
 
-    public function transfer_charges()
-    {
 
-        try {
-
-            $transfer_charge = Charge::where('title', 'transfer_fee')
-                ->first()->amount;
-
-            return response()->json([
-                'status' => $this->success,
-                'data' => $transfer_charge,
-            ], 200);
-
-        } catch (\Exception$th) {
-            return $th->getMessage();
-        }
-
-    }
 
     public function bank_transfer(Request $request)
     {
 
         try {
 
+           $erran_api_key = errand_api_key();
+
+            $epkey = env('EPKEY');
+
+            $wallet = $request->wallet;
+            $amount = $request->amount;
+            $destinationAccountNumber = $request->account_number;
+            $destinationBankCode = $request->code;
+            $destinationAccountName = $request->customer_name;
+            $longitude = $request->longitude;
+            $latitude = $request->latitude;
+            $get_description = $request->narration;
+            $pin = $request->pin;
+
+            $referenceCode = "ENK-" . random_int(1000000, 999999999);
+
+            $transfer_charges = Charge::where('id', 1)->first()->amount;
+            $user_email = user_email();
 
 
+            $description = $get_description ?? "Fund for $destinationAccountName";
 
-                $erran_api_key = errand_api_key();
+            if ($wallet == 'main_account') {
+                $user_wallet_banlance = main_account();
+            } else {
+                $user_wallet_banlance = bonus_account();
+            }
 
-                $epkey = env('EPKEY');
+            $user_pin = Auth()->user()->pin;
 
-                $wallet = $request->wallet;
-                $amount = $request->amount;
-                $destinationAccountNumber = $request->account_number;
-                $destinationBankCode = $request->code;
-                $destinationAccountName = $request->customer_name;
-                $longitude = $request->longitude;
-                $latitude = $request->latitude;
-                $get_description = $request->narration;
-                $pin = $request->pin;
+            if (Hash::check($pin, $user_pin) == false) {
 
-                $referenceCode = "ENK-" . random_int(1000000, 999999999);
+                return response()->json([
 
-                $description = $get_description ?? "Fund for $destinationAccountName";
+                    'status' => $this->failed,
+                    'message' => 'Invalid Pin, Please try again',
 
-                if ($wallet == 'main_account') {
-                    $user_wallet_banlance = main_account();
-                } else {
-                    $user_wallet_banlance = bonus_account();
+                ], 500);
+            }
+
+            if ($amount < 100) {
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'Amount must not be less than NGN 100',
+
+                ], 500);
+            }
+
+            if ($amount > $user_wallet_banlance) {
+
+                if (!empty(user_email())) {
+
+                    $data = array(
+                        'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                        'subject' => "Low Balance",
+                        'toreceiver' => user_email(),
+                        'first_name' => first_name(),
+                        'amount' => $amount,
+                        'balance' => $user_wallet_banlance,
+
+                    );
+
+                    Mail::send('emails.notify.lowbalalce', ["data1" => $data], function ($message) use ($data) {
+                        $message->from($data['fromsender']);
+                        $message->to($data['toreceiver']);
+                        $message->subject($data['subject']);
+                    });
                 }
 
-                $user_pin = Auth()->user()->pin;
+                return response()->json([
 
-                if (Hash::check($pin, $user_pin) == false) {
+                    'status' => $this->failed,
+                    'message' => 'Insufficient Funds, Fund your wallet',
 
-                    return response()->json([
+                ], 500);
 
-                        'status' => $this->failed,
-                        'message' => 'Invalid Pin, Please try again',
-
-                    ], 500);
-                }
-
-                if ($amount < 100) {
-
-                    return response()->json([
-
-                        'status' => $this->failed,
-                        'message' => 'Amount must not be less than NGN 100',
-
-                    ], 500);
-                }
-
-                if ($amount > $user_wallet_banlance) {
-
-                    if (!empty(user_email())) {
-
-                        $data = array(
-                            'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
-                            'subject' => "Low Balance",
-                            'toreceiver' => user_email(),
-                            'first_name' => first_name(),
-                            'amount' => $amount,
-                            'balance' => $user_wallet_banlance,
-
-                        );
-
-                        Mail::send('emails.notify.lowbalalce', ["data1" => $data], function ($message) use ($data) {
-                            $message->from($data['fromsender']);
-                            $message->to($data['toreceiver']);
-                            $message->subject($data['subject']);
-                        });
-                    }
-
-                    return response()->json([
-
-                        'status' => $this->failed,
-                        'message' => 'Insufficient Funds, Fund your wallet',
-
-                    ], 500);
-
-                }
-
-                DB::beginTransaction();
-                //Debit
-                $debit = $user_wallet_banlance - $amount;
-
-                if ($wallet == 'main_account') {
-
-                    $update = User::where('id', Auth::id())
-                        ->update([
-                            'main_wallet' => $debit,
-                        ]);
-
-                } else {
-
-                    $update = User::where('id', Auth::id())
-                        ->update([
-                            'bonus_wallet' => $debit,
-                        ]);
-                }
+            }
 
 
+
+            //Debit
+            $debit = $user_wallet_banlance - $amount;
+
+            if ($wallet == 'main_account') {
+
+                $update = User::where('id', Auth::id())
+                    ->update([
+                        'main_wallet' => $debit,
+                    ]);
+
+            } else {
+
+                $update = User::where('id', Auth::id())
+                    ->update([
+                        'bonus_wallet' => $debit,
+                    ]);
+            }
 
             $curl = curl_init();
             $data = array(
@@ -181,13 +164,71 @@ class TransactionController extends Controller
 
             $var = json_decode($var);
 
+
+
             $message = $var->error->message ?? null;
+
+            $trans_id = "ENK-" . random_int(100000, 999999);
+
+            $TransactionReference = $var->reference ?? null;
+
+
+            if ($var->code == 200) {
+
+                //update Transactions
+                $trasnaction = new Transaction();
+                $trasnaction->user_id = Auth::id();
+                $trasnaction->ref_trans_id = $trans_id;
+                $trasnaction->e_ref = $TransactionReference;
+                $trasnaction->transaction_type = "BankTransfer";
+                $trasnaction->debit = $amount;
+                $trasnaction->note = "Bank Transfer to other banks";
+                $trasnaction->fee = 0;
+                $trasnaction->e_charges = $transfer_charges;
+                $trasnaction->trx_date = date("Y/m/d");
+                $trasnaction->trx_time = date("h:i:s");
+                $trasnaction->receiver_name = $destinationAccountName;
+                $trasnaction->reveiver_account_no = $destinationAccountNumber;
+                $trasnaction->balance = $debit;
+                $trasnaction->status = 0;
+                $trasnaction->save();
+
+                if($user_email !== null){
+
+                    $data = array(
+                        'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                        'subject' => "Bank Transfer",
+                        'toreceiver' => $user_email,
+                        'amount' => $amount,
+                        'first_name' => $first_name,
+                    );
+
+                    Mail::send('emails.transaction.banktransfer', ["data1" => $data], function ($message) use ($data) {
+                        $message->from($data['fromsender']);
+                        $message->to($data['toreceiver']);
+                        $message->subject($data['subject']);
+                    });
+                }
+
+
+
+                return response()->json([
+
+                    'status' => $this->success,
+                    'reference' => $TransactionReference,
+                    'message' => "Transaction Processing"
+
+                ], 200);
+
+            }
+
+
 
             if ($var->code == 400) {
 
                 $data = array(
                     'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
-                    'subject' => "Low Balance",
+                    'subject' => "Error From Transfer",
                     'toreceiver' => "toluadejimi@gmail.com",
                     'message' => $message,
 
@@ -200,7 +241,8 @@ class TransactionController extends Controller
                 });
             }
 
-            DB::rollBack();
+
+
 
             return response()->json([
 
@@ -215,13 +257,7 @@ class TransactionController extends Controller
 
     }
 
-
-
-
-
-
-
-    public function get_banks()
+    public function transfer_properties()
     {
 
         try {
@@ -229,6 +265,12 @@ class TransactionController extends Controller
             $account = select_account();
 
             $errand_key = ErrandKey::where('id', 1)->first()->errand_key ?? null;
+
+
+            $transfer_charge = Charge::where('title', 'transfer_fee')
+            ->first()->amount;
+
+
 
             if ($errand_key == null) {
                 $response1 = errand_api_key();
@@ -264,8 +306,11 @@ class TransactionController extends Controller
             if ($var->code == 200) {
 
                 return response()->json([
+                    
                     'account' => $account,
+                    'transfer_charge' => $transfer_charge,
                     'banks' => $var->data,
+
                 ], 200);
 
             }
@@ -515,8 +560,6 @@ class TransactionController extends Controller
 
     }
 
-    
-
     public function balance_webhook(Request $request)
     {
 
@@ -690,7 +733,6 @@ class TransactionController extends Controller
             curl_close($curl);
             $var = json_decode($var);
 
-
         } catch (\Exception$th) {
             return $th->getMessage();
         }
@@ -830,9 +872,6 @@ class TransactionController extends Controller
             return $th->getMessage();
         }
     }
-
-
-
 
     public function get_all_transactions(Request $request)
     {

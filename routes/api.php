@@ -132,7 +132,7 @@ Route::group(['middleware' => ['auth:api','acess']], function(){
 
 
 
-    Route::get('get-banks', [TransactionController::class, 'get_banks']);
+    Route::get('transfer-properties', [TransactionController::class, 'transfer_properties']);
 
 
 
