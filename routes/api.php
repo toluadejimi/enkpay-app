@@ -107,6 +107,8 @@ Route::get('account-history', [VirtualaccountController::class, 'virtual_acct_hi
 
 
 
+
+
 //Login
 Route::post('phone-login', [LoginController::class, 'phone_login']);
 Route::post('email-login', [LoginController::class, 'email_login']);
@@ -127,6 +129,9 @@ Route::group(['middleware' => ['auth:api','acess']], function(){
     Route::post('cash-out', [TransactionController::class, 'cash_out']);
     Route::post('resolve-bank', [TransactionController::class, 'resolve_bank']);
     Route::post('resolve-enkpay-account', [TransactionController::class, 'resolve_enkpay_account']);
+    Route::post('enkpay-transfer', [TransactionController::class, 'enkpay_transfer']);
+
+
 
 
 

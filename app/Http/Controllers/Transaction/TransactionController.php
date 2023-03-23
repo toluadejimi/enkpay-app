@@ -98,7 +98,7 @@ class TransactionController extends Controller
                 return response()->json([
 
                     'status' => $this->failed,
-                    'message' => 'Insufficient Funds, Fund your wallet',
+                    'message' => 'Insufficient Funds, fund your account',
 
                 ], 500);
 
@@ -165,7 +165,6 @@ class TransactionController extends Controller
             $trans_id = "ENK-" . random_int(100000, 999999);
 
             $TransactionReference = $var->reference ?? null;
-
 
             if ($var->code == 200) {
 
@@ -395,21 +394,24 @@ class TransactionController extends Controller
 
             $phone = $request->phone;
 
-            $get_phone = User::where('id', Auth::id())->first()->phone ?? null;
+            $get_phone = User::where('phone', $phone)->first()->phone ?? null;
+            $check_user = User::where('id', Auth::id())->first()->phone ?? null;
             $customer_f_name = User::where('phone', $phone)->first()->first_name ?? null;
             $customer_l_name = User::where('phone', $phone)->first()->last_name ?? null;
-            $customer_name = $customer_f_name. " " .$customer_l_name;
+            $customer_name = $customer_f_name . " " . $customer_l_name;
+
+
+
+
 
             if ($get_phone == null) {
-
                 return response()->json([
                     'status' => $this->failed,
                     'message' => "Customer not registred on Enkpay",
                 ], 500);
-
             }
 
-            if ($phone == $get_phone) {
+            if ($phone == $check_user) {
 
                 return response()->json([
                     'status' => $this->failed,
@@ -418,10 +420,225 @@ class TransactionController extends Controller
 
             }
 
+
+
             return response()->json([
                 'status' => $this->success,
                 'customer_name' => $customer_name,
             ], 200);
+
+
+
+        } catch (\Exception$th) {
+            return $th->getMessage();
+        }
+
+    }
+
+    public function enkpay_transfer(request $request)
+    {
+
+        try {
+
+            $phone = $request->phone;
+            $amount = $request->amount;
+            $wallet = $request->wallet;
+            $pin = $request->pin;
+
+            //receiver info
+            $receiver_main_wallet = User::where('phone', $phone)->first()->main_wallet ?? null;
+            $receiver_bonus_wallet = User::where('phone', $phone)->first()->bonus_wallet ?? null;
+            $receiver_id = User::where('phone', $phone)->first()->id ?? null;
+            $receiver_email = User::where('phone', $phone)->first()->email ?? null;
+            $receiver_f_name = User::where('phone', $phone)->first()->first_name ?? null;
+            $receiver_l_name = User::where('phone', $phone)->first()->first_name ?? null;
+            $receiver_full_name = $receiver_f_name . " " . $receiver_l_name;
+
+            //sender info
+            $sender_f_name = first_name() ?? null;
+            $sender_l_name = last_name() ?? null;
+            $sender_full_name = $sender_f_name . " " . $sender_l_name;
+
+            $trans_id = "ENK-" . random_int(100000, 999999);
+
+            //check
+
+            //Debit Transaction
+
+            if ($wallet == 'main_account') {
+                $sender_balance = main_account();
+            } else {
+                $sender_balance = bonus_account();
+            }
+
+            $user_pin = Auth()->user()->pin;
+
+            if (Hash::check($pin, $user_pin) == false) {
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'Invalid Pin, Please try again',
+
+                ], 500);
+            }
+
+            if ($amount < 100) {
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'Amount must not be less than NGN 100',
+
+                ], 500);
+            }
+
+            if ($amount > $sender_balance) {
+
+                if (!empty(user_email())) {
+
+                    $data = array(
+                        'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                        'subject' => "Low Balance",
+                        'toreceiver' => user_email(),
+                        'first_name' => first_name(),
+                        'amount' => $amount,
+                        'balance' => $sender_balance,
+
+                    );
+
+                    Mail::send('emails.notify.lowbalalce', ["data1" => $data], function ($message) use ($data) {
+                        $message->from($data['fromsender']);
+                        $message->to($data['toreceiver']);
+                        $message->subject($data['subject']);
+                    });
+                }
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'Insufficient Funds, fund your account',
+
+                ], 500);
+
+            }
+
+            //Debit Sender
+
+            $debit = $sender_balance - $amount;
+
+            if ($wallet == 'main_account') {
+
+                $update = User::where('id', Auth::id())
+                    ->update([
+                        'main_wallet' => $debit,
+                    ]);
+
+            } else {
+
+                $update = User::where('id', Auth::id())
+                    ->update([
+                        'bonus_wallet' => $debit,
+                    ]);
+            }
+
+            //save debit for sender
+            $trasnaction = new Transaction();
+            $trasnaction->user_id = Auth::id();
+            $trasnaction->from_user_id = Auth::id();
+            $trasnaction->to_user_id = $receiver_id;
+            $trasnaction->ref_trans_id = $trans_id;
+            $trasnaction->transaction_type = "EnkPayTransfer";
+            $trasnaction->debit = $amount;
+            $trasnaction->note = "Bank Transfer to Enk Pay User";
+            $trasnaction->fee = 0;
+            $trasnaction->e_charges = 0;
+            $trasnaction->trx_date = date("Y/m/d");
+            $trasnaction->trx_time = date("h:i:s");
+            $trasnaction->receiver_name = $receiver_full_name;
+            $trasnaction->reveiver_account_no = $phone;
+            $trasnaction->balance = $debit;
+            $trasnaction->status = 1;
+            $trasnaction->save();
+
+
+            //credit receiver
+
+            $credit = $receiver_main_wallet + $amount;
+
+            $update = User::where('phone', $phone)
+                ->update([
+                    'main_wallet' => $credit,
+                ]);
+
+            //save credit for receiver
+            $trasnaction = new Transaction();
+            $trasnaction->user_id = $receiver_id;
+            $trasnaction->from_user_id = Auth::id();
+            $trasnaction->to_user_id = $receiver_id;
+            $trasnaction->ref_trans_id = $trans_id;
+            $trasnaction->transaction_type = "EnkPayTransfer";
+            $trasnaction->credit = $amount;
+            $trasnaction->note = "Bank Transfer to Enk Pay User";
+            $trasnaction->fee = 0;
+            $trasnaction->e_charges = 0;
+            $trasnaction->trx_date = date("Y/m/d");
+            $trasnaction->trx_time = date("h:i:s");
+            $trasnaction->sender_name = $sender_full_name;
+            $trasnaction->sender_account_no = user_phone();
+            $trasnaction->balance = $credit;
+            $trasnaction->status = 1;
+            $trasnaction->save();
+
+
+            //sender email
+
+            if (!empty(user_email())) {
+
+                $data = array(
+                    'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                    'subject' => "Debit Notification",
+                    'toreceiver' => user_email(),
+                    'first_name' => first_name(),
+                    'amount' => $amount,
+
+                );
+
+                Mail::send('emails.transaction.sender', ["data1" => $data], function ($message) use ($data) {
+                    $message->from($data['fromsender']);
+                    $message->to($data['toreceiver']);
+                    $message->subject($data['subject']);
+                });
+
+            }
+
+
+            //receiver email
+
+            if (!empty($receiver_email)) {
+
+                $data = array(
+                    'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                    'subject' => "Credit Notification",
+                    'toreceiver' => $receiver_email,
+                    'first_name' => $receiver_f_name,
+                    'amount' => $amount,
+
+                );
+
+                Mail::send('emails.transaction.receiver', ["data1" => $data], function ($message) use ($data) {
+                    $message->from($data['fromsender']);
+                    $message->to($data['toreceiver']);
+                    $message->subject($data['subject']);
+                });
+
+                return response()->json([
+
+                    'status' => $this->success,
+                    'message' => 'Transfer Successful',
+
+                ], 200);
+            }
 
         } catch (\Exception$th) {
             return $th->getMessage();
@@ -747,10 +964,6 @@ class TransactionController extends Controller
         }
 
     }
-
-
-
-
 
     public function fund_transfer_webhook(Request $request)
     {

@@ -52,7 +52,7 @@ if(!function_exists('user_phone')){
 
     function user_phone(){
         $user = Auth::user();
-        return $user->user_phone;
+        return $user->phone;
     }
 
 }
