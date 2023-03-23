@@ -395,10 +395,10 @@ class TransactionController extends Controller
 
             $phone = $request->phone;
 
-            $get_phone = User::where('phone', $phone)->first()->phone ?? null;
+            $get_phone = User::where('id', Auth::id())->first()->phone ?? null;
             $customer_f_name = User::where('phone', $phone)->first()->first_name ?? null;
             $customer_l_name = User::where('phone', $phone)->first()->last_name ?? null;
-            $customer_name = $customer_f_name ?? null . " " . $customer_l_name ?? null;
+            $customer_name = $customer_f_name. " " .$customer_l_name;
 
             if ($get_phone == null) {
 
@@ -713,12 +713,16 @@ class TransactionController extends Controller
 
         try {
 
+            $errand_key = errand_api_key();
+
+            $b_code = env('BCODE');
+
             $ref_no = $request->ref_no;
 
             $curl = curl_init();
 
             curl_setopt_array($curl, array(
-                CURLOPT_URL => "https://api.errandpay.com/epagentservice/api/v1/GetStatus?reference=$ref_no&$b_code",
+                CURLOPT_URL => "https://api.errandpay.com/epagentservice/api/v1/GetStatus?reference=$ref_no&businessCode=$b_code'",
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
@@ -727,7 +731,7 @@ class TransactionController extends Controller
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'GET',
                 CURLOPT_HTTPHEADER => array(
-
+                    "Authorization: Bearer $errand_key",
                 ),
             ));
 
@@ -736,11 +740,17 @@ class TransactionController extends Controller
             curl_close($curl);
             $var = json_decode($var);
 
+            dd($var, $errand_key, $ref_no);
+
         } catch (\Exception$th) {
             return $th->getMessage();
         }
 
     }
+
+
+
+
 
     public function fund_transfer_webhook(Request $request)
     {

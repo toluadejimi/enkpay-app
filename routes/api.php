@@ -92,6 +92,9 @@ Route::get('get-token', [TransactionController::class, 'get_token']);
 
 //Get All virtual acount
 Route::get('all-virtual-account', [VirtualaccountController::class, 'get_created_account']);
+Route::get('account-history', [VirtualaccountController::class, 'virtual_acct_history']);
+
+
 
 
 
