@@ -460,6 +460,10 @@ class TransactionController extends Controller
             $wallet = $request->wallet;
             $pin = $request->pin;
 
+
+
+
+
             //receiver info
             $receiver_main_wallet = User::where('phone', $phone)->first()->main_wallet ?? null;
             $receiver_bonus_wallet = User::where('phone', $phone)->first()->bonus_wallet ?? null;
@@ -476,7 +480,20 @@ class TransactionController extends Controller
 
             $trans_id = "ENK-" . random_int(100000, 999999);
 
+
+
+
             //check
+
+            if ($phone == user_phone()) {
+
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => "You can not send money to yourself",
+                ], 500);
+
+            }
+
 
             //Debit Transaction
 
