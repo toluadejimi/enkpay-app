@@ -130,6 +130,9 @@ Route::group(['middleware' => ['auth:api','acess']], function(){
     Route::post('resolve-bank', [TransactionController::class, 'resolve_bank']);
     Route::post('resolve-enkpay-account', [TransactionController::class, 'resolve_enkpay_account']);
     Route::post('enkpay-transfer', [TransactionController::class, 'enkpay_transfer']);
+    Route::get('get-wallet', [TransactionController::class, 'get_wallet']);
+
+
 
 
 

@@ -262,6 +262,25 @@ class TransactionController extends Controller
 
     }
 
+    public function get_wallet()
+    {
+
+        try {
+
+            $account = select_account();
+
+            return response()->json([
+
+                'account' => $account,
+                
+            ], 200);
+
+        } catch (\Exception$th) {
+            return $th->getMessage();
+        }
+
+    }
+
     public function transfer_properties()
     {
 
@@ -400,10 +419,6 @@ class TransactionController extends Controller
             $customer_l_name = User::where('phone', $phone)->first()->last_name ?? null;
             $customer_name = $customer_f_name . " " . $customer_l_name;
 
-
-
-
-
             if ($get_phone == null) {
                 return response()->json([
                     'status' => $this->failed,
@@ -420,14 +435,10 @@ class TransactionController extends Controller
 
             }
 
-
-
             return response()->json([
                 'status' => $this->success,
                 'customer_name' => $customer_name,
             ], 200);
-
-
 
         } catch (\Exception$th) {
             return $th->getMessage();
@@ -561,7 +572,6 @@ class TransactionController extends Controller
             $trasnaction->status = 1;
             $trasnaction->save();
 
-
             //credit receiver
 
             $credit = $receiver_main_wallet + $amount;
@@ -590,7 +600,6 @@ class TransactionController extends Controller
             $trasnaction->status = 1;
             $trasnaction->save();
 
-
             //sender email
 
             if (!empty(user_email())) {
@@ -611,7 +620,6 @@ class TransactionController extends Controller
                 });
 
             }
-
 
             //receiver email
 
