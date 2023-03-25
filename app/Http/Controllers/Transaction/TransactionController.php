@@ -827,6 +827,7 @@ class TransactionController extends Controller
             $serviceCode = $request->serviceCode;
             $reference = $request->reference;
 
+
             $oip = env('ERIP');
 
             $trans_id = "ENK-" . random_int(100000, 999999);
@@ -876,8 +877,9 @@ class TransactionController extends Controller
                 $status = User::where('serial_no', $serial_number)
                     ->first()->is_active;
 
-                $balance = User::where('serial_no', $serial_number)
+                $main_balance = User::where('serial_no', $serial_number)
                     ->first()->main_wallet;
+
 
                 $get_pin = User::where('serial_no', $serial_number)
                     ->first()->pin;
@@ -888,38 +890,45 @@ class TransactionController extends Controller
                     $check_agent_status = "InActive";
                 }
 
+
                 if (Hash::check($pin, $get_pin)) {
-                    $user_pin = true;
+                    $user_pin = 1;
                 } else {
-                    $user_pin = false;
+                    $user_pin = 0;
                 }
+
+
 
                 //check balance
                 $user_balance = User::where('serial_no', $serial_number)
                 ->first()->main_wallet;
 
-                if($user_balance <  $amount){
-                    $processTransaction = false;
+                if($user_balance >= $amount){
+                    $processTransaction1 = true;
                 }else{
-                    $processTransaction = true;
+                    $processTransaction1 = false;
+                }
+
+                if($user_pin == 1){
+                    $processTransaction2 = true;
+                }else{
+                    $processTransaction2 = false;
                 }
 
 
-                if($user_pin = true && $processTransaction = true){
-                    $agent_status = $check_agent_status;
-                }
 
-                dd($agent_status);
+                if ($processTransaction1 == true && $processTransaction2 == true ) {
 
-
-
-
-                if ($is_pin_valid == true && $processTransaction == true) {
 
                     $user_balance = User::where('serial_no', $serial_number)
                     ->first()->main_wallet;
+
                     $debit = $user_balance - $amount;
 
+                    $update_balance = User::where('serial_no', $serial_number)
+                    ->update([
+                        'main_wallet' => $debit
+                    ]);
 
                     //update Transactions
                     $trasnaction = new Transaction();
@@ -928,18 +937,34 @@ class TransactionController extends Controller
                     $trasnaction->transaction_type = "TerminalBankTransfer";
                     $trasnaction->type = $transaction_type;
                     $trasnaction->debit = $amount;
-                    $trasnaction->status = 0;
+                    $trasnaction->balance = $debit;
+                    $trasnaction->e_charges = 25;
+                    $trasnaction->serial_no = $serial_number;
+                    $trasnaction->status = 1;
                     $trasnaction->save();
+
+                    return response()->json([
+
+                        'is_pin_valid' => true,
+                        'balance' => number_format($debit, 2),
+                        'agent_status' => "Active",
+
+                    ]);
+
+                }else{
+
+                    return response()->json([
+
+                        'is_pin_valid' => false,
+                        'balance' => number_format($user_balance, 2),
+                        'agent_status' => "Inactive",
+
+                    ]);
+
 
                 }
 
-                return response()->json([
 
-                    'is_pin_valid' => $is_pin_valid,
-                    'balance' => number_format($balance, 2),
-                    'agent_status' => $agent_status,
-
-                ]);
 
             }
 
