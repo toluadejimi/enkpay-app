@@ -872,7 +872,7 @@ class TransactionController extends Controller
 
             }
 
-            if ($transaction_type == 'outward') {
+            if ($transaction_type == 'outward' &&  $serviceCode ==  'FT1') {
 
                 $status = User::where('serial_no', $serial_number)
                     ->first()->is_active;
@@ -967,6 +967,110 @@ class TransactionController extends Controller
 
 
             }
+
+            if ($transaction_type == 'outward' &&  $serviceCode ==  'BAT1') {
+
+                $status = User::where('serial_no', $serial_number)
+                    ->first()->is_active;
+
+                $main_balance = User::where('serial_no', $serial_number)
+                    ->first()->main_wallet;
+
+
+                $get_pin = User::where('serial_no', $serial_number)
+                    ->first()->pin;
+
+                if ($status == 1) {
+                    $check_agent_status = "Active";
+                } else {
+                    $check_agent_status = "InActive";
+                }
+
+
+                if (Hash::check($pin, $get_pin)) {
+                    $user_pin = 1;
+                } else {
+                    $user_pin = 0;
+                }
+
+
+
+                //check balance
+                $user_balance = User::where('serial_no', $serial_number)
+                ->first()->main_wallet;
+
+                if($user_balance >= $amount){
+                    $processTransaction1 = true;
+                }else{
+                    $processTransaction1 = false;
+                }
+
+                if($user_pin == 1){
+                    $processTransaction2 = true;
+                }else{
+                    $processTransaction2 = false;
+                }
+
+
+
+                if ($processTransaction1 == true && $processTransaction2 == true ) {
+
+
+                    $user_balance = User::where('serial_no', $serial_number)
+                    ->first()->main_wallet;
+
+                    $debit = $user_balance - $amount;
+
+                    $update_balance = User::where('serial_no', $serial_number)
+                    ->update([
+                        'main_wallet' => $debit
+                    ]);
+
+                    //update Transactions
+                    $trasnaction = new Transaction();
+                    $trasnaction->user_id = $user_id;
+                    $trasnaction->ref_trans_id = $reference;
+                    $trasnaction->transaction_type = "VASfromTerminal";
+                    $trasnaction->type = $transaction_type;
+                    $trasnaction->debit = $amount;
+                    $trasnaction->balance = $debit;
+                    $trasnaction->e_charges = 0;
+                    $trasnaction->serial_no = $serial_number;
+                    $trasnaction->status = 1;
+                    $trasnaction->save();
+
+                    return response()->json([
+
+                        'is_pin_valid' => true,
+                        'balance' => number_format($debit, 2),
+                        'agent_status' => "Active",
+
+                    ]);
+
+                }else{
+
+                    return response()->json([
+
+                        'is_pin_valid' => false,
+                        'balance' => number_format($user_balance, 2),
+                        'agent_status' => "Inactive",
+
+                    ]);
+
+
+                }
+
+
+
+            }
+
+
+
+
+
+
+
+
 
             if ($serviceCode == 'BLE1') {
 
