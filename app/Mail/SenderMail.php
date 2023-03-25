@@ -28,7 +28,7 @@ class SenderMail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Debit Notification')
-            ->view('emails.transaction.sender');
+        return $this->view('emails.transaction.sender');
+    
     }
 }

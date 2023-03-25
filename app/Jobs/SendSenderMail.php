@@ -1,10 +1,9 @@
 <?php
 
-
-
 namespace App\Jobs;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -12,18 +11,20 @@ use Illuminate\Queue\SerializesModels;
 use App\Mail\SenderMail;
 use Mail;
 
-class SendReceverMail implements ShouldQueue
+class SendSenderMail implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    protected $send_mail;
+
+    protected $details;
+
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($send_mail)
+    public function __construct($details)
     {
-        $this->send_mail = $send_mail;
+        $this->details = $details;
     }
 
     /**
@@ -34,6 +35,6 @@ class SendReceverMail implements ShouldQueue
     public function handle()
     {
         $email = new SenderMail();
-        Mail::to($this->send_mail)->send($email);
+        Mail::to($this->details['email'])->send($email);
     }
 }

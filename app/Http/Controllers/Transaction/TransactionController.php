@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Job\SendReceiverMail;
 use App\Job\LowBalanceMail;
+use App\Mail\BalanceMail;
 use App\Job\SendSenderMail;
 use Mail;
 
@@ -528,7 +529,6 @@ class TransactionController extends Controller
             if ($amount > $sender_balance) {
 
                 if (!empty(user_email())) {
-
                     // $data = array(
                     //     'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
                     //     'subject' => "Low Balance",
@@ -871,7 +871,7 @@ class TransactionController extends Controller
 
             }
 
-            if ($serviceCode == 'FT1') {
+            if ($transaction_type == 'outward') {
 
                 $status = User::where('serial_no', $serial_number)
                     ->first()->is_active;
@@ -883,25 +883,50 @@ class TransactionController extends Controller
                     ->first()->pin;
 
                 if ($status == 1) {
-                    $agent_status = "Active";
+                    $check_agent_status = "Active";
                 } else {
-                    $agent_status = "InActive";
-
+                    $check_agent_status = "InActive";
                 }
 
                 if (Hash::check($pin, $get_pin)) {
-                    $is_pin_valid = true;
+                    $user_pin = true;
                 } else {
-                    $is_pin_valid = false;
+                    $user_pin = false;
                 }
 
-                if ($is_pin_valid == true) {
+                //check balance
+                $user_balance = User::where('serial_no', $serial_number)
+                ->first()->main_wallet;
+
+                if($user_balance <  $amount){
+                    $processTransaction = false;
+                }else{
+                    $processTransaction = true;
+                }
+
+
+                if($user_pin = true && $processTransaction = true){
+                    $agent_status = $check_agent_status;
+                }
+
+                dd($agent_status);
+
+
+
+
+                if ($is_pin_valid == true && $processTransaction == true) {
+
+                    $user_balance = User::where('serial_no', $serial_number)
+                    ->first()->main_wallet;
+                    $debit = $user_balance - $amount;
+
 
                     //update Transactions
                     $trasnaction = new Transaction();
                     $trasnaction->user_id = $user_id;
                     $trasnaction->ref_trans_id = $reference;
-                    $trasnaction->transaction_type = $transaction_type;
+                    $trasnaction->transaction_type = "TerminalBankTransfer";
+                    $trasnaction->type = $transaction_type;
                     $trasnaction->debit = $amount;
                     $trasnaction->status = 0;
                     $trasnaction->save();

@@ -28,7 +28,7 @@ class ReceiverMail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Credit Notification')
-            ->view('emails.transaction.receiver');
+        return $this->view('emails.transaction.receiver');
+       
     }
 }

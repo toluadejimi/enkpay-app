@@ -9,16 +9,26 @@ use Illuminate\Queue\SerializesModels;
 
 class BalanceMail extends Mailable
 {
+
+
     use Queueable, SerializesModels;
+
+     /**
+     * The order instance.
+     *
+     * @var Details
+     */
+    protected $details;
+
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(Details $details)
     {
-        //
+        $this->details = $details;
     }
 
     /**
@@ -28,7 +38,20 @@ class BalanceMail extends Mailable
      */
     public function build()
     {
-        return $this->subject('Low Balance Notification')
-            ->view('emails.notify.lowbalalce');
+        return $this->view('emails.notify.lowbalalce')
+                    ->subject('Low Balance Noftification')
+                    ->with([
+                        'balance' => $this->details->main_wallet,
+                        'first_name' => $this->details->first_name,
+                    ]);
     }
+
+
+
+
+    
+
+
+
+
 }
