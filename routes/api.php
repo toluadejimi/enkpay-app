@@ -61,6 +61,8 @@ Route::post('v1/cash-out-webhook', [TransactionController::class, 'cash_out_webh
 Route::post('v1/cash-in', [VirtualaccountController::class, 'cash_in_webhook']);
 Route::post('v1/wallet-check', [TransactionController::class, 'balance_webhook']);
 Route::post('v1/transfer-request', [TransactionController::class, 'transfer_request']);
+Route::post('v1/merchant-details', [ProfileController::class, 'view_agent_account']);
+
 
 
 //Transactions
@@ -125,6 +127,7 @@ Route::group(['middleware' => ['auth:api','acess']], function(){
 
 
     Route::get('get-data-plan', [DataController::class, 'get_data']);
+
 
 
 

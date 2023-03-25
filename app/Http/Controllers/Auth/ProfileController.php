@@ -327,12 +327,81 @@ public function user_info(request $request){
     }
 
 
+    public function view_agent_account(Request $request){
+
+        try{
+
+        $serial_no = $request->serialNumber;
+
+        $check_serial = User::where('serial_no', $serial_no)
+        ->first()->serial_no ?? null;
+
+
+        if($check_serial == null){
+
+            return response()->json([
+                'status' => $this->failed,
+                'message' => "Account no available on ENKPAY",
+            ],500);
+
+        }
+
+        $firstName = User::where('serial_no', $serial_no)
+        ->first()->first_name ?? null;
+
+        $lastName = User::where('serial_no', $serial_no)
+        ->first()->last_name ?? null;
+
+        $bvn = User::where('serial_no', $serial_no)
+        ->first()->identification_number ?? null;
+
+        $accountNumber = User::where('serial_no', $serial_no)
+        ->first()->v_account_no ?? null;
+
+        $bankName = "VFD MICROFINANCE BANK";
+
+        $data = User::where('serial_no', $serial_no)->first();
+
+        $data_array = array();
+        $data_array[0] =  [
+            "firstName"=> $data->first_name,
+            "lastName"=> $data->last_name,
+            "bvn"=> $data->identification_no,
+            "accountNumber"=> $data->v_account_no,
+            "bankName" => $bankName
+        ];
+
+
+
+
+
+        return response()->json([
+            'code' => 200,
+            'message' => "success",
+            'data' => $data_array
+
+        ],200);
+
+
+
+        } catch (\Exception $th) {
+            return $th->getMessage();
+        }
+
+
+
+    }
+
+
 
 
 
 
 
 }
+
+
+
 
 
 
