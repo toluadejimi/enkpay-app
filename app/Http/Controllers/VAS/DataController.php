@@ -30,6 +30,8 @@ class DataController extends Controller
         try {
 
 
+            $account = select_account();
+
             $client = new \GuzzleHttp\Client();
             $request = $client->get('https://vtpass.com/api/service-variations?serviceID=mtn-data');
             $response = $request->getBody();
@@ -68,16 +70,14 @@ class DataController extends Controller
 
 
             return response()->json([
-
-
                 'status' => $this->success,
                 'mtn_data' =>  $get_mtn_network,
                 'glo_data' =>  $get_glo_network,
                 'airtel_data' =>  $get_airtel_network,
                 '9mobile_data' =>  $get_9mobile_network,
                 'smile_data' =>  $get_smile_network,
-                'spectranet_data' =>  $get_spectranet_network
-
+                'spectranet_data' =>  $get_spectranet_network,
+                'account'=> $account
             ], 200);
 
 
@@ -87,13 +87,10 @@ class DataController extends Controller
         }
 
 
-
-
-
-
-
-
     }
+
+
+    
 
 
 

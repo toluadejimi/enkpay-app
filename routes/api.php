@@ -73,7 +73,6 @@ Route::get('pool-balance', [TransactionController::class, 'pool_account']);
 
 
 //Get Data Plans
-Route::get('get-data-plan', [DataController::class, 'get_data']);
 
 //Get State
 Route::get('get-states', [RegisterationController::class, 'get_states']);
@@ -123,6 +122,9 @@ Route::group(['middleware' => ['auth:api','acess']], function(){
     Route::post('update-kyc', [ProfileController::class, 'update_user']);
     Route::post('verify-info', [ProfileController::class, 'verify_info']);
     Route::post('update-account-info', [ProfileController::class, 'update_account_info']);
+
+
+    Route::get('get-data-plan', [DataController::class, 'get_data']);
 
 
 

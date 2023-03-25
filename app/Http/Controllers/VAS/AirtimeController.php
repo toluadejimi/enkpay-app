@@ -23,6 +23,7 @@ class AirtimeController extends Controller
 
         try {
 
+
             $auth = env('VTAUTH');
 
             $request_id = date('YmdHis') . Str::random(4);
