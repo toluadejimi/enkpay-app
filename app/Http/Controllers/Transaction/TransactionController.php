@@ -818,7 +818,7 @@ class TransactionController extends Controller
 
         try {
 
-            $IP = $_SERVER['SERVER_ADDR'];
+            //$IP = $_SERVER['SERVER_ADDR'];
 
             $serial_number = $request->serial_number;
             $amount = $request->amount;
