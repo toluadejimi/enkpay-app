@@ -701,7 +701,7 @@ class TransactionController extends Controller
     public function cash_out_webhook(Request $request)
     {
 
-        // try {
+        try {
 
         $header = $request->header('errand-pay-header');
 
@@ -746,10 +746,30 @@ class TransactionController extends Controller
 
                 }
 
-                //credit
+                //Both Commission
                 $amount1 = $comission / 100;
                 $amount2 = $amount1 * $Amount;
-                $amount = number_format($amount2, 0);
+                $amount = number_format($amount2, 3);
+
+
+                //enkpay commission
+                $commison_subtract = $comission - 0.425;
+                $enkPayPaypercent =  $commison_subtract / 100;
+                $enkPay_amount =  $enkPayPaypercent * $Amount;
+                $enkpay_commision_amount = number_format($enkPay_amount, 3);
+
+
+
+
+                //errandpay commission
+                $errandPaypercent =  0.425 / 100;
+                $errand_amount =  $errandPaypercent * $Amount;
+                $errandPay_commission_amount = number_format($errand_amount, 3);
+
+
+
+                $enkpay_cashOut_fee = $amount -$enkpay_commision_amount ;
+
 
                 $removed_comission = $Amount - $amount;
                 $updated_amount = $main_wallet + $removed_comission;
@@ -771,6 +791,7 @@ class TransactionController extends Controller
                     $trasnaction->e_charges = $amount;
                     $trasnaction->note = "Credit eeceived from POS Terminal";
                     $trasnaction->fee = $Fee;
+                    $trasnaction->enkPay_Cashout_profit = $enkpay_commision_amount;
                     $trasnaction->balance = $updated_amount;
                     $trasnaction->terminal_id = $TerminalID;
                     $trasnaction->serial_no = $SerialNumber;
@@ -807,9 +828,9 @@ class TransactionController extends Controller
             'message' => 'Key not Authorized',
         ], 500);
 
-        // } catch (\Exception$th) {
-        //     return $th->getMessage();
-        // }
+        } catch (\Exception$th) {
+            return $th->getMessage();
+        }
 
     }
 
