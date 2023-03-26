@@ -31,9 +31,9 @@
             <div class="col-md-4" style="text-align: left;padding: 26px;padding-bottom: 17;padding-left: 74px;padding-right: 0px;border-color: var(--bs-card-bg);background: #f2f2f2;">
                 <h1 style="font-size: 32px;"><strong>LOW BALANCE&nbsp;</strong></h1>
 
-                <p style="font-size: 14px;font-weight: bold;"> Hi, {{ $first_name }}</p>
+                <p style="font-size: 14px;font-weight: bold;"> Hi, {{ $data1['first_name'] }}</p>
 
-                <p>Your balance is  NGN {{number_format($balance), 2)}}  kindly fund your wallet</p>
+                <p>Your balance is  NGN {{number_format($data1['balance'], 2)}}  kindly fund your wallet</p>
 
 
                 <p class="text-muted mb-0" style="--bs-body-font-weight: normal;height: 0px;width: 566px;text-align: left;font-size: 11px;">Copyright © 2023 ENKWAVE</p>

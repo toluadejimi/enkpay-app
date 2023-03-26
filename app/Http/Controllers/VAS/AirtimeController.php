@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use GuzzleHttp\Client;
+
 use Mail;
 
 class AirtimeController extends Controller

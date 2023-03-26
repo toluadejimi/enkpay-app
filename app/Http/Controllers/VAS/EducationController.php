@@ -10,17 +10,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use GuzzleHttp\Client;
-
 use Mail;
 
-class DataController extends Controller
+
+class EducationController extends Controller
 {
 
     public $success = true;
     public $failed = false;
 
-    public function get_data()
+    public function get_waec(request $request)
     {
 
         try {
@@ -28,51 +27,32 @@ class DataController extends Controller
             $account = select_account();
 
             $client = new \GuzzleHttp\Client();
-            $request = $client->get('https://vtpass.com/api/service-variations?serviceID=mtn-data');
+            $request = $client->get('https://vtpass.com/api/service-variations?serviceID=waec-registration');
             $response = $request->getBody();
             $result = json_decode($response);
-            $get_mtn_network = $result->content->variations;
 
-            $client = new \GuzzleHttp\Client();
-            $request = $client->get('https://vtpass.com/api/service-variations?serviceID=glo-data');
-            $response = $request->getBody();
-            $result = json_decode($response);
-            $get_glo_network = $result->content->variations;
+            $data = $result->content->variations ?? null;
 
-            $client = new \GuzzleHttp\Client();
-            $request = $client->get('https://vtpass.com/api/service-variations?serviceID=airtel-data');
-            $response = $request->getBody();
-            $result = json_decode($response);
-            $get_airtel_network = $result->content->variations;
+            $get_message = $result->content->errors ?? null;
 
-            $client = new \GuzzleHttp\Client();
-            $request = $client->get('https://vtpass.com/api/service-variations?serviceID=etisalat-data');
-            $response = $request->getBody();
-            $result = json_decode($response);
-            $get_9mobile_network = $result->content->variations;
+            $message = "Error from Eduction - $get_message";
 
-            $client = new \GuzzleHttp\Client();
-            $request = $client->get('https://vtpass.com/api/service-variations?serviceID=smile-direct');
-            $response = $request->getBody();
-            $result = json_decode($response);
-            $get_smile_network = $result->content->variations;
+            if ('response_description' == 000) {
 
-            $client = new \GuzzleHttp\Client();
-            $request = $client->get('https://vtpass.com/api/service-variations?serviceID=spectranet');
-            $response = $request->getBody();
-            $result = json_decode($response);
-            $get_spectranet_network = $result->content->variations;
+                return response()->json([
+                    'status' => $this->success,
+                    'data' => $data,
+                    'account' => $account,
+                ], 200);
+
+            }
+
+            send_error($message);
 
             return response()->json([
                 'status' => $this->success,
-                'mtn_data' => $get_mtn_network,
-                'glo_data' => $get_glo_network,
-                'airtel_data' => $get_airtel_network,
-                '9mobile_data' => $get_9mobile_network,
-                'smile_data' => $get_smile_network,
-                'spectranet_data' => $get_spectranet_network,
-                'account' => $account,
-            ], 200);
+                'message' => "Service not available, Please try again later",
+            ], 500);
 
         } catch (\Exception$th) {
             return $th->getMessage();
@@ -80,7 +60,7 @@ class DataController extends Controller
 
     }
 
-    public function buy_data(Request $request)
+    public function buy_waec(request $request)
     {
 
         try {
@@ -97,11 +77,17 @@ class DataController extends Controller
 
             $variation_code = $request->variation_code;
 
-            $amount = round($request->variation_amount);
+            $amount = $request->amount;
 
             $wallet = $request->wallet;
 
+            $quantity = $request->quantity;
+
             $pin = $request->pin;
+
+            $education_charges = Charge::where('id', 7)
+            ->first()->amount;
+
 
             if ($wallet == 'main_account') {
                 $user_wallet_banlance = main_account();
@@ -168,6 +154,7 @@ class DataController extends Controller
                     'variation_code' => $variation_code,
                     'serviceID' => $serviceid,
                     'amount' => $amount,
+                    'quantity' => $quantity,
                     'biller_code' => $biller_code,
                     'phone' => $phone,
                 ),
@@ -179,26 +166,35 @@ class DataController extends Controller
 
             $var = curl_exec($curl);
             curl_close($curl);
-
             $var = json_decode($var);
+
+
+
 
             $trx_id = $var->requestId ?? null;
 
+            $status = $var->response_description ?? null;
+
             $get_message = $var->response_description ?? null;
 
-            $message = "Error Mesage from VAS DATA BUNDLE - $get_message";
+            $get_message2 = $var->content->errors ?? null;
 
-            if ($var->response_description == 'TRANSACTION SUCCESSFUL') {
 
-                $debit = $user_wallet_banlance - $amount;
+            $message = "Error Mesage from VAS BUY WAEC EDUCATION - $get_message2";
+
+
+            $p_code = $var->purchased_code;
+
+            if ($status == 'TRANSACTION SUCCESSFUL') {
+
+                $new_amount = $amount + $education_charges;
+                $debit = $user_wallet_banlance - $new_amount;
 
                 if ($wallet == 'main_account') {
-
                     $update = User::where('id', Auth::id())
                         ->update([
                             'main_wallet' => $debit,
                         ]);
-
                 } else {
                     $update = User::where('id', Auth::id())
                         ->update([
@@ -218,13 +214,17 @@ class DataController extends Controller
 
                 $transaction = new Transaction();
                 $transaction->user_id = Auth::id();
-                $transaction->ref_trans_id = $referenceCode;
-                $transaction->transaction_type = "VasData";
+                $transaction->ref_trans_id = $var->$content->$transactionId;
+                $transaction->transaction_type = "VasEducation";
+                $transaction->e_charges = $education_charges;
                 $transaction->type = "vas";
                 $transaction->balance = $balance;
                 $transaction->debit = $amount;
                 $transaction->status = 1;
-                $transaction->note = "Data Bundle Purchase to $phone";
+                $transaction->e_ref = $var->requestId;
+
+
+                $transaction->note = "Data Bundle Purchase to $p_code";
                 $transaction->save();
 
                 if (!empty(user_email())) {
@@ -268,6 +268,10 @@ class DataController extends Controller
         } catch (\Exception$th) {
             return $th->getMessage();
         }
+
+    }
+
+    public function quary(request $request){
 
     }
 
