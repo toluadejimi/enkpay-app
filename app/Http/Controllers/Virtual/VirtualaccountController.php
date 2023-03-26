@@ -224,7 +224,9 @@ class VirtualaccountController extends Controller
                         $trasnaction->user_id = $user_id;
                         $trasnaction->ref_trans_id = $trans_id;
                         $trasnaction->e_ref = $TransactionReference;
-                        $trasnaction->transaction_type = $TransactionType;
+                        $trasnaction->type = $TransactionType;
+                        $trasnaction->transaction_type = "VirtualFundWallet";
+                        $trasnaction->main_type = "Transfer";
                         $trasnaction->credit = $enkpay_debit;
                         $trasnaction->note = "Credit received from Transfer";
                         $trasnaction->fee = $Fee;

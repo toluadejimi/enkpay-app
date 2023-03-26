@@ -177,6 +177,8 @@ class TransactionController extends Controller
                 $trasnaction->user_id = Auth::id();
                 $trasnaction->ref_trans_id = $trans_id;
                 $trasnaction->e_ref = $TransactionReference;
+                $trasnaction->type = "InterBankTransfer";
+                $trasnaction->main_type = "Transfer";
                 $trasnaction->transaction_type = "BankTransfer";
                 $trasnaction->debit = $amount;
                 $trasnaction->note = "Bank Transfer to other banks";
@@ -581,6 +583,8 @@ class TransactionController extends Controller
             $trasnaction->to_user_id = $receiver_id;
             $trasnaction->ref_trans_id = $trans_id;
             $trasnaction->transaction_type = "EnkPayTransfer";
+            $trasnaction->type = "InAppTransfer";
+            $trasnaction->main_type = "Transfer";
             $trasnaction->debit = $amount;
             $trasnaction->note = "Bank Transfer to Enk Pay User";
             $trasnaction->fee = 0;
@@ -609,6 +613,8 @@ class TransactionController extends Controller
             $trasnaction->to_user_id = $receiver_id;
             $trasnaction->ref_trans_id = $trans_id;
             $trasnaction->transaction_type = "EnkPayTransfer";
+            $trasnaction->main_type = "Transfer";
+            $trasnaction->type = "InAppTransfer";
             $trasnaction->credit = $amount;
             $trasnaction->note = "Bank Transfer to Enk Pay User";
             $trasnaction->fee = 0;
@@ -734,6 +740,9 @@ class TransactionController extends Controller
             $trans_id = "ENK-" . random_int(100000, 999999);
             $verify1 = hash('sha512', $key);
 
+            $comission = Charge::where('id',3 )
+            ->first()->amount;
+
             if ($verify1 == $header) {
 
                 if ($StatusCode == 00) {
@@ -754,7 +763,8 @@ class TransactionController extends Controller
                     }
 
                     //credit
-                    $updated_amount = $main_wallet + $Amount;
+                    $removed_comission = $Amount - $comission;
+                    $updated_amount = $main_wallet + $removed_comission;
                     $main_wallet = User::where('serial_no', $SerialNumber)
                         ->update([
                             'main_wallet' => $updated_amount,
@@ -768,7 +778,7 @@ class TransactionController extends Controller
                         $trasnaction->ref_trans_id = $trans_id;
                         $trasnaction->e_ref = $TransactionReference;
                         $trasnaction->transaction_type = $TransactionType;
-                        $trasnaction->credit = $Amount;
+                        $trasnaction->credit = $removed_comission;
                         $trasnaction->note = "Credit eeceived from POS Terminal";
                         $trasnaction->fee = $Fee;
                         $trasnaction->balance = $updated_amount;
@@ -1291,7 +1301,7 @@ class TransactionController extends Controller
 
         try {
 
-            $all_transactions = Transaction::where('user_id', Auth::id())
+            $all_transactions = Transaction::latest()->where('user_id', Auth::id())
                 ->get();
 
             return response()->json([
@@ -1326,5 +1336,52 @@ class TransactionController extends Controller
         }
 
     }
+
+
+
+    public function pos(Request $request){
+
+         try {
+
+            $pos_trasnactions = Transaction::latest()
+            ->where([
+                'user_id' => Auth::id(),
+                'transaction_type' => 'CashOut'
+            ])->take(10)->get();
+
+            return response()->json([
+
+                'status' => $this->success,
+                'data' => $pos_trasnactions,
+
+            ], 200);
+
+        } catch (\Exception$th) {
+            return $th->getMessage();
+        }
+    }
+
+    public function transfer(Request $request){
+
+        try {
+
+           $transfer_trasnactions = Transaction::orderBy("id", "DESC")
+           ->where([
+               'user_id' => Auth::id(),
+               'main_type' => 'Transfer',
+           ])
+          ->take(20)->get();
+
+           return response()->json([
+
+               'status' => $this->success,
+               'data' => $transfer_trasnactions,
+
+           ], 200);
+
+       } catch (\Exception$th) {
+           return $th->getMessage();
+       }
+   }
 
 }
