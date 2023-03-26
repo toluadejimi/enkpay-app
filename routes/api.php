@@ -163,14 +163,17 @@ Route::group(['middleware' => ['auth:api','acess']], function(){
 
     //Power
     Route::post('verify-account', [PowerController::class, 'verify_account']);
+    Route::post('buy-power', [PowerController::class, 'buy_power']);
+
+
+
 
 
     //Get  Transactions
     Route::get('all-transaction', [TransactionController::class, 'get_all_transactions']);
     Route::get('get-pos', [TransactionController::class, 'pos']);
     Route::get('get-transfers', [TransactionController::class, 'transfer']);
-    Route::get('all-transaction', [TransactionController::class, 'get_all_transactions']);
-    Route::get('all-transaction', [TransactionController::class, 'get_all_transactions']);
+    Route::get('get-vas', [TransactionController::class, 'vas']);
 
 
 

@@ -90,7 +90,7 @@ class DataController extends Controller
     }
 
 
-    
+
 
 
 
@@ -208,6 +208,10 @@ class DataController extends Controller
 
         $trx_id = $var->requestId ?? null;
 
+        $get_message = $var->response_description ?? null;
+
+        $message = "Error Mesage from VAS DATA BUNDLE - $get_message";
+
             if ($var->response_description == 'TRANSACTION SUCCESSFUL') {
 
                 $debit = $user_wallet_banlance - $amount;
@@ -240,7 +244,7 @@ class DataController extends Controller
                 $transaction = new Transaction();
                 $transaction->user_id = Auth::id();
                 $transaction->ref_trans_id = $referenceCode;
-                $transaction->transaction_type = "DATA BUNDLE";
+                $transaction->transaction_type = "VasData";
                 $transaction->type = "vas";
                 $transaction->balance = $balance;
                 $transaction->debit = $amount;
@@ -276,6 +280,9 @@ class DataController extends Controller
                 ], 200);
 
             }
+
+
+            send_error($message);
 
             return response()->json([
 

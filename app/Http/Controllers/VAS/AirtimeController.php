@@ -130,6 +130,10 @@ class AirtimeController extends Controller
 
             $trx_id = $var->requestId ?? null;
 
+            $get_message = $var->response_description ?? null;
+
+            $message = "Error Mesage from VAS AIRTIME - $get_message";
+
             if ($var->response_description == 'TRANSACTION SUCCESSFUL') {
 
                 $debit = $user_wallet_banlance - $amount;
@@ -161,7 +165,7 @@ class AirtimeController extends Controller
                 $transaction = new Transaction();
                 $transaction->user_id = Auth::id();
                 $transaction->ref_trans_id = $referenceCode;
-                $transaction->transaction_type = "Airtime";
+                $transaction->transaction_type = "VasAirtime";
                 $transaction->type = "vas";
                 $transaction->balance = $balance;
                 $transaction->debit = $amount;
@@ -197,6 +201,8 @@ class AirtimeController extends Controller
                 ], 200);
 
             }
+
+            send_error($message);
 
             return response()->json([
 

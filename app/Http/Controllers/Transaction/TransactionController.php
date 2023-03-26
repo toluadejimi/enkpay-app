@@ -10,10 +10,6 @@ use App\Models\User;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use App\Job\SendReceiverMail;
-use App\Job\LowBalanceMail;
-use App\Mail\BalanceMail;
-use App\Job\SendSenderMail;
 use Mail;
 
 class TransactionController extends Controller
@@ -463,10 +459,6 @@ class TransactionController extends Controller
             $wallet = $request->wallet;
             $pin = $request->pin;
 
-
-
-
-
             //receiver info
             $receiver_main_wallet = User::where('phone', $phone)->first()->main_wallet ?? null;
             $receiver_bonus_wallet = User::where('phone', $phone)->first()->bonus_wallet ?? null;
@@ -483,9 +475,6 @@ class TransactionController extends Controller
 
             $trans_id = "ENK-" . random_int(100000, 999999);
 
-
-
-
             //check
 
             if ($phone == user_phone()) {
@@ -496,7 +485,6 @@ class TransactionController extends Controller
                 ], 500);
 
             }
-
 
             //Debit Transaction
 
@@ -631,8 +619,6 @@ class TransactionController extends Controller
 
             if (!empty(user_email())) {
 
-
-
                 // $data = array(
                 //     'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
                 //     'subject' => "Debit Notification",
@@ -653,8 +639,6 @@ class TransactionController extends Controller
             //receiver email
 
             if (!empty($receiver_email)) {
-
-
 
                 // $data = array(
                 //     'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
@@ -719,109 +703,109 @@ class TransactionController extends Controller
 
         // try {
 
-            $header = $request->header('errand-pay-header');
+        $header = $request->header('errand-pay-header');
 
-            $StatusCode = $request->StatusCode;
-            $StatusDescription = $request->StatusDescription;
-            $SerialNumber = $request->SerialNumber;
-            $Amount = $request->Amount;
-            $Currency = $request->Currency;
-            $TransactionDate = $request->TransactionDate;
-            $TransactionTime = $request->TransactionTime;
-            $TransactionType = $request->TransactionType;
-            $ServiceCode = $request->ServiceCode;
-            $TransactionReference = $request->TransactionReference;
-            $Fee = $request->Fee;
-            $PostingType = $request->PostingType;
-            $TerminalID = $request->AdditionalDetails['TerminalID'];
+        $StatusCode = $request->StatusCode;
+        $StatusDescription = $request->StatusDescription;
+        $SerialNumber = $request->SerialNumber;
+        $Amount = $request->Amount;
+        $Currency = $request->Currency;
+        $TransactionDate = $request->TransactionDate;
+        $TransactionTime = $request->TransactionTime;
+        $TransactionType = $request->TransactionType;
+        $ServiceCode = $request->ServiceCode;
+        $TransactionReference = $request->TransactionReference;
+        $Fee = $request->Fee;
+        $PostingType = $request->PostingType;
+        $TerminalID = $request->AdditionalDetails['TerminalID'];
 
-            $key = env('ERIP');
+        $key = env('ERIP');
 
-            $trans_id = "ENK-" . random_int(100000, 999999);
-            $verify1 = hash('sha512', $key);
+        $trans_id = "ENK-" . random_int(100000, 999999);
+        $verify1 = hash('sha512', $key);
 
-            $comission = Charge::where('id',3 )
+        $comission = Charge::where('id', 3)
             ->first()->amount;
 
-            if ($verify1 == $header) {
+        if ($verify1 == $header) {
 
-                if ($StatusCode == 00) {
+            if ($StatusCode == 00) {
 
-                    $main_wallet = User::where('serial_no', $SerialNumber)
-                        ->first()->main_wallet ?? null;
+                $main_wallet = User::where('serial_no', $SerialNumber)
+                    ->first()->main_wallet ?? null;
 
-                    $user_id = User::where('serial_no', $SerialNumber)
-                        ->first()->id ?? null;
+                $user_id = User::where('serial_no', $SerialNumber)
+                    ->first()->id ?? null;
 
-                    if ($main_wallet == null && $user_id == null) {
-
-                        return response()->json([
-                            'status' => false,
-                            'message' => 'Customer not registred on Enkpay',
-                        ], 500);
-
-                    }
-
-                    //credit
-                    $amount1 = $comission / 100;
-                    $amount2 = $amount1 * $Amount;
-                    $amount = number_format($amount2, 0);
-
-                    $removed_comission = $Amount - $amount;
-                    $updated_amount = $main_wallet + $removed_comission;
-
-                    $main_wallet = User::where('serial_no', $SerialNumber)
-                        ->update([
-                            'main_wallet' => $updated_amount,
-                        ]);
-
-                    if ($TransactionType == 'CashOut') {
-
-                        //update Transactions
-                        $trasnaction = new Transaction();
-                        $trasnaction->user_id = $user_id;
-                        $trasnaction->ref_trans_id = $trans_id;
-                        $trasnaction->e_ref = $TransactionReference;
-                        $trasnaction->transaction_type = $TransactionType;
-                        $trasnaction->credit = $removed_comission;
-                        $trasnaction->e_charges = $amount;
-                        $trasnaction->note = "Credit eeceived from POS Terminal";
-                        $trasnaction->fee = $Fee;
-                        $trasnaction->balance = $updated_amount;
-                        $trasnaction->terminal_id = $TerminalID;
-                        $trasnaction->serial_no = $SerialNumber;
-                        $trasnaction->status = 1;
-                        $trasnaction->save();
-
-                    }
-
-                    $data = array(
-                        'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
-                        'subject' => "Account Credited",
-                        'toreceiver' => 'toluadejimi@gmail.com',
-                        'amount' => $removed_comission,
-                        'serial' => $SerialNumber,
-                    );
-
-                    Mail::send('emails.transaction.terminal-credit', ["data1" => $data], function ($message) use ($data) {
-                        $message->from($data['fromsender']);
-                        $message->to($data['toreceiver']);
-                        $message->subject($data['subject']);
-                    });
+                if ($main_wallet == null && $user_id == null) {
 
                     return response()->json([
-                        'status' => true,
-                        'message' => 'Tranasaction Successsfull',
-                    ], 200);
+                        'status' => false,
+                        'message' => 'Customer not registred on Enkpay',
+                    ], 500);
 
                 }
 
+                //credit
+                $amount1 = $comission / 100;
+                $amount2 = $amount1 * $Amount;
+                $amount = number_format($amount2, 0);
+
+                $removed_comission = $Amount - $amount;
+                $updated_amount = $main_wallet + $removed_comission;
+
+                $main_wallet = User::where('serial_no', $SerialNumber)
+                    ->update([
+                        'main_wallet' => $updated_amount,
+                    ]);
+
+                if ($TransactionType == 'CashOut') {
+
+                    //update Transactions
+                    $trasnaction = new Transaction();
+                    $trasnaction->user_id = $user_id;
+                    $trasnaction->ref_trans_id = $trans_id;
+                    $trasnaction->e_ref = $TransactionReference;
+                    $trasnaction->transaction_type = $TransactionType;
+                    $trasnaction->credit = $removed_comission;
+                    $trasnaction->e_charges = $amount;
+                    $trasnaction->note = "Credit eeceived from POS Terminal";
+                    $trasnaction->fee = $Fee;
+                    $trasnaction->balance = $updated_amount;
+                    $trasnaction->terminal_id = $TerminalID;
+                    $trasnaction->serial_no = $SerialNumber;
+                    $trasnaction->status = 1;
+                    $trasnaction->save();
+
+                }
+
+                $data = array(
+                    'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                    'subject' => "Account Credited",
+                    'toreceiver' => 'toluadejimi@gmail.com',
+                    'amount' => $removed_comission,
+                    'serial' => $SerialNumber,
+                );
+
+                Mail::send('emails.transaction.terminal-credit', ["data1" => $data], function ($message) use ($data) {
+                    $message->from($data['fromsender']);
+                    $message->to($data['toreceiver']);
+                    $message->subject($data['subject']);
+                });
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Tranasaction Successsfull',
+                ], 200);
+
             }
 
-            return response()->json([
-                'status' => false,
-                'message' => 'Key not Authorized',
-            ], 500);
+        }
+
+        return response()->json([
+            'status' => false,
+            'message' => 'Key not Authorized',
+        ], 500);
 
         // } catch (\Exception$th) {
         //     return $th->getMessage();
@@ -842,7 +826,6 @@ class TransactionController extends Controller
             $transaction_type = $request->transaction_type;
             $serviceCode = $request->serviceCode;
             $reference = $request->reference;
-
 
             $oip = env('ERIP');
 
@@ -888,14 +871,13 @@ class TransactionController extends Controller
 
             }
 
-            if ($transaction_type == 'outward' &&  $serviceCode ==  'FT1') {
+            if ($transaction_type == 'outward' && $serviceCode == 'FT1') {
 
                 $status = User::where('serial_no', $serial_number)
                     ->first()->is_active;
 
                 $main_balance = User::where('serial_no', $serial_number)
                     ->first()->main_wallet;
-
 
                 $get_pin = User::where('serial_no', $serial_number)
                     ->first()->pin;
@@ -906,45 +888,39 @@ class TransactionController extends Controller
                     $check_agent_status = "InActive";
                 }
 
-
                 if (Hash::check($pin, $get_pin)) {
                     $user_pin = 1;
                 } else {
                     $user_pin = 0;
                 }
 
-
-
                 //check balance
                 $user_balance = User::where('serial_no', $serial_number)
-                ->first()->main_wallet;
+                    ->first()->main_wallet;
 
-                if($user_balance >= $amount){
+                if ($user_balance >= $amount) {
                     $processTransaction1 = true;
-                }else{
+                } else {
                     $processTransaction1 = false;
                 }
 
-                if($user_pin == 1){
+                if ($user_pin == 1) {
                     $processTransaction2 = true;
-                }else{
+                } else {
                     $processTransaction2 = false;
                 }
 
-
-
-                if ($processTransaction1 == true && $processTransaction2 == true ) {
-
+                if ($processTransaction1 == true && $processTransaction2 == true) {
 
                     $user_balance = User::where('serial_no', $serial_number)
-                    ->first()->main_wallet;
+                        ->first()->main_wallet;
 
                     $debit = $user_balance - $amount;
 
                     $update_balance = User::where('serial_no', $serial_number)
-                    ->update([
-                        'main_wallet' => $debit
-                    ]);
+                        ->update([
+                            'main_wallet' => $debit,
+                        ]);
 
                     //update Transactions
                     $trasnaction = new Transaction();
@@ -967,7 +943,7 @@ class TransactionController extends Controller
 
                     ]);
 
-                }else{
+                } else {
 
                     return response()->json([
 
@@ -977,21 +953,17 @@ class TransactionController extends Controller
 
                     ]);
 
-
                 }
-
-
 
             }
 
-            if ($transaction_type == 'outward' &&  $serviceCode ==  'BAT1') {
+            if ($transaction_type == 'outward' && $serviceCode == 'BAT1') {
 
                 $status = User::where('serial_no', $serial_number)
                     ->first()->is_active;
 
                 $main_balance = User::where('serial_no', $serial_number)
                     ->first()->main_wallet;
-
 
                 $get_pin = User::where('serial_no', $serial_number)
                     ->first()->pin;
@@ -1002,45 +974,39 @@ class TransactionController extends Controller
                     $check_agent_status = "InActive";
                 }
 
-
                 if (Hash::check($pin, $get_pin)) {
                     $user_pin = 1;
                 } else {
                     $user_pin = 0;
                 }
 
-
-
                 //check balance
                 $user_balance = User::where('serial_no', $serial_number)
-                ->first()->main_wallet;
+                    ->first()->main_wallet;
 
-                if($user_balance >= $amount){
+                if ($user_balance >= $amount) {
                     $processTransaction1 = true;
-                }else{
+                } else {
                     $processTransaction1 = false;
                 }
 
-                if($user_pin == 1){
+                if ($user_pin == 1) {
                     $processTransaction2 = true;
-                }else{
+                } else {
                     $processTransaction2 = false;
                 }
 
-
-
-                if ($processTransaction1 == true && $processTransaction2 == true ) {
-
+                if ($processTransaction1 == true && $processTransaction2 == true) {
 
                     $user_balance = User::where('serial_no', $serial_number)
-                    ->first()->main_wallet;
+                        ->first()->main_wallet;
 
                     $debit = $user_balance - $amount;
 
                     $update_balance = User::where('serial_no', $serial_number)
-                    ->update([
-                        'main_wallet' => $debit
-                    ]);
+                        ->update([
+                            'main_wallet' => $debit,
+                        ]);
 
                     //update Transactions
                     $trasnaction = new Transaction();
@@ -1063,7 +1029,7 @@ class TransactionController extends Controller
 
                     ]);
 
-                }else{
+                } else {
 
                     return response()->json([
 
@@ -1073,20 +1039,9 @@ class TransactionController extends Controller
 
                     ]);
 
-
                 }
 
-
-
             }
-
-
-
-
-
-
-
-
 
             if ($serviceCode == 'BLE1') {
 
@@ -1343,17 +1298,16 @@ class TransactionController extends Controller
 
     }
 
+    public function pos(Request $request)
+    {
 
-
-    public function pos(Request $request){
-
-         try {
+        try {
 
             $pos_trasnactions = Transaction::latest()
-            ->where([
-                'user_id' => Auth::id(),
-                'transaction_type' => 'CashOut'
-            ])->take(10)->get();
+                ->where([
+                    'user_id' => Auth::id(),
+                    'transaction_type' => 'CashOut',
+                ])->take(10)->get();
 
             return response()->json([
 
@@ -1367,27 +1321,52 @@ class TransactionController extends Controller
         }
     }
 
-    public function transfer(Request $request){
+    public function transfer(Request $request)
+    {
 
         try {
 
-           $transfer_trasnactions = Transaction::orderBy("id", "DESC")
-           ->where([
-               'user_id' => Auth::id(),
-               'main_type' => 'Transfer',
-           ])
-          ->take(20)->get();
+            $transfer_trasnactions = Transaction::orderBy("id", "DESC")
+                ->where([
+                    'user_id' => Auth::id(),
+                    'main_type' => 'Transfer',
+                ])
+                ->take(20)->get();
 
-           return response()->json([
+            return response()->json([
 
-               'status' => $this->success,
-               'data' => $transfer_trasnactions,
+                'status' => $this->success,
+                'data' => $transfer_trasnactions,
 
-           ], 200);
+            ], 200);
 
-       } catch (\Exception$th) {
-           return $th->getMessage();
-       }
-   }
+        } catch (\Exception$th) {
+            return $th->getMessage();
+        }
+    }
+
+    public function vas(Request $request)
+    {
+
+        try {
+
+            $transfer_trasnactions = Transaction::orderBy("id", "DESC")
+                ->where([
+                    'user_id' => Auth::id(),
+                    'type' => 'vas',
+                ])
+                ->take(20)->get();
+
+            return response()->json([
+
+                'status' => $this->success,
+                'data' => $transfer_trasnactions,
+
+            ], 200);
+
+        } catch (\Exception$th) {
+            return $th->getMessage();
+        }
+    }
 
 }
