@@ -971,7 +971,7 @@ class TransactionController extends Controller
 
                         'is_pin_valid' => true,
                         'balance' => number_format($user_balance, 2),
-                        'agent_status' => "Inactive",
+                        'agent_status' => "Active",
 
                     ]);
 
@@ -1058,7 +1058,7 @@ class TransactionController extends Controller
 
                         'is_pin_valid' => true,
                         'balance' => number_format($user_balance, 2),
-                        'agent_status' => "Inactive",
+                        'agent_status' => "Active",
 
                     ]);
 
