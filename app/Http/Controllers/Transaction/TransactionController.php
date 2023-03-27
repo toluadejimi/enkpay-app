@@ -946,7 +946,7 @@ class TransactionController extends Controller
                     //update Transactions
                     $trasnaction = new Transaction();
                     $trasnaction->user_id = $user_id;
-                    $trasnaction->$ref_trans_id =$trans_id;
+                    $trasnaction->ref_trans_id = $trans_id;
                     $trasnaction->e_ref = $reference;
                     $trasnaction->transaction_type = "TerminalBankTransfer";
                     $trasnaction->type = $transaction_type;
@@ -1033,7 +1033,7 @@ class TransactionController extends Controller
                     //update Transactions
                     $trasnaction = new Transaction();
                     $trasnaction->user_id = $user_id;
-                    $trasnaction->$ref_trans_id =$trans_id;
+                    $trasnaction->ref_trans_id =$trans_id;
                     $trasnaction->e_ref = $reference;
                     $trasnaction->transaction_type = "VASfromTerminal";
                     $trasnaction->type = $transaction_type;
