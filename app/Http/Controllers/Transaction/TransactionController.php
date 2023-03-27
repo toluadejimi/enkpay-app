@@ -789,7 +789,7 @@ class TransactionController extends Controller
                     $trasnaction->transaction_type = $TransactionType;
                     $trasnaction->credit = $removed_comission;
                     $trasnaction->e_charges = $amount;
-                    $trasnaction->note = "Credit eeceived from POS Terminal";
+                    $trasnaction->note = "Credit received from POS Terminal";
                     $trasnaction->fee = $Fee;
                     $trasnaction->enkPay_Cashout_profit = $enkpay_commision_amount;
                     $trasnaction->balance = $updated_amount;
@@ -946,14 +946,15 @@ class TransactionController extends Controller
                     //update Transactions
                     $trasnaction = new Transaction();
                     $trasnaction->user_id = $user_id;
-                    $trasnaction->ref_trans_id = $reference;
+                    $trasnaction->$ref_trans_id =$trans_id;
+                    $trasnaction->e_ref = $reference;
                     $trasnaction->transaction_type = "TerminalBankTransfer";
                     $trasnaction->type = $transaction_type;
                     $trasnaction->debit = $amount;
                     $trasnaction->balance = $debit;
                     $trasnaction->e_charges = 25;
                     $trasnaction->serial_no = $serial_number;
-                    $trasnaction->status = 1;
+                    $trasnaction->status = 0;
                     $trasnaction->save();
 
                     return response()->json([
@@ -1115,10 +1116,14 @@ class TransactionController extends Controller
 
             $ref_no = $request->ref_no;
 
+            $e_ref = Transaction::where('ref_trans_id', $ref_no)
+            ->first()->e_ref;
+
+
             $curl = curl_init();
 
             curl_setopt_array($curl, array(
-                CURLOPT_URL => "https://api.errandpay.com/epagentservice/api/v1/GetStatus?reference=$ref_no&businessCode=$b_code'",
+                CURLOPT_URL => "https://api.errandpay.com/epagentservice/api/v1/GetStatus?reference=$e_ref&businessCode=$b_code",
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
@@ -1136,7 +1141,28 @@ class TransactionController extends Controller
             curl_close($curl);
             $var = json_decode($var);
 
-            dd($var, $errand_key, $ref_no);
+            $ms = $var->error->message ?? null;
+
+            if($var->code == 200){
+
+                $update = Transaction::where('ref_trans_id', $ref_no)
+                ->update(['status' => 1]);
+
+                return response()->json([
+
+                    'status' => true,
+                    'message' => "Transaction Successful"
+
+                ], 200);
+
+            }
+
+            return response()->json([
+
+                'status' => false,
+                'message' => $ms
+
+            ], 500);
 
         } catch (\Exception$th) {
             return $th->getMessage();
