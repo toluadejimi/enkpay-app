@@ -843,7 +843,7 @@ class TransactionController extends Controller
     public function balance_webhook(Request $request)
     {
 
-        try {
+        // try {
 
             //$IP = $_SERVER['SERVER_ADDR'];
 
@@ -900,6 +900,9 @@ class TransactionController extends Controller
 
             if ($transaction_type == 'outward' && $serviceCode == 'FT1') {
 
+                $user_balance = User::where('serial_no', $serial_number)
+                ->first()->main_wallet ?? null;
+
                 $status = User::where('serial_no', $serial_number)
                     ->first()->is_active;
 
@@ -915,32 +918,28 @@ class TransactionController extends Controller
                     $check_agent_status = "InActive";
                 }
 
-                if (Hash::check($pin, $get_pin)) {
-                    $user_pin = 1;
-                } else {
-                    $user_pin = 0;
+                if (Hash::check($pin, $get_pin) == false) {
+
+                    return response()->json([
+
+                        'is_pin_valid' => false,
+                        'balance' => number_format($user_balance, 2),
+                        'agent_status' => $check_agent_status,
+
+                    ]);
+
+
                 }
+
 
                 //check balance
                 $user_balance = User::where('serial_no', $serial_number)
                     ->first()->main_wallet;
 
                 if ($user_balance >= $amount) {
-                    $processTransaction1 = true;
-                } else {
-                    $processTransaction1 = false;
-                }
-
-                if ($user_pin == 1) {
-                    $processTransaction2 = true;
-                } else {
-                    $processTransaction2 = false;
-                }
-
-                if ($processTransaction1 == true && $processTransaction2 == true) {
 
                     $user_balance = User::where('serial_no', $serial_number)
-                        ->first()->main_wallet;
+                        ->first()->main_wallet ?? null;
 
                     $debit = $user_balance - $amount;
 
@@ -972,7 +971,7 @@ class TransactionController extends Controller
 
                         'is_pin_valid' => true,
                         'balance' => number_format($debit, 2),
-                        'agent_status' => "Active",
+                        'agent_status' => $check_agent_status,
 
                     ]);
 
@@ -982,7 +981,7 @@ class TransactionController extends Controller
 
                         'is_pin_valid' => true,
                         'balance' => number_format($user_balance, 2),
-                        'agent_status' => "Active",
+                        'agent_status' => $check_agent_status,
 
                     ]);
 
@@ -1007,29 +1006,28 @@ class TransactionController extends Controller
                     $check_agent_status = "InActive";
                 }
 
-                if (Hash::check($pin, $get_pin)) {
-                    $user_pin = 1;
-                } else {
-                    $user_pin = 0;
+                $user_balance = User::where('serial_no', $serial_number)
+                    ->first()->main_wallet;
+
+                if (Hash::check($pin, $get_pin) == false) {
+
+                    return response()->json([
+
+                        'is_pin_valid' => false,
+                        'balance' => number_format($user_balance, 2),
+                        'agent_status' => $check_agent_status,
+
+                    ]);
+
+
                 }
 
                 //check balance
                 $user_balance = User::where('serial_no', $serial_number)
                     ->first()->main_wallet;
 
+
                 if ($user_balance >= $amount) {
-                    $processTransaction1 = true;
-                } else {
-                    $processTransaction1 = false;
-                }
-
-                if ($user_pin == 1) {
-                    $processTransaction2 = true;
-                } else {
-                    $processTransaction2 = false;
-                }
-
-                if ($processTransaction1 == true && $processTransaction2 == true) {
 
                     $user_balance = User::where('serial_no', $serial_number)
                         ->first()->main_wallet;
@@ -1063,7 +1061,7 @@ class TransactionController extends Controller
 
                         'is_pin_valid' => true,
                         'balance' => number_format($debit, 2),
-                        'agent_status' => "Active",
+                        'agent_status' => $check_agent_status,
 
                     ]);
 
@@ -1073,7 +1071,7 @@ class TransactionController extends Controller
 
                         'is_pin_valid' => true,
                         'balance' => number_format($user_balance, 2),
-                        'agent_status' => "Active",
+                        'agent_status' => $check_agent_status,
 
                     ]);
 
@@ -1115,9 +1113,9 @@ class TransactionController extends Controller
 
             }
 
-        } catch (\Exception$th) {
-            return $th->getMessage();
-        }
+        // } catch (\Exception$th) {
+        //     return $th->getMessage();
+        // }
 
     }
 
