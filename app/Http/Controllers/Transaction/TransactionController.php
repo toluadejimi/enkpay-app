@@ -957,10 +957,11 @@ class TransactionController extends Controller
                     $trasnaction->transaction_type = "TerminalBankTransfer";
                     $trasnaction->type = $transaction_type;
                     $trasnaction->debit = $amount;
+                    $trasnaction->main_type = 'Transfer';
                     $trasnaction->balance = $debit;
                     $trasnaction->e_charges = 25;
                     $trasnaction->serial_no = $serial_number;
-                    $trasnaction->status = 0;
+                    $trasnaction->status = 1;
                     $trasnaction->save();
 
                     $amount4 = number_format($amount, 2);
