@@ -1055,7 +1055,7 @@ class TransactionController extends Controller
 
                     return response()->json([
 
-                        'is_pin_valid' => false,
+                        'is_pin_valid' => true,
                         'balance' => number_format($user_balance, 2),
                         'agent_status' => "Inactive",
 
@@ -1119,6 +1119,8 @@ class TransactionController extends Controller
             $e_ref = Transaction::where('ref_trans_id', $ref_no)
             ->first()->e_ref;
 
+            $url = "https://api.errandpay.com/epagentservice/api/v1/GetStatus?reference=$e_ref&businessCode=$b_code";
+
 
             $curl = curl_init();
 
@@ -1140,6 +1142,7 @@ class TransactionController extends Controller
 
             curl_close($curl);
             $var = json_decode($var);
+
 
             $ms = $var->error->message ?? null;
 
