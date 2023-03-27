@@ -969,7 +969,7 @@ class TransactionController extends Controller
 
                     return response()->json([
 
-                        'is_pin_valid' => false,
+                        'is_pin_valid' => true,
                         'balance' => number_format($user_balance, 2),
                         'agent_status' => "Inactive",
 
@@ -1033,7 +1033,8 @@ class TransactionController extends Controller
                     //update Transactions
                     $trasnaction = new Transaction();
                     $trasnaction->user_id = $user_id;
-                    $trasnaction->ref_trans_id = $reference;
+                    $trasnaction->$ref_trans_id =$trans_id;
+                    $trasnaction->e_ref = $reference;
                     $trasnaction->transaction_type = "VASfromTerminal";
                     $trasnaction->type = $transaction_type;
                     $trasnaction->debit = $amount;
