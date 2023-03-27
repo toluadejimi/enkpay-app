@@ -800,19 +800,25 @@ class TransactionController extends Controller
 
                 }
 
-                $data = array(
-                    'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
-                    'subject' => "Account Credited",
-                    'toreceiver' => 'toluadejimi@gmail.com',
-                    'amount' => $removed_comission,
-                    'serial' => $SerialNumber,
-                );
 
-                Mail::send('emails.transaction.terminal-credit', ["data1" => $data], function ($message) use ($data) {
-                    $message->from($data['fromsender']);
-                    $message->to($data['toreceiver']);
-                    $message->subject($data['subject']);
-                });
+                $amount4 = number_format($amount);
+                $message = "NGN $amount4 enter pool Account by $user_id using Card on Terminal";
+                send_notification($message);
+
+
+                // $data = array(
+                //     'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                //     'subject' => "Account Credited",
+                //     'toreceiver' => 'toluadejimi@gmail.com',
+                //     'amount' => $removed_comission,
+                //     'serial' => $SerialNumber,
+                // );
+
+                // Mail::send('emails.transaction.terminal-credit', ["data1" => $data], function ($message) use ($data) {
+                //     $message->from($data['fromsender']);
+                //     $message->to($data['toreceiver']);
+                //     $message->subject($data['subject']);
+                // });
 
                 return response()->json([
                     'status' => true,
@@ -957,6 +963,10 @@ class TransactionController extends Controller
                     $trasnaction->status = 0;
                     $trasnaction->save();
 
+                    $amount4 = number_format($amount, 2);
+                    $message = "NGN $amount4 left pool Account by $user_id using Transfer";
+                    send_notification($message);
+
                     return response()->json([
 
                         'is_pin_valid' => true,
@@ -1043,6 +1053,10 @@ class TransactionController extends Controller
                     $trasnaction->serial_no = $serial_number;
                     $trasnaction->status = 1;
                     $trasnaction->save();
+
+                    $amount4 = number_format($amount);
+                    $message = "NGN $amount4 left pool Account by $user_id using VAS";
+                    send_notification($message);
 
                     return response()->json([
 
