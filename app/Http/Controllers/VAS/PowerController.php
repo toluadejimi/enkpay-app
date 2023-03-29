@@ -100,7 +100,7 @@ class PowerController extends Controller
 
                 $customer_name = $var->content->Customer_Name ?? null;
                 $eletric_address = $var->content->Address ?? null;
-                $meter_no = $var->content->Meter_Number ?? $var->content->MeterNumber;
+                $meter_no = $var->content->Meter_Number ?? $var->content->MeterNumber ?? null;
 
                 $update = User::where('id', Auth::id())
                     ->update([
