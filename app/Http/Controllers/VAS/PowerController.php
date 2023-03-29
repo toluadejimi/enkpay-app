@@ -98,8 +98,8 @@ class PowerController extends Controller
 
             if ($var->code == 000) {
 
-                $customer_name = $var->content->Customer_Name;
-                $eletric_address = $var->content->Address;
+                $customer_name = $var->content->Customer_Name ?? null;
+                $eletric_address = $var->content->Address ?? null;
                 $meter_no = $var->content->Meter_Number ?? $var->content->MeterNumber;
 
                 $update = User::where('id', Auth::id())
