@@ -34,33 +34,17 @@
 
                 <p style="font-size: 14px;font-weight: bold;"> Hi, {{ $data1['first_name'] }}</p>
 
-                <table style="font-family:'Rubik',sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
-                    <tbody>
-                      <tr>
-                        <td style="overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:'Rubik',sans-serif;" align="left">
 
                           <div style="line-height: 140%; text-align: center; word-wrap: break-word;">
                             <p style="font-size: 14px; line-height: 140%;">Click
                               the button below.<br>to reset your pin </p>
                           </div>
-
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-
-                  <table style="font-family:'Rubik',sans-serif;" role="presentation" cellpadding="0" cellspacing="0" width="100%" border="0">
-                    <tbody>
-                      <tr>
-                        <td style="overflow-wrap:break-word;word-break:break-word;padding:10px;font-family:'Rubik',sans-serif;" align="left">
-
+                            <br>
+                            <br>
                             <a href="{{ $data1['link'] }}" class="btn btn-default" role="button">Reset Your
                             Pin</a>
+                            <br>
 
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
 
 
                 <p class="text-muted mb-0" style="--bs-body-font-weight: normal;height: 0px;width: 566px;text-align: left;font-size: 11px;">Copyright © 2023 ENKWAVE</p>
