@@ -19,6 +19,7 @@ use Exception;
 use Laravel\Passport\Passport;
 use Laravel\Passport\HasApiTokens;
 use App\Models\ErrandKey;
+use Mail;
 
 
 
@@ -321,10 +322,64 @@ public function user_info(request $request){
         return $th->getMessage();
     }
 
-
-
-
     }
+
+
+
+
+    public function forgot_pin(Request $request)
+    {
+
+        try{
+
+        $email = $request->email;
+
+        $check = User::where('email', $email)
+            ->first()->email ?? null;
+
+        $first_name = User::where('email', $email)
+            ->first()->first_name ?? null;
+
+        if ($check == $email) {
+
+            //send email
+            $data = array(
+                'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                'subject' => "Reset Pin",
+                'toreceiver' => $email,
+                'first_name' => $first_name,
+                'link' => url('') . "/forgot_pin/?email=$email",
+            );
+
+            Mail::send('emails.notify.pinlink', ["data1" => $data], function ($message) use ($data) {
+                $message->from($data['fromsender']);
+                $message->to($data['toreceiver']);
+                $message->subject($data['subject']);
+            });
+
+            return response()->json([
+                'status' => $this->success,
+                'message' => 'Check your inbox or spam for instructions',
+            ], 200);
+
+        } else {
+
+            return response()->json([
+
+                'status' => $this->failed,
+                'message' => 'User not found on our system',
+
+            ], 500);
+
+        }
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => $this->failedStatus,
+            'message' => $e->getMessage(),
+        ], 500);
+    }
+
+}
 
 
     public function view_agent_account(Request $request){

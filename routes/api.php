@@ -39,6 +39,9 @@ Route::post('verify-email-otp', [RegisterationController::class, 'verify_email_o
 
 Route::post('register', [RegisterationController::class, 'register']);
 
+
+
+
 //Device Order
 Route::post('order-device', [DeviceOrderController::class, 'order_device']);
 Route::get('bank-details', [DeviceOrderController::class, 'bank_details']);
@@ -52,6 +55,12 @@ Route::post('v1/cash-in', [VirtualaccountController::class, 'cash_in_webhook']);
 Route::post('v1/wallet-check', [TransactionController::class, 'balance_webhook']);
 Route::post('v1/transfer-request', [TransactionController::class, 'transfer_request']);
 Route::post('v1/merchant-details', [ProfileController::class, 'view_agent_account']);
+
+
+//Fogot Pin
+Route::post('forgot-pin', [ProfileController::class, 'forgot_pin']);
+
+
 
 //Transactions
 Route::get('transaction-status', [TransactionController::class, 'transactiion_status']);
