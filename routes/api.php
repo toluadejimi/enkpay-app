@@ -10,6 +10,7 @@ use App\Http\Controllers\VAS\DataController;
 use App\Http\Controllers\VAS\PowerController;
 use App\Http\Controllers\VAS\EducationController;
 use App\Http\Controllers\VAS\CableController;
+use App\Http\Controllers\VAS\InsuranceController;
 use App\Http\Controllers\Virtual\VirtualaccountController;
 use Illuminate\Support\Facades\Route;
 
@@ -133,6 +134,26 @@ Route::group(['middleware' => ['auth:api', 'acess']], function () {
 
     //Cable
     Route::get('get-cable-plan', [CableController::class, 'get_cable_plan']);
+    Route::get('buy-cable', [CableController::class, 'buy_cable']);
+
+
+
+    //insurance
+    Route::get('get-motor-insurance', [InsuranceController::class, 'third_party_motor']);
+    Route::get('get-health-insurance', [InsuranceController::class, 'health_insurance']);
+    Route::get('personal-accident-insurance', [InsuranceController::class, 'personal_accident_insurance']);
+    Route::get('home-cover-insurance', [InsuranceController::class, 'home_cover_insurance']);
+    Route::get('extra-home-cover-insurance', [InsuranceController::class, 'extra_home_cover_insurance']);
+
+
+
+
+
+
+
+
+
+
 
 
 

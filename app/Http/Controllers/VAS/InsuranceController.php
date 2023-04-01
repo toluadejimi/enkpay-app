@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Wallet;
-use App\Models\Charge;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -14,13 +13,13 @@ use Illuminate\Support\Str;
 use Mail;
 
 
-class EducationController extends Controller
+class InsuranceController extends Controller
 {
 
     public $success = true;
     public $failed = false;
 
-    public function get_waec(request $request)
+    public function third_party_motor(request $request)
     {
 
         try {
@@ -28,15 +27,16 @@ class EducationController extends Controller
             $account = select_account();
 
             $client = new \GuzzleHttp\Client();
-            $request = $client->get('https://vtpass.com/api/service-variations?serviceID=waec-registration');
+            $request = $client->get('https://vtpass.com/api/service-variations?serviceID=ui-insure');
             $response = $request->getBody();
             $result = json_decode($response);
 
             $data = $result->content->variations ?? null;
 
-            $get_message = $result->content->errors ?? null;
-
             $status = $result->response_description ?? null;
+
+
+            $get_message = $result->content->errors ?? null;
 
             $message = "Error from Eduction - $get_message";
 
@@ -48,7 +48,6 @@ class EducationController extends Controller
                 ], 500);
 
             }
-
 
 
             if ($status == 000) {
@@ -64,7 +63,7 @@ class EducationController extends Controller
             send_error($message);
 
             return response()->json([
-                'status' => $this->success,
+                'status' => $this->failed,
                 'message' => "Service not available, Please try again later",
             ], 500);
 
@@ -73,6 +72,231 @@ class EducationController extends Controller
         }
 
     }
+
+
+    public function health_insurance(request $request)
+    {
+
+        try {
+
+            $account = select_account();
+
+            $client = new \GuzzleHttp\Client();
+            $request = $client->get('https://vtpass.com/api/service-variations?serviceID=health-insurance-rhl');
+            $response = $request->getBody();
+            $result = json_decode($response);
+
+            $data = $result->content->variations ?? null;
+
+            $status = $result->response_description ?? null;
+
+            $get_message = $result->content->errors ?? null;
+
+            $message = "Error from Eduction - $get_message";
+
+            if($status == null){
+
+                return response()->json([
+                    'status' => $this->success,
+                    'message' => "Service not available, Please try again later",
+                ], 500);
+
+            }
+
+
+            if ($status == 000) {
+
+                return response()->json([
+                    'status' => $this->success,
+                    'data' => $data,
+                    'account' => $account,
+                ], 200);
+
+            }
+
+            send_error($message);
+
+            return response()->json([
+                'status' => $this->failed,
+                'message' => "Service not available, Please try again later",
+            ], 500);
+
+        } catch (\Exception$th) {
+            return $th->getMessage();
+        }
+
+    }
+
+
+    public function personal_accident_insurance(request $request)
+    {
+
+        try {
+
+            $account = select_account();
+
+            $client = new \GuzzleHttp\Client();
+            $request = $client->get('https://vtpass.com/api/service-variations?serviceID=personal-accident-insurance');
+            $response = $request->getBody();
+            $result = json_decode($response);
+
+            $data = $result->content->variations ?? null;
+
+            $status = $result->response_description ?? null;
+
+            $get_message = $result->content->errors ?? null;
+
+            $message = "Error from Eduction - $get_message";
+
+            if($status == null){
+
+                return response()->json([
+                    'status' => $this->success,
+                    'message' => "Service not available, Please try again later",
+                ], 500);
+
+            }
+
+
+            if ($status == 000) {
+
+                return response()->json([
+                    'status' => $this->success,
+                    'data' => $data,
+                    'account' => $account,
+                ], 200);
+
+            }
+
+            send_error($message);
+
+            return response()->json([
+                'status' => $this->failed,
+                'message' => "Service not available, Please try again later",
+            ], 500);
+
+        } catch (\Exception$th) {
+            return $th->getMessage();
+        }
+
+    }
+
+
+    public function home_cover_insurance(request $request)
+    {
+
+        try {
+
+            $account = select_account();
+
+            $client = new \GuzzleHttp\Client();
+            $request = $client->get('https://vtpass.com/api/service-variations?serviceID=home-cover-insurance');
+            $response = $request->getBody();
+            $result = json_decode($response);
+
+            $data = $result->content->variations ?? null;
+
+            $status = $result->response_description ?? null;
+
+            $get_message = $result->content->errors ?? null;
+
+            $message = "Error from Eduction - $get_message";
+
+            if($status == null){
+
+                return response()->json([
+                    'status' => $this->success,
+                    'message' => "Service not available, Please try again later",
+                ], 500);
+
+            }
+
+
+            if ($status == 000) {
+
+                return response()->json([
+                    'status' => $this->success,
+                    'data' => $data,
+                    'account' => $account,
+                ], 200);
+
+            }
+
+            send_error($message);
+
+            return response()->json([
+                'status' => $this->failed,
+                'message' => "Service not available, Please try again later",
+            ], 500);
+
+        } catch (\Exception$th) {
+            return $th->getMessage();
+        }
+
+    }
+
+
+
+    public function extra_home_cover_insurance(request $request)
+    {
+
+        try {
+
+            $account = select_account();
+
+            $client = new \GuzzleHttp\Client();
+            $request = $client->get('https://vtpass.com/api/extra-fields?serviceID=home-cover-insurance');
+            $response = $request->getBody();
+            $result = json_decode($response);
+
+            $data = $result->content->variations ?? null;
+
+            $status = $result->response_description ?? null;
+
+            $get_message = $result->content->errors ?? null;
+
+            $message = "Error from Eduction - $get_message";
+
+            if($status == null){
+
+                return response()->json([
+                    'status' => $this->success,
+                    'message' => "Service not available, Please try again later",
+                ], 500);
+
+            }
+
+
+            if ($status == 000) {
+
+                return response()->json([
+                    'status' => $this->success,
+                    'data' => $data,
+                    'account' => $account,
+                ], 200);
+
+            }
+
+            send_error($message);
+
+            return response()->json([
+                'status' => $this->failed,
+                'message' => "Service not available, Please try again later",
+            ], 500);
+
+        } catch (\Exception$th) {
+            return $th->getMessage();
+        }
+
+    }
+
+
+
+
+
+
+
+
 
     public function buy_waec(request $request)
     {
@@ -197,9 +421,7 @@ class EducationController extends Controller
             $message = "Error Mesage from VAS BUY WAEC EDUCATION - $get_message2";
 
 
-            $p_code = $var->purchased_code ?? null;
-
-
+            $p_code = $var->purchased_code;
 
             if ($status == 'TRANSACTION SUCCESSFUL') {
 

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Charge;
 use App\Models\ErrandKey;
 use App\Models\Transaction;
+use App\Models\Transaction2;
 use App\Models\User;
 use Auth;
 use Illuminate\Http\Request;
@@ -585,6 +586,34 @@ class TransactionController extends Controller
             $trasnaction->status = 1;
             $trasnaction->save();
 
+
+
+            //second database
+
+            $trasnaction = new Transaction2();
+            $trasnaction->setConnection('mysql_second');
+            $trasnaction->user_id = Auth::id();
+            $trasnaction->from_user_id = Auth::id();
+            $trasnaction->to_user_id = $receiver_id;
+            $trasnaction->ref_trans_id = $trans_id;
+            $trasnaction->transaction_type = "EnkPayTransfer";
+            $trasnaction->type = "InAppTransfer";
+            $trasnaction->main_type = "Transfer";
+            $trasnaction->debit = $amount;
+            $trasnaction->note = "Bank Transfer to Enk Pay User";
+            $trasnaction->fee = 0;
+            $trasnaction->e_charges = 0;
+            $trasnaction->trx_date = date("Y/m/d");
+            $trasnaction->trx_time = date("h:i:s");
+            $trasnaction->receiver_name = $receiver_full_name;
+            $trasnaction->reveiver_account_no = $phone;
+            $trasnaction->balance = $debit;
+            $trasnaction->status = 1;
+            $trasnaction->save();
+
+
+
+
             //credit receiver
 
             $credit = $receiver_main_wallet + $amount;
@@ -614,6 +643,31 @@ class TransactionController extends Controller
             $trasnaction->balance = $credit;
             $trasnaction->status = 1;
             $trasnaction->save();
+
+
+
+
+            $trasnaction = new Transaction2();
+            $trasnaction->setConnection('mysql_second');
+            $trasnaction->user_id = $receiver_id;
+            $trasnaction->from_user_id = Auth::id();
+            $trasnaction->to_user_id = $receiver_id;
+            $trasnaction->ref_trans_id = $trans_id;
+            $trasnaction->transaction_type = "EnkPayTransfer";
+            $trasnaction->main_type = "Transfer";
+            $trasnaction->type = "InAppTransfer";
+            $trasnaction->credit = $amount;
+            $trasnaction->note = "Bank Transfer to Enk Pay User";
+            $trasnaction->fee = 0;
+            $trasnaction->e_charges = 0;
+            $trasnaction->trx_date = date("Y/m/d");
+            $trasnaction->trx_time = date("h:i:s");
+            $trasnaction->sender_name = $sender_full_name;
+            $trasnaction->sender_account_no = user_phone();
+            $trasnaction->balance = $credit;
+            $trasnaction->status = 1;
+            $trasnaction->save();
+
 
             //sender email
 
@@ -1052,6 +1106,21 @@ class TransactionController extends Controller
                     $trasnaction->serial_no = $serial_number;
                     $trasnaction->status = 1;
                     $trasnaction->save();
+
+                    $trasnaction = new Transaction();
+                    $product->setConnection('mysql_second');
+                    $trasnaction->user_id = $user_id;
+                    $trasnaction->ref_trans_id =$trans_id;
+                    $trasnaction->e_ref = $reference;
+                    $trasnaction->transaction_type = "VASfromTerminal";
+                    $trasnaction->type = $transaction_type;
+                    $trasnaction->debit = $amount;
+                    $trasnaction->balance = $debit;
+                    $trasnaction->e_charges = 0;
+                    $trasnaction->serial_no = $serial_number;
+                    $trasnaction->status = 1;
+                    $trasnaction->save();
+
 
                     $amount4 = number_format($amount);
                     $message = "NGN $amount4 left pool Account by $user_id using VAS";
