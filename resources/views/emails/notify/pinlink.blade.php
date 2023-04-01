@@ -35,7 +35,7 @@
                 <p style="font-size: 14px;font-weight: bold;"> Hi, {{ $data1['first_name'] }}</p>
 
 
-                          <div style="line-height: 140%; text-align: center; word-wrap: break-word;">
+                          <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
                             <p style="font-size: 14px; line-height: 140%;">Click
                               the button below.<br>to reset your pin </p>
                           </div>
