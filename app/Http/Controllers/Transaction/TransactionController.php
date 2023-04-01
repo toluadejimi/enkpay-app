@@ -822,7 +822,7 @@ class TransactionController extends Controller
 
 
 
-                $enkpay_cashOut_fee = $amount -$enkpay_commision_amount ;
+                $enkpay_cashOut_fee = $amount - $enkpay_commision_amount ;
 
 
                 $removed_comission = $Amount - $amount;
@@ -855,7 +855,7 @@ class TransactionController extends Controller
                 }
 
 
-                $amount4 = number_format($amount);
+                $amount4 = number_format($removed_comission, 2);
                 $message = "NGN $amount4 enter pool Account by $user_id using Card on Terminal";
                 send_notification($message);
 
@@ -1122,7 +1122,7 @@ class TransactionController extends Controller
                     $trasnaction->save();
 
 
-                    $amount4 = number_format($amount);
+                    $amount4 = number_format($amount, 2);
                     $message = "NGN $amount4 left pool Account by $user_id using VAS";
                     send_notification($message);
 

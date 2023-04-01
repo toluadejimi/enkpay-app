@@ -173,6 +173,8 @@ class VirtualaccountController extends Controller
 
                 if ($StatusCode == 00) {
 
+                    $deposit_charges = Charge::where('id', 2)->first()->amount;
+
                     $main_wallet = User::where('v_account_no', $VirtualCustomerAccount)
                         ->first()->main_wallet ?? null;
 
@@ -246,7 +248,7 @@ class VirtualaccountController extends Controller
                         'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
                         'subject' => "Virtual Account Credited",
                         'toreceiver' => 'toluadejimi@gmail.com',
-                        'amount' => $Amount,
+                        'amount' => $enkpay_debit,
                         'serial' => $user_id,
                     );
 
