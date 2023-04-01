@@ -56,8 +56,8 @@
                           </div>
                             <br>
                             <br>
-                            <button a href="{{ $data1['link'] }}" class="button" role="button">Reset Your
-                            Pin</a></button>
+                            <a href="{{ $data1['link'] }}" class="button" role="button">Reset Your
+                            Pin</a>
                             <br>
                             <br>
 
