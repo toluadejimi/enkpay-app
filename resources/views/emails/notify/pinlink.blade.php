@@ -13,6 +13,21 @@
     <link rel="stylesheet" href="{{url('')}}/public/assets/css/Footer-with-social-media-icons.css">
 </head>
 
+<style>
+    .button {
+      background-color: #10047a;
+      border: none;
+      color: white;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 4px 2px;
+      cursor: pointer;
+    }
+</style>
+
 <body>
     <div class="container">
         <div class="col">
@@ -41,7 +56,7 @@
                           </div>
                             <br>
                             <br>
-                            <button a href="{{ $data1['link'] }}" class="btn btn-default" role="button">Reset Your
+                            <button a href="{{ $data1['link'] }}" class="button" role="button">Reset Your
                             Pin</a></button>
                             <br>
                             <br>
