@@ -1014,6 +1014,7 @@ class TransactionController extends Controller
                     $trasnaction->balance = $debit;
                     $trasnaction->e_charges = 25;
                     $trasnaction->serial_no = $serial_number;
+                    $trasnaction->note = "Transfer to other banks";
                     $trasnaction->status = 1;
                     $trasnaction->save();
 
