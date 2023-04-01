@@ -41,8 +41,9 @@
                           </div>
                             <br>
                             <br>
-                            <a href="{{ $data1['link'] }}" class="btn btn-default" role="button">Reset Your
-                            Pin</a>
+                            <button a href="{{ $data1['link'] }}" class="btn btn-default" role="button">Reset Your
+                            Pin</a></button>
+                            <br>
                             <br>
 
 
