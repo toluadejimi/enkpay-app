@@ -94,13 +94,13 @@ if (!function_exists('select_account')) {
         $account_array = array();
         $account_array[0] = [
             "title" => "Main Account",
-            "amount" => number_format($account->main_wallet, 2),
+            "amount" => $account->main_wallet,
             "key" => "main_account",
 
         ];
         $account_array[1] = [
             "title" => "Bonus Account",
-            "amount" => number_format($account->bonus_wallet, 2),
+            "amount" => $account->bonus_wallet,
             "key" => "bonus_account",
         ];
 
