@@ -4,12 +4,10 @@ namespace App\Http\Controllers\Virtual;
 
 use App\Http\Controllers\Controller;
 use App\Models\Charge;
-use App\Models\ErrandKey;
 use App\Models\Transaction;
 use App\Models\User;
 use Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Mail;
 
@@ -68,10 +66,40 @@ class VirtualaccountController extends Controller
                 ),
             ));
 
-            $response = curl_exec($curl);
+            $var = curl_exec($curl);
 
             curl_close($curl);
-            echo $response;
+            $var = json_decode($var);
+
+            dd($var);
+
+            $status = $var->code ?? null;
+            $acct_no = $var->data->accountNumber ?? null;
+            $acct_name = $var->data->accountName ?? null;
+
+            if ($status == 200) {
+
+                $update = User::where('id', Auth::id())
+                    ->update([
+                        'v_account_no' => $acct_no,
+                        'v_account_name' => $acct_name,
+                    ]);
+
+                return response()->json([
+
+                    'status' => $this->success,
+                    'data' => $var->data,
+
+                ], 200);
+
+            }
+
+            return response()->json([
+
+                'status' => $this->failed,
+                'data' => $var->error->message,
+
+            ], 500);
 
         } catch (\Exception$th) {
             return $th->getMessage();
@@ -135,9 +163,6 @@ class VirtualaccountController extends Controller
 
     }
 
-
-
-
     public function cash_in_webhook(Request $request)
     {
 
@@ -161,7 +186,6 @@ class VirtualaccountController extends Controller
             $sender_name = $request->originatorAccountName;
             $sender_bank = $request->originatorBank;
 
-
             $key = env('ERIP');
 
             $deposit_charges = Charge::where('id', 2)->first()->amount;
@@ -182,16 +206,15 @@ class VirtualaccountController extends Controller
                         ->first()->id ?? null;
 
                     $user_email = User::where('v_account_no', $VirtualCustomerAccount)
-                    ->first()->email ?? null;
+                        ->first()->email ?? null;
 
                     $first_name = User::where('v_account_no', $VirtualCustomerAccount)
-                    ->first()->first_name ?? null;
+                        ->first()->first_name ?? null;
 
                     $last_name = User::where('v_account_no', $VirtualCustomerAccount)
-                    ->first()->last_name ?? null;
+                        ->first()->last_name ?? null;
 
                     $check_status = User::where('v_account_no', $VirtualCustomerAccount)->first()->status ?? null;
-
 
                     if ($main_wallet == null && $user_id == null) {
 
@@ -202,14 +225,14 @@ class VirtualaccountController extends Controller
 
                     }
 
-                if($check_status == 2){
+                    if ($check_status == 2) {
 
-                    return response()->json([
-                        'status' => $this->failed,
-                        'message' => 'Account has been Restricted on ENKPAY',
-                    ], 500);
+                        return response()->json([
+                            'status' => $this->failed,
+                            'message' => 'Account has been Restricted on ENKPAY',
+                        ], 500);
 
-                }
+                    }
 
                     //credit
                     $enkpay_debit = $Amount - $deposit_charges;
@@ -258,25 +281,24 @@ class VirtualaccountController extends Controller
                         $message->subject($data['subject']);
                     });
 
-
                     //send to user
 
-                if($user_email !== null){
+                    if ($user_email !== null) {
 
-                    $data = array(
-                        'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
-                        'subject' => "Virtual Account Credited",
-                        'toreceiver' => $user_email,
-                        'amount' => $Amount,
-                        'first_name' => $first_name,
-                    );
+                        $data = array(
+                            'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                            'subject' => "Virtual Account Credited",
+                            'toreceiver' => $user_email,
+                            'amount' => $Amount,
+                            'first_name' => $first_name,
+                        );
 
-                    Mail::send('emails.transaction.virtual-credit', ["data1" => $data], function ($message) use ($data) {
-                        $message->from($data['fromsender']);
-                        $message->to($data['toreceiver']);
-                        $message->subject($data['subject']);
-                    });
-                }
+                        Mail::send('emails.transaction.virtual-credit', ["data1" => $data], function ($message) use ($data) {
+                            $message->from($data['fromsender']);
+                            $message->to($data['toreceiver']);
+                            $message->subject($data['subject']);
+                        });
+                    }
 
                     return response()->json([
                         'status' => true,
@@ -298,12 +320,46 @@ class VirtualaccountController extends Controller
 
     }
 
+    public function get_virtual_account(request $request)
+    {
+
+        try {
+
+            $bank = "VFD MICROFINANCE BANK";
+
+            $get_account = User::select('v_account_no', 'v_account_name')->where('id', Auth::id())
+                ->first() ?? null;
+
+                $account = $get_account;
+                $account['bank']=$bank;
 
 
+            if ($account !== null) {
+                return response()->json([
+
+                    'status' => $this->success,
+                    'data' => $account,
+
+                ], 200);
+            }
+
+            return response()->json([
+
+                'status' => $this->failed,
+                'data' => "Contact support to create your bank account",
+
+            ], 500);
+
+
+
+        } catch (\Exception$th) {
+            return $th->getMessage();
+        }
+
+    }
 
     public function virtual_acct_history(Request $request)
     {
-
 
         try {
 
@@ -340,14 +396,6 @@ class VirtualaccountController extends Controller
             return $th->getMessage();
         }
 
-
-
-
     }
-
-
-
-
-
 
 }

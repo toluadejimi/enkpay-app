@@ -93,13 +93,22 @@ Route::get('account-history', [VirtualaccountController::class, 'virtual_acct_hi
 Route::post('phone-login', [LoginController::class, 'phone_login']);
 Route::post('email-login', [LoginController::class, 'email_login']);
 
+//Contact
+Route::get('contact', [ProfileController::class, 'contact']);
+
+
 Route::group(['middleware' => ['auth:api', 'acess']], function () {
 
     //Profile
     Route::get('user-info', [ProfileController::class, 'user_info']);
     Route::post('update-kyc', [ProfileController::class, 'update_user']);
     Route::post('verify-info', [ProfileController::class, 'verify_info']);
+    Route::post('update-business', [ProfileController::class, 'update_business']);
     Route::post('update-account-info', [ProfileController::class, 'update_account_info']);
+    Route::post('update-bank-info', [ProfileController::class, 'update_bank_info']);
+
+
+
 
     Route::get('get-data-plan', [DataController::class, 'get_data']);
 
@@ -112,6 +121,9 @@ Route::group(['middleware' => ['auth:api', 'acess']], function () {
 
     //Pin Verify
     Route::post('verify-pin', [TransactionController::class, 'verify_pin']);
+
+
+
 
     Route::get('transfer-properties', [TransactionController::class, 'transfer_properties']);
 
@@ -136,6 +148,7 @@ Route::group(['middleware' => ['auth:api', 'acess']], function () {
 
     //Virtual Acccount
     Route::post('create-account', [VirtualaccountController::class, 'create_account']);
+    Route::get('get-virtual-account', [VirtualaccountController::class, 'get_virtual_account']);
 
     //Education
     Route::get('get-waec', [EducationController::class, 'get_waec']);
@@ -147,19 +160,15 @@ Route::group(['middleware' => ['auth:api', 'acess']], function () {
 
 
 
+
+
+
     //insurance
     Route::get('get-motor-insurance', [InsuranceController::class, 'third_party_motor']);
     Route::get('get-health-insurance', [InsuranceController::class, 'health_insurance']);
     Route::get('personal-accident-insurance', [InsuranceController::class, 'personal_accident_insurance']);
     Route::get('home-cover-insurance', [InsuranceController::class, 'home_cover_insurance']);
     Route::get('extra-home-cover-insurance', [InsuranceController::class, 'extra_home_cover_insurance']);
-
-
-
-
-
-
-
 
 
 
