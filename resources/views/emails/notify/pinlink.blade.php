@@ -52,7 +52,7 @@
 
                           <div style="line-height: 140%; text-align: left; word-wrap: break-word;">
                             <p style="font-size: 14px; line-height: 140%;">Click
-                              the button below.<br>to reset your pin </p>
+                              the button below,<br>to reset your pin </p>
                           </div>
                             <br>
                             <br>
