@@ -49,6 +49,10 @@ Route::get('all-pickup-location', [DeviceOrderController::class, 'all_pick_up_lo
 Route::post('state-pickup', [DeviceOrderController::class, 'state_pick_up_location']);
 Route::post('lga-pickup', [DeviceOrderController::class, 'lga_pick_up_location']);
 
+Route::post('order-device-complete', [DeviceOrderController::class, 'order_complete']);
+
+
+
 //webhooks
 Route::post('v1/cash-out-webhook', [TransactionController::class, 'cash_out_webhook']);
 Route::post('v1/cash-in', [VirtualaccountController::class, 'cash_in_webhook']);

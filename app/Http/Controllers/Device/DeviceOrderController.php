@@ -30,7 +30,7 @@ class DeviceOrderController extends Controller
 {
 
     public $success = true;
-    public $faialed = false;
+    public $failed = false;
 
     public function order_device(Request $request){
 
@@ -51,6 +51,7 @@ class DeviceOrderController extends Controller
         $device->fullname =$fullname;
         $device->address =$address;
         $device->state =$state;
+        $device->phone =$phone;
         $device->lga =$lga;
         $device->order_amount =$order_amount;
         $device->order_id =$order_id;
@@ -167,7 +168,62 @@ public function lga_pick_up_location(Request $request){
     }
 
 
+
+
+
+
+
 }
+
+
+public function order_complete(Request $request){
+
+    try{
+
+
+        $ref_no = $request->ref_no;
+
+
+        $name = OrderDevice::where('order_id', $ref_no)
+        ->first()->fullname ?? null;
+
+        $phone = OrderDevice::where('order_id', $ref_no)
+        ->first()->phone ?? null;
+
+
+        if($name == null){
+
+            return response()->json([
+                'status'=> $this->failed,
+                'message' => 'Order not found'
+            ],500);
+
+        }
+
+        $order = OrderDevice::where('order_id', $ref_no)
+        ->update([
+
+            'status' => 1,
+
+        ]);
+
+        $message = "New Terminal Order from ". " ".$name.  " ". "Phone Number - $phone" ;
+
+        send_notification($message);
+
+    return response()->json([
+        'status'=> $this->success,
+        'message' => 'We have received your request, our representative will get back to you shortly'
+    ],200);
+
+    } catch (\Exception $th) {
+        return $th->getMessage();
+    }
+
+
+
+}
+
 
 
 }
