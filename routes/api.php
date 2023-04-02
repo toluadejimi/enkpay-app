@@ -159,7 +159,10 @@ Route::group(['middleware' => ['auth:api', 'acess']], function () {
     Route::get('buy-cable', [CableController::class, 'buy_cable']);
 
 
- 
+    //
+    Route::post('logout', [LoginController::class, 'logout']);
+
+
 
 
 

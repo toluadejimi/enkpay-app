@@ -148,6 +148,15 @@ public function email_login(Request $request){
 }
 
 
+public function logout(Request $request) {
+    $request->user()->token()->revoke();
+    return response()->json([
+        'status' => $this->success,
+        'message' => "Successfully logged out"
+    ],200);
+  }
+
+
 
 
 
