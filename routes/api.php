@@ -110,6 +110,12 @@ Route::group(['middleware' => ['auth:api', 'acess']], function () {
     Route::post('update-business', [ProfileController::class, 'update_business']);
     Route::post('update-account-info', [ProfileController::class, 'update_account_info']);
     Route::post('update-bank-info', [ProfileController::class, 'update_bank_info']);
+    Route::post('verify-identity', [ProfileController::class, 'verify_identity']);
+    Route::post('upload-identity', [ProfileController::class, 'upload_identity']);
+
+
+
+
 
 
 

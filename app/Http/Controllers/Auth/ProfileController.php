@@ -253,6 +253,102 @@ class ProfileController extends Controller
 
     }
 
+    public function verify_identity(request $request)
+    {
+        try {
+
+            $identity_type = $request->identity_type;
+            $identity_number = $request->identity_number;
+
+            $update = User::where('id', Auth::id())
+                ->update([
+                    'identification_number' => $identity_number,
+                    'identification_type' => $identity_type,
+                    'is_identification_verified' => 1
+                ]);
+
+            if ($identity_type == 'nin') {
+                return response()->json([
+                    'status' => $this->success,
+                    'message' => "NIN Updated Successfully",
+
+                ], 200);
+            }
+
+            if ($identity_type == 'bvn') {
+                return response()->json([
+                    'status' => $this->success,
+                    'message' => "BVN Updated Successfully",
+
+                ], 200);
+            }
+
+        } catch (\Exception$th) {
+            return $th->getMessage();
+        }
+
+    }
+
+
+
+    public function upload_identity(request $request){
+
+        try {
+
+
+            $file = $request->file('utility_bill');
+            $utility_bill_fileName = $file->getClientOriginalName();
+            $destinationPath = public_path() . 'upload/utilitybill';
+            $request->utility_bill->move(public_path('upload/utilitybill'), $utility_bill_fileName);
+
+            $file = $request->file('identification_image');
+            $identification_image_fileName = $file->getClientOriginalName();
+            $destinationPath = public_path() . 'upload/identification_image';
+            $request->identification_image->move(public_path('upload/identification_image'), $identification_image_fileName);
+
+            $file = $request->file('selfie');
+            $selfie_fileName = $file->getClientOriginalName();
+            $destinationPath = public_path() . 'upload/selfie';
+            $request->selfie->move(public_path('upload/selfie'), $selfie_fileName);
+
+
+            $update = User::where('id', Auth::id())
+            ->update([
+                'image' => $selfie_fileName,
+                'utility_bill' => $utility_bill_fileName,
+                'identification_image' => $identification_image_fileName,
+                'is_identification_verified' => 0,
+            ]);
+
+            $message = "New upload of identity image from". " ". Auth::id();
+            send_notification($message);
+
+        return response()->json([
+            "status" => $this->success,
+            "message" => "Identification uploaded sucessfully, Your request will be reviewd.",
+        ], 200);
+
+
+
+
+
+         } catch (\Exception$th) {
+            return $th->getMessage();
+        }
+
+
+    }
+
+
+
+
+
+
+
+
+
+
+
     public function update_bank_info(request $request)
     {
 
@@ -275,7 +371,6 @@ class ProfileController extends Controller
                 'message' => "Account has been successfully updated",
 
             ], 200);
-
 
         } catch (\Exception$th) {
             return $th->getMessage();
