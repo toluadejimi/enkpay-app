@@ -42,6 +42,7 @@ class DeviceOrderController extends Controller
         $lga = $request->lga;
         $phone_no = $request->phone_no;
 
+
         $order_id = 'EK-'.random_int(1000, 9999);
 
 
@@ -188,7 +189,7 @@ public function order_complete(Request $request){
         ->first()->fullname ?? null;
 
         $phone = OrderDevice::where('order_id', $ref_no)
-        ->first()->phone ?? null;
+        ->first()->phone_no ?? null;
 
 
         if($name == null){
