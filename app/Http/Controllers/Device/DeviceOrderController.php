@@ -54,14 +54,26 @@ class DeviceOrderController extends Controller
         $device->lga =$lga;
         $device->order_amount =$order_amount;
         $device->order_id =$order_id;
-        $device->status =1;
+        $device->status = 0;
         $device->save();
+
+
+        $bank = Bank::all();
+
+
+
 
         return response()->json([
             'status'=> $this->success,
             'message' => 'Your order has been successfully placed',
-            'payment_ref' => $order_id
+            'payment_ref' => $order_id,
+            'bank' => $bank,
+            'amount' => $order_amount
         ],200);
+
+
+
+
 
     } catch (\Exception $th) {
         return $th->getMessage();
