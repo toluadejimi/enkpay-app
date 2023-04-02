@@ -326,7 +326,7 @@ class RegisterationController extends Controller
 
                 return response()->json([
                     'status' => $this->failed,
-                    'message' => 'Email nor present',
+                    'message' => 'Email cound not be found on Enkpay',
                 ], 500);
             }
 
