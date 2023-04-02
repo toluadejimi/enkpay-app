@@ -58,7 +58,8 @@ class DeviceOrderController extends Controller
         $device->save();
 
 
-        $bank = Bank::all();
+        $bank = Bank::where('id', 1)
+        ->first();
 
 
 
