@@ -51,7 +51,7 @@ class DeviceOrderController extends Controller
         $device->fullname =$fullname;
         $device->address =$address;
         $device->state =$state;
-        $device->phone =$phone;
+        $device->phone =$phone_no;
         $device->lga =$lga;
         $device->order_amount =$order_amount;
         $device->order_id =$order_id;
