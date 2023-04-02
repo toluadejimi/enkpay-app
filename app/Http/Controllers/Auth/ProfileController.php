@@ -272,7 +272,7 @@ class ProfileController extends Controller
 
             return response()->json([
                 'status' => $this->success,
-                'message' => "Account has been successfully verified",
+                'message' => "Account has been successfully updated",
 
             ], 200);
 
