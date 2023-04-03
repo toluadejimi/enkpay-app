@@ -80,8 +80,6 @@ Route::get('get-states', [RegisterationController::class, 'get_states']);
 //Get Lga
 Route::post('get-lga', [RegisterationController::class, 'get_lga']);
 
-//Get Eletric Compnay
-Route::get('electric-company', [PowerController::class, 'get_eletric_company']);
 
 //Charges
 Route::get('transfer-charges', [TransactionController::class, 'transfer_charges']);
@@ -114,6 +112,9 @@ Route::group(['middleware' => ['auth:api', 'acess']], function () {
     Route::post('upload-identity', [ProfileController::class, 'upload_identity']);
 
 
+
+   //Get Eletric Compnay
+Route::get('electric-company', [PowerController::class, 'get_eletric_company']);
 
 
 
