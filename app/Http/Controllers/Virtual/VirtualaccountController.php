@@ -22,8 +22,8 @@ class VirtualaccountController extends Controller
 
         try {
 
-            // $errand_key = errand_api_key();
-            //$errand_user_id = errand_id();
+            $errand_key = errand_api_key();
+            $errand_user_id = errand_id();
             $bvn = user_bvn() ?? null;
             $phone = Auth::user()->phone;
             $name = first_name() . " " . last_name();
@@ -67,40 +67,40 @@ class VirtualaccountController extends Controller
             $curl = curl_init();
             $data = array(
 
-                // "user_id" => $errand_user_id,
+                "user_id" => $errand_user_id,
                 "customerBvn" => $bvn,
                 "phoneNumber" => $phone,
                 "customerName" => $name,
 
             );
 
-            // $databody = json_encode($data);
+            $databody = json_encode($data);
 
-            // curl_setopt_array($curl, array(
-            //     CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/CreateVirtualAccount',
-            //     CURLOPT_RETURNTRANSFER => true,
-            //     CURLOPT_ENCODING => '',
-            //     CURLOPT_MAXREDIRS => 10,
-            //     CURLOPT_TIMEOUT => 0,
-            //     CURLOPT_FOLLOWLOCATION => true,
-            //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            //     CURLOPT_CUSTOMREQUEST => 'POST',
-            //     CURLOPT_POSTFIELDS => $databody,
-            //     CURLOPT_HTTPHEADER => array(
-            //         'Content-Type: application/json',
-            //         'Accept: application/json',
-            //         "Authorization: Bearer $errand_key",
-            //     ),
-            // ));
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/CreateVirtualAccount',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $databody,
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/json',
+                    'Accept: application/json',
+                    "Authorization: Bearer $errand_key",
+                ),
+            ));
 
             $var = curl_exec($curl);
 
             curl_close($curl);
             $var = json_decode($var);
 
-            $status = 200; //$var->code ?? null;
-            $acct_no = "0006363535353"; //$var->data->accountNumber ?? null;
-            $acct_name = "Adejimi"; //$var->data->accountName ?? null;
+            $status =  $var->code ?? null;
+            $acct_no = $var->data->accountNumber ?? null;
+            $acct_name = $var->data->accountName ?? null;
 
             $bank = "VFD MICROFINANCE BANK";
 
@@ -133,7 +133,7 @@ class VirtualaccountController extends Controller
             return response()->json([
 
                 'status' => $this->failed,
-                'data' => $var->error->message,
+                'message' => $var->error->message,
 
             ], 500);
 
