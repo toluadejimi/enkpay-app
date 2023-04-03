@@ -1103,6 +1103,7 @@ class TransactionController extends Controller
                     $trasnaction->type = $transaction_type;
                     $trasnaction->debit = $amount;
                     $trasnaction->balance = $debit;
+                    $trasnaction->note = "VAS Purchase from Terminal";
                     $trasnaction->e_charges = 0;
                     $trasnaction->serial_no = $serial_number;
                     $trasnaction->status = 1;
@@ -1116,6 +1117,7 @@ class TransactionController extends Controller
                     $trasnaction->transaction_type = "VASfromTerminal";
                     $trasnaction->type = $transaction_type;
                     $trasnaction->debit = $amount;
+                    $trasnaction->note = "VAS Purchase from Terminal";
                     $trasnaction->balance = $debit;
                     $trasnaction->e_charges = 0;
                     $trasnaction->serial_no = $serial_number;
