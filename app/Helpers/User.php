@@ -13,6 +13,16 @@ if (!function_exists('main_account')) {
 
 }
 
+if (!function_exists('user_status')) {
+
+    function user_status()
+    {
+        $user = Auth::user();
+        return $user->status;
+    }
+
+}
+
 if (!function_exists('bonus_account')) {
 
     function bonus_account()

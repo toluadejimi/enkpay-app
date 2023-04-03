@@ -75,7 +75,7 @@ class RegisterationController extends Controller
             $check_phone = User::where('phone', $phone_no)->first()->phone ?? null;
             $check_status = User::where('phone', $phone_no)->first()->status ?? null;
 
-            if ($check_phone == $phone_no && $check_status == 2) {
+            if ($check_phone == $phone_no && $check_status == 0) {
 
                 return response()->json([
                     'status' => $this->failed,
@@ -205,7 +205,7 @@ class RegisterationController extends Controller
             $check_email = User::where('email', $email)->first()->email ?? null;
             $check_email_verification = User::where('email', $email)->first()->is_email_verified ?? null;
 
-            if ($check_email == $email && $check_status == 2) {
+            if ($check_email == $email && $check_status == 0) {
 
                 return response()->json([
                     'status' => $this->failed,
@@ -414,6 +414,7 @@ class RegisterationController extends Controller
                     ->update([
 
                         'is_phone_verified' => 1,
+                        'status' => 1,
 
                     ]);
 
@@ -448,6 +449,7 @@ class RegisterationController extends Controller
                     ->update([
 
                         'is_email_verified' => 1,
+                        'status' => 1,
 
                     ]);
 

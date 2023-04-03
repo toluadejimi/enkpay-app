@@ -75,6 +75,20 @@ class TransactionController extends Controller
                 ], 500);
             }
 
+
+            if (Auth()->user()->status == 1 && $amount > 20000) {
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'Please Complete your KYC',
+
+                ], 500);
+            }
+
+
+
+
             if ($amount > $user_wallet_banlance) {
 
                 if (!empty(user_email())) {
@@ -487,6 +501,27 @@ class TransactionController extends Controller
 
             }
 
+
+            if ($amount >= 20000  &&  user_status() == 1) {
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'Please Complete your KYC',
+
+                ], 500);
+            }
+
+
+            if ($receiver_main_wallet == null) {
+
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => "User not available on ENKPAY",
+                ], 500);
+
+            }
+
             //Debit Transaction
 
             if ($wallet == 'main_account') {
@@ -516,6 +551,8 @@ class TransactionController extends Controller
 
                 ], 500);
             }
+
+
 
             if ($amount > $sender_balance) {
 
