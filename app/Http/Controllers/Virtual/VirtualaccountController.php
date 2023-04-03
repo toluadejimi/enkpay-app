@@ -22,11 +22,38 @@ class VirtualaccountController extends Controller
 
         try {
 
-            $errand_key = errand_api_key();
-            $errand_user_id = errand_id();
+            // $errand_key = errand_api_key();
+            //$errand_user_id = errand_id();
             $bvn = user_bvn() ?? null;
             $phone = Auth::user()->phone;
             $name = first_name() . " " . last_name();
+
+            if (user_status() == 0) {
+
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => 'User has neem restricted on ENKPAY',
+                ], 500);
+
+            }
+
+            if (user_status() == 1) {
+
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => 'Please complete your KYC',
+                ], 500);
+
+            }
+
+            if (Auth::user()->v_account_number !== null) {
+
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => 'You already own account number',
+                ], 500);
+
+            }
 
             if ($bvn == null) {
 
@@ -40,42 +67,51 @@ class VirtualaccountController extends Controller
             $curl = curl_init();
             $data = array(
 
-                "user_id" => $errand_user_id,
+                // "user_id" => $errand_user_id,
                 "customerBvn" => $bvn,
                 "phoneNumber" => $phone,
                 "customerName" => $name,
 
             );
 
-            $databody = json_encode($data);
+            // $databody = json_encode($data);
 
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/CreateVirtualAccount',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => $databody,
-                CURLOPT_HTTPHEADER => array(
-                    'Content-Type: application/json',
-                    'Accept: application/json',
-                    "Authorization: Bearer $errand_key",
-                ),
-            ));
+            // curl_setopt_array($curl, array(
+            //     CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/CreateVirtualAccount',
+            //     CURLOPT_RETURNTRANSFER => true,
+            //     CURLOPT_ENCODING => '',
+            //     CURLOPT_MAXREDIRS => 10,
+            //     CURLOPT_TIMEOUT => 0,
+            //     CURLOPT_FOLLOWLOCATION => true,
+            //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            //     CURLOPT_CUSTOMREQUEST => 'POST',
+            //     CURLOPT_POSTFIELDS => $databody,
+            //     CURLOPT_HTTPHEADER => array(
+            //         'Content-Type: application/json',
+            //         'Accept: application/json',
+            //         "Authorization: Bearer $errand_key",
+            //     ),
+            // ));
 
             $var = curl_exec($curl);
 
             curl_close($curl);
             $var = json_decode($var);
 
-            dd($var);
+            $status = 200; //$var->code ?? null;
+            $acct_no = "0006363535353"; //$var->data->accountNumber ?? null;
+            $acct_name = "Adejimi"; //$var->data->accountName ?? null;
 
-            $status = $var->code ?? null;
-            $acct_no = $var->data->accountNumber ?? null;
-            $acct_name = $var->data->accountName ?? null;
+            $bank = "VFD MICROFINANCE BANK";
+
+            $data1 = array([
+                'acct_no' => $acct_no,
+                'acct_name' => $acct_name,
+                'bank' => $bank
+            ]);
+
+            $data2 = (object) $data1[0];
+
 
             if ($status == 200) {
 
@@ -88,7 +124,7 @@ class VirtualaccountController extends Controller
                 return response()->json([
 
                     'status' => $this->success,
-                    'data' => $var->data,
+                    'data' => $data2,
 
                 ], 200);
 
@@ -330,9 +366,8 @@ class VirtualaccountController extends Controller
             $get_account = User::select('v_account_no', 'v_account_name')->where('id', Auth::id())
                 ->first() ?? null;
 
-                $account = $get_account;
-                $account['bank']=$bank;
-
+            $account = $get_account;
+            $account['bank'] = $bank;
 
             if ($account !== null) {
                 return response()->json([
@@ -349,8 +384,6 @@ class VirtualaccountController extends Controller
                 'data' => "Contact support to create your bank account",
 
             ], 500);
-
-
 
         } catch (\Exception$th) {
             return $th->getMessage();
