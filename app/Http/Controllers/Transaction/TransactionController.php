@@ -1109,7 +1109,7 @@ class TransactionController extends Controller
                     $trasnaction->save();
 
                     $trasnaction = new Transaction();
-                    $product->setConnection('mysql_second');
+                    $trasnaction->setConnection('mysql_second');
                     $trasnaction->user_id = $user_id;
                     $trasnaction->ref_trans_id =$trans_id;
                     $trasnaction->e_ref = $reference;
