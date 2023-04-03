@@ -58,7 +58,7 @@ if (!function_exists('user_bvn')) {
     function user_bvn()
     {
         $user = Auth::user();
-        return $user->identification_number;
+        return $user->bvn;
     }
 
 }

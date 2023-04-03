@@ -276,6 +276,14 @@ class ProfileController extends Controller
             }
 
             if ($identity_type == 'bvn') {
+
+                $update = User::where('id', Auth::id())
+                ->update([
+                    'bvn' => $identity_number,
+                    'is_bvnview_agent_account_verified' => 1
+                ]);
+
+
                 return response()->json([
                     'status' => $this->success,
                     'message' => "BVN Updated Successfully",
@@ -503,7 +511,7 @@ class ProfileController extends Controller
 
         try {
 
-            $serial_no = $request->serialNumber;
+            $serial_no = $request->SerialNumber;
 
             $check_serial = User::where('serial_no', $serial_no)
                 ->first()->serial_no ?? null;

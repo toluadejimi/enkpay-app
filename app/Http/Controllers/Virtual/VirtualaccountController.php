@@ -46,6 +46,18 @@ class VirtualaccountController extends Controller
 
             }
 
+            if (user_bvn() == null) {
+
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => 'We need your BVN to generate an account for you',
+                ], 500);
+
+            }
+
+
+
+
             if (Auth::user()->v_account_number !== null) {
 
                 return response()->json([
@@ -67,7 +79,7 @@ class VirtualaccountController extends Controller
             $curl = curl_init();
             $data = array(
 
-                "user_id" => $errand_user_id,
+                "userId" => $errand_user_id,
                 "customerBvn" => $bvn,
                 "phoneNumber" => $phone,
                 "customerName" => $name,
@@ -97,6 +109,8 @@ class VirtualaccountController extends Controller
 
             curl_close($curl);
             $var = json_decode($var);
+
+            dd($var, $data);
 
             $status =  $var->code ?? null;
             $acct_no = $var->data->accountNumber ?? null;
