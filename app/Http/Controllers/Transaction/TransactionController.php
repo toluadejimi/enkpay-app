@@ -1073,6 +1073,9 @@ class TransactionController extends Controller
                 $user_id = User::where('serial_no', $SerialNumber)
                     ->first()->id ?? null;
 
+                $type = User::where('serial_no', $SerialNumber)
+                ->first()->type ?? null;
+
                 if ($main_wallet == null && $user_id == null) {
 
                     return response()->json([
@@ -1085,7 +1088,39 @@ class TransactionController extends Controller
                 //Both Commission
                 $amount1 = $comission / 100;
                 $amount2 = $amount1 * $Amount;
-                $amount = number_format($amount2, 3);
+                $both_commmission = number_format($amount2, 3);
+
+
+                $business_commission_cap = Charge::where('title', 'business_cap')
+                ->first()->amount;
+
+                $agent_commission_cap = Charge::where('title', 'agent_cap')
+                ->first()->amount;
+
+
+
+
+                if($both_commmission >= $agent_commission_cap && $type == 1 ){
+
+                    $removed_comission = $Amount - $agent_commission_cap;
+
+                }
+
+
+                if($both_commmission >= $business_commission_cap && $type == 3 ){
+
+                    $removed_comission = $Amount - $business_commission_cap;
+
+                }
+
+
+                if($type == 2 ){
+
+                    $removed_comission = $Amount - $both_commmission;
+
+                }
+
+
 
 
                 //enkpay commission
@@ -1103,11 +1138,10 @@ class TransactionController extends Controller
                 $errandPay_commission_amount = number_format($errand_amount, 3);
 
 
-
                 $enkpay_cashOut_fee = $amount - $enkpay_commision_amount ;
 
 
-                $removed_comission = $Amount - $amount;
+
                 $updated_amount = $main_wallet + $removed_comission;
 
                 $main_wallet = User::where('serial_no', $SerialNumber)
