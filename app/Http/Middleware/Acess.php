@@ -30,8 +30,8 @@ class Acess
             abort(response()->json(
                 [
                     'status' => false,
-                    'message' => 'Token Expired, Please login',
-                ], 500));
+                    'message' => 'Token Expired, Please login to continue.',
+                ], 401));
 
         }elseif (Auth::guard('api')->check() != true) {
             abort(response()->json(

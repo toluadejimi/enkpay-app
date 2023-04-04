@@ -80,9 +80,23 @@ class Authenticate implements AuthenticatesRequests
      */
     protected function unauthenticated($request, array $guards)
     {
-        throw new AuthenticationException(
-            'Token Expired, Please login.', $guards, $this->redirectTo($request)
-        );
+        // throw new AuthenticationException(
+
+
+        // );
+
+
+        return response()->json([
+
+            'status' => false,
+            'message' => 'Token Expired, Please login to continue.',
+
+        ]);
+
+
+
+
+
     }
 
     /**
