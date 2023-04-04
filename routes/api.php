@@ -129,6 +129,9 @@ Route::get('electric-company', [PowerController::class, 'get_eletric_company']);
     Route::post('resolve-enkpay-account', [TransactionController::class, 'resolve_enkpay_account']);
     Route::post('enkpay-transfer', [TransactionController::class, 'enkpay_transfer']);
     Route::get('get-wallet', [TransactionController::class, 'get_wallet']);
+    Route::post('self-cash-out', [TransactionController::class, 'self_cash_out']);
+
+
 
     //Pin Verify
     Route::post('verify-pin', [TransactionController::class, 'verify_pin']);
