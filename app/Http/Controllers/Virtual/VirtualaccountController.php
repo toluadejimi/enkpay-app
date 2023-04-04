@@ -110,39 +110,42 @@ class VirtualaccountController extends Controller
             curl_close($curl);
             $var = json_decode($var);
 
-            dd($var, $data);
-
             $status =  $var->code ?? null;
             $acct_no = $var->data->accountNumber ?? null;
             $acct_name = $var->data->accountName ?? null;
 
             $bank = "VFD MICROFINANCE BANK";
 
-            $data1 = array([
-                'acct_no' => $acct_no,
-                'acct_name' => $acct_name,
-                'bank' => $bank
-            ]);
+            // $data1 = array([
+            //     'acct_no' => $acct_no,
+            //     'acct_name' => $acct_name,
+            //     'bank' => $bank
+            // ]);
 
-            $data2 = (object) $data1[0];
+            // $data2 = (object) $data1[0];
 
 
             if ($status == 200) {
 
-                $update = User::where('id', Auth::id())
-                    ->update([
-                        'v_account_no' => $acct_no,
-                        'v_account_name' => $acct_name,
-                    ]);
+                $user = User::find(Auth::id());
+                $user->v_account_no = $acct_no;
+                $user->v_account_name = $acct_name;
+                $user->save();
+
+
+                $get_user = User::find(Auth::id())->first();
 
                 return response()->json([
 
                     'status' => $this->success,
-                    'data' => $data2,
+                    'message' => "Your account has been created successfully",
+                    'data' => $get_user,
 
                 ], 200);
 
             }
+
+
 
             return response()->json([
 
