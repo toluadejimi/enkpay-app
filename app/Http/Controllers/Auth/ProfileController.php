@@ -280,7 +280,9 @@ class ProfileController extends Controller
                 $update = User::where('id', Auth::id())
                     ->update([
                         'bvn' => $identity_number,
-                        'is_bvnview_agent_account_verified' => 1,
+                        'is_bvn_verified' => 1,
+                        'is_identification_verified' => 1,
+
                     ]);
 
                 return response()->json([
