@@ -9,6 +9,8 @@ use App\Models\User;
 use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Http\Request;
 use Mail;
+use Illuminate\Support\Facades\Validator;
+
 
 class RegisterationController extends Controller
 {
@@ -498,21 +500,49 @@ class RegisterationController extends Controller
 
         try {
 
+
+            $validator = Validator::make($request->all(), [
+                'phone_no' => 'required|string|max:18',
+                'first_name' => 'required|string|max:50',
+                'last_name' => 'required|string|max:50',
+                'dob' => 'required|string|max:50',
+                'state' => 'required|string|max:18',
+                'gender' => 'required|string|max:50',
+                'street' => 'required|string|max:50',
+                'city' => 'required|string|max:50',
+                'lga' => 'required|string|max:18',
+                'password' => 'required',
+                'pin' => 'required',
+            ]);
+
+
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => $this->success,
+                    'message' => $validator->messages()->first(),
+                ], 500);
+            }
+
+
+            $email = $request->email;
+            $devide_id = $request->devide_id;
             $phone_no = $request->phone_no;
             $first_name = $request->first_name;
             $last_name = $request->last_name;
-            $dob = $request->dob;
-            $email = $request->email;
             $gender = $request->gender;
+            $dob = $request->dob;
             $street = $request->street;
-            $city = $request->city;
             $state = $request->state;
             $lga = $request->lga;
             $password = $request->password;
             $pin = $request->pin;
             $devide_id = $request->devide_id;
+            $city = $request->city;
 
-            $update = User::where('phone', $phone_no)
+
+
+            $update = User::where('phone',$phone_no)
                 ->update([
                     'first_name' => $first_name,
                     'last_name' => $last_name,
