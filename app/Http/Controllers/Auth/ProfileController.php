@@ -320,6 +320,18 @@ class ProfileController extends Controller
                 ], 500);
             }
 
+
+            $is_identification_verified = Auth::user()->is_identification_verified;
+
+            if($is_identification_verified == 2){
+
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => "We are still verifying your profile, Please wait",
+                ], 500);
+
+            }
+
             $file = $request->file('utility_bill');
             $utility_bill_fileName = $file->getClientOriginalName();
             $destinationPath = public_path() . 'upload/utilitybill';
