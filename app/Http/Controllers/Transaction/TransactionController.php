@@ -405,7 +405,10 @@ class TransactionController extends Controller
             }
 
             //Debit
-            $debit = $user_wallet_banlance - $amount;
+            $charged_amount = $user_wallet_banlance + $transfer_charges;
+            $enkpay_profit  = $transfer_charges - 10;
+
+            $debit = $charged_amount - $amount;
 
             if ($wallet == 'main_account') {
 
@@ -486,7 +489,7 @@ class TransactionController extends Controller
                 $trasnaction->debit = $amount;
                 $trasnaction->note = "Cash out to ". "|". $destinationAccountNumber. " | ".$destinationAccountName;
                 $trasnaction->fee = 0;
-                $trasnaction->e_charges = $transfer_charges;
+                $trasnaction->enkPay_Cashout_profit = $enkpay_profit;
                 $trasnaction->trx_date = date("Y/m/d");
                 $trasnaction->trx_time = date("h:i:s");
                 $trasnaction->receiver_name = $destinationAccountName;
