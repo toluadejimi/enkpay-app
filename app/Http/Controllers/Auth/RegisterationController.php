@@ -502,7 +502,6 @@ class RegisterationController extends Controller
 
 
             $validator = Validator::make($request->all(), [
-                'phone_no' => 'required|string|max:18',
                 'first_name' => 'required|string|max:50',
                 'last_name' => 'required|string|max:50',
                 'dob' => 'required|string|max:50',
@@ -541,8 +540,13 @@ class RegisterationController extends Controller
             $city = $request->city;
 
 
+            $get_phone  = $phone_no ?? null;
+            $get_email  = $email ?? null;
 
-            $update = User::where('phone',$phone_no)
+
+            if($get_phone !== null ){
+
+                $update = User::where('email',$email)
                 ->update([
                     'first_name' => $first_name,
                     'last_name' => $last_name,
@@ -559,10 +563,51 @@ class RegisterationController extends Controller
 
                 ]);
 
-            return response()->json([
-                'status' => $this->success,
-                'message' => 'Your account has been successfully created',
-            ], 200);
+                return response()->json([
+                    'status' => $this->success,
+                    'message' => 'Your account has been successfully created',
+                ], 200);
+
+            }elseif($get_email !== null){
+
+
+                $update = User::where('phone',$phone_no)
+                ->update([
+                    'first_name' => $first_name,
+                    'last_name' => $last_name,
+                    'dob' => $dob,
+                    'gender' => $gender,
+                    'email' => $email,
+                    'street' => $street,
+                    'city' => $city,
+                    'state' => $state,
+                    'lga' => $lga,
+                    'password' => bcrypt($password),
+                    'pin' => bcrypt($pin),
+                    'device_id' => $devide_id,
+
+                ]);
+
+                return response()->json([
+                    'status' => $this->success,
+                    'message' => 'Your account has been successfully created',
+                ], 200);
+
+
+
+
+            }else{
+
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => 'Email or Phone number not found',
+                ], 500);
+
+
+            }
+
+
+
 
         } catch (\Exception$e) {
             return $e->getMessage();
