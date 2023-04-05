@@ -205,7 +205,7 @@ class TransactionController extends Controller
                 $trasnaction->trx_date = date("Y/m/d");
                 $trasnaction->trx_time = date("h:i:s");
                 $trasnaction->receiver_name = $destinationAccountName;
-                $trasnaction->reveiver_account_no = $destinationAccountNumber;
+                $trasnaction->receiver_account_no = $destinationAccountNumber;
                 $trasnaction->balance = $debit;
                 $trasnaction->status = 0;
                 $trasnaction->save();
@@ -349,7 +349,7 @@ class TransactionController extends Controller
 
             }
 
-            
+
 
             if ($wallet == 'main_account') {
                 $user_wallet_banlance = main_account();
@@ -490,7 +490,7 @@ class TransactionController extends Controller
                 $trasnaction->trx_date = date("Y/m/d");
                 $trasnaction->trx_time = date("h:i:s");
                 $trasnaction->receiver_name = $destinationAccountName;
-                $trasnaction->reveiver_account_no = $destinationAccountNumber;
+                $trasnaction->receiver_account_no = $destinationAccountNumber;
                 $trasnaction->balance = $debit;
                 $trasnaction->status = 0;
                 $trasnaction->save();
@@ -904,7 +904,7 @@ class TransactionController extends Controller
             $trasnaction->trx_date = date("Y/m/d");
             $trasnaction->trx_time = date("h:i:s");
             $trasnaction->receiver_name = $receiver_full_name;
-            $trasnaction->reveiver_account_no = $phone;
+            $trasnaction->receiver_account_no = $phone;
             $trasnaction->balance = $debit;
             $trasnaction->status = 1;
             $trasnaction->save();
@@ -930,7 +930,7 @@ class TransactionController extends Controller
             $trasnaction->trx_date = date("Y/m/d");
             $trasnaction->trx_time = date("h:i:s");
             $trasnaction->receiver_name = $receiver_full_name;
-            $trasnaction->reveiver_account_no = $phone;
+            $trasnaction->receiver_account_no = $phone;
             $trasnaction->balance = $debit;
             $trasnaction->status = 1;
             $trasnaction->save();
