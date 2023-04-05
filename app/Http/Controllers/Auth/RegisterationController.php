@@ -519,7 +519,7 @@ class RegisterationController extends Controller
 
             if ($validator->fails()) {
                 return response()->json([
-                    'status' => $this->success,
+                    'status' => $this->failed,
                     'message' => $validator->messages()->first(),
                 ], 500);
             }

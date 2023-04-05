@@ -1054,6 +1054,8 @@ class TransactionController extends Controller
         $Fee = $request->Fee;
         $PostingType = $request->PostingType;
         $TerminalID = $request->AdditionalDetails['TerminalID'];
+        $MaskedPAN = $request->AdditionalDetails['MaskedPAN'];
+
 
         $key = env('ERIP');
 
@@ -1170,6 +1172,7 @@ class TransactionController extends Controller
                     $trasnaction->balance = $updated_amount;
                     $trasnaction->terminal_id = $TerminalID;
                     $trasnaction->serial_no = $SerialNumber;
+                    $trasnaction->receiver_account_no = $MaskedPAN;
                     $trasnaction->status = 1;
                     $trasnaction->save();
 
