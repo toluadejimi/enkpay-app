@@ -264,7 +264,7 @@ class ProfileController extends Controller
                 ->update([
                     'identification_number' => $identity_number,
                     'identification_type' => $identity_type,
-                    'is_identification_verified' => 1
+                    'is_identification_verified' => 1,
                 ]);
 
             if ($identity_type == 'nin') {
@@ -278,11 +278,10 @@ class ProfileController extends Controller
             if ($identity_type == 'bvn') {
 
                 $update = User::where('id', Auth::id())
-                ->update([
-                    'bvn' => $identity_number,
-                    'is_bvnview_agent_account_verified' => 1
-                ]);
-
+                    ->update([
+                        'bvn' => $identity_number,
+                        'is_bvnview_agent_account_verified' => 1,
+                    ]);
 
                 return response()->json([
                     'status' => $this->success,
@@ -297,12 +296,10 @@ class ProfileController extends Controller
 
     }
 
-
-
-    public function upload_identity(request $request){
+    public function upload_identity(request $request)
+    {
 
         try {
-
 
             $file = $request->file('utility_bill');
             $utility_bill_fileName = $file->getClientOriginalName();
@@ -319,43 +316,27 @@ class ProfileController extends Controller
             $destinationPath = public_path() . 'upload/selfie';
             $request->selfie->move(public_path('upload/selfie'), $selfie_fileName);
 
-
             $update = User::where('id', Auth::id())
-            ->update([
-                'image' => $selfie_fileName,
-                'utility_bill' => $utility_bill_fileName,
-                'identification_image' => $identification_image_fileName,
-                'is_identification_verified' => 0,
-            ]);
+                ->update([
+                    'image' => $selfie_fileName,
+                    'utility_bill' => $utility_bill_fileName,
+                    'identification_image' => $identification_image_fileName,
+                    'is_identification_verified' => 0,
+                ]);
 
-            $message = "New upload of identity image from". " ". Auth::id();
+            $message = "New upload of identity image from" . " " . Auth::id();
             send_notification($message);
 
-        return response()->json([
-            "status" => $this->success,
-            "message" => "Identification uploaded sucessfully, Your request will be reviewd.",
-        ], 200);
+            return response()->json([
+                "status" => $this->success,
+                "message" => "Identification uploaded sucessfully, Your request will be reviewd.",
+            ], 200);
 
-
-
-
-
-         } catch (\Exception$th) {
+        } catch (\Exception$th) {
             return $th->getMessage();
         }
 
-
     }
-
-
-
-
-
-
-
-
-
-
 
     public function update_bank_info(request $request)
     {
@@ -534,6 +515,10 @@ class ProfileController extends Controller
             $bvn = User::where('serial_no', $serial_no)
                 ->first()->identification_number ?? null;
 
+            $b_name = User::where('serial_no', $serial_no)
+                ->first()->v_account_name ?? null;
+
+
             $accountNumber = User::where('serial_no', $serial_no)
                 ->first()->v_account_no ?? null;
 
@@ -541,10 +526,16 @@ class ProfileController extends Controller
 
             $data = User::where('serial_no', $serial_no)->first();
 
+            if($b_name == null){
+                $name = $firstName." ".$lastName;
+            }else{
+                $name = $b_name;
+            }
+
             $data_array = array();
             $data_array[0] = [
-                "firstName" => $data->first_name,
-                "lastName" => $data->last_name,
+                "firstName" => $name,
+                //"lastName" => $data->last_name,
                 "bvn" => $data->identification_no,
                 "accountNumber" => $data->v_account_no,
                 "bankName" => $bankName,
