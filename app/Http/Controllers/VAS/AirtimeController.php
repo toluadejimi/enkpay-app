@@ -168,6 +168,7 @@ class AirtimeController extends Controller
                 $transaction->user_id = Auth::id();
                 $transaction->ref_trans_id = $referenceCode;
                 $transaction->transaction_type = "VasAirtime";
+                $trasnaction->title = "Airtime VAS";
                 $transaction->type = "vas";
                 $transaction->balance = $balance;
                 $transaction->debit = $amount;

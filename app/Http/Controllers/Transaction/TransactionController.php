@@ -182,6 +182,9 @@ class TransactionController extends Controller
             $TransactionReference = $var->reference ?? null;
 
 
+            $enkpay_profit = $transfer_charges - 10;
+
+
             $status = $var->code ?? null;
 
             if ($status == 200) {
@@ -194,10 +197,11 @@ class TransactionController extends Controller
                 $trasnaction->type = "InterBankTransfer";
                 $trasnaction->main_type = "Transfer";
                 $trasnaction->transaction_type = "BankTransfer";
+                $trasnaction->title = "Bank Transfer";
                 $trasnaction->debit = $amount;
                 $trasnaction->note = "Bank Transfer to other banks";
                 $trasnaction->fee = 0;
-                $trasnaction->e_charges = $transfer_charges;
+                $trasnaction->enkpay_Cashout_profit = $enkpay_profit;
                 $trasnaction->trx_date = date("Y/m/d");
                 $trasnaction->trx_time = date("h:i:s");
                 $trasnaction->receiver_name = $destinationAccountName;
@@ -441,8 +445,10 @@ class TransactionController extends Controller
                 $trasnaction->ref_trans_id = $trans_id;
                 $trasnaction->e_ref = $TransactionReference;
                 $trasnaction->type = "SelfCashOutTransfer";
+                $trasnaction->title = "Transfer to Self";
                 $trasnaction->main_type = "Transfer";
                 $trasnaction->transaction_type = "BankTransfer";
+                $trasnaction->title = "Bank Transfer";
                 $trasnaction->debit = $amount;
                 $trasnaction->note = "Cash out to ". "|". $destinationAccountNumber. " | ".$destinationAccountName;
                 $trasnaction->fee = 0;
@@ -854,6 +860,7 @@ class TransactionController extends Controller
             $trasnaction->to_user_id = $receiver_id;
             $trasnaction->ref_trans_id = $trans_id;
             $trasnaction->transaction_type = "EnkPayTransfer";
+            $trasnaction->title = "Enkpay Transfer";
             $trasnaction->type = "InAppTransfer";
             $trasnaction->main_type = "Transfer";
             $trasnaction->debit = $amount;
@@ -879,6 +886,7 @@ class TransactionController extends Controller
             $trasnaction->to_user_id = $receiver_id;
             $trasnaction->ref_trans_id = $trans_id;
             $trasnaction->transaction_type = "EnkPayTransfer";
+            $trasnaction->title = "Enkpay Transfer";
             $trasnaction->type = "InAppTransfer";
             $trasnaction->main_type = "Transfer";
             $trasnaction->debit = $amount;
@@ -912,6 +920,7 @@ class TransactionController extends Controller
             $trasnaction->to_user_id = $receiver_id;
             $trasnaction->ref_trans_id = $trans_id;
             $trasnaction->transaction_type = "EnkPayTransfer";
+            $trasnaction->title = "Enkpay Transfer";
             $trasnaction->main_type = "Transfer";
             $trasnaction->type = "InAppTransfer";
             $trasnaction->credit = $amount;
@@ -936,6 +945,7 @@ class TransactionController extends Controller
             $trasnaction->to_user_id = $receiver_id;
             $trasnaction->ref_trans_id = $trans_id;
             $trasnaction->transaction_type = "EnkPayTransfer";
+            $trasnaction->title = "Enkpay Transfer";
             $trasnaction->main_type = "Transfer";
             $trasnaction->type = "InAppTransfer";
             $trasnaction->credit = $amount;
@@ -1166,6 +1176,7 @@ class TransactionController extends Controller
                     $trasnaction->transaction_type = $TransactionType;
                     $trasnaction->credit = $removed_comission;
                     $trasnaction->e_charges = $enkpay_profit;
+                    $trasnaction->title = "POS Transasction";
                     $trasnaction->note = "Credit received from POS Terminal";
                     $trasnaction->fee = $Fee;
                     $trasnaction->enkPay_Cashout_profit = $enkpay_profit;
@@ -1333,6 +1344,7 @@ class TransactionController extends Controller
                     $trasnaction->e_ref = $reference;
                     $trasnaction->transaction_type = "TerminalBankTransfer";
                     $trasnaction->type = $transaction_type;
+                    $trasnaction->title = "Bank Transfer";
                     $trasnaction->debit = $amount;
                     $trasnaction->main_type = 'Transfer';
                     $trasnaction->balance = $debit;
@@ -1424,6 +1436,7 @@ class TransactionController extends Controller
                     $trasnaction->ref_trans_id =$trans_id;
                     $trasnaction->e_ref = $reference;
                     $trasnaction->transaction_type = "VASfromTerminal";
+                    $trasnaction->title = "Terminal VAS";
                     $trasnaction->type = $transaction_type;
                     $trasnaction->debit = $amount;
                     $trasnaction->balance = $debit;
@@ -1439,6 +1452,7 @@ class TransactionController extends Controller
                     $trasnaction->ref_trans_id =$trans_id;
                     $trasnaction->e_ref = $reference;
                     $trasnaction->transaction_type = "VASfromTerminal";
+                    $trasnaction->title = "Terminal VAS";
                     $trasnaction->type = $transaction_type;
                     $trasnaction->debit = $amount;
                     $trasnaction->note = "VAS Purchase from Terminal";

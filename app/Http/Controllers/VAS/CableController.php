@@ -208,7 +208,8 @@ class CableController extends Controller
                 $transaction = new Transaction();
                 $transaction->user_id = Auth::id();
                 $transaction->ref_trans_id = $referenceCode;
-                $transaction->transaction_type = "VasData";
+                $transaction->transaction_type = "VasCable";
+                $trasnaction->title = "Cable VAS";
                 $transaction->type = "vas";
                 $transaction->balance = $balance;
                 $transaction->debit = $amount;

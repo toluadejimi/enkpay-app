@@ -232,6 +232,7 @@ class EducationController extends Controller
                 $transaction->user_id = Auth::id();
                 $transaction->ref_trans_id = $var->$content->$transactionId;
                 $transaction->transaction_type = "VasEducation";
+                $trasnaction->title = "Education VAS";
                 $transaction->e_charges = $education_charges;
                 $transaction->type = "vas";
                 $transaction->balance = $balance;

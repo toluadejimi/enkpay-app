@@ -220,6 +220,7 @@ class DataController extends Controller
                 $transaction->user_id = Auth::id();
                 $transaction->ref_trans_id = $referenceCode;
                 $transaction->transaction_type = "VasData";
+                $trasnaction->title = "Data VAS";
                 $transaction->type = "vas";
                 $transaction->balance = $balance;
                 $transaction->debit = $amount;

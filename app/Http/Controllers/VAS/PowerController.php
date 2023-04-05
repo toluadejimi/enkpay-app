@@ -274,6 +274,7 @@ class PowerController extends Controller
                 $transaction->ref_trans_id = Str::random(10);
                 $transaction->user_id = Auth::id();
                 $transaction->transaction_type = "VasEletric";
+                $trasnaction->title = "Eletric VAS";
                 $transaction->debit = $new_amount;
                 $transaction->balance = $debit;
                 $transaction->e_charges = $eletricity_charges;
