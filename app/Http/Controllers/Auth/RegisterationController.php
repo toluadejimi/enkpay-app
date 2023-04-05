@@ -65,9 +65,17 @@ class RegisterationController extends Controller
     public function phone_verification(Request $request)
     {
 
-        try {
+        // try {
 
-            $phone_no = $request->phone_no;
+            $get_phone_no = $request->phone_no;
+            $trimed_no = substr($get_phone_no, 1);
+
+            if (str_contains($get_phone_no, '+234')) {
+                $phone_no = $get_phone_no;
+            }else{
+                $phone_no = "+234".$trimed_no;
+            }
+
 
             $sms_code = random_int(1000, 9999);
 
@@ -86,7 +94,6 @@ class RegisterationController extends Controller
 
             if ($check_phone == $phone_no && $check_phone_verification == 1) {
 
-                dd($check_phone, $phone_no, $check_phone_verification);
 
                 return response()->json([
                     'status' => $this->failed,
@@ -197,9 +204,9 @@ class RegisterationController extends Controller
 
             }
 
-        } catch (\Exception$e) {
-            return $e->getMessage();
-        }
+        // } catch (\Exception$e) {
+        //     return $e->getMessage();
+        // }
 
     }
 
