@@ -87,7 +87,7 @@ public function phone_login(Request $request){
         if($status !== 2 && $is_kyc_verified == 1 && $is_phone_verified == 1 && $is_email_verified == 1 && $is_identification_verified == 1  ){
 
             $update = User::where('id',Auth::id())
-            ->udpdate([
+            ->update([
                 'status' => 2
             ]);
 
@@ -163,7 +163,7 @@ public function email_login(Request $request){
         if($status !== 2 && $is_kyc_verified == 1 && $is_phone_verified == 1 && $is_email_verified == 1 && $is_identification_verified == 1  ){
 
             $update = User::where('id',Auth::id())
-            ->udpdate([
+            ->update([
                 'status' => 2
             ]);
 
