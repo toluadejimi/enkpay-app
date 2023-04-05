@@ -1037,7 +1037,7 @@ class TransactionController extends Controller
     public function cash_out_webhook(Request $request)
     {
 
-        try {
+        // try {
 
         $header = $request->header('errand-pay-header');
 
@@ -1091,6 +1091,20 @@ class TransactionController extends Controller
                 $both_commmission = number_format($amount2, 3);
 
 
+
+                 //enkpay commission
+                 $commison_subtract = $comission - 0.425;
+                 $enkPayPaypercent =  $commison_subtract / 100;
+                 $enkPay_amount =  $enkPayPaypercent * $Amount;
+                 $enkpay_commision_amount = number_format($enkPay_amount, 3);
+
+
+                 //errandpay commission
+                 $errandPaypercent =  0.425 / 100;
+                 $errand_amount =  $errandPaypercent * $Amount;
+                 $errandPay_commission_amount = number_format($errand_amount, 3);
+
+
                 $business_commission_cap = Charge::where('title', 'business_cap')
                 ->first()->amount;
 
@@ -1102,43 +1116,34 @@ class TransactionController extends Controller
 
                 if($both_commmission >= $agent_commission_cap && $type == 1 ){
 
+
                     $removed_comission = $Amount - $agent_commission_cap;
 
-                }
+                    $enkpay_profit =  $agent_commission_cap - 75;
 
 
-                if($both_commmission >= $business_commission_cap && $type == 3 ){
+                }elseif($both_commmission >= $business_commission_cap && $type == 3){
 
                     $removed_comission = $Amount - $business_commission_cap;
 
-                }
+                    $enkpay_profit =  $business_commission_cap - 75;
 
-
-                if($type == 2 ){
+                }else{
 
                     $removed_comission = $Amount - $both_commmission;
 
+                    $enkpay_profit =  $both_commmission - $errandPay_commission_amount;
+
+
                 }
 
 
 
 
-                //enkpay commission
-                $commison_subtract = $comission - 0.425;
-                $enkPayPaypercent =  $commison_subtract / 100;
-                $enkPay_amount =  $enkPayPaypercent * $Amount;
-                $enkpay_commision_amount = number_format($enkPay_amount, 3);
 
 
 
-
-                //errandpay commission
-                $errandPaypercent =  0.425 / 100;
-                $errand_amount =  $errandPaypercent * $Amount;
-                $errandPay_commission_amount = number_format($errand_amount, 3);
-
-
-                $enkpay_cashOut_fee = $amount - $enkpay_commision_amount ;
+                //$enkpay_cashOut_fee = $amount - $enkpay_commision_amount ;
 
 
 
@@ -1158,10 +1163,10 @@ class TransactionController extends Controller
                     $trasnaction->e_ref = $TransactionReference;
                     $trasnaction->transaction_type = $TransactionType;
                     $trasnaction->credit = $removed_comission;
-                    $trasnaction->e_charges = $amount;
+                    $trasnaction->e_charges = $enkpay_profit;
                     $trasnaction->note = "Credit received from POS Terminal";
                     $trasnaction->fee = $Fee;
-                    $trasnaction->enkPay_Cashout_profit = $enkpay_commision_amount;
+                    $trasnaction->enkPay_Cashout_profit = $enkpay_profit;
                     $trasnaction->balance = $updated_amount;
                     $trasnaction->terminal_id = $TerminalID;
                     $trasnaction->serial_no = $SerialNumber;
@@ -1204,9 +1209,9 @@ class TransactionController extends Controller
             'message' => 'Key not Authorized',
         ], 500);
 
-        } catch (\Exception$th) {
-            return $th->getMessage();
-        }
+        // } catch (\Exception$th) {
+        //     return $th->getMessage();
+        // }
 
     }
 
