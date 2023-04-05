@@ -294,19 +294,28 @@ class TransactionController extends Controller
 
         try {
 
+
+            $account_number = Auth::user()->c_account_number ?? null;
+            $bank_code = Auth::user()->c_bank_code;
+            $account_name = Auth::user()->c_account_name;
+
+
             $erran_api_key = errand_api_key();
 
             $epkey = env('EPKEY');
 
             $wallet = $request->wallet;
             $amount = $request->amount;
-            $destinationAccountNumber = Auth::user()->c_account_number;
-            $destinationBankCode = Auth::user()->c_bank_code;
-            $destinationAccountName = Auth::user()->c_account_name;
+            $destinationAccountNumber = $account_number;
+            $destinationBankCode = $bank_code;
+            $destinationAccountName = $account_name;
             $longitude = $request->longitude;
             $latitude = $request->latitude;
             $get_description = "Cash out to ". "|". $destinationAccountNumber. " | ".$destinationAccountName;
             $pin = $request->pin;
+
+
+
 
             $referenceCode = "ENK-" . random_int(1000000, 999999999);
 
@@ -316,6 +325,31 @@ class TransactionController extends Controller
             $first_name = first_name();
 
             $description = $get_description ?? "Fund for $destinationAccountName";
+
+
+            if($account_number == null){
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'Please update your account information.',
+
+                ], 500);
+
+            }
+
+            if($bank_code == null){
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'Please update your account information.',
+
+                ], 500);
+
+            }
+
+            
 
             if ($wallet == 'main_account') {
                 $user_wallet_banlance = main_account();
