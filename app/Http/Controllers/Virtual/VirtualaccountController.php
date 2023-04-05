@@ -25,8 +25,20 @@ class VirtualaccountController extends Controller
             $errand_key = errand_api_key();
             $errand_user_id = errand_id();
             $bvn = user_bvn() ?? null;
-            $phone = Auth::user()->phone;
-            $name = first_name() . " " . last_name();
+
+            if(Auth::user()->b_name == null){
+                $name = first_name() . " " . last_name();
+            }else{
+                $name = Auth::user()->b_name;
+            }
+
+            if(Auth::user()->b_phone == null){
+                $phone = Auth::user()->phone;
+            }else{
+                $phone = Auth::user()->b_phone;
+            }
+
+
 
             if (user_status() == 0) {
 
@@ -76,6 +88,7 @@ class VirtualaccountController extends Controller
 
             }
 
+
             $curl = curl_init();
             $data = array(
 
@@ -110,7 +123,6 @@ class VirtualaccountController extends Controller
             curl_close($curl);
             $var = json_decode($var);
 
-            dd($var, $data);
 
             $status =  $var->code ?? null;
             $acct_no = $var->data->accountNumber ?? null;

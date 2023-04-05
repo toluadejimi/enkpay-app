@@ -75,7 +75,7 @@ class RegisterationController extends Controller
             $check_phone = User::where('phone', $phone_no)->first()->phone ?? null;
             $check_status = User::where('phone', $phone_no)->first()->status ?? null;
 
-            if ($check_phone == $phone_no && $check_status == 0) {
+            if ($check_phone == $phone_no && $check_status == 3) {
 
                 return response()->json([
                     'status' => $this->failed,
@@ -85,6 +85,8 @@ class RegisterationController extends Controller
             }
 
             if ($check_phone == $phone_no && $check_phone_verification == 1) {
+
+                dd($check_phone, $phone_no, $check_phone_verification);
 
                 return response()->json([
                     'status' => $this->failed,
@@ -158,7 +160,7 @@ class RegisterationController extends Controller
                 $post_data = json_encode($data);
 
                 curl_setopt_array($curl, array(
-                    // CURLOPT_URL => "https://api.ng.termii.com/api/sms/send",
+                    CURLOPT_URL => "https://api.ng.termii.com/api/sms/send",
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_ENCODING => "",
                     CURLOPT_MAXREDIRS => 10,
@@ -177,10 +179,21 @@ class RegisterationController extends Controller
 
                 $var = json_decode($var);
 
+                $status = $var->message;
+
+                if ($status == 'Successfully Sent') {
+
+                    return response()->json([
+                        'status' => $this->success,
+                        'message' => 'OTP Code has been sent succesfully',
+                    ], 200);
+
+                }
+
                 return response()->json([
-                    'status' => $this->success,
-                    'message' => 'OTP Code has been sent succesfully',
-                ], 200);
+                    'status' => $this->failed,
+                    'message' => 'Service not available at the moment, Please try using Email',
+                ], 500);
 
             }
 
@@ -195,8 +208,6 @@ class RegisterationController extends Controller
 
         try {
 
-
-
             $email = $request->email;
 
             $sms_code = random_int(1000, 9999);
@@ -205,7 +216,7 @@ class RegisterationController extends Controller
             $check_email = User::where('email', $email)->first()->email ?? null;
             $check_email_verification = User::where('email', $email)->first()->is_email_verified ?? null;
 
-            if ($check_email == $email && $check_status == 0) {
+            if ($check_email == $email && $check_status == 3) {
 
                 return response()->json([
                     'status' => $this->failed,
@@ -321,17 +332,13 @@ class RegisterationController extends Controller
                     'message' => 'OTP Code has been sent succesfully',
                 ], 200);
 
-            }else{
-
+            } else {
 
                 return response()->json([
                     'status' => $this->failed,
                     'message' => 'Email cound not be found on Enkpay',
                 ], 500);
             }
-
-
-
 
         } catch (\Exception$th) {
             return $th->getMessage();
@@ -387,10 +394,21 @@ class RegisterationController extends Controller
 
             $var = json_decode($var);
 
+            $status = $var->message;
+
+            if ($status == 'Successfully Sent') {
+
+                return response()->json([
+                    'status' => $this->success,
+                    'message' => 'OTP Code has been sent succesfully',
+                ], 200);
+
+            }
+
             return response()->json([
-                'status' => $this->success,
-                'message' => 'OTP Code has been sent succesfully',
-            ], 200);
+                'status' => $this->failed,
+                'message' => 'Service not available at the moment, Please try using Email verification',
+            ], 500);
 
         } catch (\Exception$th) {
             return $th->getMessage();
@@ -472,9 +490,6 @@ class RegisterationController extends Controller
     {
 
         try {
-
-
-
 
             $phone_no = $request->phone_no;
             $first_name = $request->first_name;

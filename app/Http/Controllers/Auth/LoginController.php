@@ -50,7 +50,7 @@ public function phone_login(Request $request){
         $check_status = User::where('phone', $phone)->first()->status ?? null;
 
 
-        if ($check_status == 0) {
+        if ($check_status == 3) {
 
             return response()->json([
                 'status' => $this->failed,
@@ -105,7 +105,7 @@ public function email_login(Request $request){
         $check_status = User::where('email', $email)->first()->status ?? null;
 
 
-        if ($check_status == 0) {
+        if ($check_status == 3) {
 
             return response()->json([
                 'status' => $this->failed,
