@@ -140,7 +140,7 @@ class ProfileController extends Controller
                 'token' => Auth::user()->identification_type,
                 'bankCode' => null,
 
-                identification_number,
+
 
             );
 
@@ -264,7 +264,7 @@ class ProfileController extends Controller
                 ->update([
                     'identification_number' => $identity_number,
                     'identification_type' => $identity_type,
-                    'is_identification_verified' => 1,
+                    'is_kyc_verified' => 1,
                 ]);
 
             if ($identity_type == 'nin') {
@@ -281,7 +281,8 @@ class ProfileController extends Controller
                     ->update([
                         'bvn' => $identity_number,
                         'is_bvn_verified' => 1,
-                        'is_identification_verified' => 1,
+                        'is_kyc_verified' => 1,
+
 
                     ]);
 
@@ -303,6 +304,20 @@ class ProfileController extends Controller
 
         try {
 
+            $validator = Validator::make($request->all(), [
+                'utility_bill' => 'required',
+                'identification_image' => 'required',
+                'selfie' => 'required',
+
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => $validator->messages()->first(),
+                ], 500);
+            }
+
             $file = $request->file('utility_bill');
             $utility_bill_fileName = $file->getClientOriginalName();
             $destinationPath = public_path() . 'upload/utilitybill';
@@ -323,7 +338,7 @@ class ProfileController extends Controller
                     'image' => $selfie_fileName,
                     'utility_bill' => $utility_bill_fileName,
                     'identification_image' => $identification_image_fileName,
-                    'is_identification_verified' => 0,
+                    'is_identification_verified' => 1,
                 ]);
 
             $message = "New upload of identity image from" . " " . Auth::id();
