@@ -50,6 +50,8 @@ public function phone_login(Request $request){
         $check_status = User::where('phone', $phone)->first()->status ?? null;
 
 
+
+
         if ($check_status == 3) {
 
             return response()->json([
@@ -73,6 +75,26 @@ public function phone_login(Request $request){
 
         $user = Auth()->user();
         $user['token']=$token;
+
+
+        $is_kyc_verified = Auth::user()->is_kyc_verified;
+        $status = Auth::user()->status;
+        $is_phone_verified = Auth::user()->is_phone_verified;
+        $is_email_verified = Auth::user()->is_email_verified;
+        $is_identification_verified = Auth::user()->is_identification_verified;
+
+
+        if($status !== 2 && $is_kyc_verified == 1 && $is_phone_verified == 1 && $is_email_verified == 1 && $is_identification_verified == 1  ){
+
+            $update = User::where('id',Auth::id())
+            ->udpdate([
+                'status' => 2
+            ]);
+
+
+        }
+
+
 
 
         return response()->json([
@@ -131,6 +153,22 @@ public function email_login(Request $request){
         $user['token']=$token;
 
 
+        $is_kyc_verified = Auth::user()->is_kyc_verified;
+        $status = Auth::user()->status;
+        $is_phone_verified = Auth::user()->is_phone_verified;
+        $is_email_verified = Auth::user()->is_email_verified;
+        $is_identification_verified = Auth::user()->is_identification_verified;
+
+
+        if($status !== 2 && $is_kyc_verified == 1 && $is_phone_verified == 1 && $is_email_verified == 1 && $is_identification_verified == 1  ){
+
+            $update = User::where('id',Auth::id())
+            ->udpdate([
+                'status' => 2
+            ]);
+
+
+        }
 
 
 

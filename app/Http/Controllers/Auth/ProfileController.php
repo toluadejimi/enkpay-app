@@ -340,7 +340,7 @@ class ProfileController extends Controller
                     'image' => $selfie_fileName,
                     'utility_bill' => $utility_bill_fileName,
                     'identification_image' => $identification_image_fileName,
-                    'is_identification_verified' => 1,
+                    'is_identification_verified' => 2,
                 ]);
 
             $message = "New upload of identity image from" . " " . Auth::id();
