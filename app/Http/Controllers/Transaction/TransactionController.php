@@ -179,7 +179,7 @@ class TransactionController extends Controller
 
             $trans_id = "ENK-" . random_int(100000, 999999);
 
-            $TransactionReference = $var->reference ?? null;
+            $TransactionReference = $var->data->reference ?? null;
 
 
             $enkpay_profit = $transfer_charges - 10;
