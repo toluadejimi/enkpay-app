@@ -301,6 +301,8 @@ class VirtualaccountController extends Controller
 
                     }
 
+                    $enkpay_profit = $deposit_charges - 10;
+
                     //credit
                     $enkpay_debit = $Amount - $deposit_charges;
                     $updated_amount = $main_wallet + $enkpay_debit;
@@ -324,6 +326,7 @@ class VirtualaccountController extends Controller
                         $trasnaction->note = "Credit received from Transfer";
                         $trasnaction->fee = $Fee;
                         $trasnaction->e_charges = $deposit_charges;
+                        $trasnaction->enkPay_Cashout_profit = $enkpay_profit;
                         $trasnaction->trx_date = $TransactionDate;
                         $trasnaction->trx_time = $TransactionTime;
                         $trasnaction->sender_name = $sender_name;
