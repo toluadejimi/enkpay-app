@@ -138,8 +138,11 @@ Route::get('electric-company', [PowerController::class, 'get_eletric_company']);
 
 
 
-
+// Transfer Properties
     Route::get('transfer-properties', [TransactionController::class, 'transfer_properties']);
+    Route::get('selfcashout-properties', [TransactionController::class, 'selfcashout_properties']);
+
+
 
     //Airtime
     Route::post('buy-airtime', [AirtimeController::class, 'buy_airtime']);

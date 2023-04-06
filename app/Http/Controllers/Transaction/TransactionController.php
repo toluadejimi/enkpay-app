@@ -175,7 +175,9 @@ class TransactionController extends Controller
 
             $var = json_decode($var);
 
-            $message = $var->error->message ?? null;
+            $error = $var->error->message ?? null;
+
+            $message = "Error from Errand Pay | $error ";
 
             $trans_id = "ENK-" . random_int(100000, 999999);
 
@@ -238,7 +240,7 @@ class TransactionController extends Controller
             } else {
 
                 //credit
-                $credit = $user_wallet_banlance + $amount;
+                $credit = $user_wallet_banlance + $amount - $amount;
 
                 if ($wallet == 'main_account') {
 
@@ -257,19 +259,8 @@ class TransactionController extends Controller
                         ]);
                 }
 
-                $data = array(
-                    'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
-                    'subject' => "Error From Transfer",
-                    'toreceiver' => "toluadejimi@gmail.com",
-                    'message' => $message,
 
-                );
-
-                Mail::send('emails.notify.error', ["data1" => $data], function ($message) use ($data) {
-                    $message->from($data['fromsender']);
-                    $message->to($data['toreceiver']);
-                    $message->subject($data['subject']);
-                });
+                send_notification($message);
 
                 return response()->json([
 
@@ -638,6 +629,32 @@ class TransactionController extends Controller
                 ], 200);
 
             }
+
+        } catch (\Exception$th) {
+            return $th->getMessage();
+        }
+
+    }
+
+     public function selfcashout_properties()
+    {
+
+        try {
+
+            $account = select_account();
+
+            $charges = Charge::where('title', 'transfer_fee')
+            ->first()->amount;
+
+
+                return response()->json([
+
+                    'account' => $account,
+                    'transfer_charge' => $charges,
+
+                ], 200);
+
+
 
         } catch (\Exception$th) {
             return $th->getMessage();
