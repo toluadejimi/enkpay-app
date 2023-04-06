@@ -292,7 +292,7 @@ class VirtualaccountController extends Controller
 
                     }
 
-                    if ($check_status == 2) {
+                    if ($check_status == 3) {
 
                         return response()->json([
                             'status' => $this->failed,
