@@ -303,6 +303,8 @@ class VirtualaccountController extends Controller
 
                     $enkpay_profit = $deposit_charges - 10;
 
+                    $message_amount = $Amount - 10;
+
                     //credit
                     $enkpay_debit = $Amount - $deposit_charges;
                     $updated_amount = $main_wallet + $enkpay_debit;
@@ -338,19 +340,9 @@ class VirtualaccountController extends Controller
 
                     }
 
-                    $data = array(
-                        'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
-                        'subject' => "Virtual Account Credited",
-                        'toreceiver' => 'toluadejimi@gmail.com',
-                        'amount' => $enkpay_debit,
-                        'serial' => $user_id,
-                    );
+                $mesage = "Your Pool account has been credited |  $message_amount | from Virtual account";
 
-                    Mail::send('emails.transaction.terminal-credit', ["data1" => $data], function ($message) use ($data) {
-                        $message->from($data['fromsender']);
-                        $message->to($data['toreceiver']);
-                        $message->subject($data['subject']);
-                    });
+                  send_notification($message);
 
                     //send to user
 
@@ -360,7 +352,7 @@ class VirtualaccountController extends Controller
                             'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
                             'subject' => "Virtual Account Credited",
                             'toreceiver' => $user_email,
-                            'amount' => $Amount,
+                            'amount' => $enkpay_debit,
                             'first_name' => $first_name,
                         );
 
