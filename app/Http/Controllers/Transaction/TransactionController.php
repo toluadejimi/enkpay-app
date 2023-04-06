@@ -470,7 +470,7 @@ class TransactionController extends Controller
 
             $trans_id = "ENK-" . random_int(100000, 999999);
 
-            $TransactionReference = $var->reference ?? null;
+            $TransactionReference = $var->data->reference ?? null;
 
             $status = $var->code ?? null;
 
@@ -526,7 +526,7 @@ class TransactionController extends Controller
             } else {
 
                 //credit
-                $credit = $user_wallet_banlance + $amount;
+                $credit = $user_wallet_banlance + $amount - $amount;
 
                 if ($wallet == 'main_account') {
 
