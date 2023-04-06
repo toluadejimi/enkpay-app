@@ -340,7 +340,7 @@ class VirtualaccountController extends Controller
 
                     }
 
-                $mesage = "Your Pool account has been credited |  $message_amount | from Virtual account";
+                $message = "Your Pool account has been credited |  $message_amount | from Virtual account";
 
                   send_notification($message);
 
