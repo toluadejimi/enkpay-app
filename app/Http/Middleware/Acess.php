@@ -29,13 +29,11 @@ class Acess
         }elseif($request->header('Authorization') != 'Bearer '.$request->bearerToken() ){
 
 
-            return new Response('Content', 401);
-
-            // abort(401, response()->json(
-            //     [
-            //         'status' => false,
-            //         'message' => 'Token Expired, Please login to continue.',
-            //     ]));
+            abort( response()->json(
+                [
+                    'status' => false,
+                    'message' => 'Token Expired, Please login to continue.',
+                ]));
 
         }elseif (Auth::guard('api')->check() != true) {
             abort(response()->json(
