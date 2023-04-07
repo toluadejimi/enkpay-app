@@ -29,7 +29,7 @@ class Acess
         }elseif($request->header('Authorization') != 'Bearer '.$request->bearerToken() ){
 
 
-            abort( response()->json(
+            abort(response()->json(
                 [
                     'status' => false,
                     'message' => 'Token Expired, Please login to continue.',
