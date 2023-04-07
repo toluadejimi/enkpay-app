@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
     <title>Home - Brand</title>
-    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{url('')}}/public/assetsbootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800&amp;display=swap">
 </head>
 
@@ -27,11 +27,11 @@
                         <p class="my-3">MONEY IN | MONEY OUT | DATA | AIRTIME | TAP TO PAY<br>BILLS PAYMENTS AND MANY MORE</p>
                         <form class="d-flex justify-content-center flex-wrap justify-content-md-start flex-lg-nowrap" method="post">
                             <div class="my-2 me-2"></div>
-                            <div class="my-2"><img src="assets/img/app-stores-logo.png" width="283" height="55"></div>
+                            <div class="my-2"><img src="{{url('')}}/public/assetsimg/app-stores-logo.png" width="283" height="55"></div>
                         </form>
                     </div>
                 </div>
-                <div class="col-md-6 mb-4" style="border-width: 0px;margin: 0px;padding: 67px;padding-bottom: 0px;padding-top: 0px;"><img style="text-align: center;width: 259px;height: 585.22px;margin: 34px;margin-right: 14px;margin-top: 30px;margin-left: -15px;" src="assets/img/new.jpeg"></div>
+                <div class="col-md-6 mb-4" style="border-width: 0px;margin: 0px;padding: 67px;padding-bottom: 0px;padding-top: 0px;"><img style="text-align: center;width: 259px;height: 585.22px;margin: 34px;margin-right: 14px;margin-top: 30px;margin-left: -15px;" src="{{url('')}}/public/assetsimg/new.jpeg"></div>
             </div>
         </div>
     </header>
@@ -210,8 +210,8 @@
             </div>
         </div>
     </footer>
-    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
-    <script src="assets/js/bold-and-dark.js"></script>
+    <script src="{{url('')}}/public/assetsbootstrap/js/bootstrap.min.js"></script>
+    <script src="{{url('')}}/public/assetsjs/bold-and-dark.js"></script>
 </body>
 
 </html>
