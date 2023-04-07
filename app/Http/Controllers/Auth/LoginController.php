@@ -189,7 +189,7 @@ public function email_login(Request $request){
         return response()->json([
             'status' => $this->success,
             'data' => $user,
-            'permission' => $feature,
+            'permission' => int($feature),
             'setting' => $setting
 
 
