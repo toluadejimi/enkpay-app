@@ -508,13 +508,13 @@ class RegisterationController extends Controller
                 'state' => 'required|string|max:18',
                 'gender' => 'required|string|max:50',
                 'street' => 'required|string|max:50',
-                'lga' => 'required|string|max:18',
+                //'lga' => 'required|string|max:18',
                 'password' => 'required',
                 'pin' => 'required',
             ]);
 
 
-            
+
 
             if ($validator->fails()) {
                 return response()->json([
