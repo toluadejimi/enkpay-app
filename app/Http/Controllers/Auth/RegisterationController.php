@@ -508,7 +508,6 @@ class RegisterationController extends Controller
                 'state' => 'required|string|max:18',
                 'gender' => 'required|string|max:50',
                 'street' => 'required|string|max:50',
-                'city' => 'required|string|max:50',
                 'lga' => 'required|string|max:18',
                 'password' => 'required',
                 'pin' => 'required',
@@ -538,8 +537,6 @@ class RegisterationController extends Controller
             $pin = $request->pin;
             $devide_id = $request->devide_id;
             $city = $request->city;
-
-
             $get_phone  = $phone_no ?? null;
             $get_email  = $email ?? null;
 

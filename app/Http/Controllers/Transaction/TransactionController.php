@@ -1494,7 +1494,7 @@ class TransactionController extends Controller
                     $trasnaction->type = $transaction_type;
                     $trasnaction->debit = $amount;
                     $trasnaction->balance = $debit;
-                    $trasnaction->main_type = "erand_vas";
+                    $trasnaction->main_type = "errand_vas";
                     $trasnaction->note = "VAS Purchase from Terminal";
                     $trasnaction->e_charges = 0;
                     $trasnaction->serial_no = $serial_number;
