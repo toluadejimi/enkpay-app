@@ -99,52 +99,52 @@ class VirtualaccountController extends Controller
 
             );
 
-            // $databody = json_encode($data);
+            $databody = json_encode($data);
 
-            // curl_setopt_array($curl, array(
-            //     CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/CreateVirtualAccount',
-            //     CURLOPT_RETURNTRANSFER => true,
-            //     CURLOPT_ENCODING => '',
-            //     CURLOPT_MAXREDIRS => 10,
-            //     CURLOPT_TIMEOUT => 0,
-            //     CURLOPT_FOLLOWLOCATION => true,
-            //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            //     CURLOPT_CUSTOMREQUEST => 'POST',
-            //     CURLOPT_POSTFIELDS => $databody,
-            //     CURLOPT_HTTPHEADER => array(
-            //         'Content-Type: application/json',
-            //         'Accept: application/json',
-            //         "Authorization: Bearer $errand_key",
-            //     ),
-            // ));
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/CreateVirtualAccount',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $databody,
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/json',
+                    'Accept: application/json',
+                    "Authorization: Bearer $errand_key",
+                ),
+            ));
 
-            // $var = curl_exec($curl);
+            $var = curl_exec($curl);
 
-            // curl_close($curl);
-            // $var = json_decode($var);
-
-
-             //$status =  $var->code ?? null;
-            // $acct_no = $var->data->accountNumber ?? null;
-            // $acct_name = $var->data->accountName ?? null;
-
-            // $bank = "VFD MICROFINANCE BANK";
-
-            // $data1 = array([
-            //     'acct_no' => $acct_no,
-            //     'acct_name' => $acct_name,
-            //     'bank' => $bank
-            // ]);
-
-            // $data2 = (object) $data1[0];
+            curl_close($curl);
+            $var = json_decode($var);
 
 
-            // if ($status == 200) {
+            $status =  $var->code ?? null;
+            $acct_no = $var->data->accountNumber ?? null;
+            $acct_name = $var->data->accountName ?? null;
 
-            //     $user = User::find(Auth::id());
-            //     $user->v_account_no = $acct_no;
-            //     $user->v_account_name = $acct_name;
-            //     $user->save();
+            $bank = "VFD MICROFINANCE BANK";
+
+            $data1 = array([
+                'acct_no' => $acct_no,
+                'acct_name' => $acct_name,
+                'bank' => $bank
+            ]);
+
+            $data2 = (object) $data1[0];
+
+
+            if ($status == 200) {
+
+                $user = User::find(Auth::id());
+                $user->v_account_no = $acct_no;
+                $user->v_account_name = $acct_name;
+                $user->save();
 
 
                 $get_user = User::find(Auth::id())->first();
@@ -157,16 +157,16 @@ class VirtualaccountController extends Controller
 
                 ], 200);
 
-            // }
+            }
 
 
 
-            // return response()->json([
+            return response()->json([
 
-            //     'status' => $this->failed,
-            //     'message' => $var->error->message,
+                'status' => $this->failed,
+                'message' => $var->error->message,
 
-            // ], 500);
+            ], 500);
 
         } catch (\Exception$th) {
             return $th->getMessage();

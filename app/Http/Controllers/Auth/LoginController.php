@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Wallet;
 use App\Models\Feature;
+use App\Models\Setting;
+
 
 
 use App\Models\Transaction;
@@ -44,8 +46,8 @@ public function phone_login(Request $request){
 
         $credentials = request(['phone', 'password']);
 
-        Passport::tokensExpireIn(Carbon::now()->addMinutes(15));
-        Passport::refreshTokensExpireIn(Carbon::now()->addMinutes(15));
+        Passport::tokensExpireIn(Carbon::now()->addMinutes(1));
+        Passport::refreshTokensExpireIn(Carbon::now()->addMinutes(1));
 
         $check_status = User::where('phone', $phone)->first()->status ?? null;
 
@@ -96,11 +98,20 @@ public function phone_login(Request $request){
 
 
 
+        $setting = Setting::select('google_url','ios_url','version')
+        ->first();
+
+
+
+
+
+
 
         return response()->json([
             'status' => $this->success,
             'data' => $user,
-            'permission' => $feature
+            'permission' => $feature,
+            'setting' => $setting
 
 
         ],200);
@@ -121,8 +132,8 @@ public function email_login(Request $request){
 
         $credentials = request(['email', 'password']);
 
-        Passport::tokensExpireIn(Carbon::now()->addMinutes(15));
-        Passport::refreshTokensExpireIn(Carbon::now()->addMinutes(15));
+        Passport::tokensExpireIn(Carbon::now()->addMinutes(1));
+        Passport::refreshTokensExpireIn(Carbon::now()->addMinutes(1));
 
         $check_status = User::where('email', $email)->first()->status ?? null;
 
@@ -171,11 +182,16 @@ public function email_login(Request $request){
         }
 
 
+        $setting = Setting::select('google_url','ios_url','version')
+        ->first();
+
 
         return response()->json([
             'status' => $this->success,
             'data' => $user,
-            'permission' => $feature
+            'permission' => $feature,
+            'setting' => $setting
+
 
         ],200);
 
