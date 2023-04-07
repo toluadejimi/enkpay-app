@@ -31,6 +31,7 @@ class Acess
 
             abort(response()->json(
                 [
+                    'status_code' => 401,
                     'status' => false,
                     'message' => 'Token Expired, Please login to continue.',
                 ], 401));
