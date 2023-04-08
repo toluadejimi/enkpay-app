@@ -46,8 +46,8 @@ public function phone_login(Request $request){
 
         $credentials = request(['phone', 'password']);
 
-        Passport::tokensExpireIn(Carbon::now()->addMinutes(1));
-        Passport::refreshTokensExpireIn(Carbon::now()->addMinutes(1));
+        Passport::tokensExpireIn(Carbon::now()->addMinutes(20));
+        Passport::refreshTokensExpireIn(Carbon::now()->addMinutes(20));
 
         $check_status = User::where('phone', $phone)->first()->status ?? null;
 
