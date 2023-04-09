@@ -473,7 +473,6 @@ class RegisterationController extends Controller
                         'phone' => $phone_no,
                     ]);
 
-                $token = $user->createToken('API Token')->accessToken;
 
                 $headers = [
                     'Accept' => 'application/json',
