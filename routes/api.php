@@ -118,6 +118,12 @@ Route::get('electric-company', [PowerController::class, 'get_eletric_company']);
 
 
 
+//Auth Verification
+Route::post('auth-verify-phone', [RegisterationController::class, 'auth_phone_verification']);
+Route::post('auth-verify-email', [RegisterationController::class, 'auth_email_verification']);
+
+
+
 
 
 
