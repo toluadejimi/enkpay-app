@@ -722,7 +722,7 @@ class RegisterationController extends Controller
 
             $get_auth_code = User::where('id', $user_id)->first()->sms_code ?? null;
 
-            $get_code = User::where('phone', $phone)->first()->sms_code ?? null;
+            $get_code = User::where('phone', $phone_no)->first()->sms_code ?? null;
 
 
             if ($code == $get_code && $user_id == null) {
