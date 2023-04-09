@@ -470,7 +470,7 @@ class RegisterationController extends Controller
 
                 $update_code = User::where('id', $user_id)
                     ->update([
-                        'phone' => $phone,
+                        'phone' => $phone_no,
                     ]);
 
                 $token = $user->createToken('API Token')->accessToken;
