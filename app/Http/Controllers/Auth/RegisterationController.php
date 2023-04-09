@@ -720,8 +720,10 @@ class RegisterationController extends Controller
             $code = $request->code;
 
 
+            $get_auth_code = User::where('id', $user_id)->first()->sms_code ?? null;
 
-            $get_code = User::where('phone', $phone_no)->first()->sms_code;
+            $get_code = User::where('phone', $phone)->first()->sms_code ?? null;
+
 
             if ($code == $get_code && $user_id == null) {
 
@@ -746,7 +748,7 @@ class RegisterationController extends Controller
             ], 500);
 
 
-            if ($code == $get_code && $user_id == Auth::id()) {
+            if ($code == $get_auth_code  && $user_id == Auth::id()) {
 
                 $update = User::where('id', $user_id)
                     ->update([
@@ -787,7 +789,11 @@ class RegisterationController extends Controller
             $email = $request->email;
             $code = $request->code;
 
-            $get_code = User::where('email', $email)->first()->sms_code;
+
+            $get_auth_code = User::where('id', $user_id)->first()->sms_code ?? null;
+
+
+            $get_code = User::where('email', $email)->first()->sms_code ?? null;
 
             if ($code == $get_code && $user_id == null) {
 
@@ -814,7 +820,7 @@ class RegisterationController extends Controller
 
 
 
-            if ($code == $get_code && $user_id == Auth::id()) {
+            if ($code == $get_auth_code && $user_id == Auth::id()) {
 
                 $update = User::where('id', $user_id)
                     ->update([
