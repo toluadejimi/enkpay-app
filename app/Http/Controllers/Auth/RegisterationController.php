@@ -8,6 +8,7 @@ use App\Models\StateLga;
 use App\Models\User;
 use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Mail;
 use Illuminate\Support\Facades\Validator;
 
