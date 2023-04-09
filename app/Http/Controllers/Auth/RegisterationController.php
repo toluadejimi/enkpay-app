@@ -328,6 +328,7 @@ class RegisterationController extends Controller
 
             $user_id = Auth::id();
 
+
             $email = $request->email;
 
             $sms_code = random_int(1000, 9999);
@@ -354,13 +355,12 @@ class RegisterationController extends Controller
 
             }
 
-            if ($check_email == null && $check_email_verification == null && $user_id == null) {
+            if ($check_email == null && $check_email_verification == null && $user_id == Auth::id()) {
 
-                $update_code = User::where('id', $user_id)
+                $update = User::where('id', $user_id)
                     ->update([
                         'email' => $email,
                     ]);
-
 
                 $data = array(
                     'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
@@ -466,7 +466,7 @@ class RegisterationController extends Controller
 
 
 
-            if ($check_phone == null && $check_phone_verification == null && $user_id == null) {
+            if ($check_phone == null && $check_phone_verification == null && $user_id == Auth::id()) {
 
                 $update_code = User::where('id', $user_id)
                     ->update([
@@ -747,7 +747,7 @@ class RegisterationController extends Controller
             ], 500);
 
 
-            if ($code == $get_code && $user_id !== null) {
+            if ($code == $get_code && $user_id == Auth::id()) {
 
                 $update = User::where('id', $user_id)
                     ->update([
@@ -815,7 +815,7 @@ class RegisterationController extends Controller
 
 
 
-            if ($code == $get_code && $user_id !== null) {
+            if ($code == $get_code && $user_id == Auth::id()) {
 
                 $update = User::where('id', $user_id)
                     ->update([
