@@ -67,10 +67,17 @@ class RegisterationController extends Controller
     public function phone_verification(Request $request)
     {
 
-        // try {
+        try {
+
+
 
             $get_phone_no = $request->phone_no;
             $trimed_no = substr($get_phone_no, 1);
+
+            $user_id = Auth::id() ?? null;
+
+
+
 
             if (str_contains($get_phone_no, '+234')) {
                 $phone_no = $get_phone_no;
@@ -104,7 +111,11 @@ class RegisterationController extends Controller
 
             }
 
-            if ($check_phone == null && $check_phone_verification == null) {
+
+
+
+
+            if ($check_phone == null && $check_phone_verification == null && $user_id == null) {
 
                 $user = new User();
                 $user->phone = $phone_no;
@@ -206,9 +217,9 @@ class RegisterationController extends Controller
 
             }
 
-        // } catch (\Exception$e) {
-        //     return $e->getMessage();
-        // }
+        } catch (\Exception$e) {
+            return $e->getMessage();
+        }
 
     }
 
@@ -216,6 +227,9 @@ class RegisterationController extends Controller
     {
 
         try {
+
+
+            $user_id = Auth::id();
 
             $email = $request->email;
 
@@ -243,7 +257,7 @@ class RegisterationController extends Controller
 
             }
 
-            if ($check_email == null && $check_email_verification == null) {
+            if ($check_email == null && $check_email_verification == null && $user_id == null) {
 
                 $user = new User();
                 $user->email = $email;
@@ -430,12 +444,17 @@ class RegisterationController extends Controller
 
         try {
 
+
+            $user_id = Auth::id() ?? null;
+
             $phone_no = $request->phone_no;
             $code = $request->code;
 
+
+
             $get_code = User::where('phone', $phone_no)->first()->sms_code;
 
-            if ($code == $get_code) {
+            if ($code == $get_code && $user_id == null) {
 
                 $update = User::where('phone', $phone_no)
                     ->update([
@@ -450,10 +469,38 @@ class RegisterationController extends Controller
                     'message' => 'OTP Code verified successfully',
                 ], 200);
 
-            }return response()->json([
+            }
+
+            return response()->json([
                 'status' => $this->failed,
                 'message' => 'Invalid code, try again',
             ], 500);
+
+
+            if ($code == $get_code && $user_id !== null) {
+
+                $update = User::where('id', $user_id)
+                    ->update([
+
+                        'is_phone_verified' => 1,
+                        'status' => 1,
+
+                    ]);
+
+                return response()->json([
+                    'status' => $this->success,
+                    'message' => 'OTP Code verified successfully',
+                ], 200);
+
+            }
+
+            return response()->json([
+                'status' => $this->failed,
+                'message' => 'Invalid code, try again',
+            ], 500);
+
+
+
 
         } catch (\Exception$th) {
             return $th->getMessage();
@@ -465,12 +512,15 @@ class RegisterationController extends Controller
 
         try {
 
+            $user_id = Auth::id() ?? null;
+
+
             $email = $request->email;
             $code = $request->code;
 
             $get_code = User::where('email', $email)->first()->sms_code;
 
-            if ($code == $get_code) {
+            if ($code == $get_code && $user_id == null) {
 
                 $update = User::where('email', $email)
                     ->update([
@@ -485,10 +535,43 @@ class RegisterationController extends Controller
                     'message' => 'OTP Code verified successfully',
                 ], 200);
 
-            }return response()->json([
+            }
+
+
+            return response()->json([
                 'status' => $this->failed,
                 'message' => 'Invalid code, try again',
             ], 500);
+
+
+
+            if ($code == $get_code && $user_id !== null) {
+
+                $update = User::where('id', $user_id)
+                    ->update([
+
+                        'is_email_verified' => 1,
+                        'status' => 1,
+
+                    ]);
+
+                return response()->json([
+                    'status' => $this->success,
+                    'message' => 'OTP Code verified successfully',
+                ], 200);
+
+            }
+
+
+            return response()->json([
+                'status' => $this->failed,
+                'message' => 'Invalid code, try again',
+            ], 500);
+
+
+
+
+
 
         } catch (\Exception$th) {
             return $th->getMessage();
