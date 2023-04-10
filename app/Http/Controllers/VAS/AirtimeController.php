@@ -134,9 +134,12 @@ class AirtimeController extends Controller
 
             $get_message = $var->response_description ?? null;
 
+
+            $status = $var->response_description ?? null;
+
             $message = "Error Mesage from VAS AIRTIME - $get_message";
 
-            if ($var->response_description == 'TRANSACTION SUCCESSFUL') {
+            if ($status == 'TRANSACTION SUCCESSFUL') {
 
                 $debit = $user_wallet_banlance - $amount;
 
@@ -164,17 +167,29 @@ class AirtimeController extends Controller
 
                 }
 
+
+                $title = "Airtime VAS";
+
                 $transaction = new Transaction();
                 $transaction->user_id = Auth::id();
                 $transaction->ref_trans_id = $referenceCode;
                 $transaction->transaction_type = "VasAirtime";
-                $trasnaction->title = "Airtime VAS";
                 $transaction->type = "vas";
                 $transaction->balance = $balance;
                 $transaction->debit = $amount;
                 $transaction->status = 1;
+                $transaction->main_type = "enkpay_vas";
                 $transaction->note = "Airtime Purchase to $phone";
+                //$trasnaction->title = $title;
                 $transaction->save();
+
+
+                $update = Transaction::where('ref_trans_id',$referenceCode)
+                ->update([
+
+                    'title' => $title
+
+                ]);
 
                 if (!empty(user_email())) {
                     //send email
