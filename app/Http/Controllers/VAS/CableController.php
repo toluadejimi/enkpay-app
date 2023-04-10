@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\Wallet;
+use App\Models\Charge;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -74,6 +75,8 @@ class CableController extends Controller
 
         try {
 
+            $referenceCode = "ENK-" . random_int(1000000, 999999999);
+
             $auth = env('VTAUTH');
 
             $request_id = date('YmdHis') . Str::random(4);
@@ -86,7 +89,7 @@ class CableController extends Controller
 
             $variation_code = $request->variation_code;
 
-            $amount = round($request->variation_amount);
+            $amount = round($request->amount);
 
             $wallet = $request->wallet;
 
@@ -141,35 +144,35 @@ class CableController extends Controller
 
             }
 
-            $curl = curl_init();
+            // $curl = curl_init();
 
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://vtpass.com/api/pay',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => array(
-                    'request_id' => $request_id,
-                    'variation_code' => $variation_code,
-                    'serviceID' => $serviceid,
-                    'amount' => $amount,
-                    'biller_code' => $biller_code,
-                    'phone' => $phone,
-                ),
-                CURLOPT_HTTPHEADER => array(
-                    "Authorization: Basic $auth=",
-                    'Cookie: laravel_session=eyJpdiI6IlBkTGc5emRPMmhyQVwvb096YkVKV2RnPT0iLCJ2YWx1ZSI6IkNvSytPVTV5TW52K2tBRlp1R2pqaUpnRDk5YnFRbEhuTHhaNktFcnBhMFRHTlNzRWIrejJxT05kM1wvM1hEYktPT2JKT2dJWHQzdFVaYnZrRytwZ2NmQT09IiwibWFjIjoiZWM5ZjI3NzBmZTBmOTZmZDg3ZTUxMDBjODYxMzQ3OTkxN2M4YTAxNjNmMWY2YjAxZTIzNmNmNWNhOWExNzJmOCJ9',
-                ),
-            ));
+            // curl_setopt_array($curl, array(
+            //     CURLOPT_URL => 'https://vtpass.com/api/pay',
+            //     CURLOPT_RETURNTRANSFER => true,
+            //     CURLOPT_ENCODING => '',
+            //     CURLOPT_MAXREDIRS => 10,
+            //     CURLOPT_TIMEOUT => 0,
+            //     CURLOPT_FOLLOWLOCATION => true,
+            //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            //     CURLOPT_CUSTOMREQUEST => 'POST',
+            //     CURLOPT_POSTFIELDS => array(
+            //         'request_id' => $request_id,
+            //         'variation_code' => $variation_code,
+            //         'serviceID' => $serviceid,
+            //         'amount' => $amount,
+            //         'biller_code' => $biller_code,
+            //         'phone' => $phone,
+            //     ),
+            //     CURLOPT_HTTPHEADER => array(
+            //         "Authorization: Basic $auth=",
+            //         'Cookie: laravel_session=eyJpdiI6IlBkTGc5emRPMmhyQVwvb096YkVKV2RnPT0iLCJ2YWx1ZSI6IkNvSytPVTV5TW52K2tBRlp1R2pqaUpnRDk5YnFRbEhuTHhaNktFcnBhMFRHTlNzRWIrejJxT05kM1wvM1hEYktPT2JKT2dJWHQzdFVaYnZrRytwZ2NmQT09IiwibWFjIjoiZWM5ZjI3NzBmZTBmOTZmZDg3ZTUxMDBjODYxMzQ3OTkxN2M4YTAxNjNmMWY2YjAxZTIzNmNmNWNhOWExNzJmOCJ9',
+            //     ),
+            // ));
 
-            $var = curl_exec($curl);
-            curl_close($curl);
+            // $var = curl_exec($curl);
+            // curl_close($curl);
 
-            $var = json_decode($var);
+            // $var = json_decode($var);
 
             $trx_id = $var->requestId ?? null;
 
@@ -177,9 +180,18 @@ class CableController extends Controller
 
             $message = "Error Mesage from VAS DATA BUNDLE - $get_message";
 
-            if ($var->response_description == 'TRANSACTION SUCCESSFUL') {
+            $status = "TRANSACTION SUCCESSFUL";// $var->response_description ?? null;
 
-                $debit = $user_wallet_banlance - $amount;
+            $charge = Charge::where('title', 'eletricity_charges')
+            ->first()->amount;
+
+            $debited_amount = $amount + $charge;
+
+            if ($status == 'TRANSACTION SUCCESSFUL') {
+
+
+
+                $debit = $user_wallet_banlance - $debited_amount ;
 
                 if ($wallet == 'main_account') {
 
@@ -195,13 +207,15 @@ class CableController extends Controller
                         ]);
                 }
 
+
+
                 if ($wallet == 'main_account') {
 
-                    $balance = $user_wallet_banlance - $amount;
+                    $balance = $user_wallet_banlance - $debit;
 
                 } else {
 
-                    $balance = $user_wallet_banlance - $amount;
+                    $balance = $user_wallet_banlance - $debit;
 
                 }
 
@@ -209,13 +223,26 @@ class CableController extends Controller
                 $transaction->user_id = Auth::id();
                 $transaction->ref_trans_id = $referenceCode;
                 $transaction->transaction_type = "VasCable";
-                $trasnaction->title = "Cable VAS";
+                //$trasnaction->title = "Cable VAS";
                 $transaction->type = "vas";
                 $transaction->balance = $balance;
                 $transaction->debit = $amount;
                 $transaction->status = 1;
                 $transaction->note = "Data Bundle Purchase to $phone";
                 $transaction->save();
+
+
+                $title = "Cable VAS";
+
+                $update = Transaction::where('ref_trans_id',$referenceCode)
+                ->update([
+
+                    'title' => $title,
+                    'main_type' => "enkpay_vas"
+
+                ]);
+
+
 
                 if (!empty(user_email())) {
                     //send email
@@ -253,7 +280,7 @@ class CableController extends Controller
                 'status' => $this->failed,
                 'message' => 'Service unavilable please try again later',
 
-            ], 200);
+            ], 500);
 
         } catch (\Exception$th) {
             return $th->getMessage();

@@ -179,7 +179,7 @@ Route::post('auth-verify-email', [RegisterationController::class, 'auth_email_ve
 
     //Cable
     Route::get('get-cable-plan', [CableController::class, 'get_cable_plan']);
-    Route::get('buy-cable', [CableController::class, 'buy_cable']);
+    Route::post('buy-cable', [CableController::class, 'buy_cable']);
 
 
     //

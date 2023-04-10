@@ -85,6 +85,9 @@ class DataController extends Controller
 
         try {
 
+            $referenceCode = "ENK-" . random_int(1000000, 999999999);
+
+
             $auth = env('VTAUTH');
 
             $request_id = date('YmdHis') . Str::random(4);
@@ -188,7 +191,10 @@ class DataController extends Controller
 
             $message = "Error Mesage from VAS DATA BUNDLE - $get_message";
 
-            if ($var->response_description == 'TRANSACTION SUCCESSFUL') {
+            $status = $var->response_description ?? null;
+
+
+            if ($status == 'TRANSACTION SUCCESSFUL') {
 
                 $debit = $user_wallet_banlance - $amount;
 
@@ -216,17 +222,31 @@ class DataController extends Controller
 
                 }
 
+
+
                 $transaction = new Transaction();
                 $transaction->user_id = Auth::id();
                 $transaction->ref_trans_id = $referenceCode;
                 $transaction->transaction_type = "VasData";
-                $trasnaction->title = "Data VAS";
                 $transaction->type = "vas";
                 $transaction->balance = $balance;
                 $transaction->debit = $amount;
                 $transaction->status = 1;
                 $transaction->note = "Data Bundle Purchase to $phone";
                 $transaction->save();
+
+
+
+                $title = "Data VAS";
+
+                $update = Transaction::where('ref_trans_id',$referenceCode)
+                ->update([
+
+                    'title' => $title,
+                    'main_type' => "enkpay_vas"
+
+                ]);
+
 
                 if (!empty(user_email())) {
                     //send email
@@ -264,7 +284,7 @@ class DataController extends Controller
                 'status' => $this->failed,
                 'message' => 'Service unavilable please try again later',
 
-            ], 200);
+            ], 500);
 
         } catch (\Exception$th) {
             return $th->getMessage();
