@@ -249,9 +249,9 @@ class VirtualaccountController extends Controller
             $Fee = $request->Fee;
             $PostingType = $request->PostingType;
             $TransactionReference = $request->TransactionReference;
-            $sender_account_no = $request->originatorAccountNumber;
-            $sender_name = $request->originatorAccountName;
-            $sender_bank = $request->originatorBank;
+            $sender_account_no = $request->OriginatorAccountNumber;
+            $sender_name = $request->OriginatorAccountName;
+            $sender_bank = $request->OriginatorBank;
 
             $key = env('ERIP');
 
@@ -325,7 +325,7 @@ class VirtualaccountController extends Controller
                         $trasnaction->title = "Wallet Funding";
                         $trasnaction->main_type = "Transfer";
                         $trasnaction->credit = $enkpay_debit;
-                        $trasnaction->note = "Credit received from Transfer";
+                        $trasnaction->note = "$sender_name | Wallet Funding";
                         $trasnaction->fee = $Fee;
                         $trasnaction->e_charges = $deposit_charges;
                         $trasnaction->enkPay_Cashout_profit = $enkpay_profit;

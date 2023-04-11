@@ -83,7 +83,7 @@ class CableController extends Controller
 
             $serviceid = $request->service_id;
 
-            $biller_code = preg_replace('/[^0-9]/', '', $request->phone);
+            $biller_code = preg_replace('/[^0-9]/', '', $request->biller_code);
 
             $phone = preg_replace('/[^0-9]/', '', $request->phone);
 
@@ -248,15 +248,16 @@ class CableController extends Controller
                     //send email
                     $data = array(
                         'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
-                        'subject' => "Airtime Purchase",
+                        'subject' => "Cable Purchase",
                         'toreceiver' => user_email(),
                         'first_name' => first_name(),
                         'amount' => $amount,
                         'phone' => $phone,
+                        'biller_code' => $biller_code,
 
                     );
 
-                    Mail::send('emails.vas.airtime', ["data1" => $data], function ($message) use ($data) {
+                    Mail::send('emails.vas.cable', ["data1" => $data], function ($message) use ($data) {
                         $message->from($data['fromsender']);
                         $message->to($data['toreceiver']);
                         $message->subject($data['subject']);
@@ -267,7 +268,7 @@ class CableController extends Controller
                 return response()->json([
 
                     'status' => $this->success,
-                    'message' => 'Data Bundle Purchase Successfull',
+                    'message' => 'Cable Purchase Successfull',
 
                 ], 200);
 
