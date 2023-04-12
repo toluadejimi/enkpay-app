@@ -6,12 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\State;
 use App\Models\StateLga;
 use App\Models\User;
-use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Mail;
 use Illuminate\Support\Facades\Validator;
-
+use Mail;
 
 class RegisterationController extends Controller
 {
@@ -70,22 +68,16 @@ class RegisterationController extends Controller
 
         try {
 
-
-
             $get_phone_no = $request->phone_no;
             $trimed_no = substr($get_phone_no, 1);
 
             $user_id = Auth::id() ?? null;
 
-
-
-
             if (str_contains($get_phone_no, '+234')) {
                 $phone_no = $get_phone_no;
-            }else{
-                $phone_no = "+234".$trimed_no;
+            } else {
+                $phone_no = "+234" . $trimed_no;
             }
-
 
             $sms_code = random_int(1000, 9999);
 
@@ -104,17 +96,12 @@ class RegisterationController extends Controller
 
             if ($check_phone == $phone_no && $check_phone_verification == 1) {
 
-
                 return response()->json([
                     'status' => $this->failed,
                     'message' => 'Phone Number Already Exist',
                 ], 500);
 
             }
-
-
-
-
 
             if ($check_phone == null && $check_phone_verification == null && $user_id == null) {
 
@@ -125,11 +112,32 @@ class RegisterationController extends Controller
 
                 $token = $user->createToken('API Token')->accessToken;
 
-                $headers = [
-                    'Accept' => 'application/json',
-                    'Content-Type' => 'application/json',
-                    'Authorization' => 'Bearer FLWSECK-043cf4e9dd848683c6b157c234ba2fb8-X',
-                ];
+                // $message = "Your ENKPAY Verification is $sms_code";
+
+                // $curl = curl_init();
+
+                // curl_setopt_array($curl, array(
+                //     CURLOPT_URL => "http://login.betasms.com/api/?username=toluadejimi@gmail.com&password=Tolulope2580@&message=$message&mobiles=$phone_no",
+                //     CURLOPT_RETURNTRANSFER => true,
+                //     CURLOPT_ENCODING => '',
+                //     CURLOPT_MAXREDIRS => 10,
+                //     CURLOPT_TIMEOUT => 0,
+                //     CURLOPT_FOLLOWLOCATION => true,
+                //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                //     CURLOPT_CUSTOMREQUEST => 'GET',
+                // ));
+
+                // $var = curl_exec($curl);
+                // curl_close($curl);
+                // $var = json_decode($var);
+
+                // dd($var);
+
+                // $headers = [
+                //     'Accept' => 'application/json',
+                //     'Content-Type' => 'application/json',
+                //     'Authorization' => 'Bearer FLWSECK-043cf4e9dd848683c6b157c234ba2fb8-X',
+                // ];
 
                 $client = new GuzzleClient([
                     'headers' => $headers,
@@ -202,6 +210,54 @@ class RegisterationController extends Controller
 
                 $status = $var->message;
 
+
+                // $curl = curl_init();
+
+                // curl_setopt_array($curl, array(
+                //     CURLOPT_URL => "https://smsclone.com/api/sms/sendsms?username=masterkey&password=masterkey1234&sender=ENKPAY&recipient=$phone_no&message=YourENKPAYVerificationis$sms_code",
+                //     CURLOPT_RETURNTRANSFER => true,
+                //     CURLOPT_ENCODING => '',
+                //     CURLOPT_MAXREDIRS => 10,
+                //     CURLOPT_TIMEOUT => 0,
+                //     CURLOPT_FOLLOWLOCATION => true,
+                //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                //     CURLOPT_CUSTOMREQUEST => 'GET',
+                // ));
+
+                // $var = curl_exec($curl);
+                // dd($var);
+
+                // curl_close($curl);
+                // $var = json_decode($var);
+
+
+
+
+
+
+                // header("Access-Control-Allow-Origin: *");
+                // $postdata = http_build_query(
+                //     array(
+                //         'username' => 'masterkey',
+                //         'password' => 'masterkey1234',
+                //         'message' => "Your ENKPAY Verification is $sms_code",
+                //         'recipient' => $phone_no,
+                //         'sender' => 'welcome',
+                //     )
+                // );
+                // $opts = array('http' => array(
+                //     'method' => 'POST',
+                //     'header' => 'Content-type: application/x-www-form-urlencoded',
+                //     'content' => $postdata,
+                // ),
+                // );
+                // $context = stream_context_create($opts);
+                // $result = file_get_contents('https://smsclone.com/api/sms/sendsms', true, $context);
+
+                // dd($result);
+
+
+
                 if ($status == 'Successfully Sent') {
 
                     return response()->json([
@@ -228,7 +284,6 @@ class RegisterationController extends Controller
     {
 
         try {
-
 
             $user_id = Auth::id();
 
@@ -325,9 +380,7 @@ class RegisterationController extends Controller
 
         try {
 
-
             $user_id = Auth::id();
-
 
             $email = $request->email;
 
@@ -420,22 +473,16 @@ class RegisterationController extends Controller
 
         try {
 
-
-
             $get_phone_no = $request->phone_no;
             $trimed_no = substr($get_phone_no, 1);
 
             $user_id = Auth::id() ?? null;
 
-
-
-
             if (str_contains($get_phone_no, '+234')) {
                 $phone_no = $get_phone_no;
-            }else{
-                $phone_no = "+234".$trimed_no;
+            } else {
+                $phone_no = "+234" . $trimed_no;
             }
-
 
             $sms_code = random_int(1000, 9999);
 
@@ -454,17 +501,12 @@ class RegisterationController extends Controller
 
             if ($check_phone == $phone_no && $check_phone_verification == 1) {
 
-
                 return response()->json([
                     'status' => $this->failed,
                     'message' => 'Phone Number Already Exist',
                 ], 500);
 
             }
-
-
-
-
 
             if ($check_phone == null && $check_phone_verification == null && $user_id == Auth::id()) {
 
@@ -473,33 +515,48 @@ class RegisterationController extends Controller
                         'phone' => $phone_no,
                     ]);
 
-
-                $headers = [
-                    'Accept' => 'application/json',
-                    'Content-Type' => 'application/json',
-                    'Authorization' => 'Bearer FLWSECK-043cf4e9dd848683c6b157c234ba2fb8-X',
-                ];
-
-                $client = new GuzzleClient([
-                    'headers' => $headers,
-                ]);
-
-                $response = $client->request('POST', 'https://api.ng.termii.com/api/sms/send',
-                    [
-                        'body' => json_encode([
-                            "api_key" => "TLxF6Jauos8AJq6pKztkbxaQJbQjZzs43vJLOsXk8fHcUez3mBolehZGGzTwnF",
-                            "to" => $phone_no,
-                            "from" => "N-Alert",
-                            "sms" => "Your Enkwave confirmation code is $sms_code. active for 5 minutes, one-time use only",
-                            "type" => "plain",
-                            "channel" => "dnd",
-
-                        ]),
-
-                    ]);
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => "http://login.betasms.com/api/?username=toluadejimi@gmail.com&password=Tolulope2580@&message=Your%20ENKPAY%20Verification%20is%$sms_code&sender=ENKPAY&mobiles=$phone_no",
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'GET',
+                ));
 
                 $body = $response->getBody();
                 $result = json_decode($body);
+
+                dd($result);
+
+                // $headers = [
+                //     'Accept' => 'application/json',
+                //     'Content-Type' => 'application/json',
+                //     'Authorization' => 'Bearer FLWSECK-043cf4e9dd848683c6b157c234ba2fb8-X',
+                // ];
+
+                // $client = new GuzzleClient([
+                //     'headers' => $headers,
+                // ]);
+
+                // $response = $client->request('POST', 'https://api.ng.termii.com/api/sms/send',
+                //     [
+                //         'body' => json_encode([
+                //             "api_key" => "TLxF6Jauos8AJq6pKztkbxaQJbQjZzs43vJLOsXk8fHcUez3mBolehZGGzTwnF",
+                //             "to" => $phone_no,
+                //             "from" => "N-Alert",
+                //             "sms" => "Your Enkwave confirmation code is $sms_code. active for 5 minutes, one-time use only",
+                //             "type" => "plain",
+                //             "channel" => "dnd",
+
+                //         ]),
+
+                //     ]);
+
+                // $body = $response->getBody();
+                // $result = json_decode($body);
 
                 return response()->json([
                     'status' => $this->success,
@@ -572,21 +629,6 @@ class RegisterationController extends Controller
         }
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     public function resend_email_otp(Request $request)
     {
@@ -713,17 +755,14 @@ class RegisterationController extends Controller
 
         try {
 
-
             $user_id = Auth::id() ?? null;
 
             $phone_no = $request->phone_no;
             $code = $request->code;
 
-
             $get_auth_code = User::where('id', $user_id)->first()->sms_code ?? null;
 
             $get_code = User::where('phone', $phone_no)->first()->sms_code ?? null;
-
 
             if ($code == $get_code && $user_id == null) {
 
@@ -747,8 +786,7 @@ class RegisterationController extends Controller
                 'message' => 'Invalid code, try again',
             ], 500);
 
-
-            if ($code == $get_auth_code  && $user_id == Auth::id()) {
+            if ($code == $get_auth_code && $user_id == Auth::id()) {
 
                 $update = User::where('id', $user_id)
                     ->update([
@@ -770,9 +808,6 @@ class RegisterationController extends Controller
                 'message' => 'Invalid code, try again',
             ], 500);
 
-
-
-
         } catch (\Exception$th) {
             return $th->getMessage();
         }
@@ -785,13 +820,10 @@ class RegisterationController extends Controller
 
             $user_id = Auth::id() ?? null;
 
-
             $email = $request->email;
             $code = $request->code;
 
-
             $get_auth_code = User::where('id', $user_id)->first()->sms_code ?? null;
-
 
             $get_code = User::where('email', $email)->first()->sms_code ?? null;
 
@@ -812,13 +844,10 @@ class RegisterationController extends Controller
 
             }
 
-
             return response()->json([
                 'status' => $this->failed,
                 'message' => 'Invalid code, try again',
             ], 500);
-
-
 
             if ($code == $get_auth_code && $user_id == Auth::id()) {
 
@@ -837,16 +866,10 @@ class RegisterationController extends Controller
 
             }
 
-
             return response()->json([
                 'status' => $this->failed,
                 'message' => 'Invalid code, try again',
             ], 500);
-
-
-
-
-
 
         } catch (\Exception$th) {
             return $th->getMessage();
@@ -858,21 +881,17 @@ class RegisterationController extends Controller
 
         try {
 
-
             $validator = Validator::make($request->all(), [
                 'first_name' => 'required|string|max:50',
                 'last_name' => 'required|string|max:50',
                 'dob' => 'required|string|max:50',
                 'state' => 'required|string|max:18',
                 'gender' => 'required|string|max:50',
-                'street' => 'required|string|max:50',
+                'street' => 'required|string|max:500',
                 //'lga' => 'required|string|max:18',
                 'password' => 'required',
                 'pin' => 'required',
             ]);
-
-
-
 
             if ($validator->fails()) {
                 return response()->json([
@@ -880,7 +899,6 @@ class RegisterationController extends Controller
                     'message' => $validator->messages()->first(),
                 ], 500);
             }
-
 
             $email = $request->email;
             $devide_id = $request->devide_id;
@@ -896,74 +914,65 @@ class RegisterationController extends Controller
             $pin = $request->pin;
             $devide_id = $request->devide_id;
             $city = $request->city;
-            $get_phone  = $phone_no ?? null;
-            $get_email  = $email ?? null;
+            $get_phone = $phone_no ?? null;
+            $get_email = $email ?? null;
 
+            if ($get_phone !== null) {
 
-            if($get_phone !== null ){
+                $update = User::where('email', $email)
+                    ->update([
+                        'first_name' => $first_name,
+                        'last_name' => $last_name,
+                        'dob' => $dob,
+                        'gender' => $gender,
+                        'email' => $email,
+                        'street' => $street,
+                        'city' => $city,
+                        'state' => $state,
+                        'lga' => $lga,
+                        'password' => bcrypt($password),
+                        'pin' => bcrypt($pin),
+                        'device_id' => $devide_id,
 
-                $update = User::where('email',$email)
-                ->update([
-                    'first_name' => $first_name,
-                    'last_name' => $last_name,
-                    'dob' => $dob,
-                    'gender' => $gender,
-                    'email' => $email,
-                    'street' => $street,
-                    'city' => $city,
-                    'state' => $state,
-                    'lga' => $lga,
-                    'password' => bcrypt($password),
-                    'pin' => bcrypt($pin),
-                    'device_id' => $devide_id,
-
-                ]);
-
-                return response()->json([
-                    'status' => $this->success,
-                    'message' => 'Your account has been successfully created',
-                ], 200);
-
-            }elseif($get_email !== null){
-
-
-                $update = User::where('phone',$phone_no)
-                ->update([
-                    'first_name' => $first_name,
-                    'last_name' => $last_name,
-                    'dob' => $dob,
-                    'gender' => $gender,
-                    'email' => $email,
-                    'street' => $street,
-                    'city' => $city,
-                    'state' => $state,
-                    'lga' => $lga,
-                    'password' => bcrypt($password),
-                    'pin' => bcrypt($pin),
-                    'device_id' => $devide_id,
-
-                ]);
+                    ]);
 
                 return response()->json([
                     'status' => $this->success,
                     'message' => 'Your account has been successfully created',
                 ], 200);
 
+            } elseif ($get_email !== null) {
 
+                $update = User::where('phone', $phone_no)
+                    ->update([
+                        'first_name' => $first_name,
+                        'last_name' => $last_name,
+                        'dob' => $dob,
+                        'gender' => $gender,
+                        'email' => $email,
+                        'street' => $street,
+                        'city' => $city,
+                        'state' => $state,
+                        'lga' => $lga,
+                        'password' => bcrypt($password),
+                        'pin' => bcrypt($pin),
+                        'device_id' => $devide_id,
 
+                    ]);
 
-            }else{
+                return response()->json([
+                    'status' => $this->success,
+                    'message' => 'Your account has been successfully created',
+                ], 200);
+
+            } else {
 
                 return response()->json([
                     'status' => $this->failed,
                     'message' => 'Email or Phone number not found',
                 ], 500);
 
-
             }
-
-
-
 
         } catch (\Exception$e) {
             return $e->getMessage();

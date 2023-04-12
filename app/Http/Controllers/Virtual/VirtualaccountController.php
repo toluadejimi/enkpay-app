@@ -322,7 +322,7 @@ class VirtualaccountController extends Controller
                         $trasnaction->e_ref = $TransactionReference;
                         $trasnaction->type = $TransactionType;
                         $trasnaction->transaction_type = "VirtualFundWallet";
-                        $trasnaction->title = "Wallet Funding";
+                        $trasnaction->title = "Wallet Funding";DHSDHSDHS
                         $trasnaction->main_type = "Transfer";
                         $trasnaction->credit = $enkpay_debit;
                         $trasnaction->note = "$sender_name | Wallet Funding";
