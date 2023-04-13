@@ -1075,17 +1075,17 @@ class TransactionController extends Controller
         $result = " Header========> " .$headers . "\n\n Body========> " . $parametersJson;
         send_notification($result);
 
-        return response()->json([
-            'status' => true,
-            'message' => 'Tranasaction Successsfull',
-        ], 200);
+        // return response()->json([
+        //     'status' => true,
+        //     'message' => 'Tranasaction Successsfull',
+        // ], 200);
         // try {
 
         $header = $request->header('errand-pay-header');
 
         //pos transaction
 
-        if ($request->ServiceCode == 'C01') {
+        if (strtoupper($request->ServiceCode)  == 'C01') {
 
             $StatusCode = $request->StatusCode;
             $StatusDescription = $request->StatusDescription;
@@ -1591,7 +1591,8 @@ class TransactionController extends Controller
     }
 
 
-
+    $result2 = 'Key not Authorized';
+    send_notification($result2);
 
         return response()->json([
             'status' => false,
