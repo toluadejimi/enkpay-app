@@ -1166,12 +1166,6 @@ class TransactionController extends Controller
 
                     if ($TransactionType == 'CashOut') {
 
-                        $type = $ServiceCode;
-
-                        $get_type = transaction_type($type);
-
-                        dd($get_type);
-
                         //update Transactions
                         $trasnaction = new Transaction();
                         $trasnaction->user_id = $user_id;
@@ -1181,13 +1175,13 @@ class TransactionController extends Controller
                         $trasnaction->credit = $removed_comission;
                         $trasnaction->e_charges = $enkpay_profit;
                         $trasnaction->title = "POS Transasction";
-                        $trasnaction->note = "Credit received from POS Terminal";
+                        $trasnaction->note = "EP POS | $MaskedPAN ";
                         $trasnaction->fee = $Fee;
                         $trasnaction->enkPay_Cashout_profit = $enkpay_profit;
                         $trasnaction->balance = $updated_amount;
                         $trasnaction->terminal_id = $TerminalID;
                         $trasnaction->serial_no = $SerialNumber;
-                        $trasnaction->receiver_account_no = $MaskedPAN;
+                        $trasnaction->sender_account_no = $MaskedPAN;
                         $trasnaction->status = 1;
                         $trasnaction->save();
 
