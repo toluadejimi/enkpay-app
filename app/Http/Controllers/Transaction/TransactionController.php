@@ -1069,17 +1069,8 @@ class TransactionController extends Controller
     {
 
 
-        $parametersJson = json_encode($request->all());
-        $headers = json_encode($request->headers->all());
 
-        $result = " Header========> " .$headers . "\n\n Body========> " . $parametersJson;
-        send_notification($result);
-
-        // return response()->json([
-        //     'status' => true,
-        //     'message' => 'Tranasaction Successsfull',
-        // ], 200);
-        // try {
+       
 
         $header = $request->header('errand-pay-header');
 
