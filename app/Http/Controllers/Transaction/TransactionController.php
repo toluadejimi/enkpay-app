@@ -750,6 +750,8 @@ class TransactionController extends Controller
             $wallet = $request->wallet;
             $pin = $request->pin;
 
+
+
             //receiver info
             $receiver_main_wallet = User::where('phone', $phone)->first()->main_wallet ?? null;
             $receiver_bonus_wallet = User::where('phone', $phone)->first()->bonus_wallet ?? null;
@@ -757,14 +759,20 @@ class TransactionController extends Controller
             $receiver_email = User::where('phone', $phone)->first()->email ?? null;
             $receiver_f_name = User::where('phone', $phone)->first()->first_name ?? null;
             $receiver_l_name = User::where('phone', $phone)->first()->first_name ?? null;
-            $receiver_full_name = $receiver_f_name . " " . $receiver_l_name;
+            $receiver_full_name = $receiver_f_name . "  " . $receiver_l_name;
+
+
+
+
 
             //sender info
             $sender_f_name = first_name() ?? null;
             $sender_l_name = last_name() ?? null;
-            $sender_full_name = $sender_f_name . " " . $sender_l_name;
+            $sender_full_name = $sender_f_name ."  ".$sender_l_name;
 
             $trans_id = "ENK-" . random_int(100000, 999999);
+
+
 
             //check
 
@@ -896,29 +904,29 @@ class TransactionController extends Controller
             $trasnaction->status = 1;
             $trasnaction->save();
 
-            //second database
+            // //second database
 
-            $trasnaction = new Transaction2();
-            $trasnaction->setConnection('mysql_second');
-            $trasnaction->user_id = Auth::id();
-            $trasnaction->from_user_id = Auth::id();
-            $trasnaction->to_user_id = $receiver_id;
-            $trasnaction->ref_trans_id = $trans_id;
-            $trasnaction->transaction_type = "EnkPayTransfer";
-            $trasnaction->title = "Enkpay Transfer";
-            $trasnaction->type = "InAppTransfer";
-            $trasnaction->main_type = "Transfer";
-            $trasnaction->debit = $amount;
-            $trasnaction->note = "Bank Transfer to Enk Pay User";
-            $trasnaction->fee = 0;
-            $trasnaction->e_charges = 0;
-            $trasnaction->trx_date = date("Y/m/d");
-            $trasnaction->trx_time = date("h:i:s");
-            $trasnaction->receiver_name = $receiver_full_name;
-            $trasnaction->receiver_account_no = $phone;
-            $trasnaction->balance = $debit;
-            $trasnaction->status = 1;
-            $trasnaction->save();
+            // $trasnaction = new Transaction2();
+            // $trasnaction->setConnection('mysql_second');
+            // $trasnaction->user_id = Auth::id();
+            // $trasnaction->from_user_id = Auth::id();
+            // $trasnaction->to_user_id = $receiver_id;
+            // $trasnaction->ref_trans_id = $trans_id;
+            // $trasnaction->transaction_type = "EnkPayTransfer";
+            // $trasnaction->title = "Enkpay Transfer";
+            // $trasnaction->type = "InAppTransfer";
+            // $trasnaction->main_type = "Transfer";
+            // $trasnaction->debit = $amount;
+            // $trasnaction->note = "Bank Transfer to Enk Pay User";
+            // $trasnaction->fee = 0;
+            // $trasnaction->e_charges = 0;
+            // $trasnaction->trx_date = date("Y/m/d");
+            // $trasnaction->trx_time = date("h:i:s");
+            // $trasnaction->receiver_name = $receiver_full_name;
+            // $trasnaction->receiver_account_no = $phone;
+            // $trasnaction->balance = $debit;
+            // $trasnaction->status = 1;
+            // $trasnaction->save();
 
             //credit receiver
 
@@ -951,27 +959,27 @@ class TransactionController extends Controller
             $trasnaction->status = 1;
             $trasnaction->save();
 
-            $trasnaction = new Transaction2();
-            $trasnaction->setConnection('mysql_second');
-            $trasnaction->user_id = $receiver_id;
-            $trasnaction->from_user_id = Auth::id();
-            $trasnaction->to_user_id = $receiver_id;
-            $trasnaction->ref_trans_id = $trans_id;
-            $trasnaction->transaction_type = "EnkPayTransfer";
-            $trasnaction->title = "Enkpay Transfer";
-            $trasnaction->main_type = "Transfer";
-            $trasnaction->type = "InAppTransfer";
-            $trasnaction->credit = $amount;
-            $trasnaction->note = "Bank Transfer to Enk Pay User";
-            $trasnaction->fee = 0;
-            $trasnaction->e_charges = 0;
-            $trasnaction->trx_date = date("Y/m/d");
-            $trasnaction->trx_time = date("h:i:s");
-            $trasnaction->sender_name = $sender_full_name;
-            $trasnaction->sender_account_no = user_phone();
-            $trasnaction->balance = $credit;
-            $trasnaction->status = 1;
-            $trasnaction->save();
+            // $trasnaction = new Transaction2();
+            // $trasnaction->setConnection('mysql_second');
+            // $trasnaction->user_id = $receiver_id;
+            // $trasnaction->from_user_id = Auth::id();
+            // $trasnaction->to_user_id = $receiver_id;
+            // $trasnaction->ref_trans_id = $trans_id;
+            // $trasnaction->transaction_type = "EnkPayTransfer";
+            // $trasnaction->title = "Enkpay Transfer";
+            // $trasnaction->main_type = "Transfer";
+            // $trasnaction->type = "InAppTransfer";
+            // $trasnaction->credit = $amount;
+            // $trasnaction->note = "Bank Transfer to Enk Pay User";
+            // $trasnaction->fee = 0;
+            // $trasnaction->e_charges = 0;
+            // $trasnaction->trx_date = date("Y/m/d");
+            // $trasnaction->trx_time = date("h:i:s");
+            // $trasnaction->sender_name = $sender_full_name;
+            // $trasnaction->sender_account_no = user_phone();
+            // $trasnaction->balance = $credit;
+            // $trasnaction->status = 1;
+            // $trasnaction->save();
 
             //sender email
 
@@ -1576,7 +1584,7 @@ class TransactionController extends Controller
         return response()->json([
             'status' => false,
             'message' => 'Key not Authorized',
-        ], 500);
+        ], 401);
 
         // } catch (\Exception$th) {
         //     return $th->getMessage();
