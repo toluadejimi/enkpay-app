@@ -1067,9 +1067,14 @@ class TransactionController extends Controller
     public function cash_out_webhook(Request $request)
 
     {
-        $parametersJson = json_encode($request->all());
 
-        send_notification($parametersJson);
+
+        $parametersJson = json_encode($request->all());
+        $headers = json_encode($request->headers->all());
+
+        $result = " Header========> " .$headers . "\n\n Body========> " . $parametersJson;
+        send_notification($result);
+
         return response()->json([
             'status' => true,
             'message' => 'Tranasaction Successsfull',
