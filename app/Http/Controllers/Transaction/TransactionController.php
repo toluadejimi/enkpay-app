@@ -1082,10 +1082,154 @@ class TransactionController extends Controller
             $TerminalID = $request->AdditionalDetails['TerminalID'];
             $MaskedPAN = $request->AdditionalDetails['MaskedPAN'];
 
+            $key = env('ERIP');
+
+            $trans_id = "ENK-" . random_int(100000, 999999);
+
+            $verify1 = hash('sha512', $key);
+
+            $comission = Charge::where('id', 3)
+                ->first()->amount;
+
+            if ($verify1 == $header) {
+
+                if ($StatusCode == 00) {
+
+                    $main_wallet = User::where('serial_no', $SerialNumber)
+                        ->first()->main_wallet ?? null;
+
+                    $user_id = User::where('serial_no', $SerialNumber)
+                        ->first()->id ?? null;
+
+                    $type = User::where('serial_no', $SerialNumber)
+                        ->first()->type ?? null;
+
+                    if ($main_wallet == null && $user_id == null) {
+
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'Customer not registred on Enkpay',
+                        ], 500);
+
+                    }
+
+                    //Both Commission
+                    $amount1 = $comission / 100;
+                    $amount2 = $amount1 * $Amount;
+                    $both_commmission = number_format($amount2, 3);
+
+                    //enkpay commission
+                    $commison_subtract = $comission - 0.425;
+                    $enkPayPaypercent = $commison_subtract / 100;
+                    $enkPay_amount = $enkPayPaypercent * $Amount;
+                    $enkpay_commision_amount = number_format($enkPay_amount, 3);
+
+                    //errandpay commission
+                    $errandPaypercent = 0.425 / 100;
+                    $errand_amount = $errandPaypercent * $Amount;
+                    $errandPay_commission_amount = number_format($errand_amount, 3);
+
+                    $business_commission_cap = Charge::where('title', 'business_cap')
+                        ->first()->amount;
+
+                    $agent_commission_cap = Charge::where('title', 'agent_cap')
+                        ->first()->amount;
+
+                    if ($both_commmission >= $agent_commission_cap && $type == 1) {
+
+                        $removed_comission = $Amount - $agent_commission_cap;
+
+                        $enkpay_profit = $agent_commission_cap - 75;
+
+                    } elseif ($both_commmission >= $business_commission_cap && $type == 3) {
+
+                        $removed_comission = $Amount - $business_commission_cap;
+
+                        $enkpay_profit = $business_commission_cap - 75;
+
+                    } else {
+
+                        $removed_comission = $Amount - $both_commmission;
+
+                        $enkpay_profit = $both_commmission - $errandPay_commission_amount;
+
+                    }
+
+                    //$enkpay_cashOut_fee = $amount - $enkpay_commision_amount ;
+
+                    $updated_amount = $main_wallet + $removed_comission;
+
+                    $main_wallet = User::where('serial_no', $SerialNumber)
+                        ->update([
+                            'main_wallet' => $updated_amount,
+                        ]);
+
+                    if ($TransactionType == 'CashOut') {
+
+                        $type = $ServiceCode;
+
+                        $get_type = transaction_type($type);
+
+                        dd($get_type);
+
+                        //update Transactions
+                        $trasnaction = new Transaction();
+                        $trasnaction->user_id = $user_id;
+                        $trasnaction->ref_trans_id = $trans_id;
+                        $trasnaction->e_ref = $TransactionReference;
+                        $trasnaction->transaction_type = $TransactionType;
+                        $trasnaction->credit = $removed_comission;
+                        $trasnaction->e_charges = $enkpay_profit;
+                        $trasnaction->title = "POS Transasction";
+                        $trasnaction->note = "Credit received from POS Terminal";
+                        $trasnaction->fee = $Fee;
+                        $trasnaction->enkPay_Cashout_profit = $enkpay_profit;
+                        $trasnaction->balance = $updated_amount;
+                        $trasnaction->terminal_id = $TerminalID;
+                        $trasnaction->serial_no = $SerialNumber;
+                        $trasnaction->receiver_account_no = $MaskedPAN;
+                        $trasnaction->status = 1;
+                        $trasnaction->save();
+
+                    }
+
+                    $amount4 = number_format($removed_comission, 2);
+                    $message = "NGN $amount4 enter pool Account by $user_id using Card on Terminal";
+                    send_notification($message);
+
+                    // $data = array(
+                    //     'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                    //     'subject' => "Account Credited",
+                    //     'toreceiver' => 'toluadejimi@gmail.com',
+                    //     'amount' => $removed_comission,
+                    //     'serial' => $SerialNumber,
+                    // );
+
+                    // Mail::send('emails.transaction.terminal-credit', ["data1" => $data], function ($message) use ($data) {
+                    //     $message->from($data['fromsender']);
+                    //     $message->to($data['toreceiver']);
+                    //     $message->subject($data['subject']);
+                    // });
+
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Tranasaction Successsfull',
+                    ], 200);
+
+                }
+
+            }
+
         }
 
-        //MTN AIRTIME
-        if ($request->ServiceCode == 'BAT1') {
+
+        //Cable and Eletric
+
+        if (($request->ServiceCode == 'BUB1') || ($request->ServiceCode == 'BUB2') || ($request->ServiceCode == 'BUB3') || ($request->ServiceCode == 'BUB4')
+
+            || ($request->ServiceCode == 'BUB5') || ($request->ServiceCode == 'BUB6') || ($request->ServiceCode == 'BUB7') || ($request->ServiceCode == 'BUB8') || ($request->ServiceCode == 'BUB9') || ($request->ServiceCode == 'BUB10')
+
+            || ($request->ServiceCode == 'BCT1') || ($request->ServiceCode == 'BCT2') || ($request->ServiceCode == 'BCT3')) {
 
             $StatusCode = $request->StatusCode;
             $StatusDescription = $request->StatusDescription;
@@ -1099,14 +1243,109 @@ class TransactionController extends Controller
             $TransactionReference = $request->TransactionReference;
             $Fee = $request->Fee;
             $PostingType = $request->PostingType;
-            $BillCategory = $request->AdditionalDetails['BillCategory'];
-            $BillService = $request->AdditionalDetails['BillService'];
-            $Beneficiary = $request->AdditionalDetails['Beneficiary'];
+            $BillCategory = $request->AdditionalDetails['BillCategory'] ?? null;
+            $BillService = $request->AdditionalDetails['BillService'] ?? null;
+            $Beneficiary = $request->AdditionalDetails['Beneficiary'] ?? null;
+
+
+            $key = env('ERIP');
+
+            $trans_id = "ENK-" . random_int(100000, 999999);
+
+            $verify1 = hash('sha512', $key);
+
+            $terminal_charge = Charge::where('title', 'terminal_charge')
+                ->first()->amount;
+
+            if ($verify1 == $header) {
+
+                if ($StatusCode == 00) {
+
+                    $main_wallet = User::where('serial_no', $SerialNumber)
+                        ->first()->main_wallet ?? null;
+
+                    $user_id = User::where('serial_no', $SerialNumber)
+                        ->first()->id ?? null;
+
+                    $type = User::where('serial_no', $SerialNumber)
+                        ->first()->type ?? null;
+
+                    if ($main_wallet == null && $user_id == null) {
+
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'Customer not registred on Enkpay',
+                        ], 500);
+
+                    }
+
+
+
+                    //debit
+                    $debit_amount = $Amount + $terminal_charge;
+
+                    $debit_wallet =  $main_wallet - $debit_amount;
+
+                    $main_wallet_update = User::where('serial_no', $SerialNumber)
+                        ->update([
+                            'main_wallet' =>  $debit_wallet,
+                        ]);
+
+                    if ($TransactionType == 'BillsPayment') {
+
+                        //update Transactions
+                        $trasnaction = new Transaction();
+                        $trasnaction->user_id = $user_id;
+                        $trasnaction->ref_trans_id = $trans_id;
+                        $trasnaction->e_ref = $TransactionReference;
+                        $trasnaction->transaction_type = $TransactionType;
+                        $trasnaction->debit = $debit_amount;
+                        $trasnaction->title = "Bills";
+                        $trasnaction->note = "EP VAS | $BillService | $BillCategory | $Beneficiary ";
+                        $trasnaction->fee = $Fee;
+                        $trasnaction->enkPay_Cashout_profit = $terminal_charge;
+                        $trasnaction->balance = $debit_wallet;
+                        $trasnaction->main_type = "EPvas";
+                        $trasnaction->status = 1;
+                        $trasnaction->save();
+
+                    }
+
+                    $amount4 = number_format($Amount, 2);
+                    $message = "NGN $amount4 left pool Account by $user_id";
+                    send_notification($message);
+
+                    // $data = array(
+                    //     'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                    //     'subject' => "Account Credited",
+                    //     'toreceiver' => 'toluadejimi@gmail.com',
+                    //     'amount' => $removed_comission,
+                    //     'serial' => $SerialNumber,
+                    // );
+
+                    // Mail::send('emails.transaction.terminal-credit', ["data1" => $data], function ($message) use ($data) {
+                    //     $message->from($data['fromsender']);
+                    //     $message->to($data['toreceiver']);
+                    //     $message->subject($data['subject']);
+                    // });
+
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Tranasaction Successsfull',
+                    ], 200);
+
+                }
+
+            }
 
         }
 
-        //GLO AIRTIME
-        if ($request->ServiceCode == 'BAT4') {
+        //AIRTIME / DATA
+        if (($request->ServiceCode == 'BAT1') || ($request->ServiceCode == 'BAT2') || ($request->ServiceCode == 'BAT3') || ($request->ServiceCode == 'BAT4')
+
+            || ($request->ServiceCode == 'BMD1') || ($request->ServiceCode == 'BMD2') || ($request->ServiceCode == 'BMD3') || ($request->ServiceCode == 'BMD4')
+
+            || ($request->ServiceCode == 'BMD5')) {
 
             $StatusCode = $request->StatusCode;
             $StatusDescription = $request->StatusDescription;
@@ -1120,221 +1359,131 @@ class TransactionController extends Controller
             $TransactionReference = $request->TransactionReference;
             $Fee = $request->Fee;
             $PostingType = $request->PostingType;
-            $BillCategory = $request->AdditionalDetails['BillCategory'];
-            $BillService = $request->AdditionalDetails['BillService'];
-            $Beneficiary = $request->AdditionalDetails['Beneficiary'];
+            $BillCategory = $request->AdditionalDetails['BillCategory'] ?? null;
+            $BillService = $request->AdditionalDetails['BillService'] ?? null;
+            $Beneficiary = $request->AdditionalDetails['Beneficiary'] ?? null;
 
-        }
+            $key = env('ERIP');
 
-        //AIRTEL AIRTIME
-        if ($request->ServiceCode == 'BAT2') {
+            $trans_id = "ENK-" . random_int(100000, 999999);
 
-            $StatusCode = $request->StatusCode;
-            $StatusDescription = $request->StatusDescription;
-            $SerialNumber = $request->SerialNumber;
-            $Amount = $request->Amount;
-            $Currency = $request->Currency;
-            $TransactionDate = $request->TransactionDate;
-            $TransactionTime = $request->TransactionTime;
-            $TransactionType = $request->TransactionType;
-            $ServiceCode = $request->ServiceCode;
-            $TransactionReference = $request->TransactionReference;
-            $Fee = $request->Fee;
-            $PostingType = $request->PostingType;
-            $BillCategory = $request->AdditionalDetails['BillCategory'];
-            $BillService = $request->AdditionalDetails['BillService'];
-            $Beneficiary = $request->AdditionalDetails['Beneficiary'];
-
-        }
-
-        //9MOBILE AIRTIME
-        if ($request->ServiceCode == 'BAT3') {
-
-            $StatusCode = $request->StatusCode;
-            $StatusDescription = $request->StatusDescription;
-            $SerialNumber = $request->SerialNumber;
-            $Amount = $request->Amount;
-            $Currency = $request->Currency;
-            $TransactionDate = $request->TransactionDate;
-            $TransactionTime = $request->TransactionTime;
-            $TransactionType = $request->TransactionType;
-            $ServiceCode = $request->ServiceCode;
-            $TransactionReference = $request->TransactionReference;
-            $Fee = $request->Fee;
-            $PostingType = $request->PostingType;
-            $BillCategory = $request->AdditionalDetails['BillCategory'];
-            $BillService = $request->AdditionalDetails['BillService'];
-            $Beneficiary = $request->AdditionalDetails['Beneficiary'];
-
-        }
+            $verify1 = hash('sha512', $key);
 
 
-         //MTN DATA
-         if ($request->ServiceCode == 'BMD1') {
+            $terminal_charge = Charge::where('title', 'terminal_charge')
+                ->first()->amount;
 
-            $StatusCode = $request->StatusCode;
-            $StatusDescription = $request->StatusDescription;
-            $SerialNumber = $request->SerialNumber;
-            $Amount = $request->Amount;
-            $Currency = $request->Currency;
-            $TransactionDate = $request->TransactionDate;
-            $TransactionTime = $request->TransactionTime;
-            $TransactionType = $request->TransactionType;
-            $ServiceCode = $request->ServiceCode;
-            $TransactionReference = $request->TransactionReference;
-            $Fee = $request->Fee;
-            $PostingType = $request->PostingType;
-            $BillCategory = $request->AdditionalDetails['BillCategory'];
-            $BillService = $request->AdditionalDetails['BillService'];
-            $Beneficiary = $request->AdditionalDetails['Beneficiary'];
+            if ($verify1 == $header) {
 
-        }
+                if ($StatusCode == 00) {
+
+                    $main_wallet = User::where('serial_no', $SerialNumber)
+                        ->first()->main_wallet ?? null;
+
+                    $user_id = User::where('serial_no', $SerialNumber)
+                        ->first()->id ?? null;
+
+                    $type = User::where('serial_no', $SerialNumber)
+                        ->first()->type ?? null;
+
+                    if ($main_wallet == null && $user_id == null) {
+
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'Customer not registred on Enkpay',
+                        ], 500);
+
+                    }
 
 
-         //Airtel DATA
-         if ($request->ServiceCode == 'BMD2') {
 
-            $StatusCode = $request->StatusCode;
-            $StatusDescription = $request->StatusDescription;
-            $SerialNumber = $request->SerialNumber;
-            $Amount = $request->Amount;
-            $Currency = $request->Currency;
-            $TransactionDate = $request->TransactionDate;
-            $TransactionTime = $request->TransactionTime;
-            $TransactionType = $request->TransactionType;
-            $ServiceCode = $request->ServiceCode;
-            $TransactionReference = $request->TransactionReference;
-            $Fee = $request->Fee;
-            $PostingType = $request->PostingType;
-            $BillCategory = $request->AdditionalDetails['BillCategory'];
-            $BillService = $request->AdditionalDetails['BillService'];
-            $Beneficiary = $request->AdditionalDetails['Beneficiary'];
+                    //debit
+                    $debit_wallet =  $main_wallet - $Amount;
 
-        }
+                    $main_wallet_update = User::where('serial_no', $SerialNumber)
+                        ->update([
+                            'main_wallet' =>  $debit_wallet,
+                        ]);
 
-          //9mobile DATA
-          if ($request->ServiceCode == 'BMD3') {
+                    if ($TransactionType == 'BillsPayment') {
 
-            $StatusCode = $request->StatusCode;
-            $StatusDescription = $request->StatusDescription;
-            $SerialNumber = $request->SerialNumber;
-            $Amount = $request->Amount;
-            $Currency = $request->Currency;
-            $TransactionDate = $request->TransactionDate;
-            $TransactionTime = $request->TransactionTime;
-            $TransactionType = $request->TransactionType;
-            $ServiceCode = $request->ServiceCode;
-            $TransactionReference = $request->TransactionReference;
-            $Fee = $request->Fee;
-            $PostingType = $request->PostingType;
-            $BillCategory = $request->AdditionalDetails['BillCategory'];
-            $BillService = $request->AdditionalDetails['BillService'];
-            $Beneficiary = $request->AdditionalDetails['Beneficiary'];
+                        //update Transactions
+                        $trasnaction = new Transaction();
+                        $trasnaction->user_id = $user_id;
+                        $trasnaction->ref_trans_id = $trans_id;
+                        $trasnaction->e_ref = $TransactionReference;
+                        $trasnaction->transaction_type = $TransactionType;
+                        $trasnaction->debit = $Amount;
+                        $trasnaction->title = "EP Bills";
+                        $trasnaction->note = "EP VAS | $BillService | $BillCategory | $Beneficiary ";
+                        $trasnaction->fee = $Fee;
+                        $trasnaction->balance = $debit_wallet;
+                        $trasnaction->main_type = "EPvas";
+                        $trasnaction->status = 1;
+                        $trasnaction->save();
 
-        }
+                    }
 
-          //Glo DATA
-          if ($request->ServiceCode == 'BMD4') {
+                    $amount4 = number_format($Amount, 2);
+                    $message = "NGN $amount4 left pool Account by $user_id";
+                    send_notification($message);
 
-            $StatusCode = $request->StatusCode;
-            $StatusDescription = $request->StatusDescription;
-            $SerialNumber = $request->SerialNumber;
-            $Amount = $request->Amount;
-            $Currency = $request->Currency;
-            $TransactionDate = $request->TransactionDate;
-            $TransactionTime = $request->TransactionTime;
-            $TransactionType = $request->TransactionType;
-            $ServiceCode = $request->ServiceCode;
-            $TransactionReference = $request->TransactionReference;
-            $Fee = $request->Fee;
-            $PostingType = $request->PostingType;
-            $BillCategory = $request->AdditionalDetails['BillCategory'];
-            $BillService = $request->AdditionalDetails['BillService'];
-            $Beneficiary = $request->AdditionalDetails['Beneficiary'];
+                    // $data = array(
+                    //     'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                    //     'subject' => "Account Credited",
+                    //     'toreceiver' => 'toluadejimi@gmail.com',
+                    //     'amount' => $removed_comission,
+                    //     'serial' => $SerialNumber,
+                    // );
+
+                    // Mail::send('emails.transaction.terminal-credit', ["data1" => $data], function ($message) use ($data) {
+                    //     $message->from($data['fromsender']);
+                    //     $message->to($data['toreceiver']);
+                    //     $message->subject($data['subject']);
+                    // });
+
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Tranasaction Successsfull',
+                    ], 200);
+
+                }
+
+            }
+
+
 
         }
 
 
+        //FUNDS TRANSFER
 
-          //Smile DATA
-          if ($request->ServiceCode == 'BMD5') {
+        if ($request->ServiceCode == 'FT1') {
 
-            $StatusCode = $request->StatusCode;
-            $StatusDescription = $request->StatusDescription;
-            $SerialNumber = $request->SerialNumber;
-            $Amount = $request->Amount;
-            $Currency = $request->Currency;
-            $TransactionDate = $request->TransactionDate;
-            $TransactionTime = $request->TransactionTime;
-            $TransactionType = $request->TransactionType;
-            $ServiceCode = $request->ServiceCode;
-            $TransactionReference = $request->TransactionReference;
-            $Fee = $request->Fee;
-            $PostingType = $request->PostingType;
-            $BillCategory = $request->AdditionalDetails['BillCategory'];
-            $BillService = $request->AdditionalDetails['BillService'];
-            $Beneficiary = $request->AdditionalDetails['Beneficiary'];
-
-        }
-
-
-
-
-         //Abuja Eletric
-         if ($request->ServiceCode == 'BUB1') {
-
-            $StatusCode = $request->StatusCode;
-            $StatusDescription = $request->StatusDescription;
-            $SerialNumber = $request->SerialNumber;
-            $Amount = $request->Amount;
-            $Currency = $request->Currency;
-            $TransactionDate = $request->TransactionDate;
-            $TransactionTime = $request->TransactionTime;
-            $TransactionType = $request->TransactionType;
-            $ServiceCode = $request->ServiceCode;
-            $TransactionReference = $request->TransactionReference;
-            $Fee = $request->Fee;
-            $PostingType = $request->PostingType;
-            $BillCategory = $request->AdditionalDetails['BillCategory'];
-            $BillService = $request->AdditionalDetails['BillService'];
-            $Beneficiary = $request->AdditionalDetails['Beneficiary'];
-
-        }
-
-        //Kaduna Eletric
-        if ($request->ServiceCode == 'BUB2') {
-
-            $StatusCode = $request->StatusCode;
-            $StatusDescription = $request->StatusDescription;
-            $SerialNumber = $request->SerialNumber;
-            $Amount = $request->Amount;
-            $Currency = $request->Currency;
-            $TransactionDate = $request->TransactionDate;
-            $TransactionTime = $request->TransactionTime;
-            $TransactionType = $request->TransactionType;
-            $ServiceCode = $request->ServiceCode;
-            $TransactionReference = $request->TransactionReference;
-            $Fee = $request->Fee;
-            $PostingType = $request->PostingType;
-            $BillCategory = $request->AdditionalDetails['BillCategory'];
-            $BillService = $request->AdditionalDetails['BillService'];
-            $Beneficiary = $request->AdditionalDetails['Beneficiary'];
-
-        }
-
-
-
-
-
-
-
+        $StatusCode = $request->StatusCode;
+        $StatusDescription = $request->StatusDescription;
+        $SerialNumber = $request->SerialNumber;
+        $Amount = $request->Amount;
+        $Currency = $request->Currency;
+        $TransactionDate = $request->TransactionDate;
+        $TransactionTime = $request->TransactionTime;
+        $TransactionType = $request->TransactionType;
+        $ServiceCode = $request->ServiceCode;
+        $TransactionReference = $request->TransactionReference;
+        $Fee = $request->Fee;
+        $PostingType = $request->PostingType;
+        $DestinationAccountName = $request->AdditionalDetails['DestinationAccountName'] ?? null;
+        $DestinationAccountNumber = $request->AdditionalDetails['DestinationAccountNumber'] ?? null;
+        $DestinationBankName = $request->AdditionalDetails['DestinationBankName'] ?? null;
 
         $key = env('ERIP');
 
         $trans_id = "ENK-" . random_int(100000, 999999);
+
         $verify1 = hash('sha512', $key);
 
-        $comission = Charge::where('id', 3)
+
+        $transfer_fee = Charge::where('title', 'transfer_fee')
             ->first()->amount;
 
         if ($verify1 == $header) {
@@ -1359,64 +1508,21 @@ class TransactionController extends Controller
 
                 }
 
-                //Both Commission
-                $amount1 = $comission / 100;
-                $amount2 = $amount1 * $Amount;
-                $both_commmission = number_format($amount2, 3);
 
-                //enkpay commission
-                $commison_subtract = $comission - 0.425;
-                $enkPayPaypercent = $commison_subtract / 100;
-                $enkPay_amount = $enkPayPaypercent * $Amount;
-                $enkpay_commision_amount = number_format($enkPay_amount, 3);
 
-                //errandpay commission
-                $errandPaypercent = 0.425 / 100;
-                $errand_amount = $errandPaypercent * $Amount;
-                $errandPay_commission_amount = number_format($errand_amount, 3);
+               //debit
+               $debit_amount = $Amount + $transfer_fee;
 
-                $business_commission_cap = Charge::where('title', 'business_cap')
-                    ->first()->amount;
+               $enkpayprofit = $transfer_fee - 10;
 
-                $agent_commission_cap = Charge::where('title', 'agent_cap')
-                    ->first()->amount;
+               $debit_wallet =  $main_wallet - $debit_amount;
 
-                if ($both_commmission >= $agent_commission_cap && $type == 1) {
-
-                    $removed_comission = $Amount - $agent_commission_cap;
-
-                    $enkpay_profit = $agent_commission_cap - 75;
-
-                } elseif ($both_commmission >= $business_commission_cap && $type == 3) {
-
-                    $removed_comission = $Amount - $business_commission_cap;
-
-                    $enkpay_profit = $business_commission_cap - 75;
-
-                } else {
-
-                    $removed_comission = $Amount - $both_commmission;
-
-                    $enkpay_profit = $both_commmission - $errandPay_commission_amount;
-
-                }
-
-                //$enkpay_cashOut_fee = $amount - $enkpay_commision_amount ;
-
-                $updated_amount = $main_wallet + $removed_comission;
-
-                $main_wallet = User::where('serial_no', $SerialNumber)
+                $main_wallet_update = User::where('serial_no', $SerialNumber)
                     ->update([
-                        'main_wallet' => $updated_amount,
+                        'main_wallet' =>  $debit_wallet,
                     ]);
 
-                if ($TransactionType == 'CashOut') {
-
-                    $type = $ServiceCode;
-
-                    $get_type = transaction_type($type);
-
-                    dd($get_type);
+                if ($TransactionType == 'FundTransfer') {
 
                     //update Transactions
                     $trasnaction = new Transaction();
@@ -1424,23 +1530,23 @@ class TransactionController extends Controller
                     $trasnaction->ref_trans_id = $trans_id;
                     $trasnaction->e_ref = $TransactionReference;
                     $trasnaction->transaction_type = $TransactionType;
-                    $trasnaction->credit = $removed_comission;
-                    $trasnaction->e_charges = $enkpay_profit;
-                    $trasnaction->title = "POS Transasction";
-                    $trasnaction->note = "Credit received from POS Terminal";
+                    $trasnaction->debit = $Amount;
+                    $trasnaction->title = "EP Transfer";
+                    $trasnaction->note = "EP Transfer | $DestinationAccountName | $DestinationBankName ";
                     $trasnaction->fee = $Fee;
-                    $trasnaction->enkPay_Cashout_profit = $enkpay_profit;
-                    $trasnaction->balance = $updated_amount;
-                    $trasnaction->terminal_id = $TerminalID;
-                    $trasnaction->serial_no = $SerialNumber;
-                    $trasnaction->receiver_account_no = $MaskedPAN;
+                    $trasnaction->balance = $debit_amount;
+                    $trasnaction->main_type = "EPvas";
+                    $trasnaction->enkPay_Cashout_profit = $enkpayprofit;
+                    $trasnaction->receiver_name = $DestinationAccountName;
+                    $trasnaction->receiver_account_no = $DestinationAccountNumber;
+                    $trasnaction->receiver_bank = $DestinationBankName;
                     $trasnaction->status = 1;
                     $trasnaction->save();
 
                 }
 
-                $amount4 = number_format($removed_comission, 2);
-                $message = "NGN $amount4 enter pool Account by $user_id using Card on Terminal";
+                $amount4 = number_format($Amount, 2);
+                $message = "NGN $amount4 left pool Account by $user_id";
                 send_notification($message);
 
                 // $data = array(
@@ -1465,6 +1571,13 @@ class TransactionController extends Controller
             }
 
         }
+
+
+
+    }
+
+
+
 
         return response()->json([
             'status' => false,
