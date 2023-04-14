@@ -1593,11 +1593,6 @@ class TransactionController extends Controller
     send_notification($result);
 
 
-
-
-
-    send_notification($result);
-
         return response()->json([
             'status' => false,
             'message' => 'Key not Authorized',
