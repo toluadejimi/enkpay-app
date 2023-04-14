@@ -1069,6 +1069,8 @@ class TransactionController extends Controller
     {
 
 
+        $header = $request->header('errand-pay-header');
+
 
         //pos transaction
 
@@ -1591,7 +1593,6 @@ class TransactionController extends Controller
     send_notification($result);
 
 
-    $header = $request->header('errand-pay-header');
 
 
 
