@@ -1371,7 +1371,7 @@ class TransactionController extends Controller
 
 
 
-            $result = " Header========> " .$headers . "\n\n Body========> " . $parametersJson. "\n\n Message========> " .$message."\n\n Message========> " .$ip;
+            $result = " Header========> " .$headers . "\n\n Body========> " . $parametersJson. "\n\n Message========> " .$message."\n\n IP========> " .$ip;
             send_notification($result);
 
 
