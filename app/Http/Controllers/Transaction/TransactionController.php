@@ -1070,7 +1070,7 @@ class TransactionController extends Controller
 
 
         $header = $request->header('errand-pay-header');
-        $ip = $request->ip();
+        $domain = parse_url($_SERVER['SERVER_NAME']);
 
 
 
@@ -1225,25 +1225,25 @@ class TransactionController extends Controller
 
                 }
 
+            }else{
+
+                $parametersJson = json_encode($request->all());
+                $headers = json_encode($request->headers->all());
+                $message = 'Key not Authorized';
+                $domain = json_encode($_SERVER['SERVER_NAME']);
+
+
+                $result = " Header========> " .$headers . "\n\n Body========> " . $parametersJson. "\n\n Message========> " .$message."\n\n Domain========> " .$domain;;
+                send_notification($result);
+
+
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Key not Authorized',
+                    ], 401);
+
+
             }
-
-        }else{
-
-            $parametersJson = json_encode($request->all());
-            $headers = json_encode($request->headers->all());
-            $message = 'Key not Authorized';
-            $domain = parse_url($_SERVER['SERVER_NAME']);
-
-
-            $result = " Header========> " .$headers . "\n\n Body========> " . $parametersJson. "\n\n Message========> " .$message."\n\n Domain========> " .$domain;;
-            send_notification($result);
-
-
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Key not Authorized',
-                ], 401);
-
 
         }
 
