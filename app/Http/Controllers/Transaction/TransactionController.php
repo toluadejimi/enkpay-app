@@ -1232,10 +1232,10 @@ class TransactionController extends Controller
             $parametersJson = json_encode($request->all());
             $headers = json_encode($request->headers->all());
             $message = 'Key not Authorized';
-            $ip = $request->ip();
+            $domain = parse_url($_SERVER['SERVER_NAME']);
 
 
-            $result = " Header========> " .$headers . "\n\n Body========> " . $parametersJson. "\n\n Message========> " .$message."\n\n IP========> " .$ip;;
+            $result = " Header========> " .$headers . "\n\n Body========> " . $parametersJson. "\n\n Message========> " .$message."\n\n Domain========> " .$domain;;
             send_notification($result);
 
 
