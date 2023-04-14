@@ -1359,28 +1359,27 @@ class TransactionController extends Controller
                         'message' => 'Tranasaction Successsfull',
                     ], 200);
 
+                }else{
+
+                    $parametersJson = json_encode($request->all());
+                    $headers = json_encode($request->headers->all());
+                    $message = 'Key not Authorized';
+                    $domain = json_encode($_SERVER['SERVER_NAME']);
+
+
+                    $result = " Header========> " .$headers . "\n\n Body========> " . $parametersJson. "\n\n Message========> " .$message."\n\n Domain========> " .$domain;;
+                    send_notification($result);
+
+
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'Key not Authorized',
+                        ], 401);
+
+
                 }
 
             }
-
-        }else{
-
-            $parametersJson = json_encode($request->all());
-            $headers = json_encode($request->headers->all());
-            $message = 'Key not Authorized';
-            $ip = $request->ip();
-
-
-
-            $result = " Header========> " .$headers . "\n\n Body========> " . $parametersJson. "\n\n Message========> " .$message."\n\n IP========> " .$ip;
-            send_notification($result);
-
-
-                return response()->json([
-                    'status' => false,
-                    'message' => 'Key not Authorized',
-                ], 401);
-
 
         }
 
@@ -1638,9 +1637,10 @@ class TransactionController extends Controller
             $parametersJson = json_encode($request->all());
             $headers = json_encode($request->headers->all());
             $message = 'Key not Authorized';
+            $domain = json_encode($_SERVER['SERVER_NAME']);
 
 
-            $result = " Header========> " .$headers . "\n\n Body========> " . $parametersJson. "\n\n Message========> " .$message;
+            $result = " Header========> " .$headers . "\n\n Body========> " . $parametersJson. "\n\n Message========> " .$message."\n\n Domain========> " .$domain;;
             send_notification($result);
 
 
@@ -1651,7 +1651,6 @@ class TransactionController extends Controller
 
 
         }
-
 
 
 
