@@ -1063,7 +1063,7 @@ class TransactionController extends Controller
 
         //pos transaction
 
-        if (strtoupper($request->ServiceCode) == 'C01') {
+        if (strtoupper($request->ServiceCode) == 'CO1') {
 
             $StatusCode = $request->StatusCode;
             $StatusDescription = $request->StatusDescription;
