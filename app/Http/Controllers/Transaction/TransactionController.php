@@ -1080,12 +1080,11 @@ class TransactionController extends Controller
             $TerminalID = $request->AdditionalDetails['TerminalID'];
             $MaskedPAN = $request->AdditionalDetails['MaskedPAN'];
 
-            $key = env('ERIP');
+            $eip = env('EIP');
 
             $trans_id = "ENK-" . random_int(100000, 999999);
 
-            $verify1 = hash('sha512', $key);
-            $eip = '3.22.23.255'; //?? '3.22.23.255';
+            //$verify1 = hash('sha512', $key);
 
             $comission = Charge::where('id', 3)
                 ->first()->amount;
