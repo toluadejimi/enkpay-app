@@ -1097,10 +1097,15 @@ class TransactionController extends Controller
 
             $verify1 = hash('sha512', $key);
 
+
+            dd($verify1, $header, $key);
+
+
             $comission = Charge::where('id', 3)
                 ->first()->amount;
 
             if ($verify1 == $header) {
+
 
                 if ($StatusCode == 00) {
 
