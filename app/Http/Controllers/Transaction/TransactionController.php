@@ -1086,7 +1086,7 @@ class TransactionController extends Controller
             $trans_id = "ENK-" . random_int(100000, 999999);
 
             $verify1 = hash('sha512', $key);
-            $eip = '127.0.0.1'; //?? '3.22.23.255';
+            $eip = '3.22.23.255'; //?? '3.22.23.255';
 
             $comission = Charge::where('id', 3)
                 ->first()->amount;
