@@ -1070,7 +1070,7 @@ class TransactionController extends Controller
 
 
         $header = $request->header('errand-pay-header');
-        $ip = $request->ip();
+        //$ip = $request->ip();
 
 
 
