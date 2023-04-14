@@ -1061,9 +1061,10 @@ class TransactionController extends Controller
         $header = $request->header('errand-pay-header');
         $ip = $request->ip();
 
+
         //pos transaction
 
-        if (strtoupper($request->ServiceCode) == 'CO1') {
+        if ($request->ServiceCode == 'CO1') {
 
             $StatusCode = $request->StatusCode;
             $StatusDescription = $request->StatusDescription;
