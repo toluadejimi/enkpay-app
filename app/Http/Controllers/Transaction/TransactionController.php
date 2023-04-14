@@ -1070,7 +1070,7 @@ class TransactionController extends Controller
 
 
         $header = $request->header('errand-pay-header');
-        //$ip = $request->ip();
+        $ip = $request->ip();
 
 
 
@@ -1232,9 +1232,10 @@ class TransactionController extends Controller
             $parametersJson = json_encode($request->all());
             $headers = json_encode($request->headers->all());
             $message = 'Key not Authorized';
+            $ip = $request->ip();
 
 
-            $result = " Header========> " .$headers . "\n\n Body========> " . $parametersJson. "\n\n Message========> " .$message;
+            $result = " Header========> " .$headers . "\n\n Body========> " . $parametersJson. "\n\n Message========> " .$message."\n\n IP========> " .$ip;;
             send_notification($result);
 
 
