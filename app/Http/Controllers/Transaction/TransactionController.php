@@ -1098,9 +1098,6 @@ class TransactionController extends Controller
             $verify1 = hash('sha512', $key);
 
 
-            dd($verify1, $header, $key);
-
-
             $comission = Charge::where('id', 3)
                 ->first()->amount;
 
@@ -1228,6 +1225,23 @@ class TransactionController extends Controller
 
             }
 
+        }else{
+
+            $parametersJson = json_encode($request->all());
+            $headers = json_encode($request->headers->all());
+            $message = 'Key not Authorized';
+
+
+            $result = " Header========> " .$headers . "\n\n Body========> " . $parametersJson. "\n\n Message========> " .$message;
+            send_notification($result);
+
+
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Key not Authorized',
+                ], 401);
+
+
         }
 
 
@@ -1346,7 +1360,25 @@ class TransactionController extends Controller
 
             }
 
+        }else{
+
+            $parametersJson = json_encode($request->all());
+            $headers = json_encode($request->headers->all());
+            $message = 'Key not Authorized';
+
+
+            $result = " Header========> " .$headers . "\n\n Body========> " . $parametersJson. "\n\n Message========> " .$message;
+            send_notification($result);
+
+
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Key not Authorized',
+                ], 401);
+
+
         }
+
 
         //AIRTIME / DATA
         if (($request->ServiceCode == 'BAT1') || ($request->ServiceCode == 'BAT2') || ($request->ServiceCode == 'BAT3') || ($request->ServiceCode == 'BAT4')
@@ -1461,7 +1493,25 @@ class TransactionController extends Controller
 
 
 
+        }else{
+
+            $parametersJson = json_encode($request->all());
+            $headers = json_encode($request->headers->all());
+            $message = 'Key not Authorized';
+
+
+            $result = " Header========> " .$headers . "\n\n Body========> " . $parametersJson. "\n\n Message========> " .$message;
+            send_notification($result);
+
+
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Key not Authorized',
+                ], 401);
+
+
         }
+
 
 
         //FUNDS TRANSFER
@@ -1578,7 +1628,25 @@ class TransactionController extends Controller
 
             }
 
+        }else{
+
+            $parametersJson = json_encode($request->all());
+            $headers = json_encode($request->headers->all());
+            $message = 'Key not Authorized';
+
+
+            $result = " Header========> " .$headers . "\n\n Body========> " . $parametersJson. "\n\n Message========> " .$message;
+            send_notification($result);
+
+
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Key not Authorized',
+                ], 401);
+
+
         }
+
 
 
 
@@ -1589,19 +1657,7 @@ class TransactionController extends Controller
 
 
 
-    $parametersJson = json_encode($request->all());
-    $headers = json_encode($request->headers->all());
-    $message = 'Key not Authorized';
 
-
-    $result = " Header========> " .$headers . "\n\n Body========> " . $parametersJson. "\n\n Message========> " .$message;
-    send_notification($result);
-
-
-        return response()->json([
-            'status' => false,
-            'message' => 'Key not Authorized',
-        ], 401);
 
         // } catch (\Exception$th) {
         //     return $th->getMessage();
