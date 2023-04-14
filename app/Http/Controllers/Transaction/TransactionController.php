@@ -1070,10 +1070,6 @@ class TransactionController extends Controller
 
 
 
-       
-
-        $header = $request->header('errand-pay-header');
-
         //pos transaction
 
         if (strtoupper($request->ServiceCode)  == 'C01') {
@@ -1582,8 +1578,24 @@ class TransactionController extends Controller
     }
 
 
-    $result2 = 'Key not Authorized';
-    send_notification($result2);
+
+
+
+
+    $parametersJson = json_encode($request->all());
+    $headers = json_encode($request->headers->all());
+    $message = 'Key not Authorized';
+
+
+    $result = " Header========> " .$headers . "\n\n Body========> " . $parametersJson. "\n\n Message========> " .$message;
+    send_notification($result);
+
+
+    $header = $request->header('errand-pay-header');
+
+
+
+    send_notification($result);
 
         return response()->json([
             'status' => false,
