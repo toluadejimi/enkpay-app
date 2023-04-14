@@ -263,7 +263,7 @@ class TransactionController extends Controller
 
             }
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -521,7 +521,7 @@ class TransactionController extends Controller
 
             }
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -541,7 +541,7 @@ class TransactionController extends Controller
 
             ], 200);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -604,7 +604,7 @@ class TransactionController extends Controller
 
             }
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -627,7 +627,7 @@ class TransactionController extends Controller
 
             ], 200);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -693,7 +693,7 @@ class TransactionController extends Controller
 
             ], 500);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -733,7 +733,7 @@ class TransactionController extends Controller
                 'customer_name' => $customer_name,
             ], 200);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -1020,7 +1020,7 @@ class TransactionController extends Controller
                 ], 200);
             }
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -1049,7 +1049,7 @@ class TransactionController extends Controller
                 ], 500);
             }
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -1060,7 +1060,6 @@ class TransactionController extends Controller
 
         $header = $request->header('errand-pay-header');
         $ip = $request->ip();
-
 
         //pos transaction
 
@@ -1237,106 +1236,69 @@ class TransactionController extends Controller
             $BillService = $request->AdditionalDetails['BillService'] ?? null;
             $Beneficiary = $request->AdditionalDetails['Beneficiary'] ?? null;
 
-            $key = env('ERIP');
-
             $trans_id = "ENK-" . random_int(100000, 999999);
-
-            $verify1 = hash('sha512', $key);
 
             $terminal_charge = Charge::where('title', 'terminal_charge')
                 ->first()->amount;
 
-            if ($verify1 == $header) {
+            if ($StatusCode == 00) {
 
-                if ($StatusCode == 00) {
+                $main_wallet = User::where('serial_no', $SerialNumber)
+                    ->first()->main_wallet ?? null;
 
-                    $main_wallet = User::where('serial_no', $SerialNumber)
-                        ->first()->main_wallet ?? null;
+                $user_id = User::where('serial_no', $SerialNumber)
+                    ->first()->id ?? null;
 
-                    $user_id = User::where('serial_no', $SerialNumber)
-                        ->first()->id ?? null;
+                $type = User::where('serial_no', $SerialNumber)
+                    ->first()->type ?? null;
 
-                    $type = User::where('serial_no', $SerialNumber)
-                        ->first()->type ?? null;
-
-                    if ($main_wallet == null && $user_id == null) {
-
-                        return response()->json([
-                            'status' => false,
-                            'message' => 'Customer not registred on Enkpay',
-                        ], 500);
-
-                    }
-
-                    //debit
-                    $debit_amount = $Amount + $terminal_charge;
-
-                    $debit_wallet = $main_wallet - $debit_amount;
-
-                    $main_wallet_update = User::where('serial_no', $SerialNumber)
-                        ->update([
-                            'main_wallet' => $debit_wallet,
-                        ]);
-
-                    if ($TransactionType == 'BillsPayment') {
-
-                        //update Transactions
-                        $trasnaction = new Transaction();
-                        $trasnaction->user_id = $user_id;
-                        $trasnaction->ref_trans_id = $trans_id;
-                        $trasnaction->e_ref = $TransactionReference;
-                        $trasnaction->transaction_type = $TransactionType;
-                        $trasnaction->debit = $debit_amount;
-                        $trasnaction->title = "Bills";
-                        $trasnaction->note = "EP VAS | $BillService | $BillCategory | $Beneficiary ";
-                        $trasnaction->fee = $Fee;
-                        $trasnaction->enkPay_Cashout_profit = $terminal_charge;
-                        $trasnaction->balance = $debit_wallet;
-                        $trasnaction->main_type = "EPvas";
-                        $trasnaction->status = 1;
-                        $trasnaction->save();
-
-                    }
-
-                    $amount4 = number_format($Amount, 2);
-                    $message = "NGN $amount4 left pool Account by $user_id";
-                    send_notification($message);
-
-                    // $data = array(
-                    //     'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
-                    //     'subject' => "Account Credited",
-                    //     'toreceiver' => 'toluadejimi@gmail.com',
-                    //     'amount' => $removed_comission,
-                    //     'serial' => $SerialNumber,
-                    // );
-
-                    // Mail::send('emails.transaction.terminal-credit', ["data1" => $data], function ($message) use ($data) {
-                    //     $message->from($data['fromsender']);
-                    //     $message->to($data['toreceiver']);
-                    //     $message->subject($data['subject']);
-                    // });
-
-                    return response()->json([
-                        'status' => true,
-                        'message' => 'Tranasaction Successsfull',
-                    ], 200);
-
-                } else {
-
-                    $parametersJson = json_encode($request->all());
-                    $headers = json_encode($request->headers->all());
-                    $message = 'Key not Authorized';
-                    $domain = json_encode($_SERVER['SERVER_NAME']);
-
-                    $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\n Domain========> " . $domain;
-                    send_notification($result);
+                if ($main_wallet == null && $user_id == null) {
 
                     return response()->json([
                         'status' => false,
-                        'message' => 'Key not Authorized',
-                    ], 401);
+                        'message' => 'Customer not registred on Enkpay',
+                    ], 500);
 
                 }
+
+                //debit
+                $debit_amount = $Amount + $terminal_charge;
+
+                $debit_wallet = $main_wallet - $debit_amount;
+
+                $main_wallet_update = User::where('serial_no', $SerialNumber)
+                    ->update([
+                        'main_wallet' => $debit_wallet,
+                    ]);
+
+                if ($TransactionType == 'BillsPayment') {
+
+                    //update Transactions
+                    $trasnaction = new Transaction();
+                    $trasnaction->user_id = $user_id;
+                    $trasnaction->ref_trans_id = $trans_id;
+                    $trasnaction->e_ref = $TransactionReference;
+                    $trasnaction->transaction_type = $TransactionType;
+                    $trasnaction->debit = $debit_amount;
+                    $trasnaction->title = "Bills";
+                    $trasnaction->note = "EP VAS | $BillService | $BillCategory | $Beneficiary ";
+                    $trasnaction->fee = $Fee;
+                    $trasnaction->enkPay_Cashout_profit = $terminal_charge;
+                    $trasnaction->balance = $debit_wallet;
+                    $trasnaction->main_type = "EPvas";
+                    $trasnaction->status = 1;
+                    $trasnaction->save();
+
+                }
+
+                $amount4 = number_format($Amount, 2);
+                $message = "NGN $amount4 left pool Account by $user_id";
+                send_notification($message);
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Tranasaction Successsfull',
+                ], 200);
 
             }
 
@@ -1374,95 +1336,63 @@ class TransactionController extends Controller
             $terminal_charge = Charge::where('title', 'terminal_charge')
                 ->first()->amount;
 
-            if ($verify1 == $header) {
+            if ($StatusCode == 00) {
 
-                if ($StatusCode == 00) {
+                $main_wallet = User::where('serial_no', $SerialNumber)
+                    ->first()->main_wallet ?? null;
 
-                    $main_wallet = User::where('serial_no', $SerialNumber)
-                        ->first()->main_wallet ?? null;
+                $user_id = User::where('serial_no', $SerialNumber)
+                    ->first()->id ?? null;
 
-                    $user_id = User::where('serial_no', $SerialNumber)
-                        ->first()->id ?? null;
+                $type = User::where('serial_no', $SerialNumber)
+                    ->first()->type ?? null;
 
-                    $type = User::where('serial_no', $SerialNumber)
-                        ->first()->type ?? null;
-
-                    if ($main_wallet == null && $user_id == null) {
-
-                        return response()->json([
-                            'status' => false,
-                            'message' => 'Customer not registred on Enkpay',
-                        ], 500);
-
-                    }
-
-                    //debit
-                    $debit_wallet = $main_wallet - $Amount;
-
-                    $main_wallet_update = User::where('serial_no', $SerialNumber)
-                        ->update([
-                            'main_wallet' => $debit_wallet,
-                        ]);
-
-                    if ($TransactionType == 'BillsPayment') {
-
-                        //update Transactions
-                        $trasnaction = new Transaction();
-                        $trasnaction->user_id = $user_id;
-                        $trasnaction->ref_trans_id = $trans_id;
-                        $trasnaction->e_ref = $TransactionReference;
-                        $trasnaction->transaction_type = $TransactionType;
-                        $trasnaction->debit = $Amount;
-                        $trasnaction->title = "EP Bills";
-                        $trasnaction->note = "EP VAS | $BillService | $BillCategory | $Beneficiary ";
-                        $trasnaction->fee = $Fee;
-                        $trasnaction->balance = $debit_wallet;
-                        $trasnaction->main_type = "EPvas";
-                        $trasnaction->status = 1;
-                        $trasnaction->save();
-
-                    }
-
-                    $amount4 = number_format($Amount, 2);
-                    $message = "NGN $amount4 left pool Account by $user_id";
-                    send_notification($message);
-
-                    // $data = array(
-                    //     'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
-                    //     'subject' => "Account Credited",
-                    //     'toreceiver' => 'toluadejimi@gmail.com',
-                    //     'amount' => $removed_comission,
-                    //     'serial' => $SerialNumber,
-                    // );
-
-                    // Mail::send('emails.transaction.terminal-credit', ["data1" => $data], function ($message) use ($data) {
-                    //     $message->from($data['fromsender']);
-                    //     $message->to($data['toreceiver']);
-                    //     $message->subject($data['subject']);
-                    // });
+                if ($main_wallet == null && $user_id == null) {
 
                     return response()->json([
-                        'status' => true,
-                        'message' => 'Tranasaction Successsfull',
-                    ], 200);
+                        'status' => false,
+                        'message' => 'Customer not registred on Enkpay',
+                    ], 500);
 
                 }
 
+                //debit
+                $debit_wallet = $main_wallet - $Amount;
+
+                $main_wallet_update = User::where('serial_no', $SerialNumber)
+                    ->update([
+                        'main_wallet' => $debit_wallet,
+                    ]);
+
+                if ($TransactionType == 'BillsPayment') {
+
+                    //update Transactions
+                    $trasnaction = new Transaction();
+                    $trasnaction->user_id = $user_id;
+                    $trasnaction->ref_trans_id = $trans_id;
+                    $trasnaction->e_ref = $TransactionReference;
+                    $trasnaction->transaction_type = $TransactionType;
+                    $trasnaction->debit = $Amount;
+                    $trasnaction->title = "EP Bills";
+                    $trasnaction->note = "EP VAS | $BillService | $BillCategory | $Beneficiary ";
+                    $trasnaction->fee = $Fee;
+                    $trasnaction->balance = $debit_wallet;
+                    $trasnaction->main_type = "EPvas";
+                    $trasnaction->status = 1;
+                    $trasnaction->save();
+
+                }
+
+                $amount4 = number_format($Amount, 2);
+                $message = "NGN $amount4 left pool Account by $user_id";
+                send_notification($message);
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Tranasaction Successsfull',
+                ], 200);
+
             }
-
-        } else {
-
-            $parametersJson = json_encode($request->all());
-            $headers = json_encode($request->headers->all());
-            $message = 'Key not Authorized';
-
-            $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message;
-            send_notification($result);
-
-            return response()->json([
-                'status' => false,
-                'message' => 'Key not Authorized',
-            ], 401);
 
         }
 
@@ -1486,113 +1416,72 @@ class TransactionController extends Controller
             $DestinationAccountNumber = $request->AdditionalDetails['DestinationAccountNumber'] ?? null;
             $DestinationBankName = $request->AdditionalDetails['DestinationBankName'] ?? null;
 
-            $key = env('ERIP');
-
             $trans_id = "ENK-" . random_int(100000, 999999);
-
-            $verify1 = hash('sha512', $key);
 
             $transfer_fee = Charge::where('title', 'transfer_fee')
                 ->first()->amount;
 
-            if ($verify1 == $header) {
+            $main_wallet = User::where('serial_no', $SerialNumber)
+                ->first()->main_wallet ?? null;
 
-                if ($StatusCode == 00) {
+            $user_id = User::where('serial_no', $SerialNumber)
+                ->first()->id ?? null;
 
-                    $main_wallet = User::where('serial_no', $SerialNumber)
-                        ->first()->main_wallet ?? null;
+            $type = User::where('serial_no', $SerialNumber)
+                ->first()->type ?? null;
 
-                    $user_id = User::where('serial_no', $SerialNumber)
-                        ->first()->id ?? null;
-
-                    $type = User::where('serial_no', $SerialNumber)
-                        ->first()->type ?? null;
-
-                    if ($main_wallet == null && $user_id == null) {
-
-                        return response()->json([
-                            'status' => false,
-                            'message' => 'Customer not registred on Enkpay',
-                        ], 500);
-
-                    }
-
-                    //debit
-                    $debit_amount = $Amount + $transfer_fee;
-
-                    $enkpayprofit = $transfer_fee - 10;
-
-                    $debit_wallet = $main_wallet - $debit_amount;
-
-                    $main_wallet_update = User::where('serial_no', $SerialNumber)
-                        ->update([
-                            'main_wallet' => $debit_wallet,
-                        ]);
-
-                    if ($TransactionType == 'FundTransfer') {
-
-                        //update Transactions
-                        $trasnaction = new Transaction();
-                        $trasnaction->user_id = $user_id;
-                        $trasnaction->ref_trans_id = $trans_id;
-                        $trasnaction->e_ref = $TransactionReference;
-                        $trasnaction->transaction_type = $TransactionType;
-                        $trasnaction->debit = $Amount;
-                        $trasnaction->title = "EP Transfer";
-                        $trasnaction->note = "EP Transfer | $DestinationAccountName | $DestinationBankName ";
-                        $trasnaction->fee = $Fee;
-                        $trasnaction->balance = $debit_amount;
-                        $trasnaction->main_type = "EPvas";
-                        $trasnaction->enkPay_Cashout_profit = $enkpayprofit;
-                        $trasnaction->receiver_name = $DestinationAccountName;
-                        $trasnaction->receiver_account_no = $DestinationAccountNumber;
-                        $trasnaction->receiver_bank = $DestinationBankName;
-                        $trasnaction->status = 1;
-                        $trasnaction->save();
-
-                    }
-
-                    $amount4 = number_format($Amount, 2);
-                    $message = "NGN $amount4 left pool Account by $user_id";
-                    send_notification($message);
-
-                    // $data = array(
-                    //     'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
-                    //     'subject' => "Account Credited",
-                    //     'toreceiver' => 'toluadejimi@gmail.com',
-                    //     'amount' => $removed_comission,
-                    //     'serial' => $SerialNumber,
-                    // );
-
-                    // Mail::send('emails.transaction.terminal-credit', ["data1" => $data], function ($message) use ($data) {
-                    //     $message->from($data['fromsender']);
-                    //     $message->to($data['toreceiver']);
-                    //     $message->subject($data['subject']);
-                    // });
-
-                    return response()->json([
-                        'status' => true,
-                        'message' => 'Tranasaction Successsfull',
-                    ], 200);
-
-                }
-
-            } else {
-
-                $parametersJson = json_encode($request->all());
-                $headers = json_encode($request->headers->all());
-                $message = 'Key not Authorized';
-                $domain = json_encode($_SERVER['SERVER_NAME']);
-
-                $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\n Domain========> " . $domain;
-                send_notification($result);
+            if ($main_wallet == null && $user_id == null) {
 
                 return response()->json([
                     'status' => false,
-                    'message' => 'Key not Authorized',
-                ], 401);
+                    'message' => 'Customer not registred on Enkpay',
+                ], 500);
 
             }
+
+            //debit
+            $debit_amount = $Amount + $transfer_fee;
+
+            $enkpayprofit = $transfer_fee - 10;
+
+            $debit_wallet = $main_wallet - $debit_amount;
+
+            $main_wallet_update = User::where('serial_no', $SerialNumber)
+                ->update([
+                    'main_wallet' => $debit_wallet,
+                ]);
+
+            if ($TransactionType == 'FundTransfer') {
+
+                //update Transactions
+                $trasnaction = new Transaction();
+                $trasnaction->user_id = $user_id;
+                $trasnaction->ref_trans_id = $trans_id;
+                $trasnaction->e_ref = $TransactionReference;
+                $trasnaction->transaction_type = $TransactionType;
+                $trasnaction->debit = $Amount;
+                $trasnaction->title = "EP Transfer";
+                $trasnaction->note = "EP Transfer | $DestinationAccountName | $DestinationBankName ";
+                $trasnaction->fee = $Fee;
+                $trasnaction->balance = $debit_amount;
+                $trasnaction->main_type = "EPvas";
+                $trasnaction->enkPay_Cashout_profit = $enkpayprofit;
+                $trasnaction->receiver_name = $DestinationAccountName;
+                $trasnaction->receiver_account_no = $DestinationAccountNumber;
+                $trasnaction->receiver_bank = $DestinationBankName;
+                $trasnaction->status = 1;
+                $trasnaction->save();
+
+            }
+
+            $amount4 = number_format($Amount, 2);
+            $message = "NGN $amount4 left pool Account by $user_id";
+            send_notification($message);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Tranasaction Successsfull',
+            ], 200);
 
         }
 
@@ -1960,7 +1849,7 @@ class TransactionController extends Controller
 
             ], 500);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -1987,7 +1876,7 @@ class TransactionController extends Controller
             $DestinationAccountNumber = $request->AdditionalDetails['DestinationAccountNumber'];
             $DestinationBankName = $request->AdditionalDetails['DestinationBankName'];
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -2033,7 +1922,7 @@ class TransactionController extends Controller
 
             ]);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -2095,7 +1984,7 @@ class TransactionController extends Controller
                 ]);
             }
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
     }
@@ -2115,7 +2004,7 @@ class TransactionController extends Controller
 
             ], 200);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -2135,7 +2024,7 @@ class TransactionController extends Controller
 
             ]);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -2159,7 +2048,7 @@ class TransactionController extends Controller
 
             ], 200);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
     }
@@ -2183,7 +2072,7 @@ class TransactionController extends Controller
 
             ], 200);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
     }
@@ -2207,7 +2096,7 @@ class TransactionController extends Controller
 
             ], 200);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
     }
