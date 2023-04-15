@@ -67,7 +67,7 @@ Route::post('forgot-pin', [ProfileController::class, 'forgot_pin']);
 
 
 //Transactions
-Route::get('transaction-status', [TransactionController::class, 'transactiion_status']);
+Route::post('transaction-status', [TransactionController::class, 'transactiion_status']);
 
 //Get Pool Banalce
 Route::get('pool-balance', [TransactionController::class, 'pool_account']);
