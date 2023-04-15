@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use AfricasTalking\SDK\AfricasTalking;
 use App\Http\Controllers\Controller;
 use App\Models\State;
 use App\Models\StateLga;
@@ -112,58 +113,64 @@ class RegisterationController extends Controller
 
                 $token = $user->createToken('API Token')->accessToken;
 
-                // $message = "Your ENKPAY Verification is $sms_code";
+                $curl = curl_init();
 
-                // $curl = curl_init();
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => 'https://5vk4rx.api.infobip.com/sms/2/text/advanced',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'POST',
+                    CURLOPT_POSTFIELDS => '{"messages":[{"destinations":[{"to":"2348105059613"}],"from":"InfoSMS","text":"This is a sample message"}]}',
+                    CURLOPT_HTTPHEADER => array(
+                        'Authorization: a357f536d0bdb20b921ec7612edc9a17-c9ce65d7-4deb-42ba-ade8-796a539929a1',
+                        'Content-Type: application/json',
+                        'Accept: application/json',
+                    ),
+                ));
 
-                // curl_setopt_array($curl, array(
-                //     CURLOPT_URL => "http://login.betasms.com/api/?username=toluadejimi@gmail.com&password=Tolulope2580@&message=$message&mobiles=$phone_no",
-                //     CURLOPT_RETURNTRANSFER => true,
-                //     CURLOPT_ENCODING => '',
-                //     CURLOPT_MAXREDIRS => 10,
-                //     CURLOPT_TIMEOUT => 0,
-                //     CURLOPT_FOLLOWLOCATION => true,
-                //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                //     CURLOPT_CUSTOMREQUEST => 'GET',
-                // ));
+                $response = curl_exec($curl);
 
-                // $var = curl_exec($curl);
-                // curl_close($curl);
-                // $var = json_decode($var);
+                $result = json_decode($response);
 
-                // dd($var);
+                curl_close($curl);
 
-                // $headers = [
-                //     'Accept' => 'application/json',
-                //     'Content-Type' => 'application/json',
-                //     'Authorization' => 'Bearer FLWSECK-043cf4e9dd848683c6b157c234ba2fb8-X',
-                // ];
+                dd($result);
 
-                $client = new GuzzleClient([
-                    'headers' => $headers,
-                ]);
+                // $client = new GuzzleClient([
+                //     'headers' => $headers,
+                // ]);
 
-                $response = $client->request('POST', 'https://api.ng.termii.com/api/sms/send',
-                    [
-                        'body' => json_encode([
-                            "api_key" => "TLxF6Jauos8AJq6pKztkbxaQJbQjZzs43vJLOsXk8fHcUez3mBolehZGGzTwnF",
-                            "to" => $phone_no,
-                            "from" => "N-Alert",
-                            "sms" => "Your Enkwave confirmation code is $sms_code. active for 5 minutes, one-time use only",
-                            "type" => "plain",
-                            "channel" => "dnd",
+                // $response = $client->request('POST', 'https://api.ng.termii.com/api/sms/send',
+                //     [
+                //         'body' => json_encode([
+                //             "api_key" => "TLxF6Jauos8AJq6pKztkbxaQJbQjZzs43vJLOsXk8fHcUez3mBolehZGGzTwnF",
+                //             "to" => $phone_no,
+                //             "from" => "N-Alert",
+                //             "sms" => "Your Enkwave confirmation code is $sms_code. active for 5 minutes, one-time use only",
+                //             "type" => "plain",
+                //             "channel" => "dnd",
 
-                        ]),
+                //         ]),
 
-                    ]);
+                //     ]);
 
-                $body = $response->getBody();
-                $result = json_decode($body);
+                // $body = $response->getBody();
+                // $result = json_decode($body);
 
-                return response()->json([
-                    'status' => $this->success,
-                    'message' => 'OTP Code has been sent succesfully',
-                ], 200);
+                $status = $result['status'];
+
+                if ($status == 'success') {
+
+                    return response()->json([
+                        'status' => $this->success,
+                        'message' => 'OTP Code has been sent succesfully',
+                    ], 200);
+
+                }
 
             }
 
@@ -174,91 +181,35 @@ class RegisterationController extends Controller
                         'sms_code' => $sms_code,
                     ]);
 
-                $curl = curl_init();
-                $data = array(
+                    $curl = curl_init();
 
-                    "api_key" => "TLxF6Jauos8AJq6pKztkbxaQJbQjZzs43vJLOsXk8fHcUez3mBolehZGGzTwnF",
-                    "to" => $phone_no,
-                    "from" => "N-Alert",
-                    "sms" => "Your Verification Code is $sms_code",
-                    "type" => "plain",
-                    "channel" => "generic",
+                    curl_setopt_array($curl, array(
+                        CURLOPT_URL => 'https://5vk4rx.api.infobip.com/sms/2/text/advanced',
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_ENCODING => '',
+                        CURLOPT_MAXREDIRS => 10,
+                        CURLOPT_TIMEOUT => 0,
+                        CURLOPT_FOLLOWLOCATION => true,
+                        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                        CURLOPT_CUSTOMREQUEST => 'POST',
+                        CURLOPT_POSTFIELDS => '{"messages":[{"destinations":[{"to":"2348105059613"}],"from":"InfoSMS","text":"This is a sample message"}]}',
+                        CURLOPT_HTTPHEADER => array(
+                            'Authorization:App a357f536d0bdb20b921ec7612edc9a17-c9ce65d7-4deb-42ba-ade8-796a539929a1',
+                            'Content-Type: application/json',
+                            'Accept: application/json',
+                        ),
+                    ));
 
-                );
+                    $response = curl_exec($curl);
 
-                $post_data = json_encode($data);
+                    $result = json_decode($response);
 
-                curl_setopt_array($curl, array(
-                    CURLOPT_URL => "https://api.ng.termii.com/api/sms/send",
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING => "",
-                    CURLOPT_MAXREDIRS => 10,
-                    CURLOPT_TIMEOUT => 0,
-                    CURLOPT_FOLLOWLOCATION => true,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST => "POST",
-                    CURLOPT_POSTFIELDS => $post_data,
-                    CURLOPT_HTTPHEADER => array(
-                        "Content-Type: application/json",
-                    ),
-                ));
+                    curl_close($curl);
 
-                $var = curl_exec($curl);
-                curl_close($curl);
+                    dd($result);
+                $status = $result['status'];
 
-                $var = json_decode($var);
-
-                $status = $var->message;
-
-
-                // $curl = curl_init();
-
-                // curl_setopt_array($curl, array(
-                //     CURLOPT_URL => "https://smsclone.com/api/sms/sendsms?username=masterkey&password=masterkey1234&sender=ENKPAY&recipient=$phone_no&message=YourENKPAYVerificationis$sms_code",
-                //     CURLOPT_RETURNTRANSFER => true,
-                //     CURLOPT_ENCODING => '',
-                //     CURLOPT_MAXREDIRS => 10,
-                //     CURLOPT_TIMEOUT => 0,
-                //     CURLOPT_FOLLOWLOCATION => true,
-                //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                //     CURLOPT_CUSTOMREQUEST => 'GET',
-                // ));
-
-                // $var = curl_exec($curl);
-                // dd($var);
-
-                // curl_close($curl);
-                // $var = json_decode($var);
-
-
-
-
-
-
-                // header("Access-Control-Allow-Origin: *");
-                // $postdata = http_build_query(
-                //     array(
-                //         'username' => 'masterkey',
-                //         'password' => 'masterkey1234',
-                //         'message' => "Your ENKPAY Verification is $sms_code",
-                //         'recipient' => $phone_no,
-                //         'sender' => 'welcome',
-                //     )
-                // );
-                // $opts = array('http' => array(
-                //     'method' => 'POST',
-                //     'header' => 'Content-type: application/x-www-form-urlencoded',
-                //     'content' => $postdata,
-                // ),
-                // );
-                // $context = stream_context_create($opts);
-                // $result = file_get_contents('https://smsclone.com/api/sms/sendsms', true, $context);
-
-                // dd($result);
-
-
-
-                if ($status == 'Successfully Sent') {
+                if ($status == 'success') {
 
                     return response()->json([
                         'status' => $this->success,

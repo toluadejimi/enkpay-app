@@ -263,7 +263,7 @@ class TransactionController extends Controller
 
             }
 
-        } catch (\Exception $th) {
+        } catch (\Exception$th) {
             return $th->getMessage();
         }
 
@@ -521,7 +521,7 @@ class TransactionController extends Controller
 
             }
 
-        } catch (\Exception $th) {
+        } catch (\Exception$th) {
             return $th->getMessage();
         }
 
@@ -541,7 +541,7 @@ class TransactionController extends Controller
 
             ], 200);
 
-        } catch (\Exception $th) {
+        } catch (\Exception$th) {
             return $th->getMessage();
         }
 
@@ -604,7 +604,7 @@ class TransactionController extends Controller
 
             }
 
-        } catch (\Exception $th) {
+        } catch (\Exception$th) {
             return $th->getMessage();
         }
 
@@ -627,7 +627,7 @@ class TransactionController extends Controller
 
             ], 200);
 
-        } catch (\Exception $th) {
+        } catch (\Exception$th) {
             return $th->getMessage();
         }
 
@@ -693,7 +693,7 @@ class TransactionController extends Controller
 
             ], 500);
 
-        } catch (\Exception $th) {
+        } catch (\Exception$th) {
             return $th->getMessage();
         }
 
@@ -733,7 +733,7 @@ class TransactionController extends Controller
                 'customer_name' => $customer_name,
             ], 200);
 
-        } catch (\Exception $th) {
+        } catch (\Exception$th) {
             return $th->getMessage();
         }
 
@@ -1020,7 +1020,7 @@ class TransactionController extends Controller
                 ], 200);
             }
 
-        } catch (\Exception $th) {
+        } catch (\Exception$th) {
             return $th->getMessage();
         }
 
@@ -1049,7 +1049,7 @@ class TransactionController extends Controller
                 ], 500);
             }
 
-        } catch (\Exception $th) {
+        } catch (\Exception$th) {
             return $th->getMessage();
         }
 
@@ -1791,64 +1791,51 @@ class TransactionController extends Controller
 
         try {
 
-            $errand_key = errand_api_key();
 
-            $b_code = env('BCODE');
+
+
 
             $ref_no = $request->ref_no;
+
+            if($ref_no == null){
+
+                return response()->json([
+
+                    'status' => false,
+                    'message' => 'Transaction Not Found'
+
+                ],500);
+
+            }
+
 
             $e_ref = Transaction::where('ref_trans_id', $ref_no)
                 ->first()->e_ref;
 
-            $url = "https://api.errandpay.com/epagentservice/api/v1/GetStatus?reference=$e_ref&businessCode=$b_code";
+            $amount = Transaction::where('ref_trans_id', $ref_no)
+                ->first()->debit;
 
-            $curl = curl_init();
+            $receiver_bank = Transaction::where('ref_trans_id', $ref_no)
+                ->first()->receiver_bank;
 
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => "https://api.errandpay.com/epagentservice/api/v1/GetStatus?reference=$e_ref&businessCode=$b_code",
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'GET',
-                CURLOPT_HTTPHEADER => array(
-                    "Authorization: Bearer $errand_key",
-                ),
-            ));
+            $receiver_name = Transaction::where('ref_trans_id', $ref_no)
+                ->first()->receiver_name;
 
-            $var = curl_exec($curl);
-
-            curl_close($curl);
-            $var = json_decode($var);
-
-            $ms = $var->error->message ?? null;
-
-            $status = $var->code ?? null;
-
-            if ($status == 200) {
-
-                $update = Transaction::where('ref_trans_id', $ref_no)
-                    ->update(['status' => 1]);
-
-                return response()->json([
-
-                    'status' => true,
-                    'message' => "Transaction Successful",
-
-                ], 200);
-
-            }
+            $status = Transaction::where('ref_trans_id', $ref_no)
+                ->first()->status;
 
             return response()->json([
 
-                'status' => false,
-                'message' => $ms,
+                'status' => true,
+                'e_ref' => $e_ref,
+                'amount' => $amount,
+                'receiver_bank' => $receiver_bank,
+                'status' => $status,
+                'message' => "If receiver is not credited within 10mins, Please contact us with the EREF  ",
 
-            ], 500);
+            ], 200);
 
-        } catch (\Exception $th) {
+        } catch (\Exception$th) {
             return $th->getMessage();
         }
 
@@ -1875,7 +1862,7 @@ class TransactionController extends Controller
             $DestinationAccountNumber = $request->AdditionalDetails['DestinationAccountNumber'];
             $DestinationBankName = $request->AdditionalDetails['DestinationBankName'];
 
-        } catch (\Exception $th) {
+        } catch (\Exception$th) {
             return $th->getMessage();
         }
 
@@ -1921,7 +1908,7 @@ class TransactionController extends Controller
 
             ]);
 
-        } catch (\Exception $th) {
+        } catch (\Exception$th) {
             return $th->getMessage();
         }
 
@@ -1983,7 +1970,7 @@ class TransactionController extends Controller
                 ]);
             }
 
-        } catch (\Exception $th) {
+        } catch (\Exception$th) {
             return $th->getMessage();
         }
     }
@@ -2003,7 +1990,7 @@ class TransactionController extends Controller
 
             ], 200);
 
-        } catch (\Exception $th) {
+        } catch (\Exception$th) {
             return $th->getMessage();
         }
 
@@ -2023,7 +2010,7 @@ class TransactionController extends Controller
 
             ]);
 
-        } catch (\Exception $th) {
+        } catch (\Exception$th) {
             return $th->getMessage();
         }
 
@@ -2047,7 +2034,7 @@ class TransactionController extends Controller
 
             ], 200);
 
-        } catch (\Exception $th) {
+        } catch (\Exception$th) {
             return $th->getMessage();
         }
     }
@@ -2071,7 +2058,7 @@ class TransactionController extends Controller
 
             ], 200);
 
-        } catch (\Exception $th) {
+        } catch (\Exception$th) {
             return $th->getMessage();
         }
     }
@@ -2095,7 +2082,7 @@ class TransactionController extends Controller
 
             ], 200);
 
-        } catch (\Exception $th) {
+        } catch (\Exception$th) {
             return $th->getMessage();
         }
     }
