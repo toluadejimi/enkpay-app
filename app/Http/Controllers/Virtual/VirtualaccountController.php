@@ -327,6 +327,7 @@ class VirtualaccountController extends Controller
                         $trasnaction->credit = $enkpay_debit;
                         $trasnaction->note = "$sender_name | Wallet Funding";
                         $trasnaction->fee = $Fee;
+                        $trasnaction->amount = $Amount;
                         $trasnaction->e_charges = $deposit_charges;
                         $trasnaction->enkPay_Cashout_profit = $enkpay_profit;
                         $trasnaction->trx_date = $TransactionDate;

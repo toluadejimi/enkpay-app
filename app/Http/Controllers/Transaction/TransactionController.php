@@ -194,6 +194,7 @@ class TransactionController extends Controller
                 $trasnaction->transaction_type = "BankTransfer";
                 $trasnaction->title = "Bank Transfer";
                 $trasnaction->debit = $amount;
+                $trasnaction->amount = $amount;
                 $trasnaction->note = "Bank Transfer to other banks";
                 $trasnaction->fee = 0;
                 $trasnaction->enkpay_Cashout_profit = $enkpay_profit;
@@ -452,6 +453,7 @@ class TransactionController extends Controller
                 $trasnaction->transaction_type = "BankTransfer";
                 $trasnaction->title = "Bank Transfer";
                 $trasnaction->debit = $amount;
+                $trasnaction->amount = $amount;
                 $trasnaction->note = "Cash out to " . "|" . $destinationAccountNumber . " | " . $destinationAccountName;
                 $trasnaction->fee = 0;
                 $trasnaction->enkPay_Cashout_profit = $enkpay_profit;
@@ -884,6 +886,7 @@ class TransactionController extends Controller
             $trasnaction->type = "InAppTransfer";
             $trasnaction->main_type = "Transfer";
             $trasnaction->debit = $amount;
+            $trasnaction->amount = $amount;
             $trasnaction->note = "Bank Transfer to Enk Pay User";
             $trasnaction->fee = 0;
             $trasnaction->e_charges = 0;
@@ -941,6 +944,7 @@ class TransactionController extends Controller
             $trasnaction->credit = $amount;
             $trasnaction->note = "Bank Transfer to Enk Pay User";
             $trasnaction->fee = 0;
+            $trasnaction->amount = $amount;
             $trasnaction->e_charges = 0;
             $trasnaction->trx_date = date("Y/m/d");
             $trasnaction->trx_time = date("h:i:s");
@@ -1173,6 +1177,7 @@ class TransactionController extends Controller
                     $trasnaction->title = "POS Transasction";
                     $trasnaction->note = "EP POS | $MaskedPAN ";
                     $trasnaction->fee = $Fee;
+                    $trasnaction->amount = $Amount;
                     $trasnaction->enkPay_Cashout_profit = $enkpay_profit;
                     $trasnaction->balance = $updated_amount;
                     $trasnaction->terminal_id = $TerminalID;
@@ -1279,6 +1284,7 @@ class TransactionController extends Controller
                     $trasnaction->e_ref = $TransactionReference;
                     $trasnaction->transaction_type = $TransactionType;
                     $trasnaction->debit = $debit_amount;
+                    $trasnaction->amount = $Amount;
                     $trasnaction->title = "Bills";
                     $trasnaction->note = "EP VAS | $BillService | $BillCategory | $Beneficiary ";
                     $trasnaction->fee = $Fee;
@@ -1372,6 +1378,7 @@ class TransactionController extends Controller
                     $trasnaction->e_ref = $TransactionReference;
                     $trasnaction->transaction_type = $TransactionType;
                     $trasnaction->debit = $Amount;
+                    $trasnaction->amount = $Amount;
                     $trasnaction->title = "EP Bills";
                     $trasnaction->note = "EP VAS | $BillService | $BillCategory | $Beneficiary ";
                     $trasnaction->fee = $Fee;
@@ -1459,6 +1466,7 @@ class TransactionController extends Controller
                 $trasnaction->e_ref = $TransactionReference;
                 $trasnaction->transaction_type = $TransactionType;
                 $trasnaction->debit = $Amount;
+                $trasnaction->amount = $Amount;
                 $trasnaction->title = "EP Transfer";
                 $trasnaction->note = "EP Transfer | $DestinationAccountName | $DestinationBankName ";
                 $trasnaction->fee = $Fee;
