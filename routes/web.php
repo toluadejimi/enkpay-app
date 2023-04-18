@@ -24,5 +24,8 @@ Route::get('reset-pin', [ProfileController::class, 'reset_pin']);
 
 Route::post('reset-pin-now', [ProfileController::class, 'reset_pin_now']);
 
+Route::get('success', [ProfileController::class, 'success']);
+
+
 
 

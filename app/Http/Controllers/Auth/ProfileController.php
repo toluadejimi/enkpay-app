@@ -55,6 +55,15 @@ class ProfileController extends Controller
     }
 
 
+
+    public function success()
+    {
+
+        return view('success');
+
+    }
+
+
     public function reset_pin_now(Request $request)
     {
 
