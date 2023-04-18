@@ -61,8 +61,7 @@ Route::post('v1/transfer-request', [TransactionController::class, 'transfer_requ
 Route::post('v1/merchant-details', [ProfileController::class, 'view_agent_account']);
 
 
-//Fogot Pin
-Route::post('forgot-pin', [ProfileController::class, 'forgot_pin']);
+
 
 
 
@@ -100,6 +99,10 @@ Route::get('contact', [ProfileController::class, 'contact']);
 
 
 Route::group(['middleware' => ['auth:api', 'acess']], function () {
+
+
+    //Fogot Pin
+    Route::post('forgot-pin', [ProfileController::class, 'forgot_pin']);
 
     //Profile
     Route::get('user-info', [ProfileController::class, 'user_info']);
