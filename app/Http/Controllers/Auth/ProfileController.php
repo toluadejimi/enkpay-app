@@ -569,7 +569,7 @@ class ProfileController extends Controller
             }
         } catch (\Exception$e) {
             return response()->json([
-                'status' => $this->failedStatus,
+                'status' => $this->failed,
                 'message' => $e->getMessage(),
             ], 500);
         }
