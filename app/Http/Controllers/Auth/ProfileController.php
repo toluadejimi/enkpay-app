@@ -543,7 +543,7 @@ class ProfileController extends Controller
                     'subject' => "Reset Pin",
                     'toreceiver' => $email,
                     'first_name' => $first_name,
-                    'link' => url('') . "/reset_pin/?email=$email",
+                    'link' => url('') . "/reset-pin/?email=$email",
                 );
 
                 Mail::send('emails.notify.pinlink', ["data1" => $data], function ($message) use ($data) {
