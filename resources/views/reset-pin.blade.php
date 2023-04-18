@@ -60,7 +60,7 @@
 
 
                 <div class="mb-3"><button class="btn btn-primary d-block w-100" data-bss-hover-animate="pulse"
-                        type="submit" style="background: #0f0141;padding: 13px;margin-top: 46px;">Reset Password</button></div>
+                        type="submit" style="background: #0f0141;padding: 13px;margin-top: 46px;">Reset Pin</button></div>
 
             </form><small style="margin-top: 8px;text-align: right;"><br><strong>© 2023 Enkwave Dynamic
                     Technologies</strong><br></small>
