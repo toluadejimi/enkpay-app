@@ -60,10 +60,10 @@ class ProfileController extends Controller
         $email = $request->email;
 
         $input = $request->validate([
-            'pin' => ['required', 'confirmed', 'string'],
+            'password' => ['required', 'confirmed', 'int'],
         ]);
 
-        $pin = Hash::make($request->pin);
+        $pin = Hash::make($request->password);
 
         $check_email = User::where('email', $email)->first();
 

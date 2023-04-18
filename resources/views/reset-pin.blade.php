@@ -57,7 +57,7 @@
                             <form method="POST" action="/sign-in" class="pt-3">
                                 @csrf
 
-                                <div class="form-group">
+                                {{-- <div class="form-group">
                                     <input type="password" class="form-control form-control-lg" min="0" max="4"
                                         name="pin" id="pin" placeholder="Enter 4 Digit Pin" value="">
                                 </div>
@@ -65,6 +65,32 @@
                                 <div class="form-group">
                                     <input type="password" class="form-control form-control-lg" min="0" max="4"
                                         name="pin" id="pin_confirm" placeholder="Enter 4 Digit Pin" value="">
+                                </div> --}}
+
+                                <div class="mb-3 form-password-toggle">
+                                    <label class="form-label" for="password">Enter 4 Digit Pin</label>
+                                    <div class="input-group input-group-merge">
+                                        <span id="basic-icon-default-fullname2" class="input-group-text"><i
+                                                class="bx bxs-lock-alt"></i></span>
+                                        <input type="password" min="0" max="4" id="password" autofocus required class="form-control"
+                                            name="password"
+                                            placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
+                                            aria-describedby="password" />
+                                        <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3 form-password-toggle">
+                                    <label class="form-label" for="password">Confirm Pin</label>
+                                    <div class="input-group input-group-merge">
+                                        <span id="basic-icon-default-fullname2" class="input-group-text"><i
+                                                class="bx bxs-lock-alt"></i></span>
+                                        <input type="password" id="password" min="0" max="4" autofocus required class="form-control"
+                                            name="password_confirmation"
+                                            placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
+                                            aria-describedby="password" />
+                                        <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+                                    </div>
                                 </div>
 
                                 <div class="mt-3">
