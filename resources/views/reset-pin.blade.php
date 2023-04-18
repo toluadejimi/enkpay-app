@@ -53,9 +53,9 @@
                 <input name="email" hidden value="{{$email}}">
 
                 <div class="illustration"></div>
-                <div class="mb-3"><input class="form-control" type="password"  value="+234" name="password" placeholder="Enter 4 digit Pin"
+                <div class="mb-3"><input class="form-control" min="0" max="4"  type="password"  value="" name="password" placeholder="Enter 4 digit Pin"
                         required ></div>
-                <div class="mb-3"><input class="form-control" type="password" name="password_confirmation" required  placeholder="Confirm 4 digit Pin"
+                <div class="mb-3"><input class="form-control" min="0" max="4" type="password" name="password_confirmation" required  placeholder="Confirm 4 digit Pin"
                         style="height: 42px;"></div>
 
 
