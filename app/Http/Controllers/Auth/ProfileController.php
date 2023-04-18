@@ -69,11 +69,21 @@ class ProfileController extends Controller
 
         $email = $request->email;
 
+
+
         $input = $request->validate([
             'password' => ['required', 'confirmed', 'int'],
         ]);
 
         $pin = Hash::make($request->password);
+
+
+        $chk_pin_length = strlen($pin);
+
+        if($chk_pin_length != 4){
+            return back()->with('error', 'Your pin digit is more than 4');
+
+        }
 
         $check_email = User::where('email', $email)->first();
 

@@ -251,7 +251,9 @@ button:hover {
 
       <div class="bottomHalf">
 
-        <p>Pin Changed Successfully<br/></p>
+        <h3>Pin Changed Successfully</h3><br>
+        <p>Return to the app to contine your transactions</p>
+
 
         {{-- <button id="alertMO">Back to Trash Bash</button> --}}
 
