@@ -21,7 +21,7 @@ class TransactionController extends Controller
     public function bank_transfer(Request $request)
     {
 
-        // try {
+        try {
 
             $erran_api_key = errand_api_key();
 
@@ -254,9 +254,9 @@ class TransactionController extends Controller
 
             }
 
-        // } catch (\Exception$th) {
-        //     return $th->getMessage();
-        // }
+        } catch (\Exception$th) {
+            return $th->getMessage();
+        }
 
     }
 
