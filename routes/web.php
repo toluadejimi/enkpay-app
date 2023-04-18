@@ -16,3 +16,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+
+Route::get('reset-pin', [ProfileController::class, 'reset_pin']);
+
+Route::post('reset-pin-now', [ProfileController::class, 'reset_pin_now']);
+
+
+

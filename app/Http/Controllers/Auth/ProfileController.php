@@ -36,6 +36,51 @@ class ProfileController extends Controller
         }
     }
 
+
+
+
+
+
+    public function reset_pin(request $request)
+    {
+
+        $email = $request->email;
+
+
+        return view('reset-pin', compact('email'));
+
+
+
+    }
+
+
+    public function reset_pin_now(Request $request)
+    {
+
+        $email = $request->email;
+
+        $input = $request->validate([
+            'pin' => ['required', 'confirmed', 'string'],
+        ]);
+
+        $pin = Hash::make($request->pin);
+
+        $check_email = User::where('email', $email)->first();
+
+        if ($check_email == null) {
+
+            return back()->with('error', 'User not found');
+
+        }
+
+        $update_pin = User::where('email', $email)
+            ->update(['pin' => $pin]);
+
+
+        return redirect('success')->with('message', 'Your pin has been successfully updated');
+
+    }
+
     public function user_info(request $request)
     {
 
