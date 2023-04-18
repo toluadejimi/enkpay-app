@@ -52,33 +52,15 @@
                 <div class="illustration"></div>
                 <input name="email" hidden value="{{$email}}">
 
-                <div class="mb-3 form-password-toggle">
-                    <label class="form-label" for="password">Enter 4 Digit Pin</label>
-                    <div class="input-group input-group-merge">
-                        <span id="basic-icon-default-fullname2" class="input-group-text"><i
-                                class="bx bxs-lock-alt"></i></span>
-                        <input type="password" min="0" max="4" id="password" autofocus required class="form-control"
-                            name="password"
-                            placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
-                            aria-describedby="password" />
-                        <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
-                    </div>
-                </div>
+                <div class="illustration"></div>
+                <div class="mb-3"><input class="form-control" type="password"  value="+234" name="password" placeholder="Enter 4 digit Pin"
+                        required ></div>
+                <div class="mb-3"><input class="form-control" type="password" name="password_confirmation" required  placeholder="Confirm 4 digit Pin"
+                        style="height: 42px;"></div>
 
-                <div class="mb-3 form-password-toggle">
-                    <label class="form-label" for="password">Confirm Pin</label>
-                    <div class="input-group input-group-merge">
-                        <span id="basic-icon-default-fullname2" class="input-group-text"><i
-                                class="bx bxs-lock-alt"></i></span>
-                        <input type="password" id="password" min="0" max="4" autofocus required class="form-control"
-                            name="password_confirmation"
-                            placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
-                            aria-describedby="password" />
-                        <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
-                    </div>
-                </div>
+
                 <div class="mb-3"><button class="btn btn-primary d-block w-100" data-bss-hover-animate="pulse"
-                        type="submit" style="background: #0f0141;padding: 13px;margin-top: 46px;">Log In</button></div>
+                        type="submit" style="background: #0f0141;padding: 13px;margin-top: 46px;">Reset Password</button></div>
 
             </form><small style="margin-top: 8px;text-align: right;"><br><strong>© 2023 Enkwave Dynamic
                     Technologies</strong><br></small>
