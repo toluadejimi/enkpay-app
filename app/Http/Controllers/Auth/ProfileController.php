@@ -522,7 +522,7 @@ class ProfileController extends Controller
                 return response()->json([
 
                     'status' => $this->failed,
-                    'message' => 'Please the email attached to this acccount',
+                    'message' => 'Please enter the email attached to this acccount',
 
                 ], 500);
 
