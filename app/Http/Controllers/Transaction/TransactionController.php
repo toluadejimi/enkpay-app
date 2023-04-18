@@ -86,25 +86,6 @@ class TransactionController extends Controller
 
             if ($amount > $user_wallet_banlance) {
 
-                if (!empty(user_email())) {
-
-                    $data = array(
-                        'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
-                        'subject' => "Low Balance",
-                        'toreceiver' => user_email(),
-                        'first_name' => first_name(),
-                        'amount' => $amount,
-                        'balance' => $user_wallet_banlance,
-
-                    );
-
-                    Mail::send('emails.notify.lowbalalce', ["data1" => $data], function ($message) use ($data) {
-                        $message->from($data['fromsender']);
-                        $message->to($data['toreceiver']);
-                        $message->subject($data['subject']);
-                    });
-                }
-
                 return response()->json([
 
                     'status' => $this->failed,
@@ -172,7 +153,12 @@ class TransactionController extends Controller
 
             $error = $var->error->message ?? null;
 
+
+
             $message = "Error from Errand Pay | $error ";
+
+
+
 
             $trans_id = "ENK-" . random_int(100000, 999999);
 
@@ -253,7 +239,13 @@ class TransactionController extends Controller
                         ]);
                 }
 
-                send_notification($message);
+                $parametersJson = json_encode($request->all());
+                $headers = json_encode($request->headers->all());
+                $ip = $request->ip();
+
+                $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
+                send_notification($result);
+
 
                 return response()->json([
 
