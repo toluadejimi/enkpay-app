@@ -46,7 +46,7 @@
 <tr>
 <td style="padding: 18px 0px 18px 0px; line-height: 22px; text-align: inherit;" valign="top" bgcolor="" height="100%">
 <h3 style="text-align: center;"><span style="font-size: 16.38px;">PIN RESET</span></h3>
-<a href="{{ $data1['link'] }}" class="button" role="button">Click here to reset your pin</a>
+<a href="{{ $data1['link'] }}" style="text-align: center;" class="button" role="button">Click here to reset your pin</a>
 </td>
 </tr>
 </tbody>
