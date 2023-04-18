@@ -67,6 +67,7 @@ class ProfileController extends Controller
 
         $check_email = User::where('email', $email)->first();
 
+
         if ($check_email == null) {
 
             return back()->with('error', 'User not found');
@@ -516,6 +517,18 @@ class ProfileController extends Controller
 
             $email = $request->email;
 
+            if(Auth::user()->email != $email){
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'Please the email attached to this acccount',
+
+                ], 500);
+
+
+            }
+
             $check = User::where('email', $email)
                 ->first()->email ?? null;
 
@@ -530,7 +543,7 @@ class ProfileController extends Controller
                     'subject' => "Reset Pin",
                     'toreceiver' => $email,
                     'first_name' => $first_name,
-                    'link' => url('') . "/forgot_pin/?email=$email",
+                    'link' => url('') . "/reset_pin/?email=$email",
                 );
 
                 Mail::send('emails.notify.pinlink', ["data1" => $data], function ($message) use ($data) {

@@ -67,6 +67,8 @@
                                         name="pin" id="pin_confirm" placeholder="Enter 4 Digit Pin" value="">
                                 </div> --}}
 
+                                <input name="email" hidden value="{{$email}}">
+
                                 <div class="mb-3 form-password-toggle">
                                     <label class="form-label" for="password">Enter 4 Digit Pin</label>
                                     <div class="input-group input-group-merge">
