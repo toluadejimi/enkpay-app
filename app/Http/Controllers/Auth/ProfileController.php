@@ -80,7 +80,7 @@ class ProfileController extends Controller
 
         $chk_pin_length = strlen($pin);
 
-        if($chk_pin_length != 4){
+        if($chk_pin_length > 4){
             return back()->with('error', 'Your pin digit is more than 4');
 
         }
