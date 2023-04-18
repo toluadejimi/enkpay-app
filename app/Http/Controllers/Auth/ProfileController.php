@@ -78,10 +78,9 @@ class ProfileController extends Controller
         $pin = Hash::make($request->password);
 
 
-        $chk_pin_length = strlen($pin);
+        $chk_pin_length = strlen($request->password);
 
-        dd($chk_pin_length);
-
+        
         if($chk_pin_length > 4){
             return back()->with('error', 'Your pin digit is more than 4');
 
