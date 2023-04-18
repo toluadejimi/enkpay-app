@@ -21,7 +21,7 @@ class TransactionController extends Controller
     public function bank_transfer(Request $request)
     {
 
-        try {
+        // try {
 
             $erran_api_key = errand_api_key();
 
@@ -158,8 +158,6 @@ class TransactionController extends Controller
             $message = "Error from Errand Pay | $error ";
 
 
-
-
             $trans_id = "ENK-" . random_int(100000, 999999);
 
             $TransactionReference = $var->data->reference ?? null;
@@ -256,9 +254,9 @@ class TransactionController extends Controller
 
             }
 
-        } catch (\Exception$th) {
-            return $th->getMessage();
-        }
+        // } catch (\Exception$th) {
+        //     return $th->getMessage();
+        // }
 
     }
 
