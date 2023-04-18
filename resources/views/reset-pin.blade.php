@@ -18,7 +18,7 @@
         <section class="login-clean"
             style="color: var(--bs-gray-100);background: rgba(241,247,252,0);text-align: center;"><img
                 class="bounce animated" src="{{url('')}}/public/assets/img/clipboard-image.png"
-                style="height: 84px;margin-bottom: 49px;margin-top: -32px;">
+                style="height: 84px;margin-bottom: 49px;margin-top: 32px;">
 
 
             <form method="post" action="reset-pin-now"
