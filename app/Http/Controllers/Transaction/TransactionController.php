@@ -1837,6 +1837,14 @@ class TransactionController extends Controller
             $receiver_name = Transaction::where('ref_trans_id', $ref_no)
                 ->first()->receiver_name;
 
+            $note = Transaction::where('ref_trans_id', $ref_no)
+            ->first()->note;
+
+            $date = Transaction::where('ref_trans_id', $ref_no)
+            ->first()->created_at;
+
+
+
 
             $receiver_account_no = Transaction::where('ref_trans_id', $ref_no)
             ->first()->receiver_account_no;
@@ -1852,6 +1860,8 @@ class TransactionController extends Controller
                 'receiver_bank' => $receiver_bank,
                 'receiver_name' => $receiver_name,
                 'receiver_account_no' => $receiver_account_no,
+                'date' => $created_at,
+                'note' => $note,
                 'status' => $status,
                 'message' => "If receiver is not credited within 10mins, Please contact us with the EREF  ",
 
