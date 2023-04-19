@@ -32,12 +32,11 @@ class TransactionController extends Controller
             $amount = $request->amount;
             $destinationAccountNumber = $request->account_number;
             $destinationBankCode = $request->code;
-            $destinationAccountName = $request->customer_name;
+            $destinationAccountName = $request->receiver_bank;
             $longitude = $request->longitude;
             $latitude = $request->latitude;
             $get_description = $request->narration;
             $pin = $request->pin;
-
 
 
 
@@ -68,6 +67,18 @@ class TransactionController extends Controller
 
                 ], 500);
             }
+
+
+            if (Auth::user()->b_number == 6) {
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'You dont have the permission to make transfer',
+
+                ], 500);
+            }
+
 
             if ($amount < 100) {
 
@@ -798,6 +809,15 @@ class TransactionController extends Controller
 
             }
 
+            if ($receiver_status !== 2) {
+
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => "User not verified",
+                ], 500);
+
+            }
+
             //Debit Transaction
 
             if ($wallet == 'main_account') {
@@ -828,25 +848,11 @@ class TransactionController extends Controller
                 ], 500);
             }
 
+
+
+
+
             if ($amount > $sender_balance) {
-
-                if (!empty(user_email())) {
-                    // $data = array(
-                    //     'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
-                    //     'subject' => "Low Balance",
-                    //     'toreceiver' => user_email(),
-                    //     'first_name' => first_name(),
-                    //     'amount' => $amount,
-                    //     'balance' => $sender_balance,
-
-                    // );
-
-                    // Mail::send('emails.notify.lowbalalce', ["data1" => $data], function ($message) use ($data) {
-                    //     $message->from($data['fromsender']);
-                    //     $message->to($data['toreceiver']);
-                    //     $message->subject($data['subject']);
-                    // });
-                }
 
                 return response()->json([
 
@@ -888,7 +894,7 @@ class TransactionController extends Controller
             $trasnaction->main_type = "Transfer";
             $trasnaction->debit = $amount;
             $trasnaction->amount = $amount;
-            $trasnaction->note = "Bank Transfer to Enk Pay User";
+            $trasnaction->note = "ENKPAY TRANSFER | $phone ";
             $trasnaction->fee = 0;
             $trasnaction->e_charges = 0;
             $trasnaction->trx_date = date("Y/m/d");
@@ -925,6 +931,7 @@ class TransactionController extends Controller
 
             //credit receiver
 
+            $user_phone = user_phone();
             $credit = $receiver_main_wallet + $amount;
 
             $update = User::where('phone', $phone)
@@ -943,7 +950,7 @@ class TransactionController extends Controller
             $trasnaction->main_type = "Transfer";
             $trasnaction->type = "InAppTransfer";
             $trasnaction->credit = $amount;
-            $trasnaction->note = "Bank Transfer to Enk Pay User";
+            $trasnaction->note = "ENKPAY TRANSFER | $user_phone ";
             $trasnaction->fee = 0;
             $trasnaction->amount = $amount;
             $trasnaction->e_charges = 0;
@@ -981,20 +988,20 @@ class TransactionController extends Controller
 
             if (!empty(user_email())) {
 
-                // $data = array(
-                //     'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
-                //     'subject' => "Debit Notification",
-                //     'toreceiver' => user_email(),
-                //     'first_name' => first_name(),
-                //     'amount' => $amount,
+                $data = array(
+                    'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                    'subject' => "Debit Notification",
+                    'toreceiver' => user_email(),
+                    'first_name' => first_name(),
+                    'amount' => $amount,
 
-                // );
+                );
 
-                // Mail::send('emails.transaction.sender', ["data1" => $data], function ($message) use ($data) {
-                //     $message->from($data['fromsender']);
-                //     $message->to($data['toreceiver']);
-                //     $message->subject($data['subject']);
-                // });
+                Mail::send('emails.transaction.sender', ["data1" => $data], function ($message) use ($data) {
+                    $message->from($data['fromsender']);
+                    $message->to($data['toreceiver']);
+                    $message->subject($data['subject']);
+                });
 
             }
 
@@ -1002,20 +1009,20 @@ class TransactionController extends Controller
 
             if (!empty($receiver_email)) {
 
-                // $data = array(
-                //     'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
-                //     'subject' => "Credit Notification",
-                //     'toreceiver' => $receiver_email,
-                //     'first_name' => $receiver_f_name,
-                //     'amount' => $amount,
+                $data = array(
+                    'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                    'subject' => "Credit Notification",
+                    'toreceiver' => $receiver_email,
+                    'first_name' => $receiver_f_name,
+                    'amount' => $amount,
 
-                // );
+                );
 
-                // Mail::send('emails.transaction.receiver', ["data1" => $data], function ($message) use ($data) {
-                //     $message->from($data['fromsender']);
-                //     $message->to($data['toreceiver']);
-                //     $message->subject($data['subject']);
-                // });
+                Mail::send('emails.transaction.receiver', ["data1" => $data], function ($message) use ($data) {
+                    $message->from($data['fromsender']);
+                    $message->to($data['toreceiver']);
+                    $message->subject($data['subject']);
+                });
 
                 return response()->json([
 

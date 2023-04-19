@@ -186,6 +186,18 @@ class PowerController extends Controller
                 ], 500);
             }
 
+
+
+            if (Auth::user()->b_number == 6) {
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'You dont have the permission to make transfer',
+
+                ], 500);
+            }
+
             if ($amount > $user_wallet_banlance) {
 
                 if (!empty(user_email())) {

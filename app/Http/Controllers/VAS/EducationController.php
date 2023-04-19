@@ -51,6 +51,18 @@ class EducationController extends Controller
 
 
 
+            if (Auth::user()->b_number == 6) {
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'You dont have the permission to make transfer',
+
+                ], 500);
+            }
+
+
+
             if ($status == 000) {
 
                 return response()->json([
