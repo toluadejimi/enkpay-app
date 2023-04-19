@@ -39,6 +39,9 @@ class TransactionController extends Controller
             $pin = $request->pin;
 
 
+
+
+
             $referenceCode = "ENK-" . random_int(1000000, 999999999);
 
             $transfer_charges = Charge::where('id', 1)->first()->amount;
@@ -308,6 +311,9 @@ class TransactionController extends Controller
 
             }
 
+
+
+
             if ($bank_code == null) {
 
                 return response()->json([
@@ -369,10 +375,10 @@ class TransactionController extends Controller
             }
 
             //Debit
-            $charged_amount = $user_wallet_banlance + $transfer_charges;
+            $charged_amount = $amount + $transfer_charges;
+            $debit = $user_wallet_banlance - $charged_amount;
             $enkpay_profit = $transfer_charges - 10;
 
-            $debit = $charged_amount - $amount;
 
             if ($wallet == 'main_account') {
 
@@ -447,7 +453,7 @@ class TransactionController extends Controller
                 $trasnaction->main_type = "Transfer";
                 $trasnaction->transaction_type = "BankTransfer";
                 $trasnaction->title = "Bank Transfer";
-                $trasnaction->debit = $amount;
+                $trasnaction->debit = $charged_amount;
                 $trasnaction->amount = $amount;
                 $trasnaction->note = "Cash out to " . "|" . $destinationAccountNumber . " | " . $destinationAccountName;
                 $trasnaction->fee = 0;
