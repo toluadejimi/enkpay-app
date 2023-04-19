@@ -23,6 +23,7 @@ class TransactionController extends Controller
 
         try {
 
+
             $erran_api_key = errand_api_key();
 
             $epkey = env('EPKEY');
@@ -36,6 +37,7 @@ class TransactionController extends Controller
             $latitude = $request->latitude;
             $get_description = $request->narration;
             $pin = $request->pin;
+
 
             $referenceCode = "ENK-" . random_int(1000000, 999999999);
 
@@ -96,7 +98,10 @@ class TransactionController extends Controller
             }
 
             //Debit
-            $debit = $user_wallet_banlance - $amount;
+
+            $debited_amount = $transfer_charges + $amount;
+            $debit = $user_wallet_banlance - $debited_amount;
+
 
             if ($wallet == 'main_account') {
 
@@ -177,7 +182,7 @@ class TransactionController extends Controller
                 $trasnaction->main_type = "Transfer";
                 $trasnaction->transaction_type = "BankTransfer";
                 $trasnaction->title = "Bank Transfer";
-                $trasnaction->debit = $amount;
+                $trasnaction->debit = $debited_amount;
                 $trasnaction->amount = $amount;
                 $trasnaction->note = "Bank Transfer to other banks";
                 $trasnaction->fee = 0;
