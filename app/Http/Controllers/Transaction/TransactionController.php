@@ -1870,7 +1870,7 @@ class TransactionController extends Controller
                 'receiver_bank' => $receiver_bank,
                 'receiver_name' => $receiver_name,
                 'receiver_account_no' => $receiver_account_no,
-                'date' => $created_at,
+                'date' => $date,
                 'note' => $note,
                 'status' => $status,
                 'message' => "If receiver is not credited within 10mins, Please contact us with the EREF  ",
