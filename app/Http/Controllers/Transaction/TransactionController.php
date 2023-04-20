@@ -1815,7 +1815,7 @@ class TransactionController extends Controller
     public function transactiion_status(Request $request)
     {
 
-        try {
+        // try {
 
 
 
@@ -1877,9 +1877,9 @@ class TransactionController extends Controller
 
             ], 200);
 
-        } catch (\Exception$th) {
-            return $th->getMessage();
-        }
+        // } catch (\Exception$th) {
+        //     return $th->getMessage();
+        // }
 
     }
 
