@@ -1839,7 +1839,7 @@ class TransactionController extends Controller
                 ->first()->e_ref;
 
             $amount = Transaction::where('ref_trans_id', $ref_no)
-                ->first()->debit;
+                ->first()->amount;
 
             $receiver_bank = Transaction::where('ref_trans_id', $ref_no)
                 ->first()->receiver_bank;
