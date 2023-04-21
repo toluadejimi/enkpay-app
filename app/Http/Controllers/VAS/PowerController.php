@@ -128,7 +128,7 @@ class PowerController extends Controller
     public function buy_power(request $request)
     {
 
-        // try {
+        try {
 
             $auth = env('VTAUTH');
 
@@ -360,9 +360,9 @@ class PowerController extends Controller
 
             ], 200);
 
-        // } catch (\Exception$th) {
-        //     return $th->getMessage();
-        // }
+        } catch (\Exception$th) {
+            return $th->getMessage();
+        }
 
     }
 
