@@ -128,11 +128,14 @@ class PowerController extends Controller
     public function buy_power(request $request)
     {
 
-        try {
+        // try {
 
             $auth = env('VTAUTH');
 
             $request_id = date('YmdHis') . Str::random(4);
+
+            $referenceCode = "ENK-" . random_int(1000000, 999999999);
+
 
             $serviceid = User::where('id', Auth::id())
                 ->first()->eletric_company;
@@ -200,25 +203,6 @@ class PowerController extends Controller
 
             if ($amount > $user_wallet_banlance) {
 
-                if (!empty(user_email())) {
-
-                    $data = array(
-                        'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
-                        'subject' => "Low Balance",
-                        'toreceiver' => user_email(),
-                        'first_name' => first_name(),
-                        'amount' => $amount,
-                        'phone' => $phone,
-                        'balance' => $user_wallet_banlance,
-
-                    );
-
-                    Mail::send('emails.notify.lowbalalce', ["data1" => $data], function ($message) use ($data) {
-                        $message->from($data['fromsender']);
-                        $message->to($data['toreceiver']);
-                        $message->subject($data['subject']);
-                    });
-                }
 
                 return response()->json([
 
@@ -282,17 +266,33 @@ class PowerController extends Controller
                         ]);
                 }
 
+                $title = "Eletric VAS";
+
+
                 $transaction = new Transaction();
-                $transaction->ref_trans_id = Str::random(10);
+                $transaction->ref_trans_id = $referenceCode;
                 $transaction->user_id = Auth::id();
                 $transaction->transaction_type = "VasEletric";
-                $trasnaction->title = "Eletric VAS";
+                // $trasnaction->title = "Eletric VAS";
                 $transaction->debit = $new_amount;
                 $transaction->balance = $debit;
                 $transaction->e_charges = $eletricity_charges;
+                $transaction->amount = $amount;
                 $transaction->type = 'vas';
-                $transaction->note = "Token Purchase - $token";
+                $transaction->note = "Token Purchase | $token";
                 $transaction->save();
+
+
+                $update = Transaction::where('ref_trans_id',$referenceCode)
+                ->update([
+
+                    'title' => $title,
+                    'main_type' => "enkpay_vas"
+
+                ]);
+
+
+
 
                 $email = User::where('id', Auth::id())
                     ->first()->email;
@@ -360,9 +360,9 @@ class PowerController extends Controller
 
             ], 200);
 
-        } catch (\Exception$th) {
-            return $th->getMessage();
-        }
+        // } catch (\Exception$th) {
+        //     return $th->getMessage();
+        // }
 
     }
 
