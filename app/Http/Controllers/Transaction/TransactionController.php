@@ -780,6 +780,7 @@ class TransactionController extends Controller
             $receiver_email = User::where('phone', $phone)->first()->email ?? null;
             $receiver_f_name = User::where('phone', $phone)->first()->first_name ?? null;
             $receiver_l_name = User::where('phone', $phone)->first()->first_name ?? null;
+            $receiver_status = User::where('phone', $phone)->first()->status ?? null;
             $receiver_full_name = $receiver_f_name . "  " . $receiver_l_name;
 
             //sender info
@@ -1034,13 +1035,17 @@ class TransactionController extends Controller
                     $message->subject($data['subject']);
                 });
 
-                return response()->json([
 
-                    'status' => $this->success,
-                    'message' => 'Transfer Successful',
-
-                ], 200);
             }
+
+            return response()->json([
+
+                'status' => $this->success,
+                'message' => 'Transfer Successful',
+
+            ], 200);
+
+
 
         } catch (\Exception$th) {
             return $th->getMessage();
