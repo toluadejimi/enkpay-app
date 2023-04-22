@@ -1005,6 +1005,7 @@ class TransactionController extends Controller
                     'toreceiver' => user_email(),
                     'first_name' => first_name(),
                     'amount' => $amount,
+                    'receiver'=>$receiver_full_name
 
                 );
 
@@ -1026,6 +1027,8 @@ class TransactionController extends Controller
                     'toreceiver' => $receiver_email,
                     'first_name' => $receiver_f_name,
                     'amount' => $amount,
+                    'sender' => $sender_full_name,
+
 
                 );
 
