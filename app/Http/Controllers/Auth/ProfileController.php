@@ -80,7 +80,7 @@ class ProfileController extends Controller
 
         $chk_pin_length = strlen($request->password);
 
-        
+
         if($chk_pin_length > 4){
             return back()->with('error', 'Your pin digit is more than 4');
 
@@ -393,9 +393,9 @@ class ProfileController extends Controller
             if($is_identification_verified == 2){
 
                 return response()->json([
-                    'status' => $this->failed,
+                    'status' => $this->success,
                     'message' => "We are still verifying your profile, Please wait",
-                ], 500);
+                ], 200);
 
             }
 
