@@ -931,4 +931,77 @@ class RegisterationController extends Controller
 
     }
 
+
+
+    public function forgot_password(request $request){
+
+
+        try {
+
+            $email = $request->email;
+
+            $check = User::where('email', $email)
+            ->first()->email ?? null;
+
+
+            if($email == null){
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'Account not found, please sign up',
+
+                ], 500);
+
+
+            }
+
+
+            $first_name = User::where('email', $email)
+                ->first()->first_name ?? null;
+
+            if ($check == $email) {
+
+                //send email
+                $data = array(
+                    'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                    'subject' => "Reset Password",
+                    'toreceiver' => $email,
+                    'first_name' => $first_name,
+                    'link' => url('') . "/reset-password/?email=$email",
+                );
+
+                Mail::send('emails.notify.passwordlink', ["data1" => $data], function ($message) use ($data) {
+                    $message->from($data['fromsender']);
+                    $message->to($data['toreceiver']);
+                    $message->subject($data['subject']);
+                });
+
+                return response()->json([
+                    'status' => $this->success,
+                    'message' => 'Check your inbox or spam for futher instructions',
+                ], 200);
+
+            } else {
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'User not found on our system',
+
+                ], 500);
+
+            }
+
+        } catch (\Exception$e) {
+            return response()->json([
+                'status' => $this->failed,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
+
+
+
+    }
+
 }

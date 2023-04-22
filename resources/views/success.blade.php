@@ -251,7 +251,7 @@ button:hover {
 
       <div class="bottomHalf">
 
-        <h3>Pin Changed Successfully</h3><br>
+        <h3>Credientials Reset Successfully</h3><br>
         <p>Return to the Enkpay app to contine your transactions</p>
 
 

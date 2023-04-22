@@ -45,8 +45,8 @@
 <tbody>
 <tr>
 <td style="padding: 18px 0px 18px 0px; line-height: 22px; text-align: inherit;" valign="top" bgcolor="" height="100%">
-<h3 style="text-align: center;"><span style="font-size: 16.38px;">PIN RESET</span></h3>
-<h3 style="text-align: center;"><a href="{{ $data1['link'] }}" class="button" role="button">Click here to reset your pin</a></h3>
+<h3 style="text-align: center;"><span style="font-size: 16.38px;">PASSWORD RESET</span></h3>
+<h3 style="text-align: center;"><a href="{{ $data1['link'] }}" class="button" role="button">Click here to reset your password</a></h3>
 </td>
 </tr>
 </tbody>
@@ -56,7 +56,7 @@
 <tr>
 <td style="padding: 18px 0px 18px 0px; line-height: 22px; text-align: inherit;" valign="top" bgcolor="" height="100%">
 <div>
-<div style="font-family: inherit; text-align: center;">If you did not request a reset pin link, it is safe to ignore this email.</div>
+<div style="font-family: inherit; text-align: center;">If you did not request a reset password link, it is safe to ignore this email.</div>
 <div>&nbsp;</div>
 </div>
 </td>

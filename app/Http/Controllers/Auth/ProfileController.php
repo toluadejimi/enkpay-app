@@ -55,6 +55,19 @@ class ProfileController extends Controller
     }
 
 
+    public function reset_password(request $request)
+    {
+
+        $email = $request->email;
+
+
+        return view('reset-password', compact('email'));
+
+
+
+    }
+
+
 
     public function success()
     {
@@ -102,6 +115,45 @@ class ProfileController extends Controller
         return redirect('success')->with('message', 'Your pin has been successfully updated');
 
     }
+
+
+
+    public function reset_password_now(Request $request)
+    {
+
+        $email = $request->email;
+
+
+
+        $input = $request->validate([
+            'password' => ['required', 'confirmed', 'string'],
+        ]);
+
+        $password = Hash::make($request->password);
+
+
+        $check_email = User::where('email', $email)->first();
+
+
+        if ($check_email == null) {
+
+            return back()->with('error', 'User not found');
+
+        }
+
+        $update_pin = User::where('email', $email)
+            ->update(['password' => $password]);
+
+
+        return redirect('success')->with('message', 'Your password has been successfully updated');
+
+    }
+
+
+
+
+
+
 
     public function user_info(request $request)
     {

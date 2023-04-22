@@ -29,6 +29,11 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
+
+
+Route::post('forgot-password', [RegisterationController::class, 'forgot_password']);
+
+
 //Registration
 Route::post('verify-phone', [RegisterationController::class, 'phone_verification']);
 Route::post('verify-email', [RegisterationController::class, 'email_verification']);
