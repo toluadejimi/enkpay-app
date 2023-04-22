@@ -322,8 +322,8 @@ class PowerController extends Controller
 
                 if (!empty(user_email())) {
                     $data = array(
-                        'fromsender' => 'notify@admin.cardy4u.com', 'CARDY',
-                        'subject' => "Recepit for Eletricity Token Purchase",
+                        'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                        'subject' => "Eletricity Recepit",
                         'toreceiver' => $email,
                         'recepit' => $recepit,
                         'date' => $date,
@@ -345,7 +345,7 @@ class PowerController extends Controller
                 return response()->json([
 
                     'status' => $this->success,
-                    'message' => 'Purchase Successfull, Check your email for token',
+                    'message' => 'Token Purchase Successfull, Check your email for token',
 
                 ], 200);
 

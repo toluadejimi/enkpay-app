@@ -130,7 +130,7 @@
                 <tr>
                     <td>&nbsp;</td>
                     <td align="left">
-                        <p style="text-align: center;"><strong>PIN RESET</strong></p>
+                        <p style="text-align: center;"><strong>PASSWORD RESET</strong></p>
                     </td>
                     <td align="left">&nbsp;</td>
                 </tr>

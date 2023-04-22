@@ -115,12 +115,12 @@
                     <table>
                         <tr>
                             <td class="title">
-                                <img src="https://dashboard.cardy4u.com/public/assets/img/illustrations/logo.png"
+                                <img src="https://enkwave.com/wp-content/uploads/2023/03/logo.png"
                                     style="width: 100%; max-width: 200px" />
                             </td>
 
                             <td>
-                                Recepit #: }<br /> Date: {{ $data1["date"] }}<br /> Status:
+                                Recepit #: {{$recepit}}<br /> Date: {{ $data1["date"] }}<br /> Status:
                                 PAID<br />
                             </td>
                         </tr>
@@ -133,7 +133,8 @@
                     <table>
                         <tr>
                             <td>
-                                CUSTOMER INFORMATION<br /> Name: {{ $data1["f_name"] }} {{ $data1["l_name"] }}<br /> Address:
+                                CUSTOMER INFORMATION<br /> Name: {{ $data1["f_name"] }} {{ $data1["l_name"] }}<br />
+                                Address:
                                 {{ $data1["eletric_address"] }}
                             </td>
                         </tr>
@@ -157,7 +158,7 @@
             </tr>
         </table>
         <div class="footer">
-            <p>Thanks for choosing  ENKPAY</p>
+            <p>Thanks for choosing ENKPAY</p>
             <p>www.enkwave.com/enkpay</p>
         </div>
     </div>

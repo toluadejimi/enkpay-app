@@ -82,26 +82,6 @@ class AirtimeController extends Controller
 
             if ($amount > $user_wallet_banlance) {
 
-                if (!empty(user_email())) {
-
-                    $data = array(
-                        'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
-                        'subject' => "Low Balance",
-                        'toreceiver' => user_email(),
-                        'first_name' => first_name(),
-                        'amount' => $amount,
-                        'phone' => $phone,
-                        'balance' => $user_wallet_banlance,
-
-                    );
-
-                    Mail::send('emails.notify.lowbalalce', ["data1" => $data], function ($message) use ($data) {
-                        $message->from($data['fromsender']);
-                        $message->to($data['toreceiver']);
-                        $message->subject($data['subject']);
-                    });
-                }
-
                 return response()->json([
 
                     'status' => $this->failed,
