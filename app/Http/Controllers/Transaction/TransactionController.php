@@ -779,7 +779,7 @@ class TransactionController extends Controller
             $receiver_id = User::where('phone', $phone)->first()->id ?? null;
             $receiver_email = User::where('phone', $phone)->first()->email ?? null;
             $receiver_f_name = User::where('phone', $phone)->first()->first_name ?? null;
-            $receiver_l_name = User::where('phone', $phone)->first()->first_name ?? null;
+            $receiver_l_name = User::where('phone', $phone)->first()->last_name ?? null;
             $receiver_status = User::where('phone', $phone)->first()->status ?? null;
             $receiver_full_name = $receiver_f_name . "  " . $receiver_l_name;
 

@@ -43,7 +43,7 @@
 <table class="m_-5773299331375091765wrapper" style="table-layout: fixed;" role="module" border="0" width="100%" cellspacing="0" cellpadding="0">
 <tbody>
 <tr>
-<td style="font-size: 6px; line-height: 10px; padding: 16px 0px 0px 0px;" align="center" valign="top"><img class="m_-5773299331375091765max-width CToWUd" style="display: block; color: #000000; text-decoration: none; font-family: Helvetica,arial,sans-serif; font-size: 16px;" src="https://enkwave.com/wp-content/uploads/2023/03/logo.png" width="259" height="51" border="0" data-bit="iit" /></td>
+    <td style="font-size: 6px; line-height: 10px; padding: 16px 0px 0px 0px;" align="center" valign="top"><img class="m_-5773299331375091765max-width CToWUd" style="color: #000000; text-decoration: none; font-family: Helvetica, arial, sans-serif; font-size: 16px; display: block; margin-left: auto; margin-right: auto;" src="https://enkwave.com/wp-content/uploads/2023/03/logo.png" width="233" height="46" border="0" data-bit="iit" /></td>
 </tr>
 </tbody>
 </table>
@@ -54,7 +54,7 @@
 <h1 style="text-align: center;"><span style="font-size: 15px;"><strong>HI {{$data1["first_name"]}}</strong></span></h1>
 <h1 style="text-align: center;"><span style="font-size: 15px;"><strong>Debit Notification</strong></span></h1>
 <h1 style="text-align: center;"><span style="font-size: 30px;"><strong>NGN {{ number_format($data1["amount"], 2) }}</strong></span></h1>
-<p style="text-align: center;">We like to inform you that NGN {{ number_format($data1["amount"], 2) }} has left your account to {{ $data1["receiver"]}} to your main wallet.</p>
+<p style="text-align: center;">We like to inform you that NGN {{ number_format($data1["amount"], 2) }} has left your account to {{ $data1["receiver"]}}.</p>
 </td>
 </tr>
 </tbody>
