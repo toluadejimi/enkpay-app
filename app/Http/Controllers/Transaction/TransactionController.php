@@ -1065,19 +1065,19 @@ class TransactionController extends Controller
     public function cash_out_webhook(Request $request)
     {
 
+
+
         $header = $request->header('errand-pay-header');
         $ip = $request->ip();
 
-        $parametersJson = json_encode($request->all());
-        $headers = json_encode($request->headers->all());
-        $ip = $request->ip();
 
-        $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
-        send_notification($result);
+
 
         //pos transaction
 
         if (($request->ServiceCode == 'CO1') || ($request->ServiceCode == 'PU1')) {
+
+
 
             $StatusCode = $request->StatusCode;
             $StatusDescription = $request->StatusDescription;
@@ -1094,7 +1094,10 @@ class TransactionController extends Controller
             $TerminalID = $request->AdditionalDetails['TerminalID'];
             $MaskedPAN = $request->AdditionalDetails['MaskedPAN'];
 
-            $eip = env('EIP');
+
+
+            //$eip = env('EIP');
+            $eip = '127.0.0.1';
 
             $trans_id = "ENK-" . random_int(100000, 999999);
 
@@ -1104,6 +1107,7 @@ class TransactionController extends Controller
                 ->first()->amount;
 
             if ($eip == $ip) {
+
 
                 $main_wallet = User::where('serial_no', $SerialNumber)
                     ->first()->main_wallet ?? null;
@@ -1122,6 +1126,7 @@ class TransactionController extends Controller
                     ], 500);
 
                 }
+
 
                 //Both Commission
                 $amount1 = $comission / 100;
@@ -1198,16 +1203,13 @@ class TransactionController extends Controller
 
                 }
 
+
+                $ip = $request->ip();
                 $amount4 = number_format($removed_comission, 2);
                 $message = "NGN $amount4 enter pool Account by $user_id using Card on Terminal";
-                send_notification($message);
-
-                $parametersJson = json_encode($request->all());
-                $headers = json_encode($request->headers->all());
-                $ip = $request->ip();
-
-                $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
+                $result = "Service========>" . $ServiceCode ."\n\nRefrence========>" . $TransactionReference . "\n\nSerial No========>" . $SerialNumber ."\n\nDate & Time========>" . $TransactionDate.  " | " . $TransactionTime . "\n\nMessage========> " . $message . "\n\nIP========> " . $ip;
                 send_notification($result);
+
 
                 return response()->json([
                     'status' => true,
@@ -1260,7 +1262,7 @@ class TransactionController extends Controller
             $trans_id = "ENK-" . random_int(100000, 999999);
 
             $terminal_charge = Charge::where('title', 'terminal_charge')
-                ->first()->amount;
+            ->first()->amount;
 
             if ($StatusCode == 00) {
 
@@ -1313,9 +1315,14 @@ class TransactionController extends Controller
 
                 }
 
-                $amount4 = number_format($Amount, 2);
-                $message = "NGN $amount4 left pool Account by $user_id";
-                send_notification($message);
+                $ip = $request->ip();
+                $amount4 = number_format($removed_comission, 2);
+                $message = "NGN $Amount left pool account by $user_id for EPvas Transaction | EP VAS | $BillService | $BillCategory | $Beneficiary  ";
+                $result = "Service========>" . $ServiceCode ."\n\nRefrence========>" . $TransactionReference . "\n\nSerial No========>" . $SerialNumber ."\n\nDate & Time========>" . $TransactionDate.  " | " . $TransactionTime . "\n\nMessage========> " . $message . "\n\nIP========> " . $ip;
+                send_notification($result);
+
+
+
 
                 return response()->json([
                     'status' => true,
