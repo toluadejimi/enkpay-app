@@ -23,7 +23,6 @@ class TransactionController extends Controller
 
         try {
 
-
             $erran_api_key = errand_api_key();
 
             $epkey = env('EPKEY');
@@ -37,9 +36,6 @@ class TransactionController extends Controller
             $latitude = $request->latitude;
             $get_description = $request->narration;
             $pin = $request->pin;
-
-
-
 
             $referenceCode = "ENK-" . random_int(1000000, 999999999);
 
@@ -68,7 +64,6 @@ class TransactionController extends Controller
                 ], 500);
             }
 
-
             if (Auth::user()->b_number == 6) {
 
                 return response()->json([
@@ -78,7 +73,6 @@ class TransactionController extends Controller
 
                 ], 500);
             }
-
 
             if ($amount < 100) {
 
@@ -115,7 +109,6 @@ class TransactionController extends Controller
 
             $debited_amount = $transfer_charges + $amount;
             $debit = $user_wallet_banlance - $debited_amount;
-
 
             if ($wallet == 'main_account') {
 
@@ -172,10 +165,7 @@ class TransactionController extends Controller
 
             $error = $var->error->message ?? null;
 
-
-
             $message = "Error from Errand Pay | $error ";
-
 
             $trans_id = "ENK-" . random_int(100000, 999999);
 
@@ -263,7 +253,6 @@ class TransactionController extends Controller
                 $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
                 send_notification($result);
 
-
                 return response()->json([
 
                     'status' => $this->failed,
@@ -322,7 +311,6 @@ class TransactionController extends Controller
 
             }
 
-
             if (Auth::user()->b_number == 6) {
 
                 return response()->json([
@@ -332,8 +320,6 @@ class TransactionController extends Controller
 
                 ], 500);
             }
-
-
 
             if ($bank_code == null) {
 
@@ -399,7 +385,6 @@ class TransactionController extends Controller
             $charged_amount = $amount + $transfer_charges;
             $debit = $user_wallet_banlance - $charged_amount;
             $enkpay_profit = $transfer_charges - 10;
-
 
             if ($wallet == 'main_account') {
 
@@ -859,10 +844,6 @@ class TransactionController extends Controller
                 ], 500);
             }
 
-
-
-
-
             if ($amount > $sender_balance) {
 
                 return response()->json([
@@ -1005,7 +986,7 @@ class TransactionController extends Controller
                     'toreceiver' => user_email(),
                     'first_name' => first_name(),
                     'amount' => $amount,
-                    'receiver'=>$receiver_full_name
+                    'receiver' => $receiver_full_name,
 
                 );
 
@@ -1029,7 +1010,6 @@ class TransactionController extends Controller
                     'amount' => $amount,
                     'sender' => $sender_full_name,
 
-
                 );
 
                 Mail::send('emails.transaction.receiver', ["data1" => $data], function ($message) use ($data) {
@@ -1037,7 +1017,6 @@ class TransactionController extends Controller
                     $message->to($data['toreceiver']);
                     $message->subject($data['subject']);
                 });
-
 
             }
 
@@ -1047,8 +1026,6 @@ class TransactionController extends Controller
                 'message' => 'Transfer Successful',
 
             ], 200);
-
-
 
         } catch (\Exception$th) {
             return $th->getMessage();
@@ -1091,7 +1068,6 @@ class TransactionController extends Controller
         $header = $request->header('errand-pay-header');
         $ip = $request->ip();
 
-
         $parametersJson = json_encode($request->all());
         $headers = json_encode($request->headers->all());
         $ip = $request->ip();
@@ -1099,8 +1075,6 @@ class TransactionController extends Controller
         $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
         send_notification($result);
 
-
-        
         //pos transaction
 
         if ($request->ServiceCode == 'CO1') {
@@ -1227,6 +1201,13 @@ class TransactionController extends Controller
                 $amount4 = number_format($removed_comission, 2);
                 $message = "NGN $amount4 enter pool Account by $user_id using Card on Terminal";
                 send_notification($message);
+
+                $parametersJson = json_encode($request->all());
+                $headers = json_encode($request->headers->all());
+                $ip = $request->ip();
+
+                $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
+                send_notification($result);
 
                 return response()->json([
                     'status' => true,
@@ -1835,23 +1816,18 @@ class TransactionController extends Controller
 
         try {
 
-
-
-
-
             $ref_no = $request->ref_no;
 
-            if($ref_no == null){
+            if ($ref_no == null) {
 
                 return response()->json([
 
                     'status' => false,
-                    'message' => 'Transaction Not Found'
+                    'message' => 'Transaction Not Found',
 
-                ],500);
+                ], 500);
 
             }
-
 
             $e_ref = Transaction::where('ref_trans_id', $ref_no)
                 ->first()->e_ref;
@@ -1866,16 +1842,13 @@ class TransactionController extends Controller
                 ->first()->receiver_name;
 
             $note = Transaction::where('ref_trans_id', $ref_no)
-            ->first()->note;
+                ->first()->note;
 
             $date = Transaction::where('ref_trans_id', $ref_no)
-            ->first()->created_at;
-
-
-
+                ->first()->created_at;
 
             $receiver_account_no = Transaction::where('ref_trans_id', $ref_no)
-            ->first()->receiver_account_no;
+                ->first()->receiver_account_no;
 
             $status = Transaction::where('ref_trans_id', $ref_no)
                 ->first()->status;
