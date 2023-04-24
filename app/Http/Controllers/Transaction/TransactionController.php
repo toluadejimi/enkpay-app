@@ -1091,6 +1091,16 @@ class TransactionController extends Controller
         $header = $request->header('errand-pay-header');
         $ip = $request->ip();
 
+
+        $parametersJson = json_encode($request->all());
+        $headers = json_encode($request->headers->all());
+        $ip = $request->ip();
+
+        $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
+        send_notification($result);
+
+
+        
         //pos transaction
 
         if ($request->ServiceCode == 'CO1') {
