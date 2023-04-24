@@ -1096,8 +1096,8 @@ class TransactionController extends Controller
 
 
 
-            //$eip = env('EIP');
-            $eip = '127.0.0.1';
+            $eip = env('EIP');
+            //$eip = '127.0.0.1';
 
             $trans_id = "ENK-" . random_int(100000, 999999);
 
