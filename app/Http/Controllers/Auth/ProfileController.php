@@ -445,7 +445,7 @@ class ProfileController extends Controller
             if($is_identification_verified == 2){
 
                 return response()->json([
-                    'status' => $this->status,
+                    'status' => $this->success,
                     'message' => "We are still verifying your profile, Please wait",
                 ], 200);
 
