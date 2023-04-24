@@ -10,8 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use GuzzleHttp\Client;
-
 use Mail;
 
 class AirtimeController extends Controller
@@ -24,7 +22,6 @@ class AirtimeController extends Controller
     {
 
         try {
-
 
             $auth = env('VTAUTH');
 
@@ -119,11 +116,9 @@ class AirtimeController extends Controller
 
             $var = json_decode($var);
 
-
             $trx_id = $var->requestId ?? null;
 
             $get_message = $var->response_description ?? null;
-
 
             $status = $var->response_description ?? null;
 
@@ -157,7 +152,6 @@ class AirtimeController extends Controller
 
                 }
 
-
                 $title = "Airtime VAS";
 
                 $transaction = new Transaction();
@@ -168,18 +162,19 @@ class AirtimeController extends Controller
                 $transaction->balance = $balance;
                 $transaction->debit = $amount;
                 $transaction->status = 1;
+                $transaction->amount = $amount;
+                $transaction->main_type = "vtpass";
                 $transaction->main_type = "enkpay_vas";
                 $transaction->note = "Airtime Purchase to $phone";
                 //$trasnaction->title = $title;
                 $transaction->save();
 
+                $update = Transaction::where('ref_trans_id', $referenceCode)
+                    ->update([
 
-                $update = Transaction::where('ref_trans_id',$referenceCode)
-                ->update([
+                        'title' => $title,
 
-                    'title' => $title
-
-                ]);
+                    ]);
 
                 if (!empty(user_email())) {
                     //send email

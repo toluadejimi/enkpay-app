@@ -10,8 +10,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
-use GuzzleHttp\Client;
-
 use Mail;
 
 class DataController extends Controller
@@ -87,7 +85,6 @@ class DataController extends Controller
 
             $referenceCode = "ENK-" . random_int(1000000, 999999999);
 
-
             $auth = env('VTAUTH');
 
             $request_id = date('YmdHis') . Str::random(4);
@@ -123,8 +120,6 @@ class DataController extends Controller
 
                 ], 500);
             }
-
-
 
             if (Auth::user()->b_number == 6) {
 
@@ -205,7 +200,6 @@ class DataController extends Controller
 
             $status = $var->response_description ?? null;
 
-
             if ($status == 'TRANSACTION SUCCESSFUL') {
 
                 $debit = $user_wallet_banlance - $amount;
@@ -234,8 +228,6 @@ class DataController extends Controller
 
                 }
 
-
-
                 $transaction = new Transaction();
                 $transaction->user_id = Auth::id();
                 $transaction->ref_trans_id = $referenceCode;
@@ -243,28 +235,21 @@ class DataController extends Controller
                 $transaction->type = "vas";
                 $transaction->balance = $balance;
                 $transaction->debit = $amount;
+                $transaction->amount = $amount;
+                $transaction->main_type = "vtpass";
                 $transaction->status = 1;
-                $transaction->note = "Data Bundle Purchase to $phone";
+                $transaction->note = "Data Bundle| $variation_code | $phone";
                 $transaction->save();
-
-
 
                 $title = "Data VAS";
 
-                $update = Transaction::where('ref_trans_id',$referenceCode)
-                ->update([
+                $update = Transaction::where('ref_trans_id', $referenceCode)
+                    ->update([
 
-                    'title' => $title,
-                    'main_type' => "enkpay_vas"
+                        'title' => $title,
+                        'main_type' => "enkpay_vas",
 
-                ]);
-
-
-
-
-
-
-
+                    ]);
 
                 if (!empty(user_email())) {
                     //send email

@@ -132,25 +132,6 @@ class CableController extends Controller
 
             if ($amount > $user_wallet_banlance) {
 
-                if (!empty(user_email())) {
-
-                    $data = array(
-                        'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
-                        'subject' => "Low Balance",
-                        'toreceiver' => user_email(),
-                        'first_name' => first_name(),
-                        'amount' => $amount,
-                        'phone' => $phone,
-                        'balance' => $user_wallet_banlance,
-
-                    );
-
-                    Mail::send('emails.notify.lowbalalce', ["data1" => $data], function ($message) use ($data) {
-                        $message->from($data['fromsender']);
-                        $message->to($data['toreceiver']);
-                        $message->subject($data['subject']);
-                    });
-                }
 
                 return response()->json([
 
@@ -161,35 +142,35 @@ class CableController extends Controller
 
             }
 
-            // $curl = curl_init();
+            $curl = curl_init();
 
-            // curl_setopt_array($curl, array(
-            //     CURLOPT_URL => 'https://vtpass.com/api/pay',
-            //     CURLOPT_RETURNTRANSFER => true,
-            //     CURLOPT_ENCODING => '',
-            //     CURLOPT_MAXREDIRS => 10,
-            //     CURLOPT_TIMEOUT => 0,
-            //     CURLOPT_FOLLOWLOCATION => true,
-            //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            //     CURLOPT_CUSTOMREQUEST => 'POST',
-            //     CURLOPT_POSTFIELDS => array(
-            //         'request_id' => $request_id,
-            //         'variation_code' => $variation_code,
-            //         'serviceID' => $serviceid,
-            //         'amount' => $amount,
-            //         'biller_code' => $biller_code,
-            //         'phone' => $phone,
-            //     ),
-            //     CURLOPT_HTTPHEADER => array(
-            //         "Authorization: Basic $auth=",
-            //         'Cookie: laravel_session=eyJpdiI6IlBkTGc5emRPMmhyQVwvb096YkVKV2RnPT0iLCJ2YWx1ZSI6IkNvSytPVTV5TW52K2tBRlp1R2pqaUpnRDk5YnFRbEhuTHhaNktFcnBhMFRHTlNzRWIrejJxT05kM1wvM1hEYktPT2JKT2dJWHQzdFVaYnZrRytwZ2NmQT09IiwibWFjIjoiZWM5ZjI3NzBmZTBmOTZmZDg3ZTUxMDBjODYxMzQ3OTkxN2M4YTAxNjNmMWY2YjAxZTIzNmNmNWNhOWExNzJmOCJ9',
-            //     ),
-            // ));
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://vtpass.com/api/pay',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => array(
+                    'request_id' => $request_id,
+                    'variation_code' => $variation_code,
+                    'serviceID' => $serviceid,
+                    'amount' => $amount,
+                    'biller_code' => $biller_code,
+                    'phone' => $phone,
+                ),
+                CURLOPT_HTTPHEADER => array(
+                    "Authorization: Basic $auth=",
+                    'Cookie: laravel_session=eyJpdiI6IlBkTGc5emRPMmhyQVwvb096YkVKV2RnPT0iLCJ2YWx1ZSI6IkNvSytPVTV5TW52K2tBRlp1R2pqaUpnRDk5YnFRbEhuTHhaNktFcnBhMFRHTlNzRWIrejJxT05kM1wvM1hEYktPT2JKT2dJWHQzdFVaYnZrRytwZ2NmQT09IiwibWFjIjoiZWM5ZjI3NzBmZTBmOTZmZDg3ZTUxMDBjODYxMzQ3OTkxN2M4YTAxNjNmMWY2YjAxZTIzNmNmNWNhOWExNzJmOCJ9',
+                ),
+            ));
 
-            // $var = curl_exec($curl);
-            // curl_close($curl);
+            $var = curl_exec($curl);
+            curl_close($curl);
 
-            // $var = json_decode($var);
+            $var = json_decode($var);
 
             $trx_id = $var->requestId ?? null;
 
@@ -197,7 +178,7 @@ class CableController extends Controller
 
             $message = "Error Mesage from VAS DATA BUNDLE - $get_message";
 
-            $status = "TRANSACTION SUCCESSFUL";// $var->response_description ?? null;
+            $status = $var->response_description ?? null;
 
             $charge = Charge::where('title', 'eletricity_charges')
             ->first()->amount;
@@ -244,8 +225,10 @@ class CableController extends Controller
                 $transaction->type = "vas";
                 $transaction->balance = $balance;
                 $transaction->debit = $amount;
+                $transaction->amount = $amount;
+                $transaction->main_type = "vtpass";
                 $transaction->status = 1;
-                $transaction->note = "Data Bundle Purchase to $phone";
+                $transaction->note = "Cable Subscription | $variation_code | $biller_code | $amount";
                 $transaction->save();
 
 

@@ -136,7 +136,6 @@ class PowerController extends Controller
 
             $referenceCode = "ENK-" . random_int(1000000, 999999999);
 
-
             $serviceid = User::where('id', Auth::id())
                 ->first()->eletric_company;
 
@@ -189,8 +188,6 @@ class PowerController extends Controller
                 ], 500);
             }
 
-
-
             if (Auth::user()->b_number == 6) {
 
                 return response()->json([
@@ -202,7 +199,6 @@ class PowerController extends Controller
             }
 
             if ($amount > $user_wallet_banlance) {
-
 
                 return response()->json([
 
@@ -268,7 +264,6 @@ class PowerController extends Controller
 
                 $title = "Eletric VAS";
 
-
                 $transaction = new Transaction();
                 $transaction->ref_trans_id = $referenceCode;
                 $transaction->user_id = Auth::id();
@@ -278,21 +273,18 @@ class PowerController extends Controller
                 $transaction->balance = $debit;
                 $transaction->e_charges = $eletricity_charges;
                 $transaction->amount = $amount;
+                $transaction->main_type = "vtpass";
                 $transaction->type = 'vas';
                 $transaction->note = "Token Purchase | $token";
                 $transaction->save();
 
+                $update = Transaction::where('ref_trans_id', $referenceCode)
+                    ->update([
 
-                $update = Transaction::where('ref_trans_id',$referenceCode)
-                ->update([
+                        'title' => $title,
+                        'main_type' => "enkpay_vas",
 
-                    'title' => $title,
-                    'main_type' => "enkpay_vas"
-
-                ]);
-
-
-
+                    ]);
 
                 $email = User::where('id', Auth::id())
                     ->first()->email;
