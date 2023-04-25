@@ -851,6 +851,22 @@ class RegisterationController extends Controller
                 ], 500);
             }
 
+            $check_phone = User::where('phone', $request->phone_no)
+            ->first()->phone ?? null;
+
+
+            $check_email = User::where('email', $request->email)->first()->email ?? null;
+            $check_status = User::where('phone', $request->phone_no)->first()->status ?? null;
+
+            if($request->phone_no == $check_phone){
+
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => 'Phone Number has been taken',
+                ], 500);
+
+            }
+
             $email = $request->email;
             $devide_id = $request->devide_id;
             $phone_no = $request->phone_no;
@@ -869,9 +885,9 @@ class RegisterationController extends Controller
             $get_email = $email ?? null;
 
 
-            $check_phone = User::where('phone', $phone_no)->first()->phone ?? null;
-            $check_email = User::where('email', $email)->first()->phone ?? null;
-            $check_status = User::where('phone', $phone_no)->first()->status ?? null;
+
+
+
 
 
 
@@ -880,7 +896,7 @@ class RegisterationController extends Controller
                 return response()->json([
                     'status' => $this->failed,
                     'message' => 'Please Login with your phone number or email',
-                ], 200);
+                ], 500);
 
             }
 
@@ -889,6 +905,7 @@ class RegisterationController extends Controller
 
                 $create = new User();
                 $create->first_name = $first_name;
+                $create->phone = $phone_no;
                 $create->last_name = $last_name;
                 $create->dob = $dob;
                 $create->gender = $gender;
