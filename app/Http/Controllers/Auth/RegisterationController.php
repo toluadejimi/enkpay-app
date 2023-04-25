@@ -886,10 +886,22 @@ class RegisterationController extends Controller
 
             if($check_phone == null && $check_email == null ){
 
-                User::create($request->all());
 
-                $update_phone = User::where('phone', $phone_no)
-                ->update (['is_phone_verified' => 1]);
+                $create = new User();
+                $create->first_name = $first_name;
+                $create->last_name = $last_name;
+                $create->dob = $dob;
+                $create->gender = $gender;
+                $create->email = $email;
+                $create->street = $street;
+                $create->city = $city;
+                $create->state = $state;
+                $create->lga = $lga;
+                $create->is_phone_verified = 1;
+                $create->device_id = $devide_id;
+                $create->password = bcrypt($password);
+                $create->pin = bcrypt($pin);
+                $create->save();
 
                 return response()->json([
                     'status' => $this->success,
