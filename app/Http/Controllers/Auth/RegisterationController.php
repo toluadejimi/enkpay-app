@@ -830,7 +830,7 @@ class RegisterationController extends Controller
     public function register(Request $request)
     {
 
-        try {
+        // try {
 
             $validator = Validator::make($request->all(), [
                 'first_name' => 'required|string|max:50',
@@ -871,7 +871,7 @@ class RegisterationController extends Controller
 
             $check_phone = User::where('phone', $phone_no)->first()->phone ?? null;
             $check_email = User::where('email', $email)->first()->phone ?? null;
-            $check_status = User::where('phone', $phone)->first()->status ?? null;
+            $check_status = User::where('phone', $phone_no)->first()->status ?? null;
 
 
 
@@ -879,7 +879,7 @@ class RegisterationController extends Controller
 
                 return response()->json([
                     'status' => $this->failed,
-                    'message' => 'Please Login with your phone or email',
+                    'message' => 'Please Login with your phone number or email',
                 ], 200);
 
             }
@@ -888,7 +888,7 @@ class RegisterationController extends Controller
 
                 User::create($request->all());
 
-                $update_phone = User::where('phone', $phone)
+                $update_phone = User::where('phone', $phone_no)
                 ->update (['is_phone_verified' => 1]);
 
                 return response()->json([
@@ -955,9 +955,9 @@ class RegisterationController extends Controller
 
             }
 
-        } catch (\Exception$e) {
-            return $e->getMessage();
-        }
+        // } catch (\Exception$e) {
+        //     return $e->getMessage();
+        // }
 
     }
 
