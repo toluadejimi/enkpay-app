@@ -884,7 +884,7 @@ class RegisterationController extends Controller
 
             }
 
-            if($get_phone == null && $get_email == null ){
+            if($check_phone == null && $check_email == null ){
 
                 User::create($request->all());
 
