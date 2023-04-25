@@ -868,6 +868,36 @@ class RegisterationController extends Controller
             $get_phone = $phone_no ?? null;
             $get_email = $email ?? null;
 
+
+            $check_phone = User::where('phone', $phone_no)->first()->phone ?? null;
+            $check_email = User::where('email', $email)->first()->phone ?? null;
+            $check_status = User::where('phone', $phone)->first()->status ?? null;
+
+
+
+            if($check_status == "2"){
+
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => 'Please Login with your phone or email',
+                ], 200);
+
+            }
+
+            if($get_phone == null && $get_email == null ){
+
+                User::create($request->all());
+
+                $update_phone = User::where('phone', $phone)
+                ->update (['is_phone_verified' => 1]);
+
+                return response()->json([
+                    'status' => $this->success,
+                    'message' => 'Your account has been successfully created',
+                ], 200);
+
+            }
+
             if ($get_phone !== null) {
 
                 $update = User::where('email', $email)
