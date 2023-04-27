@@ -886,11 +886,6 @@ class RegisterationController extends Controller
 
 
 
-
-
-
-
-
             if($check_status == "2"){
 
                 return response()->json([

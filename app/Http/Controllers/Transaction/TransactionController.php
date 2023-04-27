@@ -1494,7 +1494,7 @@ class TransactionController extends Controller
                 $trasnaction->title = "EP Transfer";
                 $trasnaction->note = "EP Transfer | $DestinationAccountName | $DestinationBankName ";
                 $trasnaction->fee = $Fee;
-                $trasnaction->balance = $debit_amount;
+                $trasnaction->balance = $debit_wallet;
                 $trasnaction->main_type = "EPvas";
                 $trasnaction->enkPay_Cashout_profit = $enkpayprofit;
                 $trasnaction->receiver_name = $DestinationAccountName;
