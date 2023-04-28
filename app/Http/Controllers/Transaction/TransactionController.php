@@ -1069,17 +1069,24 @@ class TransactionController extends Controller
     public function cash_out_webhook(Request $request)
     {
 
+        $parametersJson = json_encode($request->all());
+        $headers = json_encode($request->headers->all());
+        $message = 'Upper Layer';
+        $ip = $request->ip();
+
+        $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
+        send_notification($result);
+
+
 
 
         $header = $request->header('errand-pay-header');
         $ip = $request->ip();
 
 
-        //pos transaction co1
+        //pos transaction pu1
 
         if ($request->ServiceCode == 'PU1') {
-
-
 
             $StatusCode = $request->StatusCode;
             $StatusDescription = $request->StatusDescription;
@@ -1095,8 +1102,6 @@ class TransactionController extends Controller
             $PostingType = $request->PostingType;
             $TerminalID = $request->AdditionalDetails['TerminalID'];
             $MaskedPAN = $request->AdditionalDetails['MaskedPAN'];
-
-
 
             $eip = env('EIP');
             //$eip = '127.0.0.1';
