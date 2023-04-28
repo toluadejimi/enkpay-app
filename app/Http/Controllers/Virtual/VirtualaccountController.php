@@ -10,6 +10,9 @@ use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Mail;
+use DateTime;
+use DateTimeZone;
+
 
 class VirtualaccountController extends Controller
 {
@@ -26,19 +29,17 @@ class VirtualaccountController extends Controller
             $errand_user_id = errand_id();
             $bvn = user_bvn() ?? null;
 
-            if(Auth::user()->b_name == null){
+            if (Auth::user()->b_name == null) {
                 $name = first_name() . " " . last_name();
-            }else{
+            } else {
                 $name = Auth::user()->b_name;
             }
 
-            if(Auth::user()->b_phone == null){
+            if (Auth::user()->b_phone == null) {
                 $phone = Auth::user()->phone;
-            }else{
+            } else {
                 $phone = Auth::user()->b_phone;
             }
-
-
 
             if (user_status() == 0) {
 
@@ -67,9 +68,6 @@ class VirtualaccountController extends Controller
 
             }
 
-
-
-
             if (Auth::user()->v_account_number !== null) {
 
                 return response()->json([
@@ -87,7 +85,6 @@ class VirtualaccountController extends Controller
                 ], 500);
 
             }
-
 
             $curl = curl_init();
             $data = array(
@@ -123,8 +120,7 @@ class VirtualaccountController extends Controller
             curl_close($curl);
             $var = json_decode($var);
 
-
-            $status =  $var->code ?? null;
+            $status = $var->code ?? null;
             $acct_no = $var->data->accountNumber ?? null;
             $acct_name = $var->data->accountName ?? null;
 
@@ -133,11 +129,10 @@ class VirtualaccountController extends Controller
             $data1 = array([
                 'acct_no' => $acct_no,
                 'acct_name' => $acct_name,
-                'bank' => $bank
+                'bank' => $bank,
             ]);
 
             $data2 = (object) $data1[0];
-
 
             if ($status == 200) {
 
@@ -145,7 +140,6 @@ class VirtualaccountController extends Controller
                 $user->v_account_no = $acct_no;
                 $user->v_account_name = $acct_name;
                 $user->save();
-
 
                 $get_user = User::find(Auth::id())->first();
 
@@ -159,8 +153,6 @@ class VirtualaccountController extends Controller
 
             }
 
-
-
             return response()->json([
 
                 'status' => $this->failed,
@@ -168,7 +160,7 @@ class VirtualaccountController extends Controller
 
             ], 500);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -224,7 +216,7 @@ class VirtualaccountController extends Controller
 
             ], 500);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -339,11 +331,63 @@ class VirtualaccountController extends Controller
                         $trasnaction->status = 1;
                         $trasnaction->save();
 
+                        $errand_key = errand_api_key();
+
+                        $b_code = env('BCODE');
+
+                        $acct_no = $request->acct_no;
+
+                        $curl = curl_init();
+
+                        $datetime = new \DateTime( "now", new DateTimeZone( "Europe/Bucharest" ) );
+
+                        $date1 = $datetime->format('Y-m-d');
+                        $date2 = $datetime->format('H:i:s');
+
+
+
+
+
+                        $data = array(
+
+                            "Amount" => $Amount,
+                            "DateOfTransaction" => $date1."T".$date2."+"."01:00",
+                            "SenderAccountNumber" => $sender_account_no,
+                            "SenderAccountName" => $sender_name,
+                            "OriginatorBank" => $sender_bank,
+                            "RecipientAccountNumber" => $VirtualCustomerAccount,
+                            "RecipientAccountName" => $first_name . " " . $last_name,
+
+                        );
+
+                        $post_data = json_encode($data);
+
+
+                        curl_setopt_array($curl, array(
+                            CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/Webhook/Notify',
+                            CURLOPT_RETURNTRANSFER => true,
+                            CURLOPT_ENCODING => '',
+                            CURLOPT_MAXREDIRS => 10,
+                            CURLOPT_TIMEOUT => 0,
+                            CURLOPT_FOLLOWLOCATION => true,
+                            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                            CURLOPT_CUSTOMREQUEST => 'POST',
+                            CURLOPT_POSTFIELDS => $post_data,
+                            CURLOPT_HTTPHEADER => array(
+                                'epKey: ep_live_jFrIZdxqSzAdraLqbvhUfVYs',
+                                'Content-Type: application/json',
+                            ),
+                        ));
+
+                        $var = curl_exec($curl);
+                        curl_close($curl);
+                        $var = json_decode($var);
+
                     }
 
-                $message = "Your Pool account has been credited |  $message_amount | from Virtual account";
+                    $message = "Your Pool account has been credited |  $message_amount | from Virtual account";
 
-                  send_notification($message);
+                    send_notification($message);
 
                     //send to user
 
@@ -378,7 +422,7 @@ class VirtualaccountController extends Controller
                 'message' => 'Key not Authorized',
             ], 500);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -413,7 +457,7 @@ class VirtualaccountController extends Controller
 
             ], 500);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -453,12 +497,10 @@ class VirtualaccountController extends Controller
 
             dd($var, $errand_key, $acct_no);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
     }
-
-    
 
 }
