@@ -200,7 +200,7 @@ class TransactionController extends Controller
                 $trasnaction->receiver_name = $destinationAccountName;
                 $trasnaction->receiver_account_no = $destinationAccountNumber;
                 $trasnaction->balance = $debit;
-                $trasnaction->status = 0;
+                $trasnaction->status = 1;
                 $trasnaction->save();
 
                 if ($user_email !== null) {
