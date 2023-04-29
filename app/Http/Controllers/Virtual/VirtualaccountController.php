@@ -432,7 +432,7 @@ class VirtualaccountController extends Controller
 
                     }
 
-                    $message = "Your Pool account has been credited |  $message_amount | from Virtual account";
+                    $message = "Your Pool account has been credited |  $message_amount | from VFD Virtual account";
 
                     send_notification($message);
 
@@ -728,7 +728,7 @@ class VirtualaccountController extends Controller
                 curl_close($curl);
                 $var = json_decode($var);
 
-                $message = "Your Pool account has been credited |  $transactionAmount | from Virtual account";
+                $message = "Your Pool account has been credited |  $transactionAmount | from PROVIDUS Virtual account";
 
                 send_notification($message);
 
