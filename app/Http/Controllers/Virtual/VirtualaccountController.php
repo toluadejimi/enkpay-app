@@ -609,7 +609,7 @@ class VirtualaccountController extends Controller
 
                 $VirtualCustomerAccount = User::where('p_account_no', $accountNumber)->first()->v_account_no ?? null;
 
-                $get_session = Transaction::where('e_ref', $sessionId)->first()->e_ref ?? null;
+                $get_session = Transaction::where('e_ref', $settlementId)->first()->e_ref ?? null;
 
                 if ($main_wallet == null && $user_id == null) {
 
@@ -620,7 +620,7 @@ class VirtualaccountController extends Controller
 
                 }
 
-                if ($get_session == $sessionId) {
+                if ($get_session == $settlementId) {
 
                     return response()->json([
                         'requestSuccessful' => true,
@@ -656,7 +656,7 @@ class VirtualaccountController extends Controller
                 $trasnaction = new Transaction();
                 $trasnaction->user_id = $user_id;
                 $trasnaction->ref_trans_id = $trans_id;
-                $trasnaction->e_ref = $sessionId;
+                $trasnaction->e_ref = $settlementId;
                 $trasnaction->type = "PROVIDUS FUNDING";
                 $trasnaction->transaction_type = "VirtualFundWallet";
                 $trasnaction->title = "Wallet Funding";
@@ -668,6 +668,7 @@ class VirtualaccountController extends Controller
                 $trasnaction->e_charges = $deposit_charges;
                 $trasnaction->enkPay_Cashout_profit = 0;
                 $trasnaction->trx_date = $tranDateTime;
+                $trasnaction->p_sessionId = $sessionId;
                 $trasnaction->trx_time = $tranDateTime;
                 $trasnaction->sender_name = $sourceAccountName;
                 $trasnaction->sender_bank = $sourceBankName;
@@ -754,6 +755,15 @@ class VirtualaccountController extends Controller
                 ], 200);
 
             }
+
+            $parametersJson = json_encode($request->all());
+            $headers = json_encode($request->headers->all());
+            $message = 'Key not Authorized';
+            $ip = $request->ip();
+
+            $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
+            send_notification($result);
+
 
             return response()->json([
                 'requestSuccessful' => true,
