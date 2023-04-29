@@ -613,10 +613,14 @@ class VirtualaccountController extends Controller
 
                 if ($main_wallet == null && $user_id == null) {
 
-                    return response()->json([
-                        'status' => false,
-                        'message' => 'V Account not registred on Enkpay',
-                    ], 500);
+
+                        return response()->json([
+                            'requestSuccessful' => true,
+                            'sessionId' => $sessionId,
+                            'responseMessage' => 'V Account no registerd on ENKPAY',
+                            'responseCode' => "02",
+                        ], 200);
+
 
                 }
 
