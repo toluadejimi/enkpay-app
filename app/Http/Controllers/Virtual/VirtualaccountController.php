@@ -711,7 +711,6 @@ class VirtualaccountController extends Controller
                 curl_close($curl);
                 $var = json_decode($var);
 
-                dd($var, $post_data);
 
                 $message = "Your Pool account has been credited |  $transactionAmount | from Virtual account";
 
