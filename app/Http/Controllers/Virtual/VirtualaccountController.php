@@ -586,7 +586,6 @@ class VirtualaccountController extends Controller
 
             $verify2 = strtoupper($verify1);
 
-
             if ($verify2 == $header) {
 
                 $deposit_charges = Charge::where('id', 2)->first()->amount;
@@ -610,12 +609,25 @@ class VirtualaccountController extends Controller
 
                 $VirtualCustomerAccount = User::where('p_account_no', $accountNumber)->first()->v_account_no ?? null;
 
+                $get_session = Transaction::where('e_ref', $sessionId)->first()->e_ref ?? null;
+
                 if ($main_wallet == null && $user_id == null) {
 
                     return response()->json([
                         'status' => false,
                         'message' => 'V Account not registred on Enkpay',
                     ], 500);
+
+                }
+
+                if ($get_session == $sessionId) {
+
+                    return response()->json([
+                        'requestSuccessful' => true,
+                        'sessionId' => $sessionId,
+                        'responseMessage' => 'duplicate transaction',
+                        'responseCode' => "01",
+                    ], 200);
 
                 }
 
@@ -711,7 +723,6 @@ class VirtualaccountController extends Controller
                 curl_close($curl);
                 $var = json_decode($var);
 
-
                 $message = "Your Pool account has been credited |  $transactionAmount | from Virtual account";
 
                 send_notification($message);
@@ -736,16 +747,20 @@ class VirtualaccountController extends Controller
                 }
 
                 return response()->json([
-                    'status' => true,
-                    'message' => 'Tranasaction Successsfull',
+                    'requestSuccessful' => true,
+                    'sessionId' => $sessionId,
+                    'responseMessage' => 'success',
+                    'responseCode' => "00",
                 ], 200);
 
             }
 
             return response()->json([
-                'status' => false,
-                'message' => 'Key not Authorized',
-            ], 500);
+                'requestSuccessful' => true,
+                'sessionId' => $sessionId,
+                'responseMessage' => 'Key not authorized',
+                'responseCode' => "02",
+            ], 200);
 
         } catch (\Exception $th) {
             return $th->getMessage();
