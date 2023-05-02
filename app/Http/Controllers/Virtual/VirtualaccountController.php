@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Virtual;
 
 use App\Http\Controllers\Controller;
 use App\Models\Charge;
+use App\Models\Terminal;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Models\VirtualAccount;
 use Auth;
 use DateTimeZone;
 use Illuminate\Http\Request;
@@ -124,28 +126,18 @@ class VirtualaccountController extends Controller
 
             $bank = "VFD MICROFINANCE BANK";
 
-            $data1 = array([
-                'acct_no' => $acct_no,
-                'acct_name' => $acct_name,
-                'bank' => $bank,
-            ]);
-
-            $data2 = (object) $data1[0];
-
             if ($status == 200) {
+
+                $create = new VirtualAccount();
+                $create->v_account_no = $acct_no;
+                $create->v_account_name = $acct_name;
+                $create->v_bank_name = $bank;
+                $create->save();
 
                 $user = User::find(Auth::id());
                 $user->v_account_no = $acct_no;
                 $user->v_account_name = $acct_name;
                 $user->save();
-            } else {
-
-                return response()->json([
-
-                    'status' => $this->failed,
-                    'message' => $var->error->message,
-
-                ], 500);
 
             }
 
@@ -183,9 +175,15 @@ class VirtualaccountController extends Controller
             $p_acct_no = $var->account_number ?? null;
             $p_acct_name = $var->account_name ?? null;
 
-            $bank = "PROVIDUS BANK";
+            $pbank = "PROVIDUS BANK";
 
             if ($status == 00) {
+
+                $create = new VirtualAccount();
+                $create->v_account_no = $p_acct_no;
+                $create->v_account_name = $p_acct_name;
+                $create->v_bank_name = $pbank;
+                $create->save();
 
                 $user = User::find(Auth::id());
                 $user->p_account_no = $p_acct_no;
@@ -310,22 +308,28 @@ class VirtualaccountController extends Controller
 
                     $deposit_charges = Charge::where('id', 2)->first()->amount;
 
-                    $main_wallet = User::where('v_account_no', $VirtualCustomerAccount)
+                    $user_id = VirtualAccount::where('v_account_no', $VirtualCustomerAccount)
+                        ->first()->user_id ?? null;
+
+                    $main_wallet = User::where('id', $user_id)
                         ->first()->main_wallet ?? null;
 
-                    $user_id = User::where('v_account_no', $VirtualCustomerAccount)
+                    $user_id = User::where('id', $user_id)
                         ->first()->id ?? null;
 
-                    $user_email = User::where('v_account_no', $VirtualCustomerAccount)
+                    $user_email = User::where('id', $user_id)
                         ->first()->email ?? null;
 
-                    $first_name = User::where('v_account_no', $VirtualCustomerAccount)
+                    $first_name = User::where('id', $user_id)
                         ->first()->first_name ?? null;
 
-                    $last_name = User::where('v_account_no', $VirtualCustomerAccount)
+                    $last_name = User::where('id', $user_id)
                         ->first()->last_name ?? null;
 
-                    $check_status = User::where('v_account_no', $VirtualCustomerAccount)->first()->status ?? null;
+                    $check_status = User::where('id', $user_id)->first()->status ?? null;
+
+                    $serial_no = Terminal::where('user_id', $user_id)
+                        ->first()->serial_no ?? null;
 
                     if ($main_wallet == null && $user_id == null) {
 
@@ -352,7 +356,7 @@ class VirtualaccountController extends Controller
                     //credit
                     $enkpay_debit = $Amount - $deposit_charges;
                     $updated_amount = $main_wallet + $enkpay_debit;
-                    $main_wallet = User::where('v_account_no', $VirtualCustomerAccount)
+                    $main_wallet = User::where('id', $user_id)
                         ->update([
                             'main_wallet' => $updated_amount,
                         ]);
@@ -378,6 +382,7 @@ class VirtualaccountController extends Controller
                         $trasnaction->trx_time = $TransactionTime;
                         $trasnaction->sender_name = $sender_name;
                         $trasnaction->sender_bank = $sender_bank;
+                        $trasnaction->serial_no = $serial_no;
                         $trasnaction->sender_account_no = $sender_account_no;
                         $trasnaction->balance = $updated_amount;
                         $trasnaction->status = 1;
@@ -586,41 +591,47 @@ class VirtualaccountController extends Controller
 
             $verify2 = strtoupper($verify1);
 
+            //dd($key, $verify2, $verify1, $header);
+
             if ($verify2 == $header) {
 
                 $deposit_charges = Charge::where('id', 2)->first()->amount;
 
-                $main_wallet = User::where('p_account_no', $accountNumber)
+                $user_id = VirtualAccount::where('v_account_no', $accountNumber)
+                    ->first()->user_id ?? null;
+
+                $main_wallet = User::where('id', $user_id)
                     ->first()->main_wallet ?? null;
 
-                $user_id = User::where('p_account_no', $accountNumber)
+                $user_id = User::where('id', $user_id)
                     ->first()->id ?? null;
 
-                $user_email = User::where('p_account_no', $accountNumber)
+                $user_email = User::where('id', $user_id)
                     ->first()->email ?? null;
 
-                $first_name = User::where('p_account_no', $accountNumber)
+                $first_name = User::where('id', $user_id)
                     ->first()->first_name ?? null;
 
-                $last_name = User::where('p_account_no', $accountNumber)
+                $last_name = User::where('id', $user_id)
                     ->first()->last_name ?? null;
 
-                $check_status = User::where('p_account_no', $accountNumber)->first()->status ?? null;
+                $SerialNumber = Terminal::where('user_id', $user_id)
+                    ->first()->serial_no ?? null;
 
-                $VirtualCustomerAccount = User::where('p_account_no', $accountNumber)->first()->v_account_no ?? null;
+                $check_status = User::where('id', $user_id)->first()->status ?? null;
+
+                $VirtualCustomerAccount = User::where('v_account_no', $accountNumber)->first()->v_account_no ?? null;
 
                 $get_session = Transaction::where('e_ref', $settlementId)->first()->e_ref ?? null;
 
                 if ($main_wallet == null && $user_id == null) {
 
-
-                        return response()->json([
-                            'requestSuccessful' => true,
-                            'sessionId' => $sessionId,
-                            'responseMessage' => 'V Account no registerd on ENKPAY',
-                            'responseCode' => "02",
-                        ], 200);
-
+                    return response()->json([
+                        'requestSuccessful' => true,
+                        'sessionId' => $sessionId,
+                        'responseMessage' => 'V Account no registerd on ENKPAY',
+                        'responseCode' => "02",
+                    ], 200);
 
                 }
 
@@ -651,7 +662,7 @@ class VirtualaccountController extends Controller
                 //credit
                 // $enkpay_debit = $Amount - $deposit_charges;
                 $updated_amount = $main_wallet + $settledAmount;
-                $main_wallet = User::where('p_account_no', $accountNumber)
+                $main_wallet = User::where('id', $user_id)
                     ->update([
                         'main_wallet' => $updated_amount,
                     ]);
@@ -676,6 +687,8 @@ class VirtualaccountController extends Controller
                 $trasnaction->trx_time = $tranDateTime;
                 $trasnaction->sender_name = $sourceAccountName;
                 $trasnaction->sender_bank = $sourceBankName;
+                $trasnaction->sender_bank = $sourceBankName;
+                $trasnaction->serial_no = $SerialNumber;
                 $trasnaction->sender_account_no = $sourceAccountNumber;
                 $trasnaction->balance = $updated_amount;
                 $trasnaction->status = 1;
@@ -767,7 +780,6 @@ class VirtualaccountController extends Controller
 
             $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
             send_notification($result);
-
 
             return response()->json([
                 'requestSuccessful' => true,

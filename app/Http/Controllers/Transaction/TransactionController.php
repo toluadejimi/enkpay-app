@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Transaction;
 use App\Http\Controllers\Controller;
 use App\Models\Charge;
 use App\Models\ErrandKey;
+use App\Models\Terminal;
 use App\Models\Transaction;
 use App\Models\User;
 use Auth;
@@ -104,11 +105,6 @@ class TransactionController extends Controller
                 ], 500);
 
             }
-
-
-
-
-
 
             //Debit
             $debited_amount = $transfer_charges + $amount;
@@ -266,7 +262,7 @@ class TransactionController extends Controller
 
             }
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -534,7 +530,7 @@ class TransactionController extends Controller
 
             }
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -554,7 +550,7 @@ class TransactionController extends Controller
 
             ], 200);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -617,7 +613,7 @@ class TransactionController extends Controller
 
             }
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -640,7 +636,7 @@ class TransactionController extends Controller
 
             ], 200);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -706,7 +702,7 @@ class TransactionController extends Controller
 
             ], 500);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -746,7 +742,7 @@ class TransactionController extends Controller
                 'customer_name' => $customer_name,
             ], 200);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -1031,7 +1027,7 @@ class TransactionController extends Controller
 
             ], 200);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -1060,7 +1056,7 @@ class TransactionController extends Controller
                 ], 500);
             }
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -1069,11 +1065,8 @@ class TransactionController extends Controller
     public function cash_out_webhook(Request $request)
     {
 
-     
-
         $header = $request->header('errand-pay-header');
         $ip = $request->ip();
-
 
         //pos transaction pu1
 
@@ -1106,14 +1099,15 @@ class TransactionController extends Controller
 
             if ($eip == $ip) {
 
+                //Get user ID
+                $user_id = Terminal::where('serial_no', $SerialNumber)
+                    ->first()->user_id ?? null;
 
-                $main_wallet = User::where('serial_no', $SerialNumber)
+                //Main Wallet
+                $main_wallet = User::where('id', $user_id)
                     ->first()->main_wallet ?? null;
 
-                $user_id = User::where('serial_no', $SerialNumber)
-                    ->first()->id ?? null;
-
-                $type = User::where('serial_no', $SerialNumber)
+                $type = User::where('id', $user_id)
                     ->first()->type ?? null;
 
                 if ($main_wallet == null && $user_id == null) {
@@ -1124,7 +1118,6 @@ class TransactionController extends Controller
                     ], 500);
 
                 }
-
 
                 //Both Commission
                 $amount1 = $comission / 100;
@@ -1172,7 +1165,7 @@ class TransactionController extends Controller
 
                 $updated_amount = $main_wallet + $removed_comission;
 
-                $main_wallet = User::where('serial_no', $SerialNumber)
+                $main_wallet = User::where('id', $user_id)
                     ->update([
                         'main_wallet' => $updated_amount,
                     ]);
@@ -1201,13 +1194,11 @@ class TransactionController extends Controller
 
                 }
 
-
                 $ip = $request->ip();
                 $amount4 = number_format($removed_comission, 2);
                 $message = "NGN $amount4 enter pool Account by $user_id using Card on Terminal";
-                $result = "Service========>" . $ServiceCode ."\n\nRefrence========>" . $TransactionReference . "\n\nSerial No========>" . $SerialNumber ."\n\nDate & Time========>" . $TransactionDate.  " | " . $TransactionTime . "\n\nMessage========> " . $message . "\n\nIP========> " . $ip;
+                $result = "Service========>" . $ServiceCode . "\n\nRefrence========>" . $TransactionReference . "\n\nSerial No========>" . $SerialNumber . "\n\nDate & Time========>" . $TransactionDate . " | " . $TransactionTime . "\n\nMessage========> " . $message . "\n\nIP========> " . $ip;
                 send_notification($result);
-
 
                 return response()->json([
                     'status' => true,
@@ -1233,12 +1224,9 @@ class TransactionController extends Controller
 
         }
 
-
         //pos transaction co1
 
         if ($request->ServiceCode == 'CO1') {
-
-
 
             $StatusCode = $request->StatusCode;
             $StatusDescription = $request->StatusDescription;
@@ -1255,8 +1243,6 @@ class TransactionController extends Controller
             $TerminalID = $request->AdditionalDetails['TerminalID'];
             $MaskedPAN = $request->AdditionalDetails['MaskedPAN'];
 
-
-
             $eip = env('EIP');
             //$eip = '127.0.0.1';
 
@@ -1269,14 +1255,15 @@ class TransactionController extends Controller
 
             if ($eip == $ip) {
 
+                //Get user ID
+                $user_id = Terminal::where('serial_no', $SerialNumber)
+                    ->first()->user_id ?? null;
 
-                $main_wallet = User::where('serial_no', $SerialNumber)
+                //Main Wallet
+                $main_wallet = User::where('id', $user_id)
                     ->first()->main_wallet ?? null;
 
-                $user_id = User::where('serial_no', $SerialNumber)
-                    ->first()->id ?? null;
-
-                $type = User::where('serial_no', $SerialNumber)
+                $type = User::where('id', $user_id)
                     ->first()->type ?? null;
 
                 if ($main_wallet == null && $user_id == null) {
@@ -1287,7 +1274,6 @@ class TransactionController extends Controller
                     ], 500);
 
                 }
-
 
                 //Both Commission
                 $amount1 = $comission / 100;
@@ -1335,7 +1321,7 @@ class TransactionController extends Controller
 
                 $updated_amount = $main_wallet + $removed_comission;
 
-                $main_wallet = User::where('serial_no', $SerialNumber)
+                $main_wallet = User::where('id', $user_id)
                     ->update([
                         'main_wallet' => $updated_amount,
                     ]);
@@ -1364,13 +1350,11 @@ class TransactionController extends Controller
 
                 }
 
-
                 $ip = $request->ip();
                 $amount4 = number_format($removed_comission, 2);
                 $message = "NGN $amount4 enter pool Account by $user_id using Card on Terminal";
-                $result = "Service========>" . $ServiceCode ."\n\nRefrence========>" . $TransactionReference . "\n\nSerial No========>" . $SerialNumber ."\n\nDate & Time========>" . $TransactionDate.  " | " . $TransactionTime . "\n\nMessage========> " . $message . "\n\nIP========> " . $ip;
+                $result = "Service========>" . $ServiceCode . "\n\nRefrence========>" . $TransactionReference . "\n\nSerial No========>" . $SerialNumber . "\n\nDate & Time========>" . $TransactionDate . " | " . $TransactionTime . "\n\nMessage========> " . $message . "\n\nIP========> " . $ip;
                 send_notification($result);
-
 
                 return response()->json([
                     'status' => true,
@@ -1423,17 +1407,18 @@ class TransactionController extends Controller
             $trans_id = "ENK-" . random_int(100000, 999999);
 
             $terminal_charge = Charge::where('title', 'terminal_charge')
-            ->first()->amount;
+                ->first()->amount;
 
             if ($StatusCode == 00) {
 
-                $main_wallet = User::where('serial_no', $SerialNumber)
+                //Get user ID
+                $user_id = Terminal::where('serial_no', $SerialNumber)
+                    ->first()->user_id ?? null;
+
+                $main_wallet = User::where('user_id', $user_id)
                     ->first()->main_wallet ?? null;
 
-                $user_id = User::where('serial_no', $SerialNumber)
-                    ->first()->id ?? null;
-
-                $type = User::where('serial_no', $SerialNumber)
+                $type = User::where('user_id', $user_id)
                     ->first()->type ?? null;
 
                 if ($main_wallet == null && $user_id == null) {
@@ -1450,7 +1435,7 @@ class TransactionController extends Controller
 
                 $debit_wallet = $main_wallet - $debit_amount;
 
-                $main_wallet_update = User::where('serial_no', $SerialNumber)
+                $main_wallet_update = User::where('user_id', $user_id)
                     ->update([
                         'main_wallet' => $debit_wallet,
                     ]);
@@ -1470,6 +1455,7 @@ class TransactionController extends Controller
                     $trasnaction->fee = $Fee;
                     $trasnaction->enkPay_Cashout_profit = $terminal_charge;
                     $trasnaction->balance = $debit_wallet;
+                    $trasnaction->serial_no = $SerialNumber;
                     $trasnaction->main_type = "EPvas";
                     $trasnaction->status = 1;
                     $trasnaction->save();
@@ -1479,11 +1465,8 @@ class TransactionController extends Controller
                 $ip = $request->ip();
                 $amount4 = number_format($removed_comission, 2);
                 $message = "NGN $Amount left pool account by $user_id for EPvas Transaction | EP VAS | $BillService | $BillCategory | $Beneficiary  ";
-                $result = "Service========>" . $ServiceCode ."\n\nRefrence========>" . $TransactionReference . "\n\nSerial No========>" . $SerialNumber ."\n\nDate & Time========>" . $TransactionDate.  " | " . $TransactionTime . "\n\nMessage========> " . $message . "\n\nIP========> " . $ip;
+                $result = "Service========>" . $ServiceCode . "\n\nRefrence========>" . $TransactionReference . "\n\nSerial No========>" . $SerialNumber . "\n\nDate & Time========>" . $TransactionDate . " | " . $TransactionTime . "\n\nMessage========> " . $message . "\n\nIP========> " . $ip;
                 send_notification($result);
-
-
-
 
                 return response()->json([
                     'status' => true,
@@ -1528,13 +1511,14 @@ class TransactionController extends Controller
 
             if ($StatusCode == 00) {
 
-                $main_wallet = User::where('serial_no', $SerialNumber)
+                //Get user ID
+                $user_id = Terminal::where('serial_no', $SerialNumber)
+                    ->first()->user_id ?? null;
+
+                $main_wallet = User::where('user_id', $user_id)
                     ->first()->main_wallet ?? null;
 
-                $user_id = User::where('serial_no', $SerialNumber)
-                    ->first()->id ?? null;
-
-                $type = User::where('serial_no', $SerialNumber)
+                $type = User::where('user_id', $user_id)
                     ->first()->type ?? null;
 
                 if ($main_wallet == null && $user_id == null) {
@@ -1549,7 +1533,7 @@ class TransactionController extends Controller
                 //debit
                 $debit_wallet = $main_wallet - $Amount;
 
-                $main_wallet_update = User::where('serial_no', $SerialNumber)
+                $main_wallet_update = User::where('user_id', $user_id)
                     ->update([
                         'main_wallet' => $debit_wallet,
                     ]);
@@ -1564,6 +1548,7 @@ class TransactionController extends Controller
                     $trasnaction->transaction_type = $TransactionType;
                     $trasnaction->debit = $Amount;
                     $trasnaction->amount = $Amount;
+                    $trasnaction->serial_no = $SerialNumber;
                     $trasnaction->title = "EP Bills";
                     $trasnaction->note = "EP VAS | $BillService | $BillCategory | $Beneficiary ";
                     $trasnaction->fee = $Fee;
@@ -1609,16 +1594,14 @@ class TransactionController extends Controller
 
             $trans_id = "ENK-" . random_int(100000, 999999);
 
-            $transfer_fee = Charge::where('title', 'transfer_fee')
-                ->first()->amount;
+            //Get user ID
+            $user_id = Terminal::where('serial_no', $SerialNumber)
+                ->first()->user_id ?? null;
 
-            $main_wallet = User::where('serial_no', $SerialNumber)
+            $main_wallet = User::where('user_id', $user_id)
                 ->first()->main_wallet ?? null;
 
-            $user_id = User::where('serial_no', $SerialNumber)
-                ->first()->id ?? null;
-
-            $type = User::where('serial_no', $SerialNumber)
+            $type = User::where('user_id', $user_id)
                 ->first()->type ?? null;
 
             if ($main_wallet == null && $user_id == null) {
@@ -1657,6 +1640,7 @@ class TransactionController extends Controller
                 $trasnaction->fee = $Fee;
                 $trasnaction->balance = $debit_wallet;
                 $trasnaction->main_type = "EPvas";
+                $trasnaction->serial_no = $SerialNumber;
                 $trasnaction->enkPay_Cashout_profit = $enkpayprofit;
                 $trasnaction->receiver_name = $DestinationAccountName;
                 $trasnaction->receiver_account_no = $DestinationAccountNumber;
@@ -1690,7 +1674,7 @@ class TransactionController extends Controller
 
         //$IP = $_SERVER['SERVER_ADDR'];
 
-        $serial_number = $request->serial_number;
+        $SerialNumber = $request->serial_number;
         $amount = $request->amount;
         $pin = $request->pin;
         $transaction_type = $request->transaction_type;
@@ -1701,8 +1685,9 @@ class TransactionController extends Controller
 
         $trans_id = "ENK-" . random_int(100000, 999999);
 
-        $user_id = User::where('serial_no', $serial_number)
-            ->first()->id ?? null;
+        //Get user ID
+            $user_id = Terminal::where('serial_no', $SerialNumber)
+                ->first()->user_id ?? null;
 
         if ($user_id == null) {
 
@@ -1715,13 +1700,17 @@ class TransactionController extends Controller
 
         if ($transaction_type == 'inward') {
 
-            $status = User::where('serial_no', $serial_number)
-                ->first()->is_active;
+            //Get user ID
+            $user_id = Terminal::where('serial_no', $SerialNumber)
+                ->first()->user_id ?? null;
 
-            $balance = User::where('serial_no', $serial_number)
+            $status = Terminal::where('serial_no', $SerialNumber)
+                ->first()->transfer_status;
+
+            $balance = User::where('id', $user_id)
                 ->first()->main_wallet;
 
-            $get_pin = User::where('serial_no', $serial_number)
+            $get_pin = User::where('id', $user_id)
                 ->first()->pin;
 
             if ($status == 1) {
@@ -1743,16 +1732,18 @@ class TransactionController extends Controller
 
         if ($transaction_type == 'outward') {
 
-            $user_balance = User::where('serial_no', $serial_number)
+
+
+            $user_balance = User::where('id', $user_id)
                 ->first()->main_wallet ?? null;
 
-            $status = User::where('serial_no', $serial_number)
-                ->first()->is_active;
+            $status = Terminal::where('serial_no', $SerialNumber)
+                ->first()->transfer_status;
 
-            $main_balance = User::where('serial_no', $serial_number)
+            $main_balance = User::where('id', $user_id)
                 ->first()->main_wallet;
 
-            $get_pin = User::where('serial_no', $serial_number)
+            $get_pin = User::where('id', $user_id)
                 ->first()->pin;
 
             if ($status == 1) {
@@ -1774,17 +1765,17 @@ class TransactionController extends Controller
             }
 
             //check balance
-            $user_balance = User::where('serial_no', $serial_number)
+            $user_balance = User::where('id', $user_id)
                 ->first()->main_wallet;
 
             if ($user_balance >= $amount) {
 
-                $user_balance = User::where('serial_no', $serial_number)
+                $user_balance = User::where('id', $user_id)
                     ->first()->main_wallet ?? null;
 
                 // $debit = $user_balance - $amount;
 
-                // $update_balance = User::where('serial_no', $serial_number)
+                // $update_balance = User::where('serial_no', $SerialNumber)
                 //     ->update([
                 //         'main_wallet' => $debit,
                 //     ]);
@@ -1801,7 +1792,7 @@ class TransactionController extends Controller
                 // $trasnaction->main_type = 'Transfer';
                 // $trasnaction->balance = $debit;
                 // $trasnaction->e_charges = 25;
-                // $trasnaction->serial_no = $serial_number;
+                // $trasnaction->serial_no = $SerialNumber;
                 // $trasnaction->note = "Transfer to other banks";
                 // $trasnaction->status = 1;
                 // $trasnaction->save();
@@ -1834,13 +1825,17 @@ class TransactionController extends Controller
 
         if ($transaction_type == 'outward') {
 
-            $status = User::where('serial_no', $serial_number)
-                ->first()->is_active;
+            //Get user ID
+            $user_id = Terminal::where('serial_no', $SerialNumber)
+                ->first()->user_id ?? null;
 
-            $main_balance = User::where('serial_no', $serial_number)
+            $status = Terminal::where('serial_no', $SerialNumber)
+                ->first()->transfer_status;
+
+            $main_balance = User::where('id', $user_id)
                 ->first()->main_wallet;
 
-            $get_pin = User::where('serial_no', $serial_number)
+            $get_pin = User::where('id', $user_id)
                 ->first()->pin;
 
             if ($status == 1) {
@@ -1849,7 +1844,7 @@ class TransactionController extends Controller
                 $check_agent_status = "InActive";
             }
 
-            $user_balance = User::where('serial_no', $serial_number)
+            $user_balance = User::where('id', $user_id)
                 ->first()->main_wallet;
 
             if (Hash::check($pin, $get_pin) == false) {
@@ -1865,17 +1860,17 @@ class TransactionController extends Controller
             }
 
             //check balance
-            $user_balance = User::where('serial_no', $serial_number)
+            $user_balance = User::where('id', $user_id)
                 ->first()->main_wallet;
 
             if ($user_balance >= $amount) {
 
-                // $user_balance = User::where('serial_no', $serial_number)
+                // $user_balance = User::where('serial_no', $SerialNumber)
                 //     ->first()->main_wallet;
 
                 // $debit = $user_balance - $amount;
 
-                // $update_balance = User::where('serial_no', $serial_number)
+                // $update_balance = User::where('serial_no', $SerialNumber)
                 //     ->update([
                 //         'main_wallet' => $debit,
                 //     ]);
@@ -1893,7 +1888,7 @@ class TransactionController extends Controller
                 // $trasnaction->main_type = "_vas";
                 // $trasnaction->note = "VAS Purchase from Terminal";
                 // $trasnaction->e_charges = 0;
-                // $trasnaction->serial_no = $serial_number;
+                // $trasnaction->serial_no = $SerialNumber;
                 // $trasnaction->status = 1;
                 // $trasnaction->save();
 
@@ -1909,7 +1904,7 @@ class TransactionController extends Controller
                 // $trasnaction->note = "VAS Purchase from Terminal";
                 // $trasnaction->balance = $debit;
                 // $trasnaction->e_charges = 0;
-                // $trasnaction->serial_no = $serial_number;
+                // $trasnaction->serial_no = $SerialNumber;
                 // $trasnaction->status = 1;
                 // $trasnaction->save();
 
@@ -1941,13 +1936,21 @@ class TransactionController extends Controller
 
         if ($serviceCode == 'BLE1') {
 
-            $status = User::where('serial_no', $serial_number)
-                ->first()->is_active;
 
-            $balance = User::where('serial_no', $serial_number)
+            //Get user ID
+            $user_id = Terminal::where('serial_no', $SerialNumber)
+                ->first()->user_id ?? null;
+
+            $status = Terminal::where('serial_no', $SerialNumber)
+                ->first()->transfer_status;
+
+
+
+
+            $balance = User::where('id', $user_id)
                 ->first()->main_wallet;
 
-            $get_pin = User::where('serial_no', $serial_number)
+            $get_pin = User::where('id', $user_id)
                 ->first()->pin;
 
             if ($status == 1) {
@@ -2036,55 +2039,35 @@ class TransactionController extends Controller
 
             ], 200);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
     }
 
-    public function fund_transfer_webhook(Request $request)
-    {
 
-        try {
-
-            $StatusCode = $request->StatusCode;
-            $StatusDescription = $request->StatusDescription;
-            $SerialNumber = $request->SerialNumber;
-            $Amount = $request->Amount;
-            $Currency = $request->Currency;
-            $TransactionReference = $request->TransactionReference;
-            $TransactionDate = $request->TransactionDate;
-            $TransactionTime = $request->TransactionTime;
-            $TransactionType = $request->TransactionType;
-            $ServiceCode = $request->ServiceCode;
-            $Fee = $request->Fee;
-            $PostingType = $request->PostingType;
-            $DestinationAccountName = $request->AdditionalDetails['DestinationAccountName'];
-            $DestinationAccountNumber = $request->AdditionalDetails['DestinationAccountNumber'];
-            $DestinationBankName = $request->AdditionalDetails['DestinationBankName'];
-
-        } catch (\Exception$th) {
-            return $th->getMessage();
-        }
-
-    }
 
     public function wallet_check(Request $request)
     {
 
         try {
 
-            $serial_number = $request->serial_number;
+            $SerialNumber = $request->serial_number;
             $pin = $request->pin;
             $transaction_type = "inward";
 
-            $status = User::where('serial_no', $serial_number)
-                ->first()->is_active;
 
-            $balance = User::where('serial_no', $serial_number)
+            //Get user ID
+            $user_id = Terminal::where('serial_no', $SerialNumber)
+                ->first()->user_id ?? null;
+
+            $status = Terminal::where('serial_no', $SerialNumber)
+                ->first()->transfer_status;
+
+            $balance = User::where('id', $user_id)
                 ->first()->main_wallet;
 
-            $get_pin = User::where('serial_no', $serial_number)
+            $get_pin = User::where('id', $user_id)
                 ->first()->pin;
 
             if ($status == 1) {
@@ -2109,7 +2092,7 @@ class TransactionController extends Controller
 
             ]);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -2171,7 +2154,7 @@ class TransactionController extends Controller
                 ]);
             }
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
     }
@@ -2191,7 +2174,7 @@ class TransactionController extends Controller
 
             ], 200);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -2211,7 +2194,7 @@ class TransactionController extends Controller
 
             ]);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
 
@@ -2235,10 +2218,14 @@ class TransactionController extends Controller
 
             ], 200);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
     }
+
+
+
+
 
     public function transfer(Request $request)
     {
@@ -2259,7 +2246,7 @@ class TransactionController extends Controller
 
             ], 200);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
     }
@@ -2283,7 +2270,7 @@ class TransactionController extends Controller
 
             ], 200);
 
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
     }
