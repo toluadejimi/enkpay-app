@@ -1417,10 +1417,10 @@ class TransactionController extends Controller
                 $user_id = Terminal::where('serial_no', $SerialNumber)
                     ->first()->user_id ?? null;
 
-                $main_wallet = User::where('user_id', $user_id)
+                $main_wallet = User::where('id', $user_id)
                     ->first()->main_wallet ?? null;
 
-                $type = User::where('user_id', $user_id)
+                $type = User::where('id', $user_id)
                     ->first()->type ?? null;
 
                 if ($main_wallet == null && $user_id == null) {
@@ -1437,7 +1437,7 @@ class TransactionController extends Controller
 
                 $debit_wallet = $main_wallet - $debit_amount;
 
-                $main_wallet_update = User::where('user_id', $user_id)
+                $main_wallet_update = User::where('id', $user_id)
                     ->update([
                         'main_wallet' => $debit_wallet,
                     ]);
@@ -1517,10 +1517,10 @@ class TransactionController extends Controller
                 $user_id = Terminal::where('serial_no', $SerialNumber)
                     ->first()->user_id ?? null;
 
-                $main_wallet = User::where('user_id', $user_id)
+                $main_wallet = User::where('id', $user_id)
                     ->first()->main_wallet ?? null;
 
-                $type = User::where('user_id', $user_id)
+                $type = User::where('id', $user_id)
                     ->first()->type ?? null;
 
                 if ($main_wallet == null && $user_id == null) {
@@ -1535,7 +1535,7 @@ class TransactionController extends Controller
                 //debit
                 $debit_wallet = $main_wallet - $Amount;
 
-                $main_wallet_update = User::where('user_id', $user_id)
+                $main_wallet_update = User::where('id', $user_id)
                     ->update([
                         'main_wallet' => $debit_wallet,
                     ]);
@@ -1600,10 +1600,10 @@ class TransactionController extends Controller
             $user_id = Terminal::where('serial_no', $SerialNumber)
                 ->first()->user_id ?? null;
 
-            $main_wallet = User::where('user_id', $user_id)
+            $main_wallet = User::where('id', $user_id)
                 ->first()->main_wallet ?? null;
 
-            $type = User::where('user_id', $user_id)
+            $type = User::where('id', $user_id)
                 ->first()->type ?? null;
 
             if ($main_wallet == null && $user_id == null) {
