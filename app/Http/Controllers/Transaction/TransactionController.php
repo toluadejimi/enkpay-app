@@ -2318,7 +2318,7 @@ class TransactionController extends Controller
 
 
             $daily_transactions = Transaction::where('serial_no', $serial_no)
-             ->whereMonth('created_at', Carbon::today())->sum('credit');
+             ->whereday('created_at', Carbon::today())->sum('credit');
 
 
 
