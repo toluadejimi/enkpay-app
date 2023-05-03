@@ -711,7 +711,7 @@ class ProfileController extends Controller
                 "firstName" => $name,
                 //"lastName" => $data->last_name,
                 // "bvn" => $data->identification_no,
-                "accountNumber" => $data->v_account_no,
+                "accountNumber" => $accountNumber,
                 "bankName" => $bankName,
             ];
 
