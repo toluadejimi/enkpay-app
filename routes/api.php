@@ -147,6 +147,13 @@ Route::post('auth-verify-email', [RegisterationController::class, 'auth_email_ve
     Route::get('get-wallet', [TransactionController::class, 'get_wallet']);
     Route::post('self-cash-out', [TransactionController::class, 'self_cash_out']);
 
+    Route::get('get-terminals', [TransactionController::class, 'get_terminals']);
+    Route::post('get-terminal-transaction', [TransactionController::class, 'get_terminal_transaction']);
+
+
+
+
+
 
 
     //Pin Verify
@@ -197,6 +204,10 @@ Route::post('auth-verify-email', [RegisterationController::class, 'auth_email_ve
 
 
 
+    //
+
+
+
 
 
     //insurance
@@ -205,6 +216,10 @@ Route::post('auth-verify-email', [RegisterationController::class, 'auth_email_ve
     Route::get('personal-accident-insurance', [InsuranceController::class, 'personal_accident_insurance']);
     Route::get('home-cover-insurance', [InsuranceController::class, 'home_cover_insurance']);
     Route::get('extra-home-cover-insurance', [InsuranceController::class, 'extra_home_cover_insurance']);
+
+
+
+
 
 
 

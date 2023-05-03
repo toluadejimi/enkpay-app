@@ -12,6 +12,8 @@ use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Mail;
+use Carbon\Carbon;
+
 
 class TransactionController extends Controller
 {
@@ -2274,5 +2276,90 @@ class TransactionController extends Controller
             return $th->getMessage();
         }
     }
+
+
+    public function  get_terminals(request $request){
+
+
+        try{
+
+
+            $terminals = Terminal::select('serial_no', 'description','transfer_status' )->where('user_id', Auth::id())
+            ->get();
+
+            return response()->json([
+
+                'status' => $this->success,
+                'data' => $terminals,
+
+            ], 200);
+
+
+        } catch (\Exception $th) {
+            return $th->getMessage();
+        }
+
+
+
+
+    }
+
+    public function  get_terminal_transaction(request $request){
+
+
+        try{
+
+
+
+            $serial_no = $request->serial_no;
+
+            $total_transactions = Transaction::where('serial_no', $serial_no)
+            ->sum('credit');
+
+
+            $daily_transactions = Transaction::where([
+                'serial_no' => $serial_no,
+                'created_at' => Carbon::today(),
+                ])->sum('credit');
+
+            $terminal = Terminal::where('user_id', Auth::id())
+            ->get();
+
+            $history = Transaction::select('*')
+            ->where('serial_no', $serial_no)
+            ->whereMonth('created_at', Carbon::now()->month)
+            ->get();
+
+
+
+
+            return response()->json([
+
+                'status' => $this->success,
+                'total_transactions' => $total_transactions,
+                'daily_transactions' => $daily_transactions,
+                'history' => $history,
+
+
+
+            ], 200);
+
+
+        } catch (\Exception $th) {
+            return $th->getMessage();
+        }
+
+
+
+
+    }
+
+
+
+
+
+
+
+
 
 }
