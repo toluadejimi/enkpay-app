@@ -333,7 +333,7 @@ class VirtualaccountController extends Controller
 
                     $check_status = User::where('id', $user_id)->first()->status ?? null;
 
-                    $serial_no = Terminal::where('user_id', $user_id)
+                    $serial_no = Terminal::where('v_account_no', $VirtualCustomerAccount)
                         ->first()->serial_no ?? null;
 
                     if ($main_wallet == null && $user_id == null) {
