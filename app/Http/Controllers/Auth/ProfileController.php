@@ -683,7 +683,7 @@ class ProfileController extends Controller
                 ->first()->last_name ?? null;
 
             $bvn = User::where('id', $user_id)
-            ->first()->identification_number ?? null;
+            ->first()->bvn ?? null;
 
             $b_name = User::where('id', $user_id)
                 ->first()->v_account_name ?? null;
