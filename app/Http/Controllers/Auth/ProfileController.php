@@ -657,7 +657,7 @@ class ProfileController extends Controller
         // try {
 
 
-            $serial_no = $request->serialNumber;
+            $serial_no = $request->SerialNumber;
 
 
             $check_serial = Terminal::where('serial_no', $serial_no)
