@@ -7,6 +7,8 @@ use App\Models\Contact;
 use App\Models\ErrandKey;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\VirtualAccount;
+use App\Models\Terminal;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Mail;
@@ -652,12 +654,15 @@ class ProfileController extends Controller
     public function view_agent_account(Request $request)
     {
 
-        try {
+        // try {
 
-            $serial_no = $request->SerialNumber;
 
-            $check_serial = User::where('serial_no', $serial_no)
+            $serial_no = $request->serialNumber;
+
+
+            $check_serial = Terminal::where('serial_no', $serial_no)
                 ->first()->serial_no ?? null;
+
 
             if ($check_serial == null) {
 
@@ -668,25 +673,29 @@ class ProfileController extends Controller
 
             }
 
-            $firstName = User::where('serial_no', $serial_no)
+            $user_id = Terminal::where('serial_no', $serial_no)
+            ->first()->user_id;
+
+            $firstName = User::where('id', $user_id)
                 ->first()->first_name ?? null;
 
-            $lastName = User::where('serial_no', $serial_no)
+            $lastName = User::where('id', $user_id)
                 ->first()->last_name ?? null;
 
-            $bvn = User::where('serial_no', $serial_no)
-                ->first()->identification_number ?? null;
+            // $bvn = User::where('id', $user_id)
+            // ->first()->identification_number ?? null;
 
-            $b_name = User::where('serial_no', $serial_no)
+            $b_name = User::where('id', $user_id)
                 ->first()->v_account_name ?? null;
 
 
-            $accountNumber = User::where('serial_no', $serial_no)
+            $accountNumber = VirtualAccount::where('user_id', $user_id)
                 ->first()->v_account_no ?? null;
 
-            $bankName = "VFD MICROFINANCE BANK";
+            $bankName = VirtualAccount::where('user_id', $user_id)
+            ->first()->v_bank_name ?? null;
 
-            $data = User::where('serial_no', $serial_no)->first();
+            $data = User::where('id', $user_id)->first();
 
             if($b_name == null){
                 $name = $firstName." ".$lastName;
@@ -698,7 +707,7 @@ class ProfileController extends Controller
             $data_array[0] = [
                 "firstName" => $name,
                 //"lastName" => $data->last_name,
-                "bvn" => $data->identification_no,
+                // "bvn" => $data->identification_no,
                 "accountNumber" => $data->v_account_no,
                 "bankName" => $bankName,
             ];
@@ -710,9 +719,9 @@ class ProfileController extends Controller
 
             ], 200);
 
-        } catch (\Exception$th) {
-            return $th->getMessage();
-        }
+        // } catch (\Exception$th) {
+        //     return $th->getMessage();
+        // }
 
     }
 
