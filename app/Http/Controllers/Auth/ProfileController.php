@@ -676,6 +676,8 @@ class ProfileController extends Controller
             $user_id = Terminal::where('serial_no', $serial_no)
             ->first()->user_id;
 
+
+
             $firstName = User::where('id', $user_id)
                 ->first()->first_name ?? null;
 
@@ -690,12 +692,15 @@ class ProfileController extends Controller
 
 
             $accountNumber = VirtualAccount::where('user_id', $user_id)
-                ->first()->v_account_no ?? null;
+            ->where('serial_no', $serial_no)
+            ->first()->v_account_no ?? null;
 
             $bankName = VirtualAccount::where('user_id', $user_id)
+            ->where('serial_no', $serial_no)
             ->first()->v_bank_name ?? null;
 
             $name = VirtualAccount::where('user_id', $user_id)
+            ->where('serial_no', $serial_no)
             ->first()->v_account_name ?? null;
 
             $data = User::where('id', $user_id)->first();
