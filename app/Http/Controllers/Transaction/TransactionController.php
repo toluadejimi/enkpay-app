@@ -1622,7 +1622,7 @@ class TransactionController extends Controller
 
             $debit_wallet = $main_wallet - $debit_amount;
 
-            $main_wallet_update = User::where('serial_no', $SerialNumber)
+            $main_wallet_update = User::where('id', $user_id)
                 ->update([
                     'main_wallet' => $debit_wallet,
                 ]);
