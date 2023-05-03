@@ -682,8 +682,8 @@ class ProfileController extends Controller
             $lastName = User::where('id', $user_id)
                 ->first()->last_name ?? null;
 
-            // $bvn = User::where('id', $user_id)
-            // ->first()->identification_number ?? null;
+            $bvn = User::where('id', $user_id)
+            ->first()->identification_number ?? null;
 
             $b_name = User::where('id', $user_id)
                 ->first()->v_account_name ?? null;
@@ -710,7 +710,7 @@ class ProfileController extends Controller
             $data_array[0] = [
                 "firstName" => $name,
                 //"lastName" => $data->last_name,
-                // "bvn" => $data->identification_no,
+                "bvn" => $bvn,
                 "accountNumber" => $accountNumber,
                 "bankName" => $bankName,
             ];
