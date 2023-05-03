@@ -2317,10 +2317,10 @@ class TransactionController extends Controller
             ->sum('credit');
 
 
-            $daily_transactions = Transaction::where([
-                'serial_no' => $serial_no,
-                'created_at' => Carbon::today(),
-                ])->sum('credit');
+            $daily_transactions = Transaction::where('serial_no', $serial_no)
+             ->whereMonth('created_at', Carbon::today())->sum('credit');
+
+
 
             $terminal = Terminal::where('user_id', Auth::id())
             ->get();
