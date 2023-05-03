@@ -695,13 +695,16 @@ class ProfileController extends Controller
             $bankName = VirtualAccount::where('user_id', $user_id)
             ->first()->v_bank_name ?? null;
 
+            $name = VirtualAccount::where('user_id', $user_id)
+            ->first()->v_account_name ?? null;
+
             $data = User::where('id', $user_id)->first();
 
-            if($b_name == null){
-                $name = $firstName." ".$lastName;
-            }else{
-                $name = $b_name;
-            }
+            // if($b_name == null){
+            //     $name = $firstName." ".$lastName;
+            // }else{
+            //     $name = $b_name;
+            // }
 
             $data_array = array();
             $data_array[0] = [
