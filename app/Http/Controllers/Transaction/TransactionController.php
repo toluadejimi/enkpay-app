@@ -1238,6 +1238,7 @@ class TransactionController extends Controller
 
         if ($request->ServiceCode == 'CO1') {
 
+            dd($request->body());
 
             $parametersJson = json_encode($request->all());
             $headers = json_encode($request->headers->all());
@@ -1351,7 +1352,7 @@ class TransactionController extends Controller
                 if ($TransactionType == 'CashOut') {
 
 
-                    dd($request->body());
+                   
                     //update Transactions
                     $trasnaction = new Transaction();
                     $trasnaction->user_id = $user_id;
