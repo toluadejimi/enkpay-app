@@ -1238,7 +1238,8 @@ class TransactionController extends Controller
 
         //pos transaction co1
 
-        if ($request->ServiceCode == 'CO1') {
+        if ($request->ServiceCode == 'CO1'
+        || $request->ServiceCode == "C01") {
            
 
             dd('hello');
