@@ -1068,13 +1068,6 @@ class TransactionController extends Controller
     {
 
 
-        $parametersJson = json_encode($request->all());
-        $headers = json_encode($request->headers->all());
-        $message = "First Body Message";
-        $ip = $request->ip();
-
-        $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
-        send_notification($result);
 
         $header = $request->header('errand-pay-header');
         $ip = $request->ip();
@@ -1242,18 +1235,6 @@ class TransactionController extends Controller
         || $request->ServiceCode == "C01") {
            
 
-            dd('hello');
-            $parametersJson = json_encode($request->all());
-            $headers = json_encode($request->headers->all());
-            $message = "First Body Message";
-            $ip = $request->ip();
-
-            $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
-            send_notification($result);
-
-
-            $ip1 = "3.22.23.255";
-
             $StatusCode = $request->StatusCode;
             $StatusDescription = $request->StatusDescription;
             $SerialNumber = $request->SerialNumber;
@@ -1269,7 +1250,7 @@ class TransactionController extends Controller
             $TerminalID = $request->AdditionalDetails['TerminalID'];
             $MaskedPAN = $request->AdditionalDetails['MaskedPAN'];
 
-            $eip ="3.22.23.255"; //env('EIP');
+            $eip =env('EIP');
             //$eip = '127.0.0.1';
 
             $trans_id = "ENK-" . random_int(100000, 999999);
@@ -1279,7 +1260,7 @@ class TransactionController extends Controller
             $comission = Charge::where('id', 3)
                 ->first()->amount;
 
-            if ($eip == $ip1) {
+            if ($eip == $ip) {
 
                 //Get user ID
                 $user_id = Terminal::where('serial_no', $SerialNumber)
