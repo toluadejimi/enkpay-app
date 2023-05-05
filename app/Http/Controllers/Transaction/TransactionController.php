@@ -1067,7 +1067,6 @@ class TransactionController extends Controller
     public function cash_out_webhook(Request $request)
     {
 
-        dd($request->body());
 
         $parametersJson = json_encode($request->all());
         $headers = json_encode($request->headers->all());
@@ -1081,6 +1080,7 @@ class TransactionController extends Controller
         $ip = $request->ip();
 
         //pos transaction pu1
+        dd($request->all());
 
         if ($request->ServiceCode == 'PU1') {
 
