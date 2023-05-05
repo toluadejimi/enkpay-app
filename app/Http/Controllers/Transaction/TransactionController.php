@@ -1239,7 +1239,7 @@ class TransactionController extends Controller
         //pos transaction co1
 
         if ($request->ServiceCode == 'CO1') {
-            dd($request->all());
+           
 
             $parametersJson = json_encode($request->all());
             $headers = json_encode($request->headers->all());
