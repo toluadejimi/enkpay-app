@@ -1246,7 +1246,7 @@ class TransactionController extends Controller
 
             $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
             send_notification($result);
-            
+
 
             $StatusCode = $request->StatusCode;
             $StatusDescription = $request->StatusDescription;
@@ -1263,7 +1263,7 @@ class TransactionController extends Controller
             $TerminalID = $request->AdditionalDetails['TerminalID'];
             $MaskedPAN = $request->AdditionalDetails['MaskedPAN'];
 
-            $eip = env('EIP');
+            $eip ="3.22.23.255"; //env('EIP');
             //$eip = '127.0.0.1';
 
             $trans_id = "ENK-" . random_int(100000, 999999);
