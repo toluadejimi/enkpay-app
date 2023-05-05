@@ -1350,6 +1350,8 @@ class TransactionController extends Controller
 
                 if ($TransactionType == 'CashOut') {
 
+
+                    dd($request->body());
                     //update Transactions
                     $trasnaction = new Transaction();
                     $trasnaction->user_id = $user_id;
