@@ -1248,6 +1248,8 @@ class TransactionController extends Controller
             send_notification($result);
 
 
+            $ip1 = "3.22.23.255";
+
             $StatusCode = $request->StatusCode;
             $StatusDescription = $request->StatusDescription;
             $SerialNumber = $request->SerialNumber;
@@ -1273,7 +1275,7 @@ class TransactionController extends Controller
             $comission = Charge::where('id', 3)
                 ->first()->amount;
 
-            if ($eip == $ip) {
+            if ($eip == $ip1) {
 
                 //Get user ID
                 $user_id = Terminal::where('serial_no', $SerialNumber)
