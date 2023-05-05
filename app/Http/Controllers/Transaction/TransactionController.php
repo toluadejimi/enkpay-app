@@ -1080,7 +1080,7 @@ class TransactionController extends Controller
         $ip = $request->ip();
 
         //pos transaction pu1
-        dd($request->all());
+    
 
         if ($request->ServiceCode == 'PU1') {
 
@@ -1239,7 +1239,7 @@ class TransactionController extends Controller
         //pos transaction co1
 
         if ($request->ServiceCode == 'CO1') {
-
+            dd($request->all());
 
             $parametersJson = json_encode($request->all());
             $headers = json_encode($request->headers->all());
