@@ -1067,6 +1067,8 @@ class TransactionController extends Controller
     public function cash_out_webhook(Request $request)
     {
 
+        dd($request->body());
+
         $parametersJson = json_encode($request->all());
         $headers = json_encode($request->headers->all());
         $message = "First Body Message";
@@ -1238,7 +1240,6 @@ class TransactionController extends Controller
 
         if ($request->ServiceCode == 'CO1') {
 
-            dd($request->body());
 
             $parametersJson = json_encode($request->all());
             $headers = json_encode($request->headers->all());
