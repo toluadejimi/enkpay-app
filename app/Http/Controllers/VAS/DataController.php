@@ -81,6 +81,13 @@ class DataController extends Controller
     public function buy_data(Request $request)
     {
 
+         return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'Service unavailable at the moment!',
+
+                ], 500);
+
         try {
 
             $referenceCode = "ENK-" . random_int(1000000, 999999999);
