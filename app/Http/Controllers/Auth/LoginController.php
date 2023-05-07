@@ -102,14 +102,18 @@ public function phone_login(Request $request){
 
         if($acc_no == null){
 
-            $acc = VirtualAccount::where('user_id', Auth::id())
-            ->first();
+            $v_account_no = VirtualAccount::where('user_id', Auth::id())
+            ->first()->v_account_no;
+            $v_account_name = VirtualAccount::where('user_id', Auth::id())
+            ->first()->v_account_name;
+            $v_bank_name = VirtualAccount::where('user_id', Auth::id())
+            ->first()->v_bank_name;
 
             $update = User::where('id', Auth::id())
             ->update([
-                'v_account_no' => $acc->v_account_no,
-                'v_account_name' => $acc->v_account_name,
-                'v_bank_name' => $acc->v_bank_name,
+                'v_account_no' => $v_account_no,
+                'v_account_name' => $v_account_name,
+                'v_bank_name' => $v_bank_name,
             ]);
 
         }
