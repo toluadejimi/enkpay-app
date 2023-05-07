@@ -112,6 +112,9 @@ public function phone_login(Request $request){
                 'v_bank_name' => $acc->v_bank_name,
             ]);
 
+            $get_user = User::find(Auth::id())->first();
+
+
         }
 
 
@@ -129,7 +132,7 @@ public function phone_login(Request $request){
 
         return response()->json([
             'status' => $this->success,
-            'data' => $user,
+            'data' => $get_user,
             'permission' => $feature,
             'setting' => $setting
 
