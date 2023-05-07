@@ -112,10 +112,10 @@ public function phone_login(Request $request){
                 'v_bank_name' => $acc->v_bank_name,
             ]);
 
-            $get_user = User::find(Auth::id())->first();
-
-
         }
+
+
+        $get_user = User::find(Auth::id())->first();
 
 
 
