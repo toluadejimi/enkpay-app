@@ -12,4 +12,6 @@ use Mail;
 
 class FeatureController extends Controller
 {
+
+   $dog = "hello";
 }

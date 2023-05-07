@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Models\VirtualAccount;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
@@ -97,6 +98,23 @@ public function phone_login(Request $request){
         }
 
 
+        if(Auth::user()->v_account_no == null){
+
+            $acc = VirtualAccount::where('user_id', Auth::id())
+            ->first();
+
+            $update = User::where('id', Auth::id())
+            ->update([
+                'v_account_no' => $acc->v_account_no,
+                'v_account_name' => $acc->v_account_name,
+                'v_bank_name' => $acc->v_bank_name,
+            ]);
+
+        }
+
+
+
+
 
         $setting = Setting::select('google_url','ios_url','version')
         ->first();
@@ -116,7 +134,7 @@ public function phone_login(Request $request){
 
         ],200);
 
-} catch (\Exception $th) {
+} catch (Exception $th) {
     return $th->getMessage();
 }
 

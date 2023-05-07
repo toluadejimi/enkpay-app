@@ -288,6 +288,8 @@ class TransactionController extends Controller
 
             $epkey = env('EPKEY');
 
+          
+
             $wallet = $request->wallet;
             $amount = $request->amount;
             $destinationAccountNumber = $account_number;
@@ -301,6 +303,10 @@ class TransactionController extends Controller
             $referenceCode = "ENK-" . random_int(1000000, 999999999);
 
             $transfer_charges = Charge::where('id', 1)->first()->amount;
+
+
+            $amoutCharges = $amount + $transfer_charges;
+            
 
             $user_email = user_email();
             $first_name = first_name();
@@ -377,7 +383,7 @@ class TransactionController extends Controller
                 ], 500);
             }
 
-            if ($amount > $user_wallet_banlance) {
+            if ($amoutCharges > $user_wallet_banlance) {
 
                 return response()->json([
 
