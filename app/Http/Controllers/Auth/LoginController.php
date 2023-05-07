@@ -97,8 +97,10 @@ public function phone_login(Request $request){
 
         }
 
+        $acc_no = Auth::user()->v_account_no ?? null;
 
-        if(Auth::user()->v_account_no == null){
+
+        if($acc_no == null){
 
             $acc = VirtualAccount::where('user_id', Auth::id())
             ->first();
