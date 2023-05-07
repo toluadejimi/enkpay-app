@@ -43,9 +43,8 @@ public function phone_login(Request $request){
 
 
         $phone = $request->phone;
-
-
         $credentials = request(['phone', 'password']);
+
 
         Passport::tokensExpireIn(Carbon::now()->addMinutes(20));
         Passport::refreshTokensExpireIn(Carbon::now()->addMinutes(20));
@@ -73,8 +72,9 @@ public function phone_login(Request $request){
 
         $feature = Feature::where('id', 1)->first();
 
-        $token = auth()->user()->createToken('API Token')->accessToken;
 
+
+        $token = auth()->user()->createToken('API Token')->accessToken;
 
         $user = Auth()->user();
         $user['token']=$token;
@@ -97,51 +97,83 @@ public function phone_login(Request $request){
 
         }
 
-        $acc_no = Auth::user()->v_account_no ?? null;
-
-
-        if($acc_no == null){
-
-            $v_account_no = VirtualAccount::where('user_id', Auth::id())
-            ->first()->v_account_no;
-            $v_account_name = VirtualAccount::where('user_id', Auth::id())
-            ->first()->v_account_name;
-            $v_bank_name = VirtualAccount::where('user_id', Auth::id())
-            ->first()->v_bank_name;
-
-            $update = User::where('id', Auth::id())
-            ->update([
-                'v_account_no' => $v_account_no,
-                'v_account_name' => $v_account_name,
-                'v_bank_name' => $v_bank_name,
-            ]);
-
-        }
-
-
-        $get_user = User::find(Auth::id())->first();
-
-
-
-
 
         $setting = Setting::select('google_url','ios_url','version')
         ->first();
 
 
-
-
-
-
-
         return response()->json([
             'status' => $this->success,
-            'data' => $get_user,
+            'data' => $user,
             'permission' => $feature,
             'setting' => $setting
 
 
         ],200);
+
+        // $feature = Feature::where('id', 1)->first();
+
+        // $token = auth()->user()->createToken('API Token')->accessToken;
+
+
+        // $user = Auth()->user();
+        // $user['token']=$token;
+
+
+        // $is_kyc_verified = Auth::user()->is_kyc_verified;
+        // $status = Auth::user()->status;
+        // $is_phone_verified = Auth::user()->is_phone_verified;
+        // $is_email_verified = Auth::user()->is_email_verified;
+        // $is_identification_verified = Auth::user()->is_identification_verified;
+
+
+        // if($status !== 2 && $is_kyc_verified == 1 && $is_phone_verified == 1 && $is_email_verified == 1 && $is_identification_verified == 1  ){
+
+        //     $update = User::where('id',Auth::id())
+        //     ->update([
+        //         'status' => 2
+        //     ]);
+
+
+        // }
+
+        // $acc_no = Auth::user()->v_account_no ?? null;
+        // if($acc_no == null){
+
+        //     $v_account_no = VirtualAccount::where('user_id', Auth::id())
+        //     ->first()->v_account_no;
+        //     $v_account_name = VirtualAccount::where('user_id', Auth::id())
+        //     ->first()->v_account_name;
+        //     $v_bank_name = VirtualAccount::where('user_id', Auth::id())
+        //     ->first()->v_bank_name;
+
+        //     $update = User::where('id', Auth::id())
+        //     ->update([
+        //         'v_account_no' => $v_account_no,
+        //         'v_account_name' => $v_account_name,
+        //         'v_bank_name' => $v_bank_name,
+        //     ]);
+
+        // }
+        // $get_user = User::find(Auth::id())->first();
+
+        // $setting = Setting::select('google_url','ios_url','version')
+        // ->first();
+
+
+
+
+
+
+
+        // return response()->json([
+        //     'status' => $this->success,
+        //     'data' => $get_user,
+        //     'permission' => $feature,
+        //     'setting' => $setting
+
+
+        // ],200);
 
 } catch (Exception $th) {
     return $th->getMessage();
