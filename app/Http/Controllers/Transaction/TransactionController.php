@@ -1079,6 +1079,15 @@ class TransactionController extends Controller
     {
 
 
+        $parametersJson = json_encode($request->all());
+        $message = 'Log 1';
+        $ip = $request->ip();
+
+        $result = "Body========> " .$parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
+        send_notification($result);
+
+
+
 
         $header = $request->header('errand-pay-header');
         $ip = $request->ip();
@@ -1595,6 +1604,7 @@ class TransactionController extends Controller
         //FUNDS TRANSFER
 
         if ($request->ServiceCode == 'FT1') {
+
 
             $StatusCode = $request->StatusCode;
             $StatusDescription = $request->StatusDescription;
