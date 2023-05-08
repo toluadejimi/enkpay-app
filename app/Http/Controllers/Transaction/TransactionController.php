@@ -1624,6 +1624,10 @@ class TransactionController extends Controller
 
             $trans_id = "ENK-" . random_int(100000, 999999);
 
+
+            $transfer_fee = Charge::where('title', 'transfer_fee')
+            ->first()->amount;
+
             //Get user ID
             $user_id = Terminal::where('serial_no', $SerialNumber)
                 ->first()->user_id ?? null;
