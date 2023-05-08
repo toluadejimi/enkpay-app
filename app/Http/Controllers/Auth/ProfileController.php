@@ -248,6 +248,9 @@ class ProfileController extends Controller
 
             $data = $request->all();
 
+            $errand_key = ErrandKey::where('id', 1)->first()->errand_key ?? null;
+
+
             $update = User::where('id', Auth::id())
                 ->update([
 
