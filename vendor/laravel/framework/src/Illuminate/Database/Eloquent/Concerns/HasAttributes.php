@@ -17,7 +17,10 @@ use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedArrayObject;
 use Illuminate\Database\Eloquent\Casts\AsEncryptedCollection;
+use Illuminate\Database\Eloquent\Casts\AsEnumArrayObject;
+use Illuminate\Database\Eloquent\Casts\AsEnumCollection;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Casts\Json;
 use Illuminate\Database\Eloquent\InvalidCastException;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Database\Eloquent\MissingAttributeException;
@@ -1241,7 +1244,7 @@ trait HasAttributes
      */
     protected function asJson($value)
     {
-        return json_encode($value);
+        return Json::encode($value);
     }
 
     /**
@@ -1253,7 +1256,7 @@ trait HasAttributes
      */
     public function fromJson($value, $asObject = false)
     {
-        return json_decode($value ?? '', ! $asObject);
+        return Json::decode($value ?? '', ! $asObject);
     }
 
     /**
@@ -1592,9 +1595,7 @@ trait HasAttributes
             return false;
         }
 
-        if (function_exists('enum_exists') && enum_exists($castType)) {
-            return true;
-        }
+        return enum_exists($castType);
     }
 
     /**
@@ -2043,6 +2044,8 @@ trait HasAttributes
             return $this->castAttribute($key, $attribute) ===
                 $this->castAttribute($key, $original);
         } elseif ($this->isClassCastable($key) && in_array($this->getCasts()[$key], [AsArrayObject::class, AsCollection::class])) {
+            return $this->fromJson($attribute) === $this->fromJson($original);
+        } elseif ($this->isClassCastable($key) && Str::startsWith($this->getCasts()[$key], [AsEnumArrayObject::class, AsEnumCollection::class])) {
             return $this->fromJson($attribute) === $this->fromJson($original);
         } elseif ($this->isClassCastable($key) && $original !== null && in_array($this->getCasts()[$key], [AsEncryptedArrayObject::class, AsEncryptedCollection::class])) {
             return $this->fromEncryptedString($attribute) === $this->fromEncryptedString($original);

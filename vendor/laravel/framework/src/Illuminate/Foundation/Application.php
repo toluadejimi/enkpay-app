@@ -38,7 +38,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
      *
      * @var string
      */
-    const VERSION = '10.1.5';
+    const VERSION = '10.9.0';
 
     /**
      * The base path for the Laravel installation.
@@ -228,11 +228,9 @@ class Application extends Container implements ApplicationContract, CachesConfig
         $this->instance(Container::class, $this);
         $this->singleton(Mix::class);
 
-        $this->singleton(PackageManifest::class, function () {
-            return new PackageManifest(
-                new Filesystem, $this->basePath(), $this->getCachedPackagesPath()
-            );
-        });
+        $this->singleton(PackageManifest::class, fn () => new PackageManifest(
+            new Filesystem, $this->basePath(), $this->getCachedPackagesPath()
+        ));
     }
 
     /**
@@ -1220,7 +1218,7 @@ class Application extends Container implements ApplicationContract, CachesConfig
     public function abort($code, $message = '', array $headers = [])
     {
         if ($code == 404) {
-            throw new NotFoundHttpException($message);
+            throw new NotFoundHttpException($message, null, 0, $headers);
         }
 
         throw new HttpException($code, $message, null, $headers);
