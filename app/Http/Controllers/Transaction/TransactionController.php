@@ -288,7 +288,7 @@ class TransactionController extends Controller
 
             $epkey = env('EPKEY');
 
-          
+
 
             $wallet = $request->wallet;
             $amount = $request->amount;
@@ -306,7 +306,7 @@ class TransactionController extends Controller
 
 
             $amoutCharges = $amount + $transfer_charges;
-            
+
 
             $user_email = user_email();
             $first_name = first_name();
@@ -1093,7 +1093,7 @@ class TransactionController extends Controller
         $ip = $request->ip();
 
         //pos transaction pu1
-    
+
 
         if ($request->ServiceCode == 'PU1') {
 
@@ -1253,7 +1253,7 @@ class TransactionController extends Controller
 
         if ($request->ServiceCode == 'CO1'
         || $request->ServiceCode == "C01") {
-           
+
 
             $StatusCode = $request->StatusCode;
             $StatusDescription = $request->StatusDescription;
@@ -1356,7 +1356,7 @@ class TransactionController extends Controller
                 if ($TransactionType == 'CashOut') {
 
 
-                   
+
                     //update Transactions
                     $trasnaction = new Transaction();
                     $trasnaction->user_id = $user_id;

@@ -134,6 +134,7 @@ class VirtualaccountController extends Controller
                 $create->v_account_no = $acct_no;
                 $create->v_account_name = $acct_name;
                 $create->v_bank_name = $bank;
+                $create->user_id = Auth::id();
                 $create->save();
 
                 $user = User::find(Auth::id());
@@ -141,58 +142,8 @@ class VirtualaccountController extends Controller
                 $user->v_account_name = $acct_name;
                 $user->save();
 
-            }
-
-            $curl = curl_init();
-            $data = array(
-                "account_name" => $name,
-                "bvn" => $bvn,
-            );
-
-            $databody = json_encode($data);
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => 'http://154.113.16.142:8088/appdevapi/api/PiPCreateReservedAccountNumber',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => $databody,
-                CURLOPT_HTTPHEADER => array(
-                    'Content-Type: application/json',
-                    'Accept: application/json',
-                    'Client-Id: dGVzdF9Qcm92aWR1cw==',
-                    'X-Auth-Signature: BE09BEE831CF262226B426E39BD1092AF84DC63076D4174FAC78A2261F9A3D6E59744983B8326B69CDF2963FE314DFC89635CFA37A40596508DD6EAAB09402C7',
-                ),
-            ));
-
-            $var = curl_exec($curl);
-
-            curl_close($curl);
-            $var = json_decode($var);
-
-            $status = $var->responseCode ?? null;
-            $p_acct_no = $var->account_number ?? null;
-            $p_acct_name = $var->account_name ?? null;
-
-            $pbank = "PROVIDUS BANK";
-
-            if ($status == 00) {
-
-                $create = new VirtualAccount();
-                $create->v_account_no = $p_acct_no;
-                $create->v_account_name = $p_acct_name;
-                $create->v_bank_name = $pbank;
-                $create->save();
-
-                $user = User::find(Auth::id());
-                $user->p_account_no = $p_acct_no;
-                $user->p_account_name = $p_acct_name;
-                $user->save();
-
                 $get_user = User::find(Auth::id())->first();
+                
                 return response()->json([
 
                     'status' => $this->success,
@@ -201,16 +152,85 @@ class VirtualaccountController extends Controller
 
                 ], 200);
 
-            } else {
+            }
 
                 return response()->json([
 
-                    'status' => $this->failed,
-                    'message' => 'Error please try again after some time',
-
+                        'status' => $this->failed,
+                        'message' => 'Error please try again after some time',
+    
                 ], 500);
 
-            }
+
+
+            // $curl = curl_init();
+            // $data = array(
+            //     "account_name" => $name,
+            //     "bvn" => $bvn,
+            // );
+
+            // $databody = json_encode($data);
+            // curl_setopt_array($curl, array(
+            //     CURLOPT_URL => 'http://154.113.16.142:8088/appdevapi/api/PiPCreateReservedAccountNumber',
+            //     CURLOPT_RETURNTRANSFER => true,
+            //     CURLOPT_ENCODING => '',
+            //     CURLOPT_MAXREDIRS => 10,
+            //     CURLOPT_TIMEOUT => 0,
+            //     CURLOPT_FOLLOWLOCATION => true,
+            //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            //     CURLOPT_CUSTOMREQUEST => 'POST',
+            //     CURLOPT_POSTFIELDS => $databody,
+            //     CURLOPT_HTTPHEADER => array(
+            //         'Content-Type: application/json',
+            //         'Accept: application/json',
+            //         'Client-Id: dGVzdF9Qcm92aWR1cw==',
+            //         'X-Auth-Signature: BE09BEE831CF262226B426E39BD1092AF84DC63076D4174FAC78A2261F9A3D6E59744983B8326B69CDF2963FE314DFC89635CFA37A40596508DD6EAAB09402C7',
+            //     ),
+            // ));
+
+            // $var = curl_exec($curl);
+
+            // curl_close($curl);
+            // $var = json_decode($var);
+
+            // $status = $var->responseCode ?? null;
+            // $p_acct_no = $var->account_number ?? null;
+            // $p_acct_name = $var->account_name ?? null;
+
+            // $pbank = "PROVIDUS BANK";
+
+            // if ($status == 00) {
+
+            //     $create = new VirtualAccount();
+            //     $create->v_account_no = $p_acct_no;
+            //     $create->v_account_name = $p_acct_name;
+            //     $create->v_bank_name = $pbank;
+            //     $create->save();
+
+            //     $user = User::find(Auth::id());
+            //     $user->p_account_no = $p_acct_no;
+            //     $user->p_account_name = $p_acct_name;
+            //     $user->save();
+
+            //     $get_user = User::find(Auth::id())->first();
+            //     return response()->json([
+
+            //         'status' => $this->success,
+            //         'message' => "Your account has been created successfully",
+            //         'data' => $get_user,
+
+            //     ], 200);
+
+            // } else {
+
+            //     return response()->json([
+
+            //         'status' => $this->failed,
+            //         'message' => 'Error please try again after some time',
+
+            //     ], 500);
+
+            // }
 
         } catch (\Exception $th) {
             return $th->getMessage();
