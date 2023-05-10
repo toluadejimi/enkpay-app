@@ -104,6 +104,8 @@ public function phone_login(Request $request){
         $acc_no = Auth::user()->v_account_no ?? null;
 
 
+
+
         if($acc_no == null){
 
             $v_account_no = VirtualAccount::where('user_id', Auth::id())
@@ -113,7 +115,18 @@ public function phone_login(Request $request){
             $v_bank_name = VirtualAccount::where('user_id', Auth::id())
             ->first()->v_bank_name ?? null;
 
-            $update = User::where('id', Auth::id())
+            if($v_bank_name == null){
+
+                return response()->json([
+                    'status' => $this->success,
+                    'data' => $user,
+                    'permission' => $feature,
+                    'setting' => $setting
+
+                ],200);
+            }
+
+            User::where('id', Auth::id())
             ->update([
                 'v_account_no' => $v_account_no,
                 'v_account_name' => $v_account_name,
