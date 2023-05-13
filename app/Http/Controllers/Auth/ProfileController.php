@@ -680,10 +680,11 @@ class ProfileController extends Controller
             ->first()->user_id;
 
 
-            dd($user_id);
+
 
             $firstName = User::where('id', $user_id)
                 ->first()->first_name ?? null;
+
 
             $lastName = User::where('id', $user_id)
                 ->first()->last_name ?? null;
