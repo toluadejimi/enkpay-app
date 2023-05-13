@@ -680,7 +680,7 @@ class ProfileController extends Controller
             ->first()->user_id;
 
 
-            dd($serial_no);
+            dd($user_id);
 
             $firstName = User::where('id', $user_id)
                 ->first()->first_name ?? null;
