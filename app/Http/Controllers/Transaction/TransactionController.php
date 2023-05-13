@@ -1667,7 +1667,7 @@ class TransactionController extends Controller
                 $trasnaction->ref_trans_id = $trans_id;
                 $trasnaction->e_ref = $TransactionReference;
                 $trasnaction->transaction_type = $TransactionType;
-                $trasnaction->debit = $Amount;
+                $trasnaction->debit = $debit_amount;
                 $trasnaction->amount = $Amount;
                 $trasnaction->title = "EP Transfer";
                 $trasnaction->note = "EP Transfer | $DestinationAccountName | $DestinationBankName ";
