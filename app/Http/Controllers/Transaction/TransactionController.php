@@ -1195,7 +1195,7 @@ class TransactionController extends Controller
                         'main_wallet' => $updated_amount,
                     ]);
 
-                if ($TransactionType == 'CashOut') {
+                if ($TransactionType == 'Purchase') {
 
                     //update Transactions
                     $trasnaction = new Transaction();
