@@ -8,6 +8,7 @@ use App\Models\Terminal;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\VirtualAccount;
+use App\Models\Webtransfer;
 use Auth;
 use DateTimeZone;
 use Illuminate\Http\Request;
@@ -143,7 +144,7 @@ class VirtualaccountController extends Controller
                 $user->save();
 
                 $get_user = User::find(Auth::id())->first();
-                
+
                 return response()->json([
 
                     'status' => $this->success,
@@ -158,7 +159,7 @@ class VirtualaccountController extends Controller
 
                         'status' => $this->failed,
                         'message' => 'Error please try again after some time',
-    
+
                 ], 500);
 
 
@@ -462,6 +463,18 @@ class VirtualaccountController extends Controller
                     $message = "Your Pool account has been credited |  $message_amount | from VFD Virtual account";
 
                     send_notification($message);
+
+
+                    $get_web_transfer = Webtransfer::where('v_account_no', $VirtualCustomerAccount)
+                    ->where('payable_amount', $Amount)->first()->status ?? null;
+
+                    if($get_web_transfer == 0){
+
+                        Webtransfer::where('v_account_no', $VirtualCustomerAccount)
+                        ->where('payable_amount', $Amount)
+                        ->update(['status' => 1]);
+
+                    }
 
                     //send to user
 
