@@ -70,7 +70,7 @@ public function phone_login(Request $request){
             ], 500);
         }
 
-        $get_device_id = User::where('device_id', $device_id)
+        $get_device_id = User::where('device_id', $request->device_id)
         ->first()->device_id ?? null;
 
         if($get_device_id == null){
@@ -262,7 +262,7 @@ public function email_login(Request $request){
         }
 
 
-        $get_device_id = User::where('device_id', $device_id)
+        $get_device_id = User::where('device_id', $request->device_id)
         ->first()->device_id ?? null;
 
         if($get_device_id == null){
