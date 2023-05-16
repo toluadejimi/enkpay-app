@@ -1655,11 +1655,40 @@ class TransactionController extends Controller
             $debit_wallet = $main_wallet - $debit_amount;
 
             $main_wallet_update = User::where('id', $user_id)
-                ->update([
-                    'main_wallet' => $debit_wallet,
-                ]);
+            ->update([
+                'main_wallet' => $debit_wallet,
+            ]);
+
 
             if ($TransactionType == 'FundTransfer') {
+
+                //check transaction
+                $serial_no = Transaction::where('serial_no',$SerialNumber)
+                ->first()->serial_no ?? null;
+
+                if($serial_no !== null ){
+
+                    Transaction::where('serial_no',$SerialNumber)
+                    ->update([
+                        'debit' => $debit_amount,
+                        'amount' => $Amount,
+                        'note' => "EP Transfer | $DestinationAccountName | $DestinationBankName ",
+                        'fee' => $Fee,
+                        'balance' => $debit_wallet,
+                        'status' => 1,
+
+                    ]);
+
+                    $amount4 = number_format($Amount, 2);
+                    $message = "NGN $amount4 left pool Account by $user_id";
+                    send_notification($message);
+
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Tranasaction Successsfull',
+                    ], 200);
+
+                }
 
                 //update Transactions
                 $trasnaction = new Transaction();
@@ -1857,7 +1886,7 @@ class TransactionController extends Controller
 
         }
 
-        if ($transaction_type == 'outward') {
+        if ($serviceCode == 'FT1') {
 
             //Get user ID
             $user_id = Terminal::where('serial_no', $SerialNumber)
@@ -1909,42 +1938,25 @@ class TransactionController extends Controller
                 //         'main_wallet' => $debit,
                 //     ]);
 
-                // //update Transactions
-                // $trasnaction = new Transaction();
-                // $trasnaction->user_id = $user_id;
-                // $trasnaction->ref_trans_id = $trans_id;
-                // $trasnaction->e_ref = $reference;
-                // $trasnaction->transaction_type = "VASfromTerminal";
-                // $trasnaction->title = "Terminal VAS";
-                // $trasnaction->type = $transaction_type;
-                // $trasnaction->debit = $amount;
-                // $trasnaction->balance = $debit;
-                // $trasnaction->main_type = "_vas";
-                // $trasnaction->note = "VAS Purchase from Terminal";
-                // $trasnaction->e_charges = 0;
-                // $trasnaction->serial_no = $SerialNumber;
-                // $trasnaction->status = 1;
-                // $trasnaction->save();
+                //update Transactions
+                $trasnaction = new Transaction();
+                $trasnaction->user_id = $user_id;
+                $trasnaction->ref_trans_id = $trans_id;
+                $trasnaction->e_ref = $reference;
+                $trasnaction->transaction_type = "EP TRANSFER";
+                $trasnaction->title = "Terminal Transfer";
+                $trasnaction->type = $transaction_type;
+                $trasnaction->debit = $amount;
+                $trasnaction->balance = 0.00;
+                $trasnaction->main_type = "Transfer";
+                $trasnaction->e_charges = 0;
+                $trasnaction->serial_no = $SerialNumber;
+                $trasnaction->status = 0;
+                $trasnaction->save();
 
-                // $trasnaction = new Transaction();
-                // $trasnaction->setConnection('mysql_second');
-                // $trasnaction->user_id = $user_id;
-                // $trasnaction->ref_trans_id = $trans_id;
-                // $trasnaction->e_ref = $reference;
-                // $trasnaction->transaction_type = "VASfromTerminal";
-                // $trasnaction->title = "Terminal VAS";
-                // $trasnaction->type = $transaction_type;
-                // $trasnaction->debit = $amount;
-                // $trasnaction->note = "VAS Purchase from Terminal";
-                // $trasnaction->balance = $debit;
-                // $trasnaction->e_charges = 0;
-                // $trasnaction->serial_no = $SerialNumber;
-                // $trasnaction->status = 1;
-                // $trasnaction->save();
-
-                // $amount4 = number_format($amount, 2);
-                // $message = "NGN $amount4 left pool Account by $user_id using VAS";
-                // send_notification($message);
+                $amount4 = number_format($amount, 2);
+                $message = "NGN $amount4 is about to leave your pool Account by $user_id using VAS";
+                send_notification($message);
 
                 return response()->json([
 

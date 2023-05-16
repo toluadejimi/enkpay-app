@@ -70,14 +70,27 @@ public function phone_login(Request $request){
             ], 500);
         }
 
+
+        if(){
+
+            $update = User::where('id',Auth::id())
+            ->update([
+                'status' => 2
+            ]);
+
+
+        }
+
+
+
+
         $feature = Feature::where('id', 1)->first();
-
-
-
         $token = auth()->user()->createToken('API Token')->accessToken;
 
         $user = Auth()->user();
         $user['token']=$token;
+
+
 
 
         $is_kyc_verified = Auth::user()->is_kyc_verified;
