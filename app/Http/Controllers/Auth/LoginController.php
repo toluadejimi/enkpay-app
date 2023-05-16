@@ -71,13 +71,12 @@ public function phone_login(Request $request){
         }
 
 
-        if(){
+        if(Auth::user()->device_id == null){
 
             $update = User::where('id',Auth::id())
             ->update([
-                'status' => 2
+                'device_id' => $request->device_id;
             ]);
-
 
         }
 
@@ -258,6 +257,16 @@ public function email_login(Request $request){
                 'status' => $this->failed,
                 'message' => 'Email or Password Incorrect'
             ], 500);
+        }
+
+
+        if(Auth::user()->device_id == null){
+
+            $update = User::where('id',Auth::id())
+            ->update([
+                'device_id' => $request->device_id;
+            ]);
+
         }
 
         $feature = Feature::where('id', 1)->first();

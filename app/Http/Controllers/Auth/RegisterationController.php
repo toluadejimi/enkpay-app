@@ -879,6 +879,7 @@ class RegisterationController extends Controller
             $lga = $request->lga;
             $password = $request->password;
             $pin = $request->pin;
+            $device_id = $request->device_id;
             $devide_id = $request->devide_id;
             $city = $request->city;
             $get_phone = $phone_no ?? null;
@@ -905,6 +906,7 @@ class RegisterationController extends Controller
                 $create->dob = $dob;
                 $create->gender = $gender;
                 $create->email = $email;
+                $create->email = $device_id;
                 $create->street = $street;
                 $create->city = $city;
                 $create->state = $state;
