@@ -519,8 +519,7 @@ class VirtualaccountController extends Controller
                     }
 
 
-                $message = "Your Pool account has been credited |  $message_amount | from VFD Virtual account";
-
+                    $message = "Your Pool account has been credited |  $message_amount | from VFD Virtual account";
                     send_notification($message);
 
 
@@ -532,6 +531,10 @@ class VirtualaccountController extends Controller
                         Webtransfer::where('v_account_no', $VirtualCustomerAccount)
                         ->where('payable_amount', $Amount)
                         ->update(['status' => 1]);
+
+
+                    $message = "Web Gatway Credited |  $Amount | for $VirtualCustomerAccount ";
+                    send_notification($message);
 
                     }
 
