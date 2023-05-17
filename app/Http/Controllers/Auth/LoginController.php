@@ -254,6 +254,8 @@ public function email_login(Request $request){
 
         }
 
+        dd('hello');
+        
         if (!auth()->attempt($credentials)) {
             return response()->json([
                 'status' => $this->failed,

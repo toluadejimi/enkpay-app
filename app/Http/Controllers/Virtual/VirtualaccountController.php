@@ -533,9 +533,6 @@ class VirtualaccountController extends Controller
                         ->update(['status' => 1]);
 
 
-                    $message = "Web Gatway Credited |  $Amount | for $VirtualCustomerAccount ";
-                    send_notification($message);
-
                     }
 
                     //send to user
