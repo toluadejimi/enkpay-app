@@ -128,7 +128,7 @@ class PowerController extends Controller
     public function buy_power(request $request)
     {
 
-        try {
+        // try {
 
             $auth = env('VTAUTH');
 
@@ -159,7 +159,7 @@ class PowerController extends Controller
             $eletricity_charges = Charge::where('id', 4)
                 ->first()->amount;
 
-            if ($amount < 500) {
+            if ($amount < 100) {
 
                 return response()->json([
 
@@ -237,15 +237,24 @@ class PowerController extends Controller
             $var = curl_exec($curl);
             curl_close($curl);
 
+
             $var = json_decode($var);
+
+
 
             $token = $var->purchased_code ?? null;
 
-            $get_message = $var->response_description ?? null;
+            $get_message = $var->content ?? null;
+
+            $get_var_status = $var->response_description;
+
+            // $status = 'TRANSACTION SUCCESSFUL';
+            // $token = "11182766373746646";
 
             $message = "Error Mesage from VAS ELETRIC - $get_message";
 
-            if ($var->response_description == 'TRANSACTION SUCCESSFUL') {
+
+            if ($get_var_status == 'TRANSACTION SUCCESSFUL') {
 
                 $new_amount = $amount + $eletricity_charges;
                 $debit = $user_wallet_banlance - $new_amount;
@@ -337,7 +346,7 @@ class PowerController extends Controller
                 return response()->json([
 
                     'status' => $this->success,
-                    'message' => 'Token Purchase Successfull, Check your email for token',
+                    'message' => 'Token Purchase Successful, Check your email for token',
 
                 ], 200);
 
@@ -348,13 +357,13 @@ class PowerController extends Controller
             return response()->json([
 
                 'status' => $this->failed,
-                'message' => 'Service unavilable please try again later',
+                'message' => 'Service unavailable please try again later',
 
             ], 200);
 
-        } catch (\Exception$th) {
-            return $th->getMessage();
-        }
+        // } catch (\Exception$th) {
+        //     return $th->getMessage();
+        // }
 
     }
 

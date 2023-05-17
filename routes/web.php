@@ -20,6 +20,14 @@ Route::get('/', function () {
 });
 
 
+Route::get('/get-error', function () {
+
+    $find = App\Models\User::find(100000)->id;
+
+    return view('welcome');
+});
+
+
 Route::get('reset-pin', [ProfileController::class, 'reset_pin']);
 Route::get('reset-password', [ProfileController::class, 'reset_password']);
 

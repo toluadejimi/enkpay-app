@@ -343,6 +343,11 @@ class VirtualaccountController extends Controller
                     $user_email = User::where('id', $user_id)
                         ->first()->email ?? null;
 
+
+                    $device_id = User::where('id', $user_id)
+                    ->first()->device_id ?? null;
+
+                
                     $first_name = User::where('id', $user_id)
                         ->first()->first_name ?? null;
 
@@ -458,9 +463,63 @@ class VirtualaccountController extends Controller
                         curl_close($curl);
                         $var = json_decode($var);
 
+
+                        if($device_id != null ){
+
+                            $data = [
+
+                                "registration_ids" => array($device_id),  
+
+                                    "notification" => [
+                                        "title" => "Incoming Transfer",
+                                        "body" => "You have an Incoming transfer from $sender_name",
+                                        "icon" => "ic_notification",
+                                        "click_action" => "OPEN_CHAT_ACTIVITY",
+
+                                    ],
+
+                                    "data" =>[
+                                        "sender_name" => "$sender_name",
+                                        "sender_bank" => "$sender_bank",
+                                        "amount" => "$Amount"
+                                    ],
+
+                                ];
+
+                            $dataString = json_encode($data);
+
+                            $SERVER_API_KEY = env('FCM_SERVER_KEY');
+
+                            $headers = [
+                                'Authorization: key=' . $SERVER_API_KEY,
+                                'Content-Type: application/json',
+                            ];
+
+
+                            $ch = curl_init();
+
+                            curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+                            curl_setopt($ch, CURLOPT_POST, true);
+                            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                            curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
+
+                            $get_response = curl_exec($ch);
+
+
+                            dd($get_response, $dataString, $headers);
+                            curl_close($curl);
+
+                          
+                          
+
+                        }
+
                     }
 
-                    $message = "Your Pool account has been credited |  $message_amount | from VFD Virtual account";
+
+                $message = "Your Pool account has been credited |  $message_amount | from VFD Virtual account";
 
                     send_notification($message);
 
