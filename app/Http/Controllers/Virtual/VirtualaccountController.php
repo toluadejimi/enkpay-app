@@ -347,7 +347,7 @@ class VirtualaccountController extends Controller
                     $device_id = User::where('id', $user_id)
                     ->first()->device_id ?? null;
 
-                
+
                     $first_name = User::where('id', $user_id)
                         ->first()->first_name ?? null;
 
@@ -468,7 +468,7 @@ class VirtualaccountController extends Controller
 
                             $data = [
 
-                                "registration_ids" => array($device_id),  
+                                "registration_ids" => array($device_id),
 
                                     "notification" => [
                                         "title" => "Incoming Transfer",
@@ -508,11 +508,11 @@ class VirtualaccountController extends Controller
                             $get_response = curl_exec($ch);
 
 
-                            dd($get_response, $dataString, $headers);
+                            //dd($get_response, $dataString, $headers);
                             curl_close($curl);
 
-                          
-                          
+
+
 
                         }
 
