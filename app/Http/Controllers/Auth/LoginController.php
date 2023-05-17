@@ -262,7 +262,7 @@ public function email_login(Request $request){
             ], 500);
         }
 
-        $hello = me.
+        
 
         $get_device_id = User::where('device_id', $request->device_id)
         ->first()->device_id ?? null;
