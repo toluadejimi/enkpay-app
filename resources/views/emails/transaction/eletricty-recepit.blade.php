@@ -120,7 +120,7 @@
                             </td>
 
                             <td>
-                                Recepit #: {{$recepit}}<br /> Date: {{ $data1["date"] }}<br /> Status:
+                                Recepit no: {{$data1["recepit"]}}<br /> Date: {{ $data1["date"] }}<br /> Status:
                                 PAID<br />
                             </td>
                         </tr>

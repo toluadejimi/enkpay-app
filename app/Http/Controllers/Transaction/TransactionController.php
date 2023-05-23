@@ -42,7 +42,7 @@ class TransactionController extends Controller
 
             $referenceCode = "ENK-" . random_int(1000000, 999999999);
 
-            $transfer_charges = Charge::where('id', 1)->first()->amount;
+            $transfer_charges = Charge::where('title', 'transfer_fee')->first()->amount;
 
             $amoutCharges = $amount + $transfer_charges;
 
@@ -302,7 +302,7 @@ class TransactionController extends Controller
 
             $referenceCode = "ENK-" . random_int(1000000, 999999999);
 
-            $transfer_charges = Charge::where('id', 1)->first()->amount;
+            $transfer_charges = Charge::where('title', 'transfer_fee')->first()->amount;
 
 
             $amoutCharges = $amount + $transfer_charges;
@@ -1119,7 +1119,7 @@ class TransactionController extends Controller
 
             //$verify1 = hash('sha512', $key);
 
-            $comission = Charge::where('id', 3)
+            $comission = Charge::where('title', 'both_commission')
                 ->first()->amount;
 
             if ($eip == $ip) {
@@ -1277,7 +1277,7 @@ class TransactionController extends Controller
 
             //$verify1 = hash('sha512', $key);
 
-            $comission = Charge::where('id', 3)
+            $comission = Charge::where('title', 'both_commission')
                 ->first()->amount;
 
             if ($eip == $ip) {
