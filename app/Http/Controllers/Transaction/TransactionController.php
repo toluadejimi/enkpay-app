@@ -1616,7 +1616,7 @@ class TransactionController extends Controller
                         ]);
 
                     $amount4 = number_format($Amount, 2);
-                    $message = "NGN $amount4 left pool Account by $full_name";
+                    $message = "NGN $amount4 left pool Account by  $full_name";
                     send_notification($message);
 
                     return response()->json([
@@ -1630,7 +1630,7 @@ class TransactionController extends Controller
             }
 
             $amount4 = number_format($Amount, 2);
-            $message = "NGN $amount4 left pool Account by $user_id";
+            $message = "NGN $amount4 left pool Account by  $full_name";
             send_notification($message);
 
             return response()->json([
@@ -1705,96 +1705,94 @@ class TransactionController extends Controller
             ]);
         }
 
+        // if ($transaction_type == 'outward') {
+
+        //     $user_balance = User::where('id', $user_id)
+        //         ->first()->main_wallet ?? null;
+
+        //     $status = Terminal::where('serial_no', $SerialNumber)
+        //         ->first()->transfer_status;
+
+        //     $main_balance = User::where('id', $user_id)
+        //         ->first()->main_wallet;
+
+        //     $get_pin = User::where('id', $user_id)
+        //         ->first()->pin;
+
+        //     if ($status == 1) {
+        //         $check_agent_status = "Active";
+        //     } else {
+        //         $check_agent_status = "InActive";
+        //     }
+
+        //     if (Hash::check($pin, $get_pin) == false) {
+
+        //         return response()->json([
+
+        //             'is_pin_valid' => false,
+        //             'balance' => number_format($user_balance, 2),
+        //             'agent_status' => $check_agent_status,
+
+        //         ]);
+        //     }
+
+        //     //check balance
+        //     $user_balance = User::where('id', $user_id)
+        //         ->first()->main_wallet;
+
+        //     if ($user_balance >= $amount) {
+
+        //         $user_balance = User::where('id', $user_id)
+        //             ->first()->main_wallet ?? null;
+
+        //         // $debit = $user_balance - $amount;
+
+        //         // $update_balance = User::where('serial_no', $SerialNumber)
+        //         //     ->update([
+        //         //         'main_wallet' => $debit,
+        //         //     ]);
+
+        //         // //update Transactions
+        //         // $trasnaction = new Transaction();
+        //         // $trasnaction->user_id = $user_id;
+        //         // $trasnaction->ref_trans_id = $trans_id;
+        //         // $trasnaction->e_ref = $reference;
+        //         // $trasnaction->transaction_type = "TerminalBankTransfer";
+        //         // $trasnaction->type = $transaction_type;
+        //         // $trasnaction->title = "Bank Transfer";
+        //         // $trasnaction->debit = $amount;
+        //         // $trasnaction->main_type = 'Transfer';
+        //         // $trasnaction->balance = $debit;
+        //         // $trasnaction->e_charges = 25;
+        //         // $trasnaction->serial_no = $SerialNumber;
+        //         // $trasnaction->note = "Transfer to other banks";
+        //         // $trasnaction->status = 1;
+        //         // $trasnaction->save();
+
+        //         // $amount4 = number_format($amount, 2);
+        //         // $message = "NGN $amount4 left pool Account by $user_id using Transfer";
+        //         // send_notification($message);
+
+        //         return response()->json([
+
+        //             'is_pin_valid' => true,
+        //             'balance' => number_format($user_balance, 2),
+        //             'agent_status' => $check_agent_status,
+
+        //         ]);
+        //     } else {
+
+        //         return response()->json([
+
+        //             'is_pin_valid' => true,
+        //             'balance' => number_format($user_balance, 2),
+        //             'agent_status' => $check_agent_status,
+
+        //         ]);
+        //     }
+        // }
+
         if ($transaction_type == 'outward') {
-
-
-
-            $user_balance = User::where('id', $user_id)
-                ->first()->main_wallet ?? null;
-
-            $status = Terminal::where('serial_no', $SerialNumber)
-                ->first()->transfer_status;
-
-            $main_balance = User::where('id', $user_id)
-                ->first()->main_wallet;
-
-            $get_pin = User::where('id', $user_id)
-                ->first()->pin;
-
-            if ($status == 1) {
-                $check_agent_status = "Active";
-            } else {
-                $check_agent_status = "InActive";
-            }
-
-            if (Hash::check($pin, $get_pin) == false) {
-
-                return response()->json([
-
-                    'is_pin_valid' => false,
-                    'balance' => number_format($user_balance, 2),
-                    'agent_status' => $check_agent_status,
-
-                ]);
-            }
-
-            //check balance
-            $user_balance = User::where('id', $user_id)
-                ->first()->main_wallet;
-
-            if ($user_balance >= $amount) {
-
-                $user_balance = User::where('id', $user_id)
-                    ->first()->main_wallet ?? null;
-
-                // $debit = $user_balance - $amount;
-
-                // $update_balance = User::where('serial_no', $SerialNumber)
-                //     ->update([
-                //         'main_wallet' => $debit,
-                //     ]);
-
-                // //update Transactions
-                // $trasnaction = new Transaction();
-                // $trasnaction->user_id = $user_id;
-                // $trasnaction->ref_trans_id = $trans_id;
-                // $trasnaction->e_ref = $reference;
-                // $trasnaction->transaction_type = "TerminalBankTransfer";
-                // $trasnaction->type = $transaction_type;
-                // $trasnaction->title = "Bank Transfer";
-                // $trasnaction->debit = $amount;
-                // $trasnaction->main_type = 'Transfer';
-                // $trasnaction->balance = $debit;
-                // $trasnaction->e_charges = 25;
-                // $trasnaction->serial_no = $SerialNumber;
-                // $trasnaction->note = "Transfer to other banks";
-                // $trasnaction->status = 1;
-                // $trasnaction->save();
-
-                // $amount4 = number_format($amount, 2);
-                // $message = "NGN $amount4 left pool Account by $user_id using Transfer";
-                // send_notification($message);
-
-                return response()->json([
-
-                    'is_pin_valid' => true,
-                    'balance' => number_format($user_balance, 2),
-                    'agent_status' => $check_agent_status,
-
-                ]);
-            } else {
-
-                return response()->json([
-
-                    'is_pin_valid' => true,
-                    'balance' => number_format($user_balance, 2),
-                    'agent_status' => $check_agent_status,
-
-                ]);
-            }
-        }
-
-        if ($serviceCode == 'FT1') {
 
             //Get user ID
             $user_id = Terminal::where('serial_no', $SerialNumber)
