@@ -1844,13 +1844,13 @@ class TransactionController extends Controller
                 ->first()->main_wallet;
 
 
-            $debit_amount = $amount + $transfer_fee;
+            //$debit_amount = $amount + $transfer_fee;
 
             $enkpayprofit = $transfer_fee - 10;
 
             if ($user_balance >= $amount) {
 
-                $debit = $user_balance - $debit_amount;
+                $debit = $user_balance - $amount;
 
                 User::where('id', $user_id)
                     ->update([
@@ -1863,7 +1863,7 @@ class TransactionController extends Controller
                 $trasnaction->ref_trans_id = $trans_id;
                 $trasnaction->e_ref = $reference;
                 $trasnaction->transaction_type = "EP TRANSFER";
-                $trasnaction->debit = $debit_amount;
+                $trasnaction->debit = $amount;
                 $trasnaction->amount = $amount;
                 $trasnaction->title = "EP Transfer";
                 $trasnaction->balance = $debit;
