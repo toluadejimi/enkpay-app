@@ -1852,7 +1852,7 @@ class TransactionController extends Controller
 
                 $debit = $user_balance - $debit_amount;
 
-                User::where('user_id', $user_id)
+                User::where('id', $user_id)
                     ->update([
                         'main_wallet' => $debit,
                     ]);
