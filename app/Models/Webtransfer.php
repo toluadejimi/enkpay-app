@@ -8,4 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Webtransfer extends Model
 {
     use HasFactory;
+
+
+    protected $fillable = [
+        'trans_id',
+        'status',
+        'amount',
+    ];
 }

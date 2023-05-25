@@ -1663,12 +1663,13 @@ class TransactionController extends Controller
             if ($TransactionType == 'FundTransfer') {
 
                 //check transaction
-                $serial_no = Transaction::where('serial_no',$SerialNumber)
+                $e_ref = Transaction::where('e_ref',$TransactionReference)
                 ->first()->serial_no ?? null;
 
-                if($serial_no !== null ){
+                if($e_ref !== null ){
 
-                    Transaction::where('serial_no',$SerialNumber)
+                    Transaction::where('e_ref',$TransactionReference)
+                    ->where('status', 0)
                     ->update([
                         'debit' => $debit_amount,
                         'amount' => $Amount,
@@ -1676,7 +1677,6 @@ class TransactionController extends Controller
                         'fee' => $Fee,
                         'balance' => $debit_wallet,
                         'status' => 1,
-
                     ]);
 
                     $amount4 = number_format($Amount, 2);

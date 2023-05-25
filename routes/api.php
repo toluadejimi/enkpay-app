@@ -12,6 +12,7 @@ use App\Http\Controllers\VAS\EducationController;
 use App\Http\Controllers\VAS\CableController;
 use App\Http\Controllers\VAS\InsuranceController;
 use App\Http\Controllers\Virtual\VirtualaccountController;
+use App\Http\Controllers\WebpaymentController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -123,6 +124,9 @@ Route::group(['middleware' => ['auth:api', 'acess']], function () {
 
 
 
+
+
+
    //Get Eletric Compnay
 Route::get('electric-company', [PowerController::class, 'get_eletric_company']);
 
@@ -221,6 +225,8 @@ Route::post('auth-verify-email', [RegisterationController::class, 'auth_email_ve
 
 
 
+
+    Route::post('confirm-pay', [WebpaymentController::class, 'confirm_pay']);
 
 
 
