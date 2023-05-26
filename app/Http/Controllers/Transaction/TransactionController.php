@@ -201,7 +201,7 @@ class TransactionController extends Controller
                 $trasnaction->receiver_name = $destinationAccountName;
                 $trasnaction->receiver_account_no = $destinationAccountNumber;
                 $trasnaction->balance = $debit;
-                $trasnaction->status = 1;
+                $trasnaction->status = 0;
                 $trasnaction->save();
 
                 if ($user_email !== null) {
@@ -1493,6 +1493,15 @@ class TransactionController extends Controller
                 $type = User::where('id', $user_id)
                     ->first()->type ?? null;
 
+                $f_name = User::where('id', $user_id)
+                    ->first()->first_name ?? null;
+
+                $l_name = User::where('id', $user_id)
+                    ->first()->last_name ?? null;
+
+
+                $full_name = $f_name . " " . $l_name;
+
                 if ($main_wallet == null && $user_id == null) {
 
                     return response()->json([
@@ -1530,8 +1539,9 @@ class TransactionController extends Controller
                 }
 
                 $amount4 = number_format($Amount, 2);
-                $message = "NGN $amount4 left pool Account by $user_id";
+                $message = "NGN $amount4 left pool Account by  $full_name for VAS | $BillService | $BillCategory | $Beneficiary ";
                 send_notification($message);
+
 
                 return response()->json([
                     'status' => true,
@@ -1643,6 +1653,106 @@ class TransactionController extends Controller
         //     return $th->getMessage();
         // }
 
+
+
+
+        //Reversal
+
+        if ($request->ServiceCode == 'RFT1') {
+
+            $StatusCode = $request->StatusCode;
+            $StatusDescription = $request->StatusDescription;
+            $SerialNumber = $request->SerialNumber;
+            $Amount = $request->Amount;
+            $Currency = $request->Currency;
+            $TransactionDate = $request->TransactionDate;
+            $TransactionTime = $request->TransactionTime;
+            $TransactionType = $request->TransactionType;
+            $ServiceCode = $request->ServiceCode;
+            $TransactionReference = $request->TransactionReference;
+            $Fee = $request->Fee;
+            $PostingType = $request->PostingType;
+            $DestinationAccountName = $request->AdditionalDetails['DestinationAccountName'] ?? null;
+            $DestinationAccountNumber = $request->AdditionalDetails['DestinationAccountNumber'] ?? null;
+            $DestinationBankName = $request->AdditionalDetails['DestinationBankName'] ?? null;
+
+
+
+            $trx = Transaction::where('e_ref', $TransactionReference)->first();
+
+
+
+            if ($trx == null) {
+
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Transaction not found',
+                ], 500);
+            }
+
+            if ($trx->status == 1) {
+
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Transaction is completed',
+                ], 500);
+            }
+
+            if ($trx->status == 3) {
+
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Transaction has been reversed',
+                ], 500);
+            }
+
+            Transaction::where('e_ref', $TransactionReference)->where('status', 0)->update([
+                'status' => 3,
+            ]);
+
+
+            User::where('id', $trx->user_id)->increment('main_wallet', $trx->debit);
+
+            $balance = User::where('id', $trx->user_id)->first()->main_wallet;
+
+
+            $trasnaction = new Transaction();
+            $trasnaction->user_id = $trx->user_id;
+            $trasnaction->ref_trans_id = $trx->ref_trans_id;
+            $trasnaction->e_ref = $trx->e_ref;
+            $trasnaction->transaction_type = "Reversal";
+            $trasnaction->debit = 0;
+            $trasnaction->amount = $trx->debit;
+            $trasnaction->serial_no = $SerialNumber;
+            $trasnaction->title = "Reversal";
+            $trasnaction->note = "Revasal | $DestinationAccountName | $DestinationAccountNumber";
+            $trasnaction->fee = $Fee;
+            $trasnaction->balance = $balance;
+            $trasnaction->main_type = "Revasal";
+            $trasnaction->status = 3;
+            $trasnaction->save();
+
+
+            $f_name = User::where('id', $trx->user_id)
+                ->first()->first_name ?? null;
+
+            $l_name = User::where('id', $trx->user_id)
+                ->first()->last_name ?? null;
+
+            $full_name = $f_name . " " . $l_name;
+
+
+            $amount4 = number_format($trx->debit, 2);
+            $message = "NGN $amount4 has been reversed to  $full_name";
+            send_notification($message);
+
+
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Reversed Successsfully',
+            ], 200);
+        }
     }
 
     public function balance_webhook(Request $request)
@@ -1945,6 +2055,10 @@ class TransactionController extends Controller
     public function transactiion_status(Request $request)
     {
 
+        $erran_api_key = errand_api_key();
+        $epkey = env('EPKEY');
+
+
         try {
 
             $ref_no = $request->ref_no;
@@ -1970,41 +2084,46 @@ class TransactionController extends Controller
 
 
 
-            if ($e_ref_status == 0) {
+            if ($e_ref_status == 0 ) {
 
 
-                // $curl = curl_init();
+                $curl = curl_init();
 
-                // curl_setopt_array($curl, array(
-                //     CURLOPT_URL => "https://api.errandpay.com/epagentservice/api/v1/v1/GetStatus?reference=$e_ref&businessCode=$b_code",
-                //     CURLOPT_RETURNTRANSFER => true,
-                //     CURLOPT_ENCODING => '',
-                //     CURLOPT_MAXREDIRS => 10,
-                //     CURLOPT_TIMEOUT => 0,
-                //     CURLOPT_FOLLOWLOCATION => true,
-                //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                //     CURLOPT_CUSTOMREQUEST => 'GET',
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => "https://api.errandpay.com/epagentservice/api/v1/GetStatus?reference=$e_ref&businessCode=A00088",
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'GET',
+                    CURLOPT_HTTPHEADER => array(
+                        "Authorization: Bearer $erran_api_key"
+                    ),
+                ));
 
-                // ));
+                $var = curl_exec($curl);
 
-                // $var = curl_exec($curl);
+                curl_close($curl);
+                $var = json_decode($var);
+                $status = $var->data->statusCode ?? null;
 
-                // curl_close($curl);
-                // $var = json_decode($var);
-                // $status = $var->data->statusCode ?? null;
 
-                // dd($var);
 
-                // if ($status == 00) {
 
-                //     Transaction::where('ref_trans_id', $ref_no)->update([
 
-                //         'status' => 1,
+                if ($status == 00) {
 
-                //     ]);
 
-                //     $done = $var->data->statusCode ?? null;
-                //}
+
+                    Transaction::where('ref_trans_id', $ref_no)->update([
+
+                        'status' => 1,
+
+                    ]);
+
+                }
             }
 
 
