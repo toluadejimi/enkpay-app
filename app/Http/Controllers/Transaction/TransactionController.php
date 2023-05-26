@@ -1993,6 +1993,8 @@ class TransactionController extends Controller
                 $var = json_decode($var);
                 $status = $var->data->statusCode ?? null;
 
+                dd($var);
+
                 if ($status == 00) {
 
                     Transaction::where('ref_trans_id', $ref_no)->update([
@@ -2039,7 +2041,7 @@ class TransactionController extends Controller
                 'note' => $note,
                 'status' => $status,
                 'message' => "If receiver is not credited within 10mins, Please contact us with the EREF ",
-                
+
 
             ], 200);
         } catch (\Exception $th) {
