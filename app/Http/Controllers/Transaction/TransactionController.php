@@ -1564,19 +1564,19 @@ class TransactionController extends Controller
             $trans_id = "ENK-" . random_int(100000, 999999);
 
 
-            
+
 
             //Get user ID
             $user_id = Terminal::where('serial_no', $SerialNumber)
                 ->first()->user_id ?? null;
 
             $f_name = User::where('id', $user_id)
-            ->first()->first_name ?? null;
+                ->first()->first_name ?? null;
 
             $l_name = User::where('id', $user_id)
-            ->first()->last_name ?? null;
+                ->first()->last_name ?? null;
 
-            $full_name = $f_name . " ". $l_name;
+            $full_name = $f_name . " " . $l_name;
 
             $main_wallet = User::where('id', $user_id)
                 ->first()->main_wallet ?? null;
@@ -1592,8 +1592,8 @@ class TransactionController extends Controller
                 ], 500);
             }
 
-           
-            
+
+
 
 
             if ($TransactionType == 'FundTransfer') {
@@ -1626,7 +1626,7 @@ class TransactionController extends Controller
                 }
 
                 //update Transactions
-                
+
             }
 
             $amount4 = number_format($Amount, 2);
@@ -1805,15 +1805,15 @@ class TransactionController extends Controller
                 ->first()->pin;
 
             $transfer_fee = Charge::where('title', 'transfer_fee')
-            ->first()->amount;
+                ->first()->amount;
 
             $f_name = User::where('id', $user_id)
-            ->first()->first_name ?? null;
+                ->first()->first_name ?? null;
 
             $l_name = User::where('id', $user_id)
-            ->first()->last_name ?? null;
+                ->first()->last_name ?? null;
 
-            $full_name = $f_name . " ". $l_name;
+            $full_name = $f_name . " " . $l_name;
 
             if ($status == 1) {
                 $check_agent_status = "Active";
@@ -1884,8 +1884,7 @@ class TransactionController extends Controller
                     'agent_status' => $check_agent_status,
 
                 ]);
-            
-            }else{
+            } else {
 
                 return response()->json([
 
@@ -1894,10 +1893,7 @@ class TransactionController extends Controller
                     'agent_status' => $check_agent_status,
 
                 ]);
-
-
             }
-            
         }
 
         if ($serviceCode == 'BLE1') {
@@ -1963,8 +1959,52 @@ class TransactionController extends Controller
                 ], 500);
             }
 
+
             $e_ref = Transaction::where('ref_trans_id', $ref_no)
                 ->first()->e_ref;
+
+            $e_ref_status = Transaction::where('ref_trans_id', $ref_no)
+                ->first()->status;
+
+            $b_code = env('BCODE');
+
+
+
+            if ($e_ref_status == 0) {
+
+
+                $curl = curl_init();
+
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => "https://api.errandpay.com/epagentservice/api/v1/v1/GetStatus?reference=$e_ref&businessCode=$b_code",
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'GET',
+
+                ));
+
+                $var = curl_exec($curl);
+
+                curl_close($curl);
+                $var = json_decode($var);
+                $status = $var->data->statusCode ?? null;
+
+                if ($status == 00) {
+
+                    Transaction::where('ref_no', $ref_no)->update([
+
+                        'status' => 1,
+
+                    ]);
+
+                    $done = $var->data->statusCode ?? null;
+                }
+            }
+
 
             $amount = Transaction::where('ref_trans_id', $ref_no)
                 ->first()->amount;
@@ -1998,7 +2038,7 @@ class TransactionController extends Controller
                 'date' => $date,
                 'note' => $note,
                 'status' => $status,
-                'message' => "If receiver is not credited within 10mins, Please contact us with the EREF  ",
+                'message' => "If receiver is not credited within 10mins, Please contact us with the EREF $done ",
 
             ], 200);
         } catch (\Exception $th) {
