@@ -1995,7 +1995,7 @@ class TransactionController extends Controller
 
                 if ($status == 00) {
 
-                    Transaction::where('ref_no', $ref_no)->update([
+                    Transaction::where('ref_trans_id', $ref_no)->update([
 
                         'status' => 1,
 
