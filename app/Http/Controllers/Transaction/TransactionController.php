@@ -2038,7 +2038,8 @@ class TransactionController extends Controller
                 'date' => $date,
                 'note' => $note,
                 'status' => $status,
-                'message' => "If receiver is not credited within 10mins, Please contact us with the EREF $done ",
+                'message' => "If receiver is not credited within 10mins, Please contact us with the EREF ",
+                
 
             ], 200);
         } catch (\Exception $th) {
