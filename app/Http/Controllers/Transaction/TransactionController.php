@@ -1973,38 +1973,38 @@ class TransactionController extends Controller
             if ($e_ref_status == 0) {
 
 
-                $curl = curl_init();
+                // $curl = curl_init();
 
-                curl_setopt_array($curl, array(
-                    CURLOPT_URL => "https://api.errandpay.com/epagentservice/api/v1/v1/GetStatus?reference=$e_ref&businessCode=$b_code",
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING => '',
-                    CURLOPT_MAXREDIRS => 10,
-                    CURLOPT_TIMEOUT => 0,
-                    CURLOPT_FOLLOWLOCATION => true,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST => 'GET',
+                // curl_setopt_array($curl, array(
+                //     CURLOPT_URL => "https://api.errandpay.com/epagentservice/api/v1/v1/GetStatus?reference=$e_ref&businessCode=$b_code",
+                //     CURLOPT_RETURNTRANSFER => true,
+                //     CURLOPT_ENCODING => '',
+                //     CURLOPT_MAXREDIRS => 10,
+                //     CURLOPT_TIMEOUT => 0,
+                //     CURLOPT_FOLLOWLOCATION => true,
+                //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                //     CURLOPT_CUSTOMREQUEST => 'GET',
 
-                ));
+                // ));
 
-                $var = curl_exec($curl);
+                // $var = curl_exec($curl);
 
-                curl_close($curl);
-                $var = json_decode($var);
-                $status = $var->data->statusCode ?? null;
+                // curl_close($curl);
+                // $var = json_decode($var);
+                // $status = $var->data->statusCode ?? null;
 
-                dd($var);
+                // dd($var);
 
-                if ($status == 00) {
+                // if ($status == 00) {
 
-                    Transaction::where('ref_trans_id', $ref_no)->update([
+                //     Transaction::where('ref_trans_id', $ref_no)->update([
 
-                        'status' => 1,
+                //         'status' => 1,
 
-                    ]);
+                //     ]);
 
-                    $done = $var->data->statusCode ?? null;
-                }
+                //     $done = $var->data->statusCode ?? null;
+                //}
             }
 
 
