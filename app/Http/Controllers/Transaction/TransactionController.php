@@ -1980,7 +1980,6 @@ class TransactionController extends Controller
                 $trasnaction->main_type = "Transfer";
                 $trasnaction->serial_no = $SerialNumber;
                 $trasnaction->enkPay_Cashout_profit = $enkpayprofit;
-                $trasnaction->status = 0;
                 $trasnaction->save();
 
                 $amount4 = number_format($amount, 2);
