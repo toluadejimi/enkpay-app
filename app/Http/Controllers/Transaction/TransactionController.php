@@ -2110,6 +2110,7 @@ class TransactionController extends Controller
 
 
 
+                dd($var);
 
 
                 if ($status == 00) {
