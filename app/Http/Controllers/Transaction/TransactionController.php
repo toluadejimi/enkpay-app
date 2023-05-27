@@ -1902,7 +1902,7 @@ class TransactionController extends Controller
         //     }
         // }
 
-        if ($transaction_type == 'outward') {
+        if ($transaction_type == 'outward' && $serviceCode == 'FT1') {
 
             //Get user ID
             $user_id = Terminal::where('serial_no', $SerialNumber)
