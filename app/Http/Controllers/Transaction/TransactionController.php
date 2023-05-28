@@ -114,12 +114,6 @@ class TransactionController extends Controller
             }
 
 
-
-
-
-
-
-
             $user_email = user_email();
             $first_name = first_name();
 
@@ -217,7 +211,7 @@ class TransactionController extends Controller
             $post_data = json_encode($data);
 
             curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
+                // CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
@@ -365,9 +359,11 @@ class TransactionController extends Controller
 
                 ], 500);
             }
+
         } catch (\Exception $th) {
-            return $th->getMessage();
+          return $th->getMessage();
         }
+
     }
 
     public function self_cash_out(Request $request)
@@ -638,6 +634,7 @@ class TransactionController extends Controller
                     'message' => "Transaction Processing",
 
                 ], 200);
+
             } else {
 
                 //credit
