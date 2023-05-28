@@ -30,9 +30,9 @@ class TransactionController extends Controller
             $chk = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
             $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
 
-            if($fa != null){
+            if ($fa != null) {
 
-                if($chk->user_id == Auth::id()){
+                if ($chk->user_id == Auth::id()) {
 
 
                     $anchorTime = Carbon::createFromFormat("Y-m-d H:i:s", $fa->created_at);
@@ -40,36 +40,29 @@ class TransactionController extends Controller
                     # count difference in minutes
                     $minuteDiff = $anchorTime->diffInSeconds($currentTime);
 
-                   
-                    if($minuteDiff >= 100){
+
+                    if ($minuteDiff >= 100) {
                         FailedTransaction::where('user_id', Auth::id())->delete();
                     }
-    
                 }
-
-
             }
 
 
             $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
-            if($fa !== null){
+            if ($fa !== null) {
 
-                if($fa->attempt == 2 ){
+                if ($fa->attempt == 2) {
                     return response()->json([
-    
+
                         'status' => $this->failed,
                         'message' => 'Service not available at the moment, please wait for about 10 mins and try again',
-    
+
                     ], 500);
-    
                 }
-    
-
-
             }
-          
-        
-           
+
+
+
 
 
 
@@ -94,7 +87,7 @@ class TransactionController extends Controller
             $amoutCharges = $amount + $transfer_charges;
 
 
-            if(Auth::user()->status == 5){
+            if (Auth::user()->status == 5) {
 
 
                 return response()->json([
@@ -103,26 +96,23 @@ class TransactionController extends Controller
                     'message' => 'You can not make transfer at the moment, Please contact  support',
 
                 ], 500);
-
             }
 
 
             $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
-            if($fa !== null){
+            if ($fa !== null) {
 
 
-                if($fa->attempt == 2){
+                if ($fa->attempt == 2) {
                     return response()->json([
-    
+
                         'status' => $this->failed,
                         'message' => 'Service not available at the moment, please wait and try again later',
-    
-                    ], 500);
-    
-                }
 
+                    ], 500);
+                }
             }
-        
+
 
 
 
@@ -336,7 +326,7 @@ class TransactionController extends Controller
                 //save failed Transactions
 
                 $chk = FailedTransaction::where('user_id', Auth::id())->first()->user_id ?? null;
-                if($chk == null){
+                if ($chk == null) {
 
                     $f = new FailedTransaction();
                     $f->user_id = Auth::id();
@@ -346,23 +336,22 @@ class TransactionController extends Controller
                 }
 
 
-                if($chk == Auth::id()){
+                if ($chk == Auth::id()) {
 
                     $time = FailedTransaction::where('user_id', Auth::id())->first()->created_at;
                     $currentDateTime = Carbon::now();
                     $targetDateTime = Carbon::now()->addSeconds(2);
                     $diffInSeconds = $targetDateTime->diffInSeconds($currentDateTime);
 
-                    if($diffInSeconds == 2){
+                    if ($diffInSeconds == 2) {
                         FailedTransaction::where('user_id', Auth::id())->increment('attempt', 1);
                     }
-
                 }
 
-              
+
                 $parametersJson = json_encode($request->all());
                 $headers = json_encode($request->headers->all());
-                $full_name = Auth::user()->first_name. "  " .Auth::user()->last_name;
+                $full_name = Auth::user()->first_name . "  " . Auth::user()->last_name;
 
                 $ip = $request->ip();
 
@@ -390,9 +379,9 @@ class TransactionController extends Controller
             $chk = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
             $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
 
-            if($fa != null){
+            if ($fa != null) {
 
-                if($chk->user_id == Auth::id()){
+                if ($chk->user_id == Auth::id()) {
 
 
                     $anchorTime = Carbon::createFromFormat("Y-m-d H:i:s", $fa->created_at);
@@ -400,36 +389,29 @@ class TransactionController extends Controller
                     # count difference in minutes
                     $minuteDiff = $anchorTime->diffInSeconds($currentTime);
 
-                   
-                    if($minuteDiff >= 100){
+
+                    if ($minuteDiff >= 100) {
                         FailedTransaction::where('user_id', Auth::id())->delete();
                     }
-    
                 }
-
-
             }
 
 
             $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
-            if($fa !== null){
+            if ($fa !== null) {
 
-                if($fa->attempt == 2 ){
+                if ($fa->attempt == 2) {
                     return response()->json([
-    
+
                         'status' => $this->failed,
                         'message' => 'Service not available at the moment, please wait for about 10 mins and try again',
-    
+
                     ], 500);
-    
                 }
-    
-
-
             }
-          
-        
-           
+
+
+
 
             $account_number = Auth::user()->c_account_number ?? null;
             $bank_code = Auth::user()->c_bank_code;
@@ -680,7 +662,7 @@ class TransactionController extends Controller
                 //save failed Transactions
 
                 $chk = FailedTransaction::where('user_id', Auth::id())->first()->user_id ?? null;
-                if($chk == null){
+                if ($chk == null) {
 
                     $f = new FailedTransaction();
                     $f->user_id = Auth::id();
@@ -690,34 +672,35 @@ class TransactionController extends Controller
                 }
 
 
-                if($chk == Auth::id()){
+                if ($chk == Auth::id()) {
 
                     $time = FailedTransaction::where('user_id', Auth::id())->first()->created_at;
                     $currentDateTime = Carbon::now();
                     $targetDateTime = Carbon::now()->addSeconds(2);
                     $diffInSeconds = $targetDateTime->diffInSeconds($currentDateTime);
 
-                    if($diffInSeconds == 2){
+                    if ($diffInSeconds == 2) {
                         FailedTransaction::where('user_id', Auth::id())->increment('attempt', 1);
+                    }
+
+
+
+                    $parametersJson = json_encode($request->all());
+                    $headers = json_encode($request->headers->all());
+                    $full_name = Auth::user()->first_name . "  " . Auth::user()->last_name;
+
+                    $ip = $request->ip();
+
+                    $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\n Full Name=======> " . $full_name . "\n\nIP========> " . $ip;
+                    send_notification($result);
+
+                    return response()->json([
+
+                        'status' => $this->failed,
+                        'message' => 'Service not reachable, please try again later',
+
+                    ], 500);
                 }
-
-
-
-                $parametersJson = json_encode($request->all());
-                $headers = json_encode($request->headers->all());
-                $full_name = Auth::user()->first_name. "  " .Auth::user()->last_name;
-
-                $ip = $request->ip();
-
-                $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\n Full Name=======> " . $full_name . "\n\nIP========> " . $ip;
-                send_notification($result);
-
-                return response()->json([
-
-                    'status' => $this->failed,
-                    'message' => 'Service not reachable, please try again later',
-
-                ], 500);
             }
         } catch (\Exception $th) {
             return $th->getMessage();
@@ -2184,7 +2167,6 @@ class TransactionController extends Controller
                     'agent_status' => $check_agent_status,
 
                 ]);
-                
             } else {
 
                 return response()->json([
@@ -2275,7 +2257,7 @@ class TransactionController extends Controller
 
 
 
-            if ($e_ref_status == 0 ) {
+            if ($e_ref_status == 0) {
 
 
                 $curl = curl_init();
@@ -2314,7 +2296,6 @@ class TransactionController extends Controller
                         'status' => 1,
 
                     ]);
-
                 }
             }
 
