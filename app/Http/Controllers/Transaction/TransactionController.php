@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Transaction;
 use App\Http\Controllers\Controller;
 use App\Models\Charge;
 use App\Models\ErrandKey;
+use App\Models\FailedTransaction;
 use App\Models\Terminal;
 use App\Models\Transaction;
 use App\Models\User;
@@ -25,6 +26,52 @@ class TransactionController extends Controller
     {
 
         try {
+
+            $chk = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
+            $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
+
+            if($fa != null){
+
+                if($chk->user_id == Auth::id()){
+
+
+                    $anchorTime = Carbon::createFromFormat("Y-m-d H:i:s", $fa->created_at);
+                    $currentTime = Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00"));
+                    # count difference in minutes
+                    $minuteDiff = $anchorTime->diffInSeconds($currentTime);
+
+                   
+                    if($minuteDiff >= 100){
+                        FailedTransaction::where('user_id', Auth::id())->delete();
+                    }
+    
+                }
+
+
+            }
+
+
+            $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
+            if($fa !== null){
+
+                if($fa->attempt == 2 ){
+                    return response()->json([
+    
+                        'status' => $this->failed,
+                        'message' => 'Service not available at the moment, please wait for about 10 mins and try again',
+    
+                    ], 500);
+    
+                }
+    
+
+
+            }
+          
+        
+           
+
+
 
             $erran_api_key = errand_api_key();
 
@@ -58,6 +105,29 @@ class TransactionController extends Controller
                 ], 500);
 
             }
+
+
+            $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
+            if($fa !== null){
+
+
+                if($fa->attempt == 2){
+                    return response()->json([
+    
+                        'status' => $this->failed,
+                        'message' => 'Service not available at the moment, please wait and try again later',
+    
+                    ], 500);
+    
+                }
+
+            }
+        
+
+
+
+
+
 
 
             $user_email = user_email();
@@ -191,6 +261,8 @@ class TransactionController extends Controller
 
             $status = $var->code ?? null;
 
+            //$status = 209;
+
             if ($status == 200) {
 
                 //update Transactions
@@ -260,6 +332,34 @@ class TransactionController extends Controller
                         ]);
                 }
 
+
+                //save failed Transactions
+
+                $chk = FailedTransaction::where('user_id', Auth::id())->first()->user_id ?? null;
+                if($chk == null){
+
+                    $f = new FailedTransaction();
+                    $f->user_id = Auth::id();
+                    $f->attempt = 1;
+                    $f->created_at = Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00"));
+                    $f->save();
+                }
+
+
+                if($chk == Auth::id()){
+
+                    $time = FailedTransaction::where('user_id', Auth::id())->first()->created_at;
+                    $currentDateTime = Carbon::now();
+                    $targetDateTime = Carbon::now()->addSeconds(2);
+                    $diffInSeconds = $targetDateTime->diffInSeconds($currentDateTime);
+
+                    if($diffInSeconds == 2){
+                        FailedTransaction::where('user_id', Auth::id())->increment('attempt', 1);
+                    }
+
+                }
+
+              
                 $parametersJson = json_encode($request->all());
                 $headers = json_encode($request->headers->all());
                 $full_name = Auth::user()->first_name. "  " .Auth::user()->last_name;
@@ -272,7 +372,7 @@ class TransactionController extends Controller
                 return response()->json([
 
                     'status' => $this->failed,
-                    'message' => 'Service not reachable, please try again later',
+                    'message' => 'Service not available at the moment, please wait and try again later',
 
                 ], 500);
             }
@@ -285,6 +385,51 @@ class TransactionController extends Controller
     {
 
         try {
+
+
+            $chk = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
+            $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
+
+            if($fa != null){
+
+                if($chk->user_id == Auth::id()){
+
+
+                    $anchorTime = Carbon::createFromFormat("Y-m-d H:i:s", $fa->created_at);
+                    $currentTime = Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00"));
+                    # count difference in minutes
+                    $minuteDiff = $anchorTime->diffInSeconds($currentTime);
+
+                   
+                    if($minuteDiff >= 100){
+                        FailedTransaction::where('user_id', Auth::id())->delete();
+                    }
+    
+                }
+
+
+            }
+
+
+            $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
+            if($fa !== null){
+
+                if($fa->attempt == 2 ){
+                    return response()->json([
+    
+                        'status' => $this->failed,
+                        'message' => 'Service not available at the moment, please wait for about 10 mins and try again',
+    
+                    ], 500);
+    
+                }
+    
+
+
+            }
+          
+        
+           
 
             $account_number = Auth::user()->c_account_number ?? null;
             $bank_code = Auth::user()->c_bank_code;
@@ -532,7 +677,40 @@ class TransactionController extends Controller
                         ]);
                 }
 
-                send_notification($message);
+                //save failed Transactions
+
+                $chk = FailedTransaction::where('user_id', Auth::id())->first()->user_id ?? null;
+                if($chk == null){
+
+                    $f = new FailedTransaction();
+                    $f->user_id = Auth::id();
+                    $f->attempt = 1;
+                    $f->created_at = Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00"));
+                    $f->save();
+                }
+
+
+                if($chk == Auth::id()){
+
+                    $time = FailedTransaction::where('user_id', Auth::id())->first()->created_at;
+                    $currentDateTime = Carbon::now();
+                    $targetDateTime = Carbon::now()->addSeconds(2);
+                    $diffInSeconds = $targetDateTime->diffInSeconds($currentDateTime);
+
+                    if($diffInSeconds == 2){
+                        FailedTransaction::where('user_id', Auth::id())->increment('attempt', 1);
+                }
+
+
+
+                $parametersJson = json_encode($request->all());
+                $headers = json_encode($request->headers->all());
+                $full_name = Auth::user()->first_name. "  " .Auth::user()->last_name;
+
+                $ip = $request->ip();
+
+                $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\n Full Name=======> " . $full_name . "\n\nIP========> " . $ip;
+                send_notification($result);
 
                 return response()->json([
 

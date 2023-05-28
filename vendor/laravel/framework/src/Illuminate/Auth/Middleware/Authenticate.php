@@ -93,7 +93,7 @@ class Authenticate implements AuthenticatesRequests
     protected function unauthenticated($request, array $guards)
     {
         throw new AuthenticationException(
-            'Unauthenticated.', $guards, $this->redirectTo($request)
+            'Your Session has been timed out, Please log-out and login again to continue', $guards, $this->redirectTo($request)
         );
     }
 
