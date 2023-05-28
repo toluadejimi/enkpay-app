@@ -55,7 +55,7 @@ class TransactionController extends Controller
                     return response()->json([
 
                         'status' => $this->failed,
-                        'message' => 'Service not available at the moment, please wait for about 10 mins and try again',
+                        'message' => 'Service not available at the moment, \n please wait for about 10 mins and try again',
 
                     ], 500);
                 }
@@ -338,7 +338,7 @@ class TransactionController extends Controller
 
                     // if ($diffInSeconds == 2) {
 
-                        
+
                         FailedTransaction::where('user_id', Auth::id())->increment('attempt', 1);
 
 
