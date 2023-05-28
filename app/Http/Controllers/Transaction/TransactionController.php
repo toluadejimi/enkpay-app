@@ -331,15 +331,18 @@ class TransactionController extends Controller
 
 
                 if ($chk == Auth::id()) {
+                    // $time = FailedTransaction::where('user_id', Auth::id())->first()->created_at;
+                    // $currentDateTime = Carbon::now();
+                    // $targetDateTime = Carbon::now()->addSeconds(2);
+                    // $diffInSeconds = $targetDateTime->diffInSeconds($currentDateTime);
 
-                    $time = FailedTransaction::where('user_id', Auth::id())->first()->created_at;
-                    $currentDateTime = Carbon::now();
-                    $targetDateTime = Carbon::now()->addSeconds(2);
-                    $diffInSeconds = $targetDateTime->diffInSeconds($currentDateTime);
+                    // if ($diffInSeconds == 2) {
 
-                    if ($diffInSeconds == 2) {
+                        
                         FailedTransaction::where('user_id', Auth::id())->increment('attempt', 1);
-                    }
+
+
+                    // }
                 }
 
 
