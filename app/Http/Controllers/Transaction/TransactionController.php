@@ -47,6 +47,17 @@ class TransactionController extends Controller
             $amoutCharges = $amount + $transfer_charges;
 
 
+            if(Auth::user()->status == 5){
+
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'You can not make transfer at the moment, Please contact  support',
+
+                ], 500);
+
+            }
 
 
             $user_email = user_email();
@@ -251,9 +262,11 @@ class TransactionController extends Controller
 
                 $parametersJson = json_encode($request->all());
                 $headers = json_encode($request->headers->all());
+                $full_name = Auth::user()->first_name. "  " .Auth::user()->last_name;
+
                 $ip = $request->ip();
 
-                $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
+                $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\n Full Name=======> " . $full_name . "\n\nIP========> " . $ip;
                 send_notification($result);
 
                 return response()->json([
