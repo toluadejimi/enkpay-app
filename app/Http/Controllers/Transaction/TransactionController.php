@@ -55,7 +55,7 @@ class TransactionController extends Controller
                     return response()->json([
 
                         'status' => $this->failed,
-                        'message' => 'Service not available at the moment, \n please wait for about 10 mins and try again',
+                        'message' => 'Service not available at the moment, please wait for about 10 mins and try again',
 
                     ], 500);
                 }
@@ -211,7 +211,7 @@ class TransactionController extends Controller
             $post_data = json_encode($data);
 
             curl_setopt_array($curl, array(
-                // CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
+                CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
