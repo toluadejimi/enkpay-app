@@ -187,7 +187,7 @@ if (!function_exists('send_notification')) {
 
             $errand_key = ErrandKey::where('id', 1)->first()->errand_key ?? null;
 
-        
+
             if ($errand_key == null) {
                 $response1 = errand_api_key();
                 $update = ErrandKey::where('id', 1)
@@ -252,7 +252,7 @@ if (!function_exists('send_notification')) {
                 CURLOPT_FOLLOWLOCATION => true,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'GET',
-               
+
             ));
 
             $var = curl_exec($curl);
@@ -291,15 +291,15 @@ if (!function_exists('send_notification')) {
 
             $set = Setting::where('id', 1)->first();
 
-            if($set->bank == 'manuel'){
+            if($set->bank == 'vfd'){
                 $get_banks = VfdBank::select('bankName', 'code')->get();
 
-                
+
                 return $get_banks;
             }
 
 
-            if($set->bank == ''){
+            if($set->bank == 'manuel'){
                 $get_banks = ProvidusBank::select('bankName', 'code')->get();
                 return $get_banks;
             }
@@ -316,7 +316,7 @@ if (!function_exists('send_notification')) {
 
             }
 
-            
+
         }
     }
 
@@ -334,12 +334,12 @@ if (!function_exists('send_notification')) {
                     'accountNumber' => $account_number,
                     'institutionCode' => $bank_code,
                     'channel' => "Bank",
-    
+
                 );
-    
+
                 $body = json_encode($databody);
                 $curl = curl_init();
-    
+
                 curl_setopt_array($curl, array(
                     CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/AccountNameVerification',
                     CURLOPT_RETURNTRANSFER => true,
@@ -354,22 +354,22 @@ if (!function_exists('send_notification')) {
                         'Content-Type: application/json',
                     ),
                 ));
-    
+
                 $var = curl_exec($curl);
                 curl_close($curl);
                 $var = json_decode($var);
-    
+
                 $customer_name = $var->data->name ?? null;
                 $error = $var->error->message ?? null;
-    
+
                 $status = $var->code ?? null;
-    
+
                 if ($status == 200) {
-    
+
                     return $customer_name;
-    
+
                 }
-    
+
                 return $error;
 
 
@@ -383,12 +383,12 @@ if (!function_exists('send_notification')) {
                     'accountNumber' => $account_number,
                     'institutionCode' => $bank_code,
                     'channel' => "Bank",
-    
+
                 );
-    
+
                 $body = json_encode($databody);
                 $curl = curl_init();
-    
+
                 curl_setopt_array($curl, array(
                     CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/AccountNameVerification',
                     CURLOPT_RETURNTRANSFER => true,
@@ -403,22 +403,22 @@ if (!function_exists('send_notification')) {
                         'Content-Type: application/json',
                     ),
                 ));
-    
+
                 $var = curl_exec($curl);
                 curl_close($curl);
                 $var = json_decode($var);
-    
+
                 $customer_name = $var->data->name ?? null;
                 $error = $var->error->message ?? null;
-    
+
                 $status = $var->code ?? null;
-    
+
                 if ($status == 200) {
-    
+
                     return $customer_name;
-    
+
                 }
-    
+
                 return $error;
 
 
@@ -433,12 +433,12 @@ if (!function_exists('send_notification')) {
                     'accountNumber' => $account_number,
                     'institutionCode' => $bank_code,
                     'channel' => "Bank",
-    
+
                 );
-    
+
                 $body = json_encode($databody);
                 $curl = curl_init();
-    
+
                 curl_setopt_array($curl, array(
                     CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/AccountNameVerification',
                     CURLOPT_RETURNTRANSFER => true,
@@ -453,22 +453,22 @@ if (!function_exists('send_notification')) {
                         'Content-Type: application/json',
                     ),
                 ));
-    
+
                 $var = curl_exec($curl);
                 curl_close($curl);
                 $var = json_decode($var);
-    
+
                 $customer_name = $var->data->name ?? null;
                 $error = $var->error->message ?? null;
-    
+
                 $status = $var->code ?? null;
-    
+
                 if ($status == 200) {
-    
+
                     return $customer_name;
-    
+
                 }
-    
+
                 return $error;
 
 
