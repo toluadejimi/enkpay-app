@@ -6,10 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Charge;
 use App\Models\ErrandKey;
 use App\Models\FailedTransaction;
+use App\Models\Setting;
 use App\Models\Terminal;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Models\VfdBank;
 use Auth;
+use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Mail;
@@ -26,6 +29,9 @@ class TransactionController extends Controller
     {
 
         try {
+
+
+
 
             $chk = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
             $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
@@ -60,9 +66,6 @@ class TransactionController extends Controller
                     ], 500);
                 }
             }
-
-
-
 
 
 
@@ -730,45 +733,31 @@ class TransactionController extends Controller
 
         try {
 
+
+
+            $set = Setting::where('id', 1)->first();
+            if($set->bank == 'vfd')
+            {
+                $data = 'vfd';
+            }else{
+                $data = 'pbank';
+            }
+
+            $banks = get_banks($data);
+
+
             $account = select_account();
 
-            $errand_key = ErrandKey::where('id', 1)->first()->errand_key ?? null;
 
             $transfer_charge = Charge::where('title', 'transfer_fee')
                 ->first()->amount;
 
-            if ($errand_key == null) {
-                $response1 = errand_api_key();
-                $update = ErrandKey::where('id', 1)
-                    ->update([
-                        'errand_key' => $response1[0],
-                    ]);
-            }
+              
+          
 
-            $curl = curl_init();
 
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiGetBanks',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'GET',
-                CURLOPT_HTTPHEADER => array(
-                    "Authorization: Bearer $errand_key",
-                ),
-            ));
+            $status = 200;
 
-            $var = curl_exec($curl);
-
-            curl_close($curl);
-            $var = json_decode($var);
-
-            $result = $var->data ?? null;
-
-            $status = $var->code ?? null;
 
             if ($status == 200) {
 
@@ -776,7 +765,7 @@ class TransactionController extends Controller
 
                     'account' => $account,
                     'transfer_charge' => $transfer_charge,
-                    'banks' => $var->data,
+                    'banks' => $banks,
 
                 ], 200);
             }
