@@ -44,10 +44,10 @@ class TransactionController extends Controller
                     $anchorTime = Carbon::createFromFormat("Y-m-d H:i:s", $fa->created_at);
                     $currentTime = Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00"));
                     # count difference in minutes
-                    $minuteDiff = $anchorTime->diffInSeconds($currentTime);
+                    $minuteDiff = $anchorTime->diffInMinutes($currentTime);
 
 
-                    if ($minuteDiff >= 60) {
+                    if ($minuteDiff >= 2) {
                         FailedTransaction::where('user_id', Auth::id())->delete();
                     }
                 }
@@ -61,7 +61,7 @@ class TransactionController extends Controller
                     return response()->json([
 
                         'status' => $this->failed,
-                        'message' => 'Service not available at the moment, please wait for about 1 min and try again',
+                        'message' => 'Service not available at the moment, please wait for about 2 mins and try again',
 
                     ], 500);
                 }
@@ -214,7 +214,7 @@ class TransactionController extends Controller
             $post_data = json_encode($data);
 
             curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
+                // CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
@@ -331,12 +331,6 @@ class TransactionController extends Controller
                     $f->created_at = Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00"));
                     $f->save();
                 }
-
-
-                // if ($chk == Auth::id()) {
-                
-                //         FailedTransaction::where('user_id', Auth::id())->increment('attempt', 1);
-                // }
 
 
                 $parametersJson = json_encode($request->all());
