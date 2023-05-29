@@ -63,7 +63,7 @@ public function phone_login(Request $request){
 
         }
 
-        $ur = User::where('email', $phone)->first() ?? null;
+        $ur = User::where('phone', $phone)->first() ?? null;
         if ($ur != null) {
 
             if ($ur->user_id == Auth::id()) {
