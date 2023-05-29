@@ -30,9 +30,6 @@ class TransactionController extends Controller
 
         try {
 
-
-
-
             $chk = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
             $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
 
@@ -47,7 +44,7 @@ class TransactionController extends Controller
                     $minuteDiff = $anchorTime->diffInMinutes($currentTime);
 
 
-                    if ($minuteDiff >= 2) {
+                    if ($minuteDiff >= 3) {
                         FailedTransaction::where('user_id', Auth::id())->delete();
                     }
                 }
@@ -55,14 +52,23 @@ class TransactionController extends Controller
 
 
             $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
-            if ($fa !== null) {
+            if ($fa != null) {
 
                 if ($fa->attempt == 1) {
                     return response()->json([
-
                         'status' => $this->failed,
                         'message' => 'Service not available at the moment, please wait for about 2 mins and try again',
+                    ], 500);
+                }
+            }
 
+            $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
+            if ($fa != null) {
+
+                if ($fa->attempt == 1) {
+                    return response()->json([
+                        'status' => $this->failed,
+                        'message' => 'Service not available at the moment, please wait for about 2 mins and try again',
                     ], 500);
                 }
             }
@@ -105,6 +111,7 @@ class TransactionController extends Controller
             $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
             if ($fa !== null) {
 
+                dd('hello');
 
                 if ($fa->attempt == 1) {
                     return response()->json([
@@ -384,9 +391,9 @@ class TransactionController extends Controller
 
 
         $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
-        if ($fa !== null) {
+        if ($fa != null) {
 
-            if ($fa->attempt == 1) {
+            if ($fa->attempt = 1) {
                 return response()->json([
 
                     'status' => $this->failed,
