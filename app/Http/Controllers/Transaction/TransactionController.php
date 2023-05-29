@@ -752,10 +752,6 @@ class TransactionController extends Controller
             $transfer_charge = Charge::where('title', 'transfer_fee')
                 ->first()->amount;
 
-              
-          
-
-
             $status = 200;
 
 

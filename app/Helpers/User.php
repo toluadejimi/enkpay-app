@@ -287,14 +287,15 @@ if (!function_exists('send_notification')) {
         {
 
             if($data == 'vfd'){
-                $get_banks = VfdBank::select('bank_name', 'code')->get();
+                $get_banks = VfdBank::select('bankName', 'code')->get();
 
+                
                 return $get_banks;
             }
 
 
             if($data == 'pbank'){
-                $get_banks = ProvidusBank::select('bank_name', 'code')->get();
+                $get_banks = ProvidusBank::select('bankName', 'code')->get();
 
                 return $get_banks;
             }
