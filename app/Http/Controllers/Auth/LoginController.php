@@ -96,7 +96,7 @@ public function phone_login(Request $request){
             return response()->json([
 
                 'status' => $this->failed,
-                'message' => 'You can login at the moment, Please contact  support',
+                'message' => 'You can not login at the moment, Please contact  support',
 
             ], 500);
         }
