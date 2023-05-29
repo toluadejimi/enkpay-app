@@ -715,6 +715,7 @@ class TransactionController extends Controller
                 $longitude = $request->longitude;
                 $latitude = $request->latitude;
                 $get_description = $request->narration;
+                $receiver_name = $request->customer_name;
                 $pin = $request->pin;
 
                 $account_number = $destinationAccountNumber;
@@ -850,7 +851,7 @@ class TransactionController extends Controller
                     $trasnaction->note = "BANK TRANSFER TO | $destinationAccountName | $destinationAccountNumber | $bank_name  ";
                     $trasnaction->fee = 0;
                     $trasnaction->enkpay_Cashout_profit = $enkpay_profit;
-                    $trasnaction->receiver_name = $destinationAccountName;
+                    $trasnaction->receiver_name = $receiver_name;
                     $trasnaction->receiver_account_no = $destinationAccountNumber;
                     $trasnaction->receiver_bank = $bank_name;
                     $trasnaction->balance = $debit;
@@ -871,7 +872,7 @@ class TransactionController extends Controller
                      $trasnaction->note = "BANK TRANSFER TO | $destinationAccountName | $destinationAccountNumber | $bank_name  ";
                      $trasnaction->fee = 0;
                      $trasnaction->enkpay_Cashout_profit = $enkpay_profit;
-                     $trasnaction->receiver_name = $destinationAccountName;
+                     $trasnaction->receiver_name = $receiver_name;
                      $trasnaction->receiver_account_no = $destinationAccountNumber;
                      $trasnaction->receiver_bank = $bank_name;
                      $trasnaction->balance = $debit;
