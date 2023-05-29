@@ -47,7 +47,7 @@ class TransactionController extends Controller
                     $minuteDiff = $anchorTime->diffInSeconds($currentTime);
 
 
-                    if ($minuteDiff >= 100) {
+                    if ($minuteDiff >= 60) {
                         FailedTransaction::where('user_id', Auth::id())->delete();
                     }
                 }
@@ -57,11 +57,11 @@ class TransactionController extends Controller
             $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
             if ($fa !== null) {
 
-                if ($fa->attempt == 2) {
+                if ($fa->attempt == 1) {
                     return response()->json([
 
                         'status' => $this->failed,
-                        'message' => 'Service not available at the moment, please wait for about 10 mins and try again',
+                        'message' => 'Service not available at the moment, please wait for about 1 min and try again',
 
                     ], 500);
                 }
@@ -333,20 +333,10 @@ class TransactionController extends Controller
                 }
 
 
-                if ($chk == Auth::id()) {
-                    // $time = FailedTransaction::where('user_id', Auth::id())->first()->created_at;
-                    // $currentDateTime = Carbon::now();
-                    // $targetDateTime = Carbon::now()->addSeconds(2);
-                    // $diffInSeconds = $targetDateTime->diffInSeconds($currentDateTime);
-
-                    // if ($diffInSeconds == 2) {
-
-
-                        FailedTransaction::where('user_id', Auth::id())->increment('attempt', 1);
-
-
-                    // }
-                }
+                // if ($chk == Auth::id()) {
+                
+                //         FailedTransaction::where('user_id', Auth::id())->increment('attempt', 1);
+                // }
 
 
                 $parametersJson = json_encode($request->all());
@@ -800,55 +790,16 @@ class TransactionController extends Controller
             $account_number = $request->account_number;
             //$bvn = $request->bvn;
 
-            $databody = array(
-
-                'accountNumber' => $account_number,
-                'institutionCode' => $bank_code,
-                'channel' => "Bank",
-
-            );
-
-            $body = json_encode($databody);
-            $curl = curl_init();
-
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/AccountNameVerification',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => $body,
-                CURLOPT_HTTPHEADER => array(
-                    'Content-Type: application/json',
-                ),
-            ));
-
-            $var = curl_exec($curl);
-            curl_close($curl);
-            $var = json_decode($var);
-
-            $customer_name = $var->data->name ?? null;
-            $error = $var->error->message ?? null;
-
-            $status = $var->code ?? null;
-
-            if ($status == 200) {
-
-                return response()->json([
-                    'status' => $this->success,
-                    'customer_name' => $customer_name,
-
-                ], 200);
-            }
+            $resolve = resolve_bank($bank_code,$account_number);
 
             return response()->json([
-                'status' => $this->failed,
-                'message' => $error,
+                'status' => true,
+                'customer_name' => $resolve,
 
-            ], 500);
+            ], 200);
+
+
+           
         } catch (\Exception $th) {
             return $th->getMessage();
         }
