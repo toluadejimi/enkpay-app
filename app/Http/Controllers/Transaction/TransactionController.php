@@ -858,6 +858,28 @@ class TransactionController extends Controller
                     $trasnaction->save();
 
 
+                     //update Transactions
+                     $trasnaction = new Transaction();
+                     $trasnaction->user_id = Auth::id();
+                     $trasnaction->ref_trans_id = $trans_id;
+                     $trasnaction->type = "EPBankTransfer";
+                     $trasnaction->main_type = "Transfer";
+                     $trasnaction->transaction_type = "BankTransfer";
+                     $trasnaction->title = "Bank Transfer";
+                     $trasnaction->debit = $debited_amount;
+                     $trasnaction->amount = $amount;
+                     $trasnaction->note = "BANK TRANSFER TO | $destinationAccountName | $destinationAccountNumber | $bank_name  ";
+                     $trasnaction->fee = 0;
+                     $trasnaction->enkpay_Cashout_profit = $enkpay_profit;
+                     $trasnaction->receiver_name = $destinationAccountName;
+                     $trasnaction->receiver_account_no = $destinationAccountNumber;
+                     $trasnaction->receiver_bank = $bank_name;
+                     $trasnaction->balance = $debit;
+                     $trasnaction->status = 1;
+                     $trasnaction->save();
+
+
+
                     $ip = $request->ip();
                     $message = "Request to transfer NGN $amount | $bank_name  | $destinationAccountNumber ";
                     $result = "Message========> " . $message . "\n\nIP========> " . $ip;
