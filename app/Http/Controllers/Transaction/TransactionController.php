@@ -722,7 +722,7 @@ class TransactionController extends Controller
 
 
 
-                //$destinationAccountName = resolve_bank($account_number, $bank_code);
+                $destinationAccountName = null;//resolve_bank($account_number, $bank_code);
 
                 $bank_name = VfdBank::select('bankName')->where('code', $destinationBankCode)->first()->bankName ?? null;
                 $referenceCode = "ENK-" . random_int(1000000, 999999999);
