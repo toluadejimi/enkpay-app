@@ -88,6 +88,19 @@ public function phone_login(Request $request){
             ], 500);
         }
 
+
+
+        if (Auth::user()->status == 5) {
+
+
+            return response()->json([
+
+                'status' => $this->failed,
+                'message' => 'You can login at the moment, Please contact  support',
+
+            ], 500);
+        }
+
         $get_device_id = User::where('device_id', $request->device_id)
         ->first()->device_id ?? null;
 
@@ -323,6 +336,16 @@ public function email_login(Request $request){
         }
 
         
+        if (Auth::user()->status == 5) {
+
+
+            return response()->json([
+
+                'status' => $this->failed,
+                'message' => 'You can login at the moment, Please contact  support',
+
+            ], 500);
+        }
 
         $get_device_id = User::where('device_id', $request->device_id)
         ->first()->device_id ?? null;
