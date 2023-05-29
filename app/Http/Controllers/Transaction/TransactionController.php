@@ -2418,9 +2418,9 @@ class TransactionController extends Controller
                     $enkpay_profit = $business_commission_cap - 75;
                 } else {
 
-                    $removed_comission = $Amount - $both_commmission;
+                    $removed_comission = (int)$Amount - (int)$both_commmission;
 
-                    $enkpay_profit = $both_commmission - $errandPay_commission_amount;
+                    $enkpay_profit = (int)$both_commmission - (int)$errandPay_commission_amount;
                 }
 
                 //$enkpay_cashOut_fee = $amount - $enkpay_commision_amount ;
