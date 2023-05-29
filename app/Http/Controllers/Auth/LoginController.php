@@ -75,7 +75,7 @@ public function phone_login(Request $request){
 
 
                 if ($minuteDiff >= 1) {
-                    User::where('email', $phone)->update(['session_time' => Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00")), 'session' => 0 ]);
+                    User::where('phone', $phone)->update(['session_time' => Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00")), 'session' => 0 ]);
                 }
 
             }
