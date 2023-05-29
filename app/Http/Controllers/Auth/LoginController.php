@@ -63,23 +63,23 @@ public function phone_login(Request $request){
 
         }
 
-        $ur = User::where('phone', $phone)->first() ?? null;
-        if ($ur != null) {
+        // $ur = User::where('phone', $phone)->first() ?? null;
+        // if ($ur != null) {
 
-            if ($ur->user_id == Auth::id()) {
+        //     if ($ur->user_id == Auth::id()) {
 
-                $anchorTime = Carbon::createFromFormat("Y-m-d H:i:s", $ur->session_time);
-                $currentTime = Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00"));
-                # count difference in minutes
-                $minuteDiff = $anchorTime->diffInMinutes($currentTime);
+        //         $anchorTime = Carbon::createFromFormat("Y-m-d H:i:s", $ur->session_time);
+        //         $currentTime = Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00"));
+        //         # count difference in minutes
+        //         $minuteDiff = $anchorTime->diffInMinutes($currentTime);
 
 
-                if ($minuteDiff >= 1) {
-                    User::where('phone', $phone)->update(['session_time' => Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00")), 'session' => 0 ]);
-                }
+        //         if ($minuteDiff >= 1) {
+        //             User::where('phone', $phone)->update(['session_time' => Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00")), 'session' => 0 ]);
+        //         }
 
-            }
-        }
+        //     }
+        // }
 
         if (!auth()->attempt($credentials)) {
             return response()->json([
@@ -130,10 +130,10 @@ public function phone_login(Request $request){
 
 
 
-        $ur = User::where('id', Auth::id())->first() ?? null;
-        if ($ur != null) {
-            User::where('id', Auth::id())->update(['session_time' => Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00")), 'session' => 1 ]);
-        }
+        // $ur = User::where('id', Auth::id())->first() ?? null;
+        // if ($ur != null) {
+        //     User::where('id', Auth::id())->update(['session_time' => Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00"))->toString(), 'session' => 1 ]);
+        // }
 
 
 
@@ -310,22 +310,22 @@ public function email_login(Request $request){
         }
 
 
-        $ur = User::where('email', $email)->first() ?? null;
-        if ($ur != null) {
+        // $ur = User::where('email', $email)->first() ?? null;
+        // if ($ur != null) {
 
-            if ($ur->user_id == Auth::id()) {
+        //     if ($ur->user_id == Auth::id()) {
 
-                $anchorTime = Carbon::createFromFormat("Y-m-d H:i:s", $ur->session_time);
-                $currentTime = Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00"));
-                # count difference in minutes
-                $minuteDiff = $anchorTime->diffInMinutes($currentTime);
+        //         $anchorTime = Carbon::createFromFormat("Y-m-d H:i:s", $ur->session_time);
+        //         $currentTime = Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00"));
+        //         # count difference in minutes
+        //         $minuteDiff = $anchorTime->diffInMinutes($currentTime);
 
 
-                if ($minuteDiff >= 1) {
-                    User::where('email', $email)->update(['session_time' => Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00")), 'session' => 0 ]);
-                }
-            }
-        }
+        //         if ($minuteDiff >= 1) {
+        //             User::where('email', $email)->update(['session_time' => Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00")), 'session' => 0 ]);
+        //         }
+        //     }
+        // }
 
 
         if (!auth()->attempt($credentials)) {
@@ -390,25 +390,25 @@ public function email_login(Request $request){
       
 
         //ck session
-        $ur = User::where('id', Auth::id())->first() ?? null;
-        if ($ur != null) {
+        // $ur = User::where('id', Auth::id())->first() ?? null;
+        // if ($ur != null) {
 
-            if($ur->session ==1 ){
+        //     if($ur->session ==1 ){
 
-                return response()->json([
-                    'status' => $this->failed,
-                    'message' => 'You can only login on a device, Please log out on current device'
-                ], 500);
+        //         return response()->json([
+        //             'status' => $this->failed,
+        //             'message' => 'You can only login on a device, Please log out on current device'
+        //         ], 500);
 
-            }
-        }
+        //     }
+        // }
 
 
 
-        $ur = User::where('id', Auth::id())->first() ?? null;
-        if ($ur != null) {
-            User::where('id', Auth::id())->update(['session_time' => Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00")), 'session' => 1 ]);
-        }
+        // $ur = User::where('id', Auth::id())->first() ?? null;
+        // if ($ur != null) {
+        //     User::where('id', Auth::id())->update(['session_time' => Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:s")), 'session' => 1 ]);
+        // }
 
 
 
@@ -439,9 +439,9 @@ public function email_login(Request $request){
 public function logout(Request $request) {
     $request->user()->token()->revoke();
     $ur = User::where('id', Auth::id())->first() ?? null;
-    if ($ur != null) {
-        User::where('id', Auth::id())->update(['session_time' => Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00")), 'session' => 0 ]);
-    }
+    // if ($ur != null) {
+    //     User::where('id', Auth::id())->update(['session_time' => Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00")), 'session' => 0 ]);
+    // }
     return response()->json([
         'status' => $this->success,
         'message' => "Successfully logged out"
