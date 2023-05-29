@@ -39,7 +39,7 @@ public $failed = false;
 public function phone_login(Request $request){
 
 
-    try{
+    // try{
 
 
         $phone = $request->phone;
@@ -274,17 +274,17 @@ public function phone_login(Request $request){
 
         // ],200);
 
-} catch (Exception $th) {
-    return $th->getMessage();
-}
+// } catch (Exception $th) {
+//     return $th->getMessage();
+// }
 
-}
+// }
 
 
 public function email_login(Request $request){
 
 
-    try{
+    // try{
 
 
     
@@ -342,7 +342,7 @@ public function email_login(Request $request){
             return response()->json([
 
                 'status' => $this->failed,
-                'message' => 'You can login at the moment, Please contact  support',
+                'message' => 'You can login at the moment,Please contact  support',
 
             ], 500);
         }
@@ -429,9 +429,9 @@ public function email_login(Request $request){
 
         ],200);
 
-} catch (\Exception $th) {
-    return $th->getMessage();
-}
+// } catch (\Exception $th) {
+//     return $th->getMessage();
+// }
 
 }
 
