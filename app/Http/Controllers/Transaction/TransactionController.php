@@ -30,6 +30,926 @@ class TransactionController extends Controller
 
         try {
 
+
+
+            $set = Setting::where('id', 1)->first();
+
+
+            //VFD BANK
+            if ($set->bank == 'vfd') {
+
+                $chk = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
+                $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
+
+                if ($fa != null) {
+
+                    if ($chk->user_id == Auth::id()) {
+
+
+                        $anchorTime = Carbon::createFromFormat("Y-m-d H:i:s", $fa->created_at);
+                        $currentTime = Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00"));
+                        # count difference in minutes
+                        $minuteDiff = $anchorTime->diffInMinutes($currentTime);
+
+
+                        if ($minuteDiff >= 3) {
+                            FailedTransaction::where('user_id', Auth::id())->delete();
+                        }
+                    }
+                }
+
+
+                $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
+                if ($fa != null) {
+
+                    if ($fa->attempt == 1) {
+                        return response()->json([
+                            'status' => $this->failed,
+                            'message' => 'Service not available at the moment, please wait for about 2 mins and try again',
+                        ], 500);
+                    }
+                }
+
+                $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
+                if ($fa != null) {
+
+                    if ($fa->attempt == 1) {
+                        return response()->json([
+                            'status' => $this->failed,
+                            'message' => 'Service not available at the moment, please wait for about 2 mins and try again',
+                        ], 500);
+                    }
+                }
+
+
+
+                $erran_api_key = errand_api_key();
+
+                $epkey = env('EPKEY');
+
+                $wallet = $request->wallet;
+                $amount = $request->amount;
+                $destinationAccountNumber = $request->account_number;
+                $destinationBankCode = $request->code;
+                $destinationAccountName = $request->receiver_bank;
+                $longitude = $request->longitude;
+                $latitude = $request->latitude;
+                $get_description = $request->narration;
+                $pin = $request->pin;
+
+                $referenceCode = "ENK-" . random_int(1000000, 999999999);
+
+                $transfer_charges = Charge::where('title', 'transfer_fee')->first()->amount;
+
+                $amoutCharges = $amount + $transfer_charges;
+
+
+                if (Auth::user()->status == 5) {
+
+
+                    return response()->json([
+
+                        'status' => $this->failed,
+                        'message' => 'You can not make transfer at the moment, Please contact  support',
+
+                    ], 500);
+                }
+
+
+                $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
+                if ($fa !== null) {
+
+                    dd('hello');
+
+                    if ($fa->attempt == 1) {
+                        return response()->json([
+
+                            'status' => $this->failed,
+                            'message' => 'Service not available at the moment, please wait and try again later',
+
+                        ], 500);
+                    }
+                }
+
+
+                $user_email = user_email();
+                $first_name = first_name();
+
+                $description = $get_description ?? "Fund for $destinationAccountName";
+
+                if ($wallet == 'main_account') {
+                    $user_wallet_banlance = main_account();
+                } else {
+                    $user_wallet_banlance = bonus_account();
+                }
+
+                $user_pin = Auth()->user()->pin;
+
+                if (Hash::check($pin, $user_pin) == false) {
+
+                    return response()->json([
+
+                        'status' => $this->failed,
+                        'message' => 'Invalid Pin, Please try again',
+
+                    ], 500);
+                }
+
+                if (Auth::user()->b_number == 6) {
+
+                    return response()->json([
+
+                        'status' => $this->failed,
+                        'message' => 'You dont have the permission to make transfer',
+
+                    ], 500);
+                }
+
+                if ($amount < 100) {
+
+                    return response()->json([
+
+                        'status' => $this->failed,
+                        'message' => 'Amount must not be less than NGN 100',
+
+                    ], 500);
+                }
+
+                if (Auth()->user()->status == 1 && $amount > 20000) {
+
+                    return response()->json([
+
+                        'status' => $this->failed,
+                        'message' => 'Please Complete your KYC',
+
+                    ], 500);
+                }
+
+                if ($amoutCharges > $user_wallet_banlance) {
+
+                    return response()->json([
+
+                        'status' => $this->failed,
+                        'message' => 'Insufficient Funds, fund your account',
+
+                    ], 500);
+                }
+
+                //Debit
+                $debited_amount = $transfer_charges + $amount;
+                $debit = $user_wallet_banlance - $debited_amount;
+
+                if ($wallet == 'main_account') {
+
+                    $update = User::where('id', Auth::id())
+                        ->update([
+                            'main_wallet' => $debit,
+                        ]);
+                } else {
+
+                    $update = User::where('id', Auth::id())
+                        ->update([
+                            'bonus_wallet' => $debit,
+                        ]);
+                }
+
+                $curl = curl_init();
+                $data = array(
+
+                    "amount" => $amount,
+                    "destinationAccountNumber" => $destinationAccountNumber,
+                    "destinationBankCode" => $destinationBankCode,
+                    "destinationAccountName" => $destinationAccountName,
+                    "longitude" => $longitude,
+                    "latitude" => $latitude,
+                    "description" => $description,
+
+                );
+
+                $post_data = json_encode($data);
+
+                curl_setopt_array($curl, array(
+                    // CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'POST',
+                    CURLOPT_POSTFIELDS => $post_data,
+                    CURLOPT_HTTPHEADER => array(
+                        "Authorization: Bearer $erran_api_key",
+                        "EpKey: $epkey",
+                        'Content-Type: application/json',
+                    ),
+                ));
+
+                $var = curl_exec($curl);
+
+                curl_close($curl);
+
+                $var = json_decode($var);
+
+                $error = $var->error->message ?? null;
+
+                $message = "Error from Errand Pay | $error ";
+
+                $trans_id = "ENK-" . random_int(100000, 999999);
+
+                $TransactionReference = $var->data->reference ?? null;
+
+                $enkpay_profit = $transfer_charges - 10;
+
+                $status = $var->code ?? null;
+
+                //$status = 209;
+
+                if ($status == 200) {
+
+                    //update Transactions
+                    $trasnaction = new Transaction();
+                    $trasnaction->user_id = Auth::id();
+                    $trasnaction->ref_trans_id = $trans_id;
+                    $trasnaction->e_ref = $TransactionReference;
+                    $trasnaction->type = "InterBankTransfer";
+                    $trasnaction->main_type = "Transfer";
+                    $trasnaction->transaction_type = "BankTransfer";
+                    $trasnaction->title = "Bank Transfer";
+                    $trasnaction->debit = $debited_amount;
+                    $trasnaction->amount = $amount;
+                    $trasnaction->note = "Bank Transfer to other banks";
+                    $trasnaction->fee = 0;
+                    $trasnaction->enkpay_Cashout_profit = $enkpay_profit;
+                    $trasnaction->trx_date = date("Y/m/d");
+                    $trasnaction->trx_time = date("h:i:s");
+                    $trasnaction->receiver_name = $destinationAccountName;
+                    $trasnaction->receiver_account_no = $destinationAccountNumber;
+                    $trasnaction->balance = $debit;
+                    $trasnaction->status = 0;
+                    $trasnaction->save();
+
+                    if ($user_email !== null) {
+
+                        $data = array(
+                            'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                            'subject' => "Bank Transfer",
+                            'toreceiver' => $user_email,
+                            'amount' => $amount,
+                            'first_name' => $first_name,
+                        );
+
+                        Mail::send('emails.transaction.banktransfer', ["data1" => $data], function ($message) use ($data) {
+                            $message->from($data['fromsender']);
+                            $message->to($data['toreceiver']);
+                            $message->subject($data['subject']);
+                        });
+                    }
+
+                    return response()->json([
+
+                        'status' => $this->success,
+                        'reference' => $TransactionReference,
+                        'message' => "Transaction Processing",
+
+                    ], 200);
+                } else {
+
+                    //credit
+                    $credit = $user_wallet_banlance + $amount - $amount;
+
+                    if ($wallet == 'main_account') {
+
+                        $update = User::where('id', Auth::id())
+                            ->update([
+                                'main_wallet' => $credit,
+                            ]);
+                    }
+
+                    if ($wallet == 'bonus_account') {
+
+                        $update = User::where('id', Auth::id())
+                            ->update([
+                                'bonus_wallet' => $credit,
+                            ]);
+                    }
+
+
+                    //save failed Transactions
+
+                    $chk = FailedTransaction::where('user_id', Auth::id())->first()->user_id ?? null;
+                    if ($chk == null) {
+
+                        $f = new FailedTransaction();
+                        $f->user_id = Auth::id();
+                        $f->attempt = 1;
+                        $f->created_at = Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00"));
+                        $f->save();
+                    }
+
+
+
+                    $parametersJson = json_encode($request->all());
+                    $headers = json_encode($request->headers->all());
+                    $full_name = Auth::user()->first_name . "  " . Auth::user()->last_name;
+
+                    $ip = $request->ip();
+
+                    $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\n Full Name=======> " . $full_name . "\n\nIP========> " . $ip;
+                    send_notification($result);
+
+                    return response()->json([
+
+                        'status' => $this->failed,
+                        'message' => 'Service not available at the moment, please wait and try again later',
+
+                    ], 500);
+                }
+            }
+        
+
+
+            //PROVIDUS BANK
+
+            if ($set->bank == 'pbank') {
+
+                $chk = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
+                $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
+
+                if ($fa != null) {
+
+                    if ($chk->user_id == Auth::id()) {
+
+
+                        $anchorTime = Carbon::createFromFormat("Y-m-d H:i:s", $fa->created_at);
+                        $currentTime = Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00"));
+                        # count difference in minutes
+                        $minuteDiff = $anchorTime->diffInMinutes($currentTime);
+
+
+                        if ($minuteDiff >= 3) {
+                            FailedTransaction::where('user_id', Auth::id())->delete();
+                        }
+                    }
+                }
+
+
+                $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
+                if ($fa != null) {
+
+                    if ($fa->attempt == 1) {
+                        return response()->json([
+                            'status' => $this->failed,
+                            'message' => 'Service not available at the moment, please wait for about 2 mins and try again',
+                        ], 500);
+                    }
+                }
+
+                $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
+                if ($fa != null) {
+
+                    if ($fa->attempt == 1) {
+                        return response()->json([
+                            'status' => $this->failed,
+                            'message' => 'Service not available at the moment, please wait for about 2 mins and try again',
+                        ], 500);
+                    }
+                }
+
+
+
+                $erran_api_key = errand_api_key();
+
+                $epkey = env('EPKEY');
+
+                $wallet = $request->wallet;
+                $amount = $request->amount;
+                $destinationAccountNumber = $request->account_number;
+                $destinationBankCode = $request->code;
+                $destinationAccountName = $request->receiver_bank;
+                $longitude = $request->longitude;
+                $latitude = $request->latitude;
+                $get_description = $request->narration;
+                $pin = $request->pin;
+
+                $referenceCode = "ENK-" . random_int(1000000, 999999999);
+
+                $transfer_charges = Charge::where('title', 'transfer_fee')->first()->amount;
+
+                $amoutCharges = $amount + $transfer_charges;
+
+
+                if (Auth::user()->status == 5) {
+
+
+                    return response()->json([
+
+                        'status' => $this->failed,
+                        'message' => 'You can not make transfer at the moment, Please contact  support',
+
+                    ], 500);
+                }
+
+
+                $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
+                if ($fa !== null) {
+
+                    dd('hello');
+
+                    if ($fa->attempt == 1) {
+                        return response()->json([
+
+                            'status' => $this->failed,
+                            'message' => 'Service not available at the moment, please wait and try again later',
+
+                        ], 500);
+                    }
+                }
+
+
+                $user_email = user_email();
+                $first_name = first_name();
+
+                $description = $get_description ?? "Fund for $destinationAccountName";
+
+                if ($wallet == 'main_account') {
+                    $user_wallet_banlance = main_account();
+                } else {
+                    $user_wallet_banlance = bonus_account();
+                }
+
+                $user_pin = Auth()->user()->pin;
+
+                if (Hash::check($pin, $user_pin) == false) {
+
+                    return response()->json([
+
+                        'status' => $this->failed,
+                        'message' => 'Invalid Pin, Please try again',
+
+                    ], 500);
+                }
+
+                if (Auth::user()->b_number == 6) {
+
+                    return response()->json([
+
+                        'status' => $this->failed,
+                        'message' => 'You dont have the permission to make transfer',
+
+                    ], 500);
+                }
+
+                if ($amount < 100) {
+
+                    return response()->json([
+
+                        'status' => $this->failed,
+                        'message' => 'Amount must not be less than NGN 100',
+
+                    ], 500);
+                }
+
+                if (Auth()->user()->status == 1 && $amount > 20000) {
+
+                    return response()->json([
+
+                        'status' => $this->failed,
+                        'message' => 'Please Complete your KYC',
+
+                    ], 500);
+                }
+
+                if ($amoutCharges > $user_wallet_banlance) {
+
+                    return response()->json([
+
+                        'status' => $this->failed,
+                        'message' => 'Insufficient Funds, fund your account',
+
+                    ], 500);
+                }
+
+                //Debit
+                $debited_amount = $transfer_charges + $amount;
+                $debit = $user_wallet_banlance - $debited_amount;
+
+                if ($wallet == 'main_account') {
+
+                    $update = User::where('id', Auth::id())
+                        ->update([
+                            'main_wallet' => $debit,
+                        ]);
+                } else {
+
+                    $update = User::where('id', Auth::id())
+                        ->update([
+                            'bonus_wallet' => $debit,
+                        ]);
+                }
+
+                $curl = curl_init();
+                $data = array(
+
+                    "amount" => $amount,
+                    "destinationAccountNumber" => $destinationAccountNumber,
+                    "destinationBankCode" => $destinationBankCode,
+                    "destinationAccountName" => $destinationAccountName,
+                    "longitude" => $longitude,
+                    "latitude" => $latitude,
+                    "description" => $description,
+
+                );
+
+                $post_data = json_encode($data);
+
+                curl_setopt_array($curl, array(
+                    // CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'POST',
+                    CURLOPT_POSTFIELDS => $post_data,
+                    CURLOPT_HTTPHEADER => array(
+                        "Authorization: Bearer $erran_api_key",
+                        "EpKey: $epkey",
+                        'Content-Type: application/json',
+                    ),
+                ));
+
+                $var = curl_exec($curl);
+
+                curl_close($curl);
+
+                $var = json_decode($var);
+
+                $error = $var->error->message ?? null;
+
+                $message = "Error from Errand Pay | $error ";
+
+                $trans_id = "ENK-" . random_int(100000, 999999);
+
+                $TransactionReference = $var->data->reference ?? null;
+
+                $enkpay_profit = $transfer_charges - 10;
+
+                $status = $var->code ?? null;
+
+                //$status = 209;
+
+                if ($status == 200) {
+
+                    //update Transactions
+                    $trasnaction = new Transaction();
+                    $trasnaction->user_id = Auth::id();
+                    $trasnaction->ref_trans_id = $trans_id;
+                    $trasnaction->e_ref = $TransactionReference;
+                    $trasnaction->type = "InterBankTransfer";
+                    $trasnaction->main_type = "Transfer";
+                    $trasnaction->transaction_type = "BankTransfer";
+                    $trasnaction->title = "Bank Transfer";
+                    $trasnaction->debit = $debited_amount;
+                    $trasnaction->amount = $amount;
+                    $trasnaction->note = "Bank Transfer to other banks";
+                    $trasnaction->fee = 0;
+                    $trasnaction->enkpay_Cashout_profit = $enkpay_profit;
+                    $trasnaction->trx_date = date("Y/m/d");
+                    $trasnaction->trx_time = date("h:i:s");
+                    $trasnaction->receiver_name = $destinationAccountName;
+                    $trasnaction->receiver_account_no = $destinationAccountNumber;
+                    $trasnaction->balance = $debit;
+                    $trasnaction->status = 0;
+                    $trasnaction->save();
+
+                    if ($user_email !== null) {
+
+                        $data = array(
+                            'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                            'subject' => "Bank Transfer",
+                            'toreceiver' => $user_email,
+                            'amount' => $amount,
+                            'first_name' => $first_name,
+                        );
+
+                        Mail::send('emails.transaction.banktransfer', ["data1" => $data], function ($message) use ($data) {
+                            $message->from($data['fromsender']);
+                            $message->to($data['toreceiver']);
+                            $message->subject($data['subject']);
+                        });
+                    }
+
+                    return response()->json([
+
+                        'status' => $this->success,
+                        'reference' => $TransactionReference,
+                        'message' => "Transaction Processing",
+
+                    ], 200);
+                } else {
+
+                    //credit
+                    $credit = $user_wallet_banlance + $amount - $amount;
+
+                    if ($wallet == 'main_account') {
+
+                        $update = User::where('id', Auth::id())
+                            ->update([
+                                'main_wallet' => $credit,
+                            ]);
+                    }
+
+                    if ($wallet == 'bonus_account') {
+
+                        $update = User::where('id', Auth::id())
+                            ->update([
+                                'bonus_wallet' => $credit,
+                            ]);
+                    }
+
+
+                    //save failed Transactions
+
+                    $chk = FailedTransaction::where('user_id', Auth::id())->first()->user_id ?? null;
+                    if ($chk == null) {
+
+                        $f = new FailedTransaction();
+                        $f->user_id = Auth::id();
+                        $f->attempt = 1;
+                        $f->created_at = Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00"));
+                        $f->save();
+                    }
+
+
+
+                    $parametersJson = json_encode($request->all());
+                    $headers = json_encode($request->headers->all());
+                    $full_name = Auth::user()->first_name . "  " . Auth::user()->last_name;
+
+                    $ip = $request->ip();
+
+                    $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\n Full Name=======> " . $full_name . "\n\nIP========> " . $ip;
+                    send_notification($result);
+
+                    return response()->json([
+
+                        'status' => $this->failed,
+                        'message' => 'Service not available at the moment, please wait and try again later',
+
+                    ], 500);
+                }
+            }
+
+
+
+            //Manuel
+
+            if ($set->bank == 'manuel') {
+                $wallet = $request->wallet;
+                $amount = $request->amount;
+                $destinationAccountNumber = $request->account_number;
+                $destinationBankCode = $request->code;
+                $longitude = $request->longitude;
+                $latitude = $request->latitude;
+                $get_description = $request->narration;
+                $pin = $request->pin;
+
+                $account_number = $destinationAccountNumber;
+                $bank_code = $destinationBankCode;
+                $destinationAccountName = resolve_bank($account_number,$bank_code );
+                $bank_name = VfdBank::select('bankName')->where('code', $destinationBankCode)->first()->bankName ?? null;
+                $referenceCode = "ENK-" . random_int(1000000, 999999999);
+
+                $transfer_charges = Charge::where('title', 'transfer_fee')->first()->amount;
+
+                $amoutCharges = $amount + $transfer_charges;
+
+
+                if (Auth::user()->status == 5) {
+
+
+                    return response()->json([
+
+                        'status' => $this->failed,
+                        'message' => 'You can not make transfer at the moment, Please contact  support',
+
+                    ], 500);
+                }
+
+
+            
+
+                $user_email = user_email();
+                $first_name = first_name();
+
+                $description = $get_description ?? "Fund for $destinationAccountName";
+
+                if ($wallet == 'main_account') {
+                    $user_wallet_banlance = main_account();
+                } else {
+                    $user_wallet_banlance = bonus_account();
+                }
+
+                $user_pin = Auth()->user()->pin;
+
+                if (Hash::check($pin, $user_pin) == false) {
+
+                    return response()->json([
+
+                        'status' => $this->failed,
+                        'message' => 'Invalid Pin, Please try again',
+
+                    ], 500);
+                }
+
+                if (Auth::user()->b_number == 6) {
+
+                    return response()->json([
+
+                        'status' => $this->failed,
+                        'message' => 'You dont have the permission to make transfer',
+
+                    ], 500);
+                }
+
+                if ($amount < 100) {
+
+                    return response()->json([
+
+                        'status' => $this->failed,
+                        'message' => 'Amount must not be less than NGN 100',
+
+                    ], 500);
+                }
+
+                if (Auth()->user()->status == 1 && $amount > 20000) {
+
+                    return response()->json([
+
+                        'status' => $this->failed,
+                        'message' => 'Please Complete your KYC',
+
+                    ], 500);
+                }
+
+                if ($amoutCharges > $user_wallet_banlance) {
+
+                    return response()->json([
+
+                        'status' => $this->failed,
+                        'message' => 'Insufficient Funds, fund your account',
+
+                    ], 500);
+                }
+
+                //Debit
+                $debited_amount = $transfer_charges + $amount;
+                $debit = $user_wallet_banlance - $debited_amount;
+
+                if ($wallet == 'main_account') {
+
+                    $update = User::where('id', Auth::id())
+                        ->update([
+                            'main_wallet' => $debit,
+                        ]);
+                } else {
+
+                    $update = User::where('id', Auth::id())
+                        ->update([
+                            'bonus_wallet' => $debit,
+                        ]);
+                }
+
+               
+                $trans_id = "ENK-" . random_int(100000, 999999);
+
+             
+                $enkpay_profit = $transfer_charges - 10;
+                $status = 200;
+
+                if ($status == 200) {
+
+                    //update Transactions
+                    $trasnaction = new Transaction();
+                    $trasnaction->user_id = Auth::id();
+                    $trasnaction->ref_trans_id = $trans_id;
+                    $trasnaction->type = "EPBankTransfer";
+                    $trasnaction->main_type = "Transfer";
+                    $trasnaction->transaction_type = "BankTransfer";
+                    $trasnaction->title = "Bank Transfer";
+                    $trasnaction->debit = $debited_amount;
+                    $trasnaction->amount = $amount;
+                    $trasnaction->note = "BANK TRANSFER TO | $destinationAccountName | $destinationAccountNumber | $bank_name  ";
+                    $trasnaction->fee = 0;
+                    $trasnaction->enkpay_Cashout_profit = $enkpay_profit;
+                    $trasnaction->receiver_name = $destinationAccountName;
+                    $trasnaction->receiver_account_no = $destinationAccountNumber;
+                    $trasnaction->receiver_bank = $bank_name;
+                    $trasnaction->balance = $debit;
+                    $trasnaction->status = 1;
+                    $trasnaction->save();
+
+
+                    $ip = $request->ip();
+                    $message = "Request to transfer $amount | $destinationAccountName | $bank_name | $destinationAccountName ";
+                    $result = "Message========> " . $message . "\n\nIP========> " . $ip;
+                    send_notification($result);
+
+
+
+
+                    if ($user_email !== null) {
+
+                        $data = array(
+                            'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                            'subject' => "Bank Transfer",
+                            'toreceiver' => $user_email,
+                            'amount' => $amount,
+                            'first_name' => $first_name,
+                        );
+
+                        Mail::send('emails.transaction.banktransfer', ["data1" => $data], function ($message) use ($data) {
+                            $message->from($data['fromsender']);
+                            $message->to($data['toreceiver']);
+                            $message->subject($data['subject']);
+                        });
+                    }
+
+                    return response()->json([
+
+                        'status' => $this->success,
+                        'message' => "Transaction Processing",
+
+                    ], 200);
+                } else {
+
+                    //credit
+                    $credit = $user_wallet_banlance + $amount - $amount;
+
+                    if ($wallet == 'main_account') {
+
+                        $update = User::where('id', Auth::id())
+                            ->update([
+                                'main_wallet' => $credit,
+                            ]);
+                    }
+
+                    if ($wallet == 'bonus_account') {
+
+                        $update = User::where('id', Auth::id())
+                            ->update([
+                                'bonus_wallet' => $credit,
+                            ]);
+                    }
+
+
+                    $parametersJson = json_encode($request->all());
+                    $headers = json_encode($request->headers->all());
+                    $full_name = Auth::user()->first_name . "  " . Auth::user()->last_name;
+
+                    $ip = $request->ip();
+
+                    $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\n Full Name=======> " . $full_name . "\n\nIP========> " . $ip;
+                    send_notification($result);
+
+                    return response()->json([
+
+                        'status' => $this->failed,
+                        'message' => 'Service not available at the moment, please wait and try again later',
+
+                    ], 500);
+                }
+            }
+        
+
+
+        
+
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        } catch (\Exception $th) {
+            return $th->getMessage();
+        }
+    }
+
+    public function self_cash_out(Request $request)
+    {
+
+        try {
+
+
             $chk = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
             $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
 
@@ -44,7 +964,7 @@ class TransactionController extends Controller
                     $minuteDiff = $anchorTime->diffInMinutes($currentTime);
 
 
-                    if ($minuteDiff >= 3) {
+                    if ($minuteDiff >= 2) {
                         FailedTransaction::where('user_id', Auth::id())->delete();
                     }
                 }
@@ -54,80 +974,81 @@ class TransactionController extends Controller
             $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
             if ($fa != null) {
 
-                if ($fa->attempt == 1) {
+                if ($fa->attempt = 1) {
                     return response()->json([
+
                         'status' => $this->failed,
                         'message' => 'Service not available at the moment, please wait for about 2 mins and try again',
-                    ], 500);
-                }
-            }
 
-            $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
-            if ($fa != null) {
-
-                if ($fa->attempt == 1) {
-                    return response()->json([
-                        'status' => $this->failed,
-                        'message' => 'Service not available at the moment, please wait for about 2 mins and try again',
                     ], 500);
                 }
             }
 
 
+
+
+            $account_number = Auth::user()->c_account_number ?? null;
+            $bank_code = Auth::user()->c_bank_code;
+            $account_name = Auth::user()->c_account_name;
 
             $erran_api_key = errand_api_key();
 
             $epkey = env('EPKEY');
 
+
+
             $wallet = $request->wallet;
             $amount = $request->amount;
-            $destinationAccountNumber = $request->account_number;
-            $destinationBankCode = $request->code;
-            $destinationAccountName = $request->receiver_bank;
+            $destinationAccountNumber = $account_number;
+            $destinationBankCode = $bank_code;
+            $destinationAccountName = $account_name;
             $longitude = $request->longitude;
             $latitude = $request->latitude;
-            $get_description = $request->narration;
+            $get_description = "Cash out to " . "|" . $destinationAccountNumber . " | " . $destinationAccountName;
             $pin = $request->pin;
 
             $referenceCode = "ENK-" . random_int(1000000, 999999999);
 
             $transfer_charges = Charge::where('title', 'transfer_fee')->first()->amount;
 
+
             $amoutCharges = $amount + $transfer_charges;
-
-
-            if (Auth::user()->status == 5) {
-
-
-                return response()->json([
-
-                    'status' => $this->failed,
-                    'message' => 'You can not make transfer at the moment, Please contact  support',
-
-                ], 500);
-            }
-
-
-            $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
-            if ($fa !== null) {
-
-                dd('hello');
-
-                if ($fa->attempt == 1) {
-                    return response()->json([
-
-                        'status' => $this->failed,
-                        'message' => 'Service not available at the moment, please wait and try again later',
-
-                    ], 500);
-                }
-            }
 
 
             $user_email = user_email();
             $first_name = first_name();
 
             $description = $get_description ?? "Fund for $destinationAccountName";
+
+            if ($account_number == null) {
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'Please update your account information.',
+
+                ], 500);
+            }
+
+            if (Auth::user()->b_number == 6) {
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'You dont have the permission to make transfer',
+
+                ], 500);
+            }
+
+            if ($bank_code == null) {
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'Please update your account information.',
+
+                ], 500);
+            }
 
             if ($wallet == 'main_account') {
                 $user_wallet_banlance = main_account();
@@ -143,16 +1064,6 @@ class TransactionController extends Controller
 
                     'status' => $this->failed,
                     'message' => 'Invalid Pin, Please try again',
-
-                ], 500);
-            }
-
-            if (Auth::user()->b_number == 6) {
-
-                return response()->json([
-
-                    'status' => $this->failed,
-                    'message' => 'You dont have the permission to make transfer',
 
                 ], 500);
             }
@@ -188,8 +1099,9 @@ class TransactionController extends Controller
             }
 
             //Debit
-            $debited_amount = $transfer_charges + $amount;
-            $debit = $user_wallet_banlance - $debited_amount;
+            $charged_amount = $amount + $transfer_charges;
+            $debit = $user_wallet_banlance - $charged_amount;
+            $enkpay_profit = $transfer_charges - 10;
 
             if ($wallet == 'main_account') {
 
@@ -221,7 +1133,7 @@ class TransactionController extends Controller
             $post_data = json_encode($data);
 
             curl_setopt_array($curl, array(
-                // CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
+                CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
@@ -243,19 +1155,13 @@ class TransactionController extends Controller
 
             $var = json_decode($var);
 
-            $error = $var->error->message ?? null;
-
-            $message = "Error from Errand Pay | $error ";
+            $message = "Error from Bank Transfer" . "  |  " . $var->error->message ?? null;
 
             $trans_id = "ENK-" . random_int(100000, 999999);
 
             $TransactionReference = $var->data->reference ?? null;
 
-            $enkpay_profit = $transfer_charges - 10;
-
             $status = $var->code ?? null;
-
-            //$status = 209;
 
             if ($status == 200) {
 
@@ -264,15 +1170,16 @@ class TransactionController extends Controller
                 $trasnaction->user_id = Auth::id();
                 $trasnaction->ref_trans_id = $trans_id;
                 $trasnaction->e_ref = $TransactionReference;
-                $trasnaction->type = "InterBankTransfer";
+                $trasnaction->type = "SelfCashOutTransfer";
+                $trasnaction->title = "Transfer to Self";
                 $trasnaction->main_type = "Transfer";
                 $trasnaction->transaction_type = "BankTransfer";
                 $trasnaction->title = "Bank Transfer";
-                $trasnaction->debit = $debited_amount;
+                $trasnaction->debit = $charged_amount;
                 $trasnaction->amount = $amount;
-                $trasnaction->note = "Bank Transfer to other banks";
+                $trasnaction->note = "Cash out to " . "|" . $destinationAccountNumber . " | " . $destinationAccountName;
                 $trasnaction->fee = 0;
-                $trasnaction->enkpay_Cashout_profit = $enkpay_profit;
+                $trasnaction->enkPay_Cashout_profit = $enkpay_profit;
                 $trasnaction->trx_date = date("Y/m/d");
                 $trasnaction->trx_time = date("h:i:s");
                 $trasnaction->receiver_name = $destinationAccountName;
@@ -326,9 +1233,6 @@ class TransactionController extends Controller
                         ]);
                 }
 
-
-                //save failed Transactions
-
                 $chk = FailedTransaction::where('user_id', Auth::id())->first()->user_id ?? null;
                 if ($chk == null) {
 
@@ -338,6 +1242,8 @@ class TransactionController extends Controller
                     $f->created_at = Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00"));
                     $f->save();
                 }
+
+
 
 
                 $parametersJson = json_encode($request->all());
@@ -352,349 +1258,14 @@ class TransactionController extends Controller
                 return response()->json([
 
                     'status' => $this->failed,
-                    'message' => 'Service not available at the moment, please wait and try again later',
+                    'message' => 'Service not reachable, please try again later',
 
                 ], 500);
             }
-
         } catch (\Exception $th) {
-          return $th->getMessage();
+            return $th->getMessage();
         }
-
     }
-
-    public function self_cash_out(Request $request)
-    {
-
-    try {
-
-
-        $chk = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
-        $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
-
-        if ($fa != null) {
-
-            if ($chk->user_id == Auth::id()) {
-
-
-                $anchorTime = Carbon::createFromFormat("Y-m-d H:i:s", $fa->created_at);
-                $currentTime = Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00"));
-                # count difference in minutes
-                $minuteDiff = $anchorTime->diffInMinutes($currentTime);
-
-
-                if ($minuteDiff >= 2) {
-                    FailedTransaction::where('user_id', Auth::id())->delete();
-                }
-            }
-        }
-
-
-        $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
-        if ($fa != null) {
-
-            if ($fa->attempt = 1) {
-                return response()->json([
-
-                    'status' => $this->failed,
-                    'message' => 'Service not available at the moment, please wait for about 2 mins and try again',
-
-                ], 500);
-            }
-        }
-
-
-
-
-        $account_number = Auth::user()->c_account_number ?? null;
-        $bank_code = Auth::user()->c_bank_code;
-        $account_name = Auth::user()->c_account_name;
-
-        $erran_api_key = errand_api_key();
-
-        $epkey = env('EPKEY');
-
-
-
-        $wallet = $request->wallet;
-        $amount = $request->amount;
-        $destinationAccountNumber = $account_number;
-        $destinationBankCode = $bank_code;
-        $destinationAccountName = $account_name;
-        $longitude = $request->longitude;
-        $latitude = $request->latitude;
-        $get_description = "Cash out to " . "|" . $destinationAccountNumber . " | " . $destinationAccountName;
-        $pin = $request->pin;
-
-        $referenceCode = "ENK-" . random_int(1000000, 999999999);
-
-        $transfer_charges = Charge::where('title', 'transfer_fee')->first()->amount;
-
-
-        $amoutCharges = $amount + $transfer_charges;
-
-
-        $user_email = user_email();
-        $first_name = first_name();
-
-        $description = $get_description ?? "Fund for $destinationAccountName";
-
-        if ($account_number == null) {
-
-            return response()->json([
-
-                'status' => $this->failed,
-                'message' => 'Please update your account information.',
-
-            ], 500);
-        }
-
-        if (Auth::user()->b_number == 6) {
-
-            return response()->json([
-
-                'status' => $this->failed,
-                'message' => 'You dont have the permission to make transfer',
-
-            ], 500);
-        }
-
-        if ($bank_code == null) {
-
-            return response()->json([
-
-                'status' => $this->failed,
-                'message' => 'Please update your account information.',
-
-            ], 500);
-        }
-
-        if ($wallet == 'main_account') {
-            $user_wallet_banlance = main_account();
-        } else {
-            $user_wallet_banlance = bonus_account();
-        }
-
-        $user_pin = Auth()->user()->pin;
-
-        if (Hash::check($pin, $user_pin) == false) {
-
-            return response()->json([
-
-                'status' => $this->failed,
-                'message' => 'Invalid Pin, Please try again',
-
-            ], 500);
-        }
-
-        if ($amount < 100) {
-
-            return response()->json([
-
-                'status' => $this->failed,
-                'message' => 'Amount must not be less than NGN 100',
-
-            ], 500);
-        }
-
-        if (Auth()->user()->status == 1 && $amount > 20000) {
-
-            return response()->json([
-
-                'status' => $this->failed,
-                'message' => 'Please Complete your KYC',
-
-            ], 500);
-        }
-
-        if ($amoutCharges > $user_wallet_banlance) {
-
-            return response()->json([
-
-                'status' => $this->failed,
-                'message' => 'Insufficient Funds, fund your account',
-
-            ], 500);
-        }
-
-        //Debit
-        $charged_amount = $amount + $transfer_charges;
-        $debit = $user_wallet_banlance - $charged_amount;
-        $enkpay_profit = $transfer_charges - 10;
-
-        if ($wallet == 'main_account') {
-
-            $update = User::where('id', Auth::id())
-                ->update([
-                    'main_wallet' => $debit,
-                ]);
-        } else {
-
-            $update = User::where('id', Auth::id())
-                ->update([
-                    'bonus_wallet' => $debit,
-                ]);
-        }
-
-        $curl = curl_init();
-        $data = array(
-
-            "amount" => $amount,
-            "destinationAccountNumber" => $destinationAccountNumber,
-            "destinationBankCode" => $destinationBankCode,
-            "destinationAccountName" => $destinationAccountName,
-            "longitude" => $longitude,
-            "latitude" => $latitude,
-            "description" => $description,
-
-        );
-
-        $post_data = json_encode($data);
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => $post_data,
-            CURLOPT_HTTPHEADER => array(
-                "Authorization: Bearer $erran_api_key",
-                "EpKey: $epkey",
-                'Content-Type: application/json',
-            ),
-        ));
-
-        $var = curl_exec($curl);
-
-        curl_close($curl);
-
-        $var = json_decode($var);
-
-        $message = "Error from Bank Transfer" . "  |  " . $var->error->message ?? null;
-
-        $trans_id = "ENK-" . random_int(100000, 999999);
-
-        $TransactionReference = $var->data->reference ?? null;
-
-        $status = $var->code ?? null;
-
-        if ($status == 200) {
-
-            //update Transactions
-            $trasnaction = new Transaction();
-            $trasnaction->user_id = Auth::id();
-            $trasnaction->ref_trans_id = $trans_id;
-            $trasnaction->e_ref = $TransactionReference;
-            $trasnaction->type = "SelfCashOutTransfer";
-            $trasnaction->title = "Transfer to Self";
-            $trasnaction->main_type = "Transfer";
-            $trasnaction->transaction_type = "BankTransfer";
-            $trasnaction->title = "Bank Transfer";
-            $trasnaction->debit = $charged_amount;
-            $trasnaction->amount = $amount;
-            $trasnaction->note = "Cash out to " . "|" . $destinationAccountNumber . " | " . $destinationAccountName;
-            $trasnaction->fee = 0;
-            $trasnaction->enkPay_Cashout_profit = $enkpay_profit;
-            $trasnaction->trx_date = date("Y/m/d");
-            $trasnaction->trx_time = date("h:i:s");
-            $trasnaction->receiver_name = $destinationAccountName;
-            $trasnaction->receiver_account_no = $destinationAccountNumber;
-            $trasnaction->balance = $debit;
-            $trasnaction->status = 0;
-            $trasnaction->save();
-
-            if ($user_email !== null) {
-
-                $data = array(
-                    'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
-                    'subject' => "Bank Transfer",
-                    'toreceiver' => $user_email,
-                    'amount' => $amount,
-                    'first_name' => $first_name,
-                );
-
-                Mail::send('emails.transaction.banktransfer', ["data1" => $data], function ($message) use ($data) {
-                    $message->from($data['fromsender']);
-                    $message->to($data['toreceiver']);
-                    $message->subject($data['subject']);
-                });
-            }
-
-            return response()->json([
-
-                'status' => $this->success,
-                'reference' => $TransactionReference,
-                'message' => "Transaction Processing",
-
-            ], 200);
-
-        } else {
-
-            //credit
-            $credit = $user_wallet_banlance + $amount - $amount;
-
-            if ($wallet == 'main_account') {
-
-                $update = User::where('id', Auth::id())
-                    ->update([
-                        'main_wallet' => $credit,
-                    ]);
-            }
-
-            if ($wallet == 'bonus_account') {
-
-                $update = User::where('id', Auth::id())
-                    ->update([
-                        'bonus_wallet' => $credit,
-                    ]);
-            }
-
-            $chk = FailedTransaction::where('user_id', Auth::id())->first()->user_id ?? null;
-            if ($chk == null) {
-
-                $f = new FailedTransaction();
-                $f->user_id = Auth::id();
-                $f->attempt = 1;
-                $f->created_at = Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00"));
-                $f->save();
-            }
-
-
-
-
-            $parametersJson = json_encode($request->all());
-            $headers = json_encode($request->headers->all());
-            $full_name = Auth::user()->first_name . "  " . Auth::user()->last_name;
-
-            $ip = $request->ip();
-
-            $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\n Full Name=======> " . $full_name . "\n\nIP========> " . $ip;
-            send_notification($result);
-
-            return response()->json([
-
-                'status' => $this->failed,
-                'message' => 'Service not reachable, please try again later',
-
-            ], 500);
-
-
-
-        }
-    } catch (\Exception $th) {
-        return $th->getMessage();
-    }
-
-
-
-
-
-
-}
 
     public function get_wallet()
     {
@@ -722,10 +1293,9 @@ class TransactionController extends Controller
 
 
             $set = Setting::where('id', 1)->first();
-            if($set->bank == 'vfd')
-            {
+            if ($set->bank == 'vfd') {
                 $data = 'vfd';
-            }else{
+            } else {
                 $data = 'pbank';
             }
 
@@ -786,16 +1356,13 @@ class TransactionController extends Controller
             $account_number = $request->account_number;
             //$bvn = $request->bvn;
 
-            $resolve = resolve_bank($bank_code,$account_number);
+            $resolve = resolve_bank($bank_code, $account_number);
 
             return response()->json([
                 'status' => true,
                 'customer_name' => $resolve,
 
             ], 200);
-
-
-           
         } catch (\Exception $th) {
             return $th->getMessage();
         }
