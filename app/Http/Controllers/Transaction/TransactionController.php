@@ -102,19 +102,19 @@ class TransactionController extends Controller
             }
 
 
-            $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
-            if ($fa !== null) {
+            // $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
+            // if ($fa !== null) {
 
 
-                if ($fa->attempt == 2) {
-                    return response()->json([
+            //     if ($fa->attempt == 1) {
+            //         return response()->json([
 
-                        'status' => $this->failed,
-                        'message' => 'Service not available at the moment, please wait and try again later',
+            //             'status' => $this->failed,
+            //             'message' => 'Service not available at the moment, please wait and try again later',
 
-                    ], 500);
-                }
-            }
+            //         ], 500);
+            //     }
+            // }
 
 
             $user_email = user_email();
@@ -214,7 +214,7 @@ class TransactionController extends Controller
             $post_data = json_encode($data);
 
             curl_setopt_array($curl, array(
-                // CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
+                CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
