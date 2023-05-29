@@ -1745,6 +1745,7 @@ class TransactionController extends Controller
 
                 if($status == 200){
 
+                //update Transactions
                 $trasnaction = new Transfer();
                 $trasnaction->user_id = Auth::id();
                 $trasnaction->ref_trans_id = $referenceCode;
@@ -1763,6 +1764,28 @@ class TransactionController extends Controller
                 $trasnaction->balance = $debit;
                 $trasnaction->status = 1;
                 $trasnaction->save();
+
+
+                 //update Transactions
+                 $trasnaction = new Transaction();
+                 $trasnaction->user_id = Auth::id();
+                 $trasnaction->ref_trans_id = $referenceCode;
+                 $trasnaction->type = "EPBankTransfer";
+                 $trasnaction->main_type = "Transfer";
+                 $trasnaction->transaction_type = "BankTransfer";
+                 $trasnaction->title = "Bank Transfer";
+                 $trasnaction->debit = $charged_amount;
+                 $trasnaction->amount = $amount;
+                 $trasnaction->note = "BANK TRANSFER TO | $destinationAccountName | $destinationAccountNumber | $bank_name  ";
+                 $trasnaction->fee = 0;
+                 $trasnaction->enkpay_Cashout_profit = $enkpay_profit;
+                 $trasnaction->receiver_name = $destinationAccountName;
+                 $trasnaction->receiver_account_no = $destinationAccountNumber;
+                 $trasnaction->receiver_bank = $bank_name;
+                 $trasnaction->balance = $debit;
+                 $trasnaction->status = 1;
+                 $trasnaction->save();
+
 
 
                 $ip = $request->ip();
