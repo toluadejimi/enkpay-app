@@ -722,7 +722,7 @@ class TransactionController extends Controller
 
 
 
-                $destinationAccountName = resolve_bank($account_number, $bank_code);
+                //$destinationAccountName = resolve_bank($account_number, $bank_code);
 
                 $bank_name = VfdBank::select('bankName')->where('code', $destinationBankCode)->first()->bankName ?? null;
                 $referenceCode = "ENK-" . random_int(1000000, 999999999);
@@ -859,7 +859,7 @@ class TransactionController extends Controller
 
 
                     $ip = $request->ip();
-                    $message = "Request to transfer NGN $amount | $bank_name | $destinationAccountName | $destinationAccountNumber ";
+                    $message = "Request to transfer NGN $amount | $bank_name  | $destinationAccountNumber ";
                     $result = "Message========> " . $message . "\n\nIP========> " . $ip;
                     send_notification($result);
 
@@ -887,7 +887,7 @@ class TransactionController extends Controller
 
                         'status' => $this->success,
                         'message' => "Transaction Processing",
-                    
+
 
 
                     ], 200);
@@ -1824,7 +1824,7 @@ class TransactionController extends Controller
                 ], 500);
             }
         }
-        
+
         } catch (\Exception $th) {
             return $th->getMessage();
         }

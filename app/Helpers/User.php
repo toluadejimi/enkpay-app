@@ -299,10 +299,21 @@ if (!function_exists('send_notification')) {
             }
 
 
+            // if($set->bank == 'manuel'){
+            //     $get_banks = ProvidusBank::select('bankName', 'code')->get();
+            //     return $get_banks;
+            // }
+
+
+
             if($set->bank == 'manuel'){
-                $get_banks = ProvidusBank::select('bankName', 'code')->get();
+                $get_banks = VfdBank::select('bankName', 'code')->get();
+
                 return $get_banks;
             }
+
+
+
 
 
             if($set->bank == 'pbank'){
@@ -326,7 +337,10 @@ if (!function_exists('send_notification')) {
         function resolve_bank($bank_code, $account_number)
         {
 
+
+
             $set = Setting::where('id', 1)->first();
+
             if($set->bank == 'vfd'){
 
                 $databody = array(
@@ -428,6 +442,7 @@ if (!function_exists('send_notification')) {
 
             if($set->bank == 'manuel'){
 
+
                 $databody = array(
 
                     'accountNumber' => $account_number,
@@ -464,9 +479,7 @@ if (!function_exists('send_notification')) {
                 $status = $var->code ?? null;
 
                 if ($status == 200) {
-
                     return $customer_name;
-
                 }
 
                 return $error;
