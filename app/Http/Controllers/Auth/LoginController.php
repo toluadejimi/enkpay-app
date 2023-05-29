@@ -278,7 +278,7 @@ public function phone_login(Request $request){
 //     return $th->getMessage();
 // }
 
-// }
+}
 
 
 public function email_login(Request $request){
