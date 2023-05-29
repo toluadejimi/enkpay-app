@@ -284,10 +284,14 @@ if (!function_exists('send_notification')) {
 
 
     if (!function_exists('get_banks')) {
-        function get_banks($data)
+        function get_banks()
         {
 
-            if($data == 'vfd'){
+
+
+            $set = Setting::where('id', 1)->first();
+
+            if($set->bank == 'manuel'){
                 $get_banks = VfdBank::select('bankName', 'code')->get();
 
                 
@@ -295,10 +299,21 @@ if (!function_exists('send_notification')) {
             }
 
 
-            if($data == 'pbank'){
+            if($set->bank == ''){
+                $get_banks = ProvidusBank::select('bankName', 'code')->get();
+                return $get_banks;
+            }
+
+
+            if($set->bank == 'pbank'){
                 $get_banks = ProvidusBank::select('bankName', 'code')->get();
 
+
+
                 return $get_banks;
+
+
+
             }
 
             
@@ -361,7 +376,6 @@ if (!function_exists('send_notification')) {
 
             }
 
-
             if($set->bank == 'pbank'){
 
                 $databody = array(
@@ -410,6 +424,57 @@ if (!function_exists('send_notification')) {
 
 
             }
+
+
+            if($set->bank == 'manuel'){
+
+                $databody = array(
+
+                    'accountNumber' => $account_number,
+                    'institutionCode' => $bank_code,
+                    'channel' => "Bank",
+    
+                );
+    
+                $body = json_encode($databody);
+                $curl = curl_init();
+    
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/AccountNameVerification',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'POST',
+                    CURLOPT_POSTFIELDS => $body,
+                    CURLOPT_HTTPHEADER => array(
+                        'Content-Type: application/json',
+                    ),
+                ));
+    
+                $var = curl_exec($curl);
+                curl_close($curl);
+                $var = json_decode($var);
+    
+                $customer_name = $var->data->name ?? null;
+                $error = $var->error->message ?? null;
+    
+                $status = $var->code ?? null;
+    
+                if ($status == 200) {
+    
+                    return $customer_name;
+    
+                }
+    
+                return $error;
+
+
+
+            }
+
 
         }
     }
