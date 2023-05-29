@@ -63,6 +63,24 @@ public function phone_login(Request $request){
 
         }
 
+        $ur = User::where('email', $phone)->first() ?? null;
+        if ($ur != null) {
+
+            if ($ur->user_id == Auth::id()) {
+
+                $anchorTime = Carbon::createFromFormat("Y-m-d H:i:s", $ur->session_time);
+                $currentTime = Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00"));
+                # count difference in minutes
+                $minuteDiff = $anchorTime->diffInMinutes($currentTime);
+
+
+                if ($minuteDiff >= 1) {
+                    User::where('email', $phone)->update(['session_time' => Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00")), 'session' => 0 ]);
+                }
+
+            }
+        }
+
         if (!auth()->attempt($credentials)) {
             return response()->json([
                 'status' => $this->failed,
@@ -83,6 +101,29 @@ public function phone_login(Request $request){
         }
 
 
+        //ck session
+        $ur = User::where('id', Auth::id())->first() ?? null;
+        if ($ur != null) {
+
+            if($ur->session ==1 ){
+
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => 'You can only login on a device, Please log out on current device'
+                ], 500);
+
+            }
+        }
+
+
+
+        $ur = User::where('id', Auth::id())->first() ?? null;
+        if ($ur != null) {
+            User::where('id', Auth::id())->update(['session_time' => Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00")), 'session' => 1 ]);
+        }
+
+
+
 
 
         $feature = Feature::where('id', 1)->first();
@@ -90,9 +131,6 @@ public function phone_login(Request $request){
 
         $user = Auth()->user();
         $user['token']=$token;
-
-
-
 
         $is_kyc_verified = Auth::user()->is_kyc_verified;
         $status = Auth::user()->status;
@@ -235,6 +273,10 @@ public function email_login(Request $request){
 
     try{
 
+
+    
+
+
         $email = $request->email;
 
         $credentials = request(['email', 'password']);
@@ -252,6 +294,24 @@ public function email_login(Request $request){
                 'message' => 'Your account has restricted on ENKPAY',
             ], 500);
 
+        }
+
+
+        $ur = User::where('email', $email)->first() ?? null;
+        if ($ur != null) {
+
+            if ($ur->user_id == Auth::id()) {
+
+                $anchorTime = Carbon::createFromFormat("Y-m-d H:i:s", $ur->session_time);
+                $currentTime = Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00"));
+                # count difference in minutes
+                $minuteDiff = $anchorTime->diffInMinutes($currentTime);
+
+
+                if ($minuteDiff >= 1) {
+                    User::where('email', $email)->update(['session_time' => Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00")), 'session' => 0 ]);
+                }
+            }
         }
 
 
@@ -304,6 +364,35 @@ public function email_login(Request $request){
         }
 
 
+      
+
+        //ck session
+        $ur = User::where('id', Auth::id())->first() ?? null;
+        if ($ur != null) {
+
+            if($ur->session ==1 ){
+
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => 'You can only login on a device, Please log out on current device'
+                ], 500);
+
+            }
+        }
+
+
+
+        $ur = User::where('id', Auth::id())->first() ?? null;
+        if ($ur != null) {
+            User::where('id', Auth::id())->update(['session_time' => Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00")), 'session' => 1 ]);
+        }
+
+
+
+       
+
+
+
         $setting = Setting::select('google_url','ios_url','version')
         ->first();
 
@@ -326,6 +415,10 @@ public function email_login(Request $request){
 
 public function logout(Request $request) {
     $request->user()->token()->revoke();
+    $ur = User::where('id', Auth::id())->first() ?? null;
+    if ($ur != null) {
+        User::where('id', Auth::id())->update(['session_time' => Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00")), 'session' => 0 ]);
+    }
     return response()->json([
         'status' => $this->success,
         'message' => "Successfully logged out"

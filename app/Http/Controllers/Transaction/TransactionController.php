@@ -373,10 +373,10 @@ class TransactionController extends Controller
                     $anchorTime = Carbon::createFromFormat("Y-m-d H:i:s", $fa->created_at);
                     $currentTime = Carbon::createFromFormat("Y-m-d H:i:s", date("Y-m-d H:i:00"));
                     # count difference in minutes
-                    $minuteDiff = $anchorTime->diffInSeconds($currentTime);
+                    $minuteDiff = $anchorTime->diffInMinutes($currentTime);
 
 
-                    if ($minuteDiff >= 100) {
+                    if ($minuteDiff >= 2) {
                         FailedTransaction::where('user_id', Auth::id())->delete();
                     }
                 }
@@ -386,11 +386,11 @@ class TransactionController extends Controller
             $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
             if ($fa !== null) {
 
-                if ($fa->attempt == 2) {
+                if ($fa->attempt == 1) {
                     return response()->json([
 
                         'status' => $this->failed,
-                        'message' => 'Service not available at the moment, please wait for about 10 mins and try again',
+                        'message' => 'Service not available at the moment, please wait for about 2 mins and try again',
 
                     ], 500);
                 }
@@ -646,8 +646,6 @@ class TransactionController extends Controller
                         ]);
                 }
 
-                //save failed Transactions
-
                 $chk = FailedTransaction::where('user_id', Auth::id())->first()->user_id ?? null;
                 if ($chk == null) {
 
@@ -658,17 +656,6 @@ class TransactionController extends Controller
                     $f->save();
                 }
 
-
-                if ($chk == Auth::id()) {
-
-                    $time = FailedTransaction::where('user_id', Auth::id())->first()->created_at;
-                    $currentDateTime = Carbon::now();
-                    $targetDateTime = Carbon::now()->addSeconds(2);
-                    $diffInSeconds = $targetDateTime->diffInSeconds($currentDateTime);
-
-                    if ($diffInSeconds == 2) {
-                        FailedTransaction::where('user_id', Auth::id())->increment('attempt', 1);
-                    }
 
 
 
