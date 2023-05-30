@@ -2,6 +2,12 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Charge;
+use App\Models\PendingTransaction;
+use App\Models\Transaction;
+use App\Models\Transfer;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Log;
 
@@ -27,14 +33,109 @@ class SendCron extends Command
     public function handle()
     {
 
-        \Illuminate\Support\Facades\Log::info("Cron is working fine!");
 
-        $message = "Working Fine";
-        send_notification($message);
+
+        $trx = PendingTransaction::where('status', 0)
+            ->whereBetween('created_at', [now()->subMinutes(1), now()])->first() ?? null;
+
+        if (!empty($trx) || $trx != null) {
+
+
+
+
+            $ref = $trx->ref_trans_id;
+
+            $erran_api_key = errand_api_key();
+
+            $epkey = env('EPKEY');
+
+            $curl = curl_init();
+            $data = array(
+
+                "amount" => $trx->amount,
+                "destinationAccountNumber" => $trx->receiver_account_no,
+                "destinationBankCode" => $trx->bank_code,
+                "destinationAccountName" => $trx->receiver_name,
+
+            );
+
+            $post_data = json_encode($data);
+
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $post_data,
+                CURLOPT_HTTPHEADER => array(
+                    "Authorization: Bearer $erran_api_key",
+                    "EpKey: $epkey",
+                    'Content-Type: application/json',
+                ),
+            ));
+
+            $var = curl_exec($curl);
+
+            curl_close($curl);
+
+            $var = json_decode($var);
+
+            $error = $var->error->message ?? null;
+            $TransactionReference = $var->data->reference ?? null;
+            $status = $var->code ?? null;
+
+            if ($status == 200) {
+
+
+                Transfer::where('ref_trans_id', $trx->ref_trans_id)->update(['status' => 2, 'e_ref' => $TransactionReference]);
+                Transaction::where('ref_trans_id', $trx->ref_trans_id)->update(['status' => 1, 'e_ref' => $TransactionReference]);
+                PendingTransaction::where('ref_trans_id', $trx->ref_trans_id)->delete();
+
+
+                $message = "Transaction |  $TransactionReference | has been sent ";
+                send_notification($message);
+            } else {
+
+
+                PendingTransaction::where('ref_trans_id', $trx->ref_trans_id)->update(['status' => 4]);
+                Transaction::where('ref_trans_id', $trx->ref_trans_id)->update(['status' => 3]);
+                $transfer_charges = Charge::where('title', 'transfer_fee')->first()->amount;
+
+                $user_wallet_banlance = User::where('id', $trx->user_id)->first()->main_wallet;
+
+                //credit
+                $credit = $user_wallet_banlance + $trx->amount + $transfer_charges;
+
+
+                $update = User::where('id', $trx->user_id)
+                    ->update([
+                        'main_wallet' => $credit,
+                    ]);
+
+                $usr = User::where('id', $trx->user_id)->first();
+
+                $message = "Transaction reversed | $error ";
+                $full_name = $usr->first_name . "  " . $usr->last_name;
+
+
+                $result = " Message========> " . $message . "\n\nCustomer Name========> " . $full_name;
+                send_notification($result);
+            }
+        }
+
+
+
+
+
+
+
+
+
 
         //
     }
 }
-
-
-
