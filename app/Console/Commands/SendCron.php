@@ -34,9 +34,29 @@ class SendCron extends Command
     {
 
 
+        // $anchorTime = Carbon::createFromFormat("Y-m-d H:i:s", $created_at);
+        // $currentTime = Carbon::now();
+
+        // $minuteDiff = $anchorTime->diffInMinutes($currentTime);
+
+        // if($minuteDiff > 2){
+
+        //     dd($minuteDiff, $currentTime, "Send");
+
+        // ->where('created_at', '<', Carbon::now()->subDay())
+
+        // where('created_at','<=',$time)->first();
+        // }
+
+
+
+
+
 
         $trx = PendingTransaction::where('status', 0)
-        ->whereBetween('created_at', [now()->subMinutes(1), now()])->first() ?? null;
+        ->where('created_at','<', Carbon::now()->subMinutes(1))->first() ?? null;
+
+        
 
         if (!empty($trx) || $trx != null) {
 
