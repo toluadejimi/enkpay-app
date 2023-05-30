@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\AccountInfo;
 use App\Models\ErrandKey;
 use App\Models\ProvidusBank;
 use App\Models\Setting;
@@ -275,7 +276,7 @@ if (!function_exists('send_notification')) {
                     );
                 }
 
-               $rr =  DB::table('providus_banks')->insert($history);
+                $rr =  DB::table('providus_banks')->insert($history);
 
                 return  $rr;
             }
@@ -291,7 +292,7 @@ if (!function_exists('send_notification')) {
 
             $set = Setting::where('id', 1)->first();
 
-            if($set->bank == 'vfd'){
+            if ($set->bank == 'vfd') {
                 $get_banks = VfdBank::select('bankName', 'code')->get();
 
 
@@ -306,7 +307,7 @@ if (!function_exists('send_notification')) {
 
 
 
-            if($set->bank == 'manuel'){
+            if ($set->bank == 'manuel') {
                 $get_banks = VfdBank::select('bankName', 'code')->get();
 
                 return $get_banks;
@@ -316,18 +317,13 @@ if (!function_exists('send_notification')) {
 
 
 
-            if($set->bank == 'pbank'){
+            if ($set->bank == 'pbank') {
                 $get_banks = ProvidusBank::select('bankName', 'code')->get();
 
 
 
                 return $get_banks;
-
-
-
             }
-
-
         }
     }
 
@@ -341,7 +337,7 @@ if (!function_exists('send_notification')) {
 
             $set = Setting::where('id', 1)->first();
 
-            if($set->bank == 'manuel'){
+            if ($set->bank == 'manuel') {
 
                 $databody = array(
 
@@ -381,16 +377,12 @@ if (!function_exists('send_notification')) {
                 if ($status == 200) {
 
                     return $customer_name;
-
                 }
 
                 return $error;
-
-
-
             }
 
-            if($set->bank == 'pbank'){
+            if ($set->bank == 'pbank') {
 
                 $databody = array(
 
@@ -430,76 +422,77 @@ if (!function_exists('send_notification')) {
                 if ($status == 200) {
 
                     return $customer_name;
-
                 }
 
                 return $error;
-
-
-
             }
 
 
-            if($set->bank == 'vfd'){
+            if ($set->bank == 'vfd') {
 
 
-                $databody = array(
+                $customer_name = AccountInfo::where('account_no', $account_number)
+                    ->where('code', $bank_code)->first()->customer_name ?? null;
 
-                    'accountNumber' => $account_number,
-                    'institutionCode' => $bank_code,
-                    'channel' => "Bank",
+                    if($customer_name != null){
 
-                );
+                        return $customer_name;
+                    }
 
-                $body = json_encode($databody);
-                $curl = curl_init();
 
-                curl_setopt_array($curl, array(
-                    CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/AccountNameVerification',
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING => '',
-                    CURLOPT_MAXREDIRS => 10,
-                    CURLOPT_TIMEOUT => 0,
-                    CURLOPT_FOLLOWLOCATION => true,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST => 'POST',
-                    CURLOPT_POSTFIELDS => $body,
-                    CURLOPT_HTTPHEADER => array(
-                        'Content-Type: application/json',
-                    ),
-                ));
 
-                $var = curl_exec($curl);
-                curl_close($curl);
-                $var = json_decode($var);
 
-                $customer_name = $var->data->name ?? null;
-                $error = $var->error->message ?? null;
+                if (!empty($customer_name) || $customer_name == null) {
 
-                $status = $var->code ?? null;
+                    $databody = array(
 
-                if ($status == 200) {
-                    return $customer_name;
+                        'accountNumber' => $account_number,
+                        'institutionCode' => $bank_code,
+                        'channel' => "Bank",
+
+                    );
+
+                    $body = json_encode($databody);
+                    $curl = curl_init();
+
+                    curl_setopt_array($curl, array(
+                        CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/AccountNameVerification',
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_ENCODING => '',
+                        CURLOPT_MAXREDIRS => 10,
+                        CURLOPT_TIMEOUT => 0,
+                        CURLOPT_FOLLOWLOCATION => true,
+                        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                        CURLOPT_CUSTOMREQUEST => 'POST',
+                        CURLOPT_POSTFIELDS => $body,
+                        CURLOPT_HTTPHEADER => array(
+                            'Content-Type: application/json',
+                        ),
+                    ));
+
+                    $var = curl_exec($curl);
+                    curl_close($curl);
+                    $var = json_decode($var);
+
+                    $customer_name = $var->data->name ?? null;
+                    $error = $var->error->message ?? null;
+
+                    $status = $var->code ?? null;
+
+                    if ($status == 200) {
+                        
+                       $sv = new AccountInfo();
+                       $sv->account_no = $account_number;
+                       $sv->code = $bank_code;
+                       $sv->customer_name = $customer_name;
+                       $sv->save();
+
+                       return $customer_name;
+                    }
+
+                    return $error;
                 }
-
-                return $error;
-
-
-
             }
-
-
         }
     }
-
-
-
-
-
-
-
-
-
-
-
 }
