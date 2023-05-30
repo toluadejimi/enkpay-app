@@ -36,12 +36,9 @@ class SendCron extends Command
 
 
         $trx = PendingTransaction::where('status', 0)
-            ->whereBetween('created_at', [now()->subMinutes(1), now()])->first() ?? null;
+        ->whereBetween('created_at', [now()->subMinutes(1), now()])->first() ?? null;
 
         if (!empty($trx) || $trx != null) {
-
-
-
 
             $ref = $trx->ref_trans_id;
 

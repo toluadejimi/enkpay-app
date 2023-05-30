@@ -85,7 +85,7 @@ class TransactionController extends Controller
 
 
 
-               
+
 
                 $wallet = $request->wallet;
                 $amount = $request->amount;
@@ -299,7 +299,7 @@ class TransactionController extends Controller
                         'message' => "Transaction Processing",
 
                     ], 200);
-                } 
+                }
             }
 
 
@@ -3205,16 +3205,18 @@ class TransactionController extends Controller
                 return response()->json([
 
                     'is_pin_valid' => true,
-                    //'balance' => number_format($debit, 2),
+                    'balance' => number_format($user_balance, 2),
                     'agent_status' => $check_agent_status,
 
                 ]);
+
+
             } else {
 
                 return response()->json([
 
                     'is_pin_valid' => true,
-                    //'balance' => number_format($user_balance, 2),
+                    'balance' => number_format($user_balance, 2),
                     'agent_status' => $check_agent_status,
 
                 ]);
