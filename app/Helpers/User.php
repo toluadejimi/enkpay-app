@@ -435,7 +435,6 @@ if (!function_exists('send_notification')) {
                     ->where('code', $bank_code)->first()->customer_name ?? null;
 
                     if($customer_name != null){
-
                         return $customer_name;
                     }
 
@@ -479,11 +478,14 @@ if (!function_exists('send_notification')) {
 
                     $status = $var->code ?? null;
 
+                    $bankName = VfdBank::where('code', $bank_code)->first()->bankName;
+
                     if ($status == 200) {
-                        
+
                        $sv = new AccountInfo();
                        $sv->account_no = $account_number;
                        $sv->code = $bank_code;
+                       $sv->bankName = $bankName;
                        $sv->customer_name = $customer_name;
                        $sv->save();
 
