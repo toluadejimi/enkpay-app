@@ -3041,7 +3041,7 @@ class TransactionController extends Controller
 
 
 
-            $trx = Transaction::where('e_ref', $TransactionReference)->first();
+            $trx = Transfer::where('e_ref', $TransactionReference)->first();
 
 
 
@@ -3069,7 +3069,7 @@ class TransactionController extends Controller
                 ], 500);
             }
 
-            $ch = Transaction::where('e_ref', $TransactionReference)->where('status', 0)->update([
+            $ch = Transfer::where('e_ref', $TransactionReference)->where('status', 2)->update([
                 'status' => 3,
             ]);
 
