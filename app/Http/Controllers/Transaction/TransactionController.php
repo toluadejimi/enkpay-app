@@ -2799,7 +2799,7 @@ class TransactionController extends Controller
                 }
 
                 $ip = $request->ip();
-                $amount4 = number_format($removed_comission, 2);
+                $amount4 = number_format($Amount, 2);
                 $message = "NGN $Amount left pool account by $user_id for EPvas Transaction | EP VAS | $BillService | $BillCategory | $Beneficiary  ";
                 $result = "Service========>" . $ServiceCode . "\n\nRefrence========>" . $TransactionReference . "\n\nSerial No========>" . $SerialNumber . "\n\nDate & Time========>" . $TransactionDate . " | " . $TransactionTime . "\n\nMessage========> " . $message . "\n\nIP========> " . $ip;
                 send_notification($result);
