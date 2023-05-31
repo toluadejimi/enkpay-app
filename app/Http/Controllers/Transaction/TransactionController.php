@@ -3069,10 +3069,19 @@ class TransactionController extends Controller
                 ], 500);
             }
 
-            Transaction::where('e_ref', $TransactionReference)->where('status', 0)->update([
+            $ch = Transaction::where('e_ref', $TransactionReference)->where('status', 0)->update([
                 'status' => 3,
             ]);
 
+
+            if($ch == 0){
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Transaction reversed already or not found',
+                ], 500);
+
+            }
 
             User::where('id', $trx->user_id)->increment('main_wallet', $trx->debit);
 
