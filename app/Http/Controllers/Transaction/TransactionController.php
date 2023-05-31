@@ -3483,19 +3483,15 @@ class TransactionController extends Controller
                 $status = $var->data->statusCode ?? null;
 
 
-
-                dd($var);
-
-
                 if ($status == 00) {
 
 
 
-                    Transaction::where('ref_trans_id', $ref_no)->update([
+                    // Transaction::where('ref_trans_id', $ref_no)->update([
 
-                        'status' => 1,
+                    //     'status' => 1,
 
-                    ]);
+                    // ]);
                 }
             }
 
