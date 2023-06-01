@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\Auth\RegisterationController;
 use App\Http\Controllers\Device\DeviceOrderController;
 use App\Http\Controllers\Transaction\TransactionController;
+use App\Http\Controllers\Transaction\EnkpayposController;
 use App\Http\Controllers\VAS\AirtimeController;
 use App\Http\Controllers\VAS\DataController;
 use App\Http\Controllers\VAS\PowerController;
@@ -29,6 +30,10 @@ use Illuminate\Support\Facades\Route;
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
 // });
+
+
+Route::post('pos', [EnkpayposController::class, 'enkpayPos']);
+
 
 
 
