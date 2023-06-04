@@ -68,6 +68,9 @@ Route::post('order-device-complete', [DeviceOrderController::class, 'order_compl
 Route::post('v1/cash-out-webhook', [TransactionController::class, 'cash_out_webhook']);
 Route::post('v1/cash-in', [VirtualaccountController::class, 'cash_in_webhook']);
 Route::post('v1/pwebhook', [VirtualaccountController::class, 'providusCashIn']);
+Route::post('v1/pwebhook.com', [VirtualaccountController::class, 'providusCashIn']);
+Route::post('v1/p-cash-in', [VirtualaccountController::class, 'providusCashIn']);
+
 Route::post('v1/wallet-check', [TransactionController::class, 'balance_webhook']);
 Route::post('v1/transfer-request', [TransactionController::class, 'transfer_request']);
 

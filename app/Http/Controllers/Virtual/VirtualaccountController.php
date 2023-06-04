@@ -654,9 +654,28 @@ class VirtualaccountController extends Controller
     public function providusCashIn(request $request)
     {
 
+            $parametersJson = json_encode($request->all());
+            $headers = json_encode($request->headers->all());
+            $message = 'Log 1';
+            $ip = $request->ip();
+
+            $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
+            send_notification($result);
+
         try {
 
             $header = $request->header('X-Auth-Signature');
+
+
+            if($header == null){
+
+                return response()->json([
+                        'requestSuccessful' => true,
+                        'responseMessage' => 'Key Can not be empty',
+                        'responseCode' => "02",
+                    ], 200);
+
+            }
 
             $sessionId = $request->sessionId;
             $accountNumber = $request->accountNumber;
@@ -677,19 +696,21 @@ class VirtualaccountController extends Controller
 
             $key = env('POKEY');
 
-            $deposit_charges = Charge::where('id', 2)->first()->amount;
 
             $trans_id = "ENK-" . random_int(100000, 999999);
 
             $verify1 = hash('sha512', $key);
 
-            $verify2 = strtoupper($verify1);
+            //dd($verify1, $header);
+
+            //$verify2 = strtoupper($verify1);
 
             //dd($key, $verify2, $verify1, $header);
 
-            if ($verify2 == $header) {
+            if ($verify1 == $header) {
 
-                $deposit_charges = Charge::where('id', 2)->first()->amount;
+            $deposit_charges = Charge::where('title', 'bwebpay')->first()->amount ;
+
 
                 $user_id = VirtualAccount::where('v_account_no', $accountNumber)
                     ->first()->user_id ?? null;
@@ -749,17 +770,111 @@ class VirtualaccountController extends Controller
 
                 }
 
-                // $enkpay_profit = $deposit_charges - 10;
 
-                // $message_amount = $Amount - 10;
+                //Business Information
 
-                //credit
-                // $enkpay_debit = $Amount - $deposit_charges;
-                $updated_amount = $main_wallet + $settledAmount;
-                $main_wallet = User::where('id', $user_id)
-                    ->update([
-                        'main_wallet' => $updated_amount,
-                    ]);
+
+
+                $web_commission = Charge::where('title', 'bwebpay')->first()->amount;
+
+
+                //Both Commission
+                $amount1 = $web_commission / 100;
+                $amount2 = $amount1 * $transactionAmount;
+                $both_commmission = number_format($amount2, 3);
+
+
+                //enkpay commission
+                $commison_subtract = $web_commission - 0.5;
+                $enkPayPaypercent = $commison_subtract / 100;
+                $enkPay_amount = $enkPayPaypercent * $transactionAmount;
+                $enkpay_commision_amount = number_format($enkPay_amount, 3);
+
+
+                $p_cap = Charge::where('title', 'p_cap')
+                    ->first()->amount;
+
+                if($both_commmission > $p_cap){
+
+                    $removed_comm =  $p_cap;
+
+                }else{
+                    $removed_comm =  $both_commmission;
+
+                }
+
+                $business_id = VirtualAccount::where('v_account_no', $accountNumber)->first()->business_id ?? null;
+                if(!empty($business_id) || $business_id != null){
+
+                    $amt_to_credit = $transactionAmount - $removed_comm;
+
+                    User::where('business_id',  $business_id)->increment('main_wallet', $amt_to_credit);
+
+                    $first_name = User::where('business_id',  $business_id)->first()->first_name ?? null;
+                    $last_name = User::where('business_id',  $business_id)->first()->last_name ?? null;
+                    $balance = User::where('business_id',  $business_id)->first()->main_wallet;
+
+
+                        //update Transactions
+                    $trasnaction = new Transaction();
+                    $trasnaction->user_id = $user_id;
+                    $trasnaction->ref_trans_id = $trans_id;
+                    $trasnaction->e_ref = $settlementId;
+                    $trasnaction->type = "WEBPAY FUNDING";
+                    $trasnaction->transaction_type = "VirtualFundWallet";
+                    $trasnaction->title = "Wallet Funding";
+                    $trasnaction->main_type = "Transfer";
+                    $trasnaction->credit = $amt_to_credit;
+                    $trasnaction->note = "$sourceAccountName | Wallet Funding";
+                    $trasnaction->fee = $feeAmount;
+                    $trasnaction->amount = $transactionAmount;
+                    $trasnaction->e_charges = $deposit_charges;
+                    $trasnaction->enkPay_Cashout_profit = 0;
+                    $trasnaction->trx_date = $tranDateTime;
+                    $trasnaction->p_sessionId = $sessionId;
+                    $trasnaction->trx_time = $tranDateTime;
+                    $trasnaction->sender_name = $sourceAccountName;
+                    $trasnaction->sender_bank = $sourceBankName;
+                    $trasnaction->sender_bank = $sourceBankName;
+                    $trasnaction->serial_no = $SerialNumber;
+                    $trasnaction->sender_account_no = $sourceAccountNumber;
+                    $trasnaction->balance = $balance;
+                    $trasnaction->status = 1;
+                    $trasnaction->save();
+
+                    $message = "Business funded | $amt_to_credit | $first_name ". " ". $last_name;
+                    send_notification($message);
+
+                    return response()->json([
+                        'requestSuccessful' => true,
+                        'sessionId' => $sessionId,
+                        'responseMessage' => 'success',
+                        'responseCode' => "00",
+                    ], 200);
+    
+
+
+                }
+
+             
+
+
+                $n_cap = Charge::where('title', 'n_cap')->first()->amount;
+
+                if($both_commmission > $p_cap){
+
+                    $removed_comm =  $n_cap;
+
+                }else{
+                    $removed_comm =  $both_commmission;
+
+                }
+
+                $amt_to_credit = $transactionAmount - $removed_comm;
+                User::where('id',  $user_id)->increment('main_wallet', $amt_to_credit);
+                $balance = User::where('user_id',  $user_id)->first()->main_wallet;
+
+
 
                 //update Transactions
                 $trasnaction = new Transaction();
@@ -784,7 +899,7 @@ class VirtualaccountController extends Controller
                 $trasnaction->sender_bank = $sourceBankName;
                 $trasnaction->serial_no = $SerialNumber;
                 $trasnaction->sender_account_no = $sourceAccountNumber;
-                $trasnaction->balance = $updated_amount;
+                $trasnaction->balance = $balance;
                 $trasnaction->status = 1;
                 $trasnaction->save();
 
@@ -800,6 +915,13 @@ class VirtualaccountController extends Controller
 
                 $date1 = $datetime->format('Y-m-d');
                 $date2 = $datetime->format('H:i:s');
+
+                $serial_no = VirtualAccount::where('v_account_no', $accountNumber)
+                ->first()->serial_no ?? null;
+
+                $epKey = env('EPKEY');
+
+                if(!empty($serial_no) || $serial_no != null){
 
                 $data = array(
 
@@ -826,7 +948,7 @@ class VirtualaccountController extends Controller
                     CURLOPT_CUSTOMREQUEST => 'POST',
                     CURLOPT_POSTFIELDS => $post_data,
                     CURLOPT_HTTPHEADER => array(
-                        'epKey: ep_live_jFrIZdxqSzAdraLqbvhUfVYs',
+                        "epKey: $epKey",
                         'Content-Type: application/json',
                     ),
                 ));
@@ -835,12 +957,12 @@ class VirtualaccountController extends Controller
                 curl_close($curl);
                 $var = json_decode($var);
 
-                $message = "Your Pool account has been credited |  $transactionAmount | from PROVIDUS Virtual account";
+            }
 
+                $message = "Your Pool account has been credited |  $transactionAmount | from PROVIDUS Virtual account";
                 send_notification($message);
 
                 //send to user
-
                 if ($user_email !== null) {
 
                     $data = array(
@@ -858,6 +980,7 @@ class VirtualaccountController extends Controller
                     });
                 }
 
+          
                 return response()->json([
                     'requestSuccessful' => true,
                     'sessionId' => $sessionId,
