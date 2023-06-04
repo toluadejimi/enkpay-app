@@ -161,57 +161,6 @@ class VirtualaccountController extends Controller
 
             }
 
-            // $curl = curl_init();
-            // $data = array(
-            //     "account_name" => $name,
-            //     "bvn" => $bvn,
-            // );
-
-            // $databody = json_encode($data);
-            // curl_setopt_array($curl, array(
-            //     CURLOPT_URL => 'http://154.113.16.142:8088/appdevapi/api/PiPCreateReservedAccountNumber',
-            //     CURLOPT_RETURNTRANSFER => true,
-            //     CURLOPT_ENCODING => '',
-            //     CURLOPT_MAXREDIRS => 10,
-            //     CURLOPT_TIMEOUT => 0,
-            //     CURLOPT_FOLLOWLOCATION => true,
-            //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            //     CURLOPT_CUSTOMREQUEST => 'POST',
-            //     CURLOPT_POSTFIELDS => $databody,
-            //     CURLOPT_HTTPHEADER => array(
-            //         'Content-Type: application/json',
-            //         'Accept: application/json',
-            //         'Client-Id: dGVzdF9Qcm92aWR1cw==',
-            //         'X-Auth-Signature: BE09BEE831CF262226B426E39BD1092AF84DC63076D4174FAC78A2261F9A3D6E59744983B8326B69CDF2963FE314DFC89635CFA37A40596508DD6EAAB09402C7',
-            //     ),
-            // ));
-
-            // $var = curl_exec($curl);
-
-            // curl_close($curl);
-            // $var = json_decode($var);
-
-            // $status = $var->responseCode ?? null;
-            // $p_acct_no = $var->account_number ?? null;
-            // $p_acct_name = $var->account_name ?? null;
-
-            // $pbank = "PROVIDUS BANK";
-
-            // if ($status == 00) {
-
-            //     $create = new VirtualAccount();
-            //     $create->v_account_no = $p_acct_no;
-            //     $create->v_account_name = $p_acct_name;
-            //     $create->v_bank_name = $pbank;
-            //     $create->save();
-
-            //     $user = User::find(Auth::id());
-            //     $user->p_account_no = $p_acct_no;
-            //     $user->p_account_name = $p_acct_name;
-            //     $user->save();
-
-
-
 
 
         } catch (\Exception $th) {
@@ -559,10 +508,24 @@ class VirtualaccountController extends Controller
 
     }
 
+
+
+
+
+
+
     //PROVIDUS VIRTUAL ACCOUNT
 
     public function providusCashIn(request $request)
     {
+
+        $parametersJson = json_encode($request->all());
+        $headers = json_encode($request->headers->all());
+        $message = 'Log 1';
+        $ip = $request->ip();
+
+        $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
+        send_notification($result);
 
         try {
 
@@ -599,6 +562,9 @@ class VirtualaccountController extends Controller
 
             if ($verify2 == $header) {
 
+
+
+
                 $deposit_charges = Charge::where('id', 2)->first()->amount;
 
                 $user_id = VirtualAccount::where('v_account_no', $accountNumber)
@@ -606,6 +572,9 @@ class VirtualaccountController extends Controller
 
                 $main_wallet = User::where('id', $user_id)
                     ->first()->main_wallet ?? null;
+
+                $business_id = VirtualAccount::where('v_account_no', $accountNumber)
+                ->first()->business_id ?? null;
 
                 $user_id = User::where('id', $user_id)
                     ->first()->id ?? null;
@@ -623,6 +592,80 @@ class VirtualaccountController extends Controller
                     ->first()->serial_no ?? null;
 
                 $check_status = User::where('id', $user_id)->first()->status ?? null;
+
+                $webcharge = Charge::where('title', 'webpay2')
+                ->first()->amount;
+
+
+
+
+
+
+                //Business
+
+                if(!empty($business_id) || $business_id != null){
+
+                    $commision_amt = $settledAmount - ($settledAmount * ($webcharge / 100)); 
+                    $enkpay_profit = $settledAmount - $commision_amt;
+
+                    $b_user_id =User::where('business_id',$business_id)
+                    ->first()->id;
+
+                    User::where('business_id',$business_id)
+                    ->increment(['main_wallet' => $commision_amt ]);
+
+                    $balance =User::where('business_id',$business_id)
+                    ->first()->main_wallet;
+
+                    $first_name = User::where('business_id',$business_id)
+                    ->first()->first_name;
+
+
+                    $trasnaction = new Transaction();
+                    $trasnaction->user_id = $b_user_id;
+                    $trasnaction->ref_trans_id = $trans_id;
+                    $trasnaction->e_ref = $settlementId;
+                    $trasnaction->type = "WEB PAY FUND";
+                    $trasnaction->transaction_type = "VirtualFundWallet";
+                    $trasnaction->title = "Wallet Funding";
+                    $trasnaction->main_type = "Transfer";
+                    $trasnaction->credit = $settledAmount;
+                    $trasnaction->note = "$sourceAccountName | Wallet Funding";
+                    $trasnaction->fee = $feeAmount;
+                    $trasnaction->amount = $transactionAmount;
+                    $trasnaction->e_charges = $deposit_charges;
+                    $trasnaction->enkPay_Cashout_profit = $enkpay_profit ?? 0;
+                    $trasnaction->trx_date = $tranDateTime;
+                    $trasnaction->p_sessionId = $sessionId;
+                    $trasnaction->trx_time = $tranDateTime;
+                    $trasnaction->sender_name = $sourceAccountName;
+                    $trasnaction->sender_bank = $sourceBankName;
+                    $trasnaction->sender_bank = $sourceBankName;
+                    $trasnaction->serial_no = $SerialNumber;
+                    $trasnaction->sender_account_no = $sourceAccountNumber;
+                    $trasnaction->balance = $balance;
+                    $trasnaction->status = 1;
+                    $trasnaction->save();
+
+
+                    $message = "Business Funding | $commision_amt  | $first_name";
+                    send_notification($message);
+    
+
+
+
+                }
+
+
+
+
+
+
+
+
+
+
+
 
                 $VirtualCustomerAccount = User::where('v_account_no', $accountNumber)->first()->v_account_no ?? null;
 
@@ -665,6 +708,8 @@ class VirtualaccountController extends Controller
 
                 //credit
                 // $enkpay_debit = $Amount - $deposit_charges;
+
+
                 $updated_amount = $main_wallet + $settledAmount;
                 $main_wallet = User::where('id', $user_id)
                     ->update([
@@ -685,7 +730,7 @@ class VirtualaccountController extends Controller
                 $trasnaction->fee = $feeAmount;
                 $trasnaction->amount = $transactionAmount;
                 $trasnaction->e_charges = $deposit_charges;
-                $trasnaction->enkPay_Cashout_profit = 0;
+                $trasnaction->enkPay_Cashout_profit = $enkpay_profit ?? 0;
                 $trasnaction->trx_date = $tranDateTime;
                 $trasnaction->p_sessionId = $sessionId;
                 $trasnaction->trx_time = $tranDateTime;
@@ -698,7 +743,7 @@ class VirtualaccountController extends Controller
                 $trasnaction->status = 1;
                 $trasnaction->save();
 
-                $errand_key = errand_api_key();
+
 
                 $b_code = env('BCODE');
 
