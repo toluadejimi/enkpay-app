@@ -13,6 +13,7 @@ use App\Http\Controllers\VAS\EducationController;
 use App\Http\Controllers\VAS\CableController;
 use App\Http\Controllers\VAS\InsuranceController;
 use App\Http\Controllers\Virtual\VirtualaccountController;
+use App\Http\Controllers\Virtualcard\VirtualCardController;
 use App\Http\Controllers\WebpaymentController;
 use Illuminate\Support\Facades\Route;
 
@@ -129,6 +130,23 @@ Route::group(['middleware' => ['auth:api', 'acess']], function () {
     Route::post('update-bank-info', [ProfileController::class, 'update_bank_info']);
     Route::post('verify-identity', [ProfileController::class, 'verify_identity']);
     Route::post('upload-identity', [ProfileController::class, 'upload_identity']);
+
+
+//Virtual Card
+
+Route::post('verify-identity', [VirtualCardController::class, 'verify_identity']);
+Route::post('fund-card', [VirtualCardController::class, 'fund_card']);
+Route::post('block-card', [VirtualCardController::class, 'block_card']);
+Route::post('unblock-card', [VirtualCardController::class, 'unblock_card']);
+Route::post('liquidate-card', [VirtualCardController::class, 'liquidate_card']);
+Route::post('create-card', [VirtualCardController::class, 'create_card']);
+
+
+
+
+
+
+
 
 
 

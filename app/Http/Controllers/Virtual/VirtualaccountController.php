@@ -26,217 +26,209 @@ class VirtualaccountController extends Controller
 
         try {
 
+
+
+
+
+
             $errand_key = errand_api_key();
             $errand_user_id = errand_id();
             $bvn = user_bvn() ?? null;
 
-            if (Auth::user()->b_name == null) {
-                $name = first_name() . " " . last_name();
-            } else {
-                $name = Auth::user()->b_name;
+
+            $user_id = User::where('bvn', $bvn)->first()->id ?? null;
+            $chk_V_account = VirtualAccount::where('user_id', $user_id)->where('v_bank_name', 'VFD MFB')->first() ?? null;
+            if (empty($chk_V_account) || $chk_V_account == null) {
+                if (Auth::user()->b_name == null) {
+                    $name = first_name() . " " . last_name();
+                } else {
+                    $name = Auth::user()->b_name;
+                }
+
+                if (Auth::user()->b_phone == null) {
+                    $phone = Auth::user()->phone;
+                } else {
+                    $phone = Auth::user()->b_phone;
+                }
+
+                if (user_status() == 0) {
+
+                    return response()->json([
+                        'status' => $this->failed,
+                        'message' => 'User has been restricted on ENKPAY',
+                    ], 500);
+                }
+
+                if (user_status() == 1) {
+
+                    return response()->json([
+                        'status' => $this->failed,
+                        'message' => 'Please complete your KYC',
+                    ], 500);
+                }
+
+                if (user_bvn() == null) {
+
+                    return response()->json([
+                        'status' => $this->failed,
+                        'message' => 'We need your BVN to generate an account for you',
+                    ], 500);
+                }
+
+                if (Auth::user()->v_account_number !== null) {
+
+                    return response()->json([
+                        'status' => $this->failed,
+                        'message' => 'You already own account number',
+                    ], 500);
+                }
+
+                if ($bvn == null) {
+
+                    return response()->json([
+                        'status' => $this->failed,
+                        'message' => 'BVN not verified, Kindly update your BVN',
+                    ], 500);
+                }
+
+                $curl = curl_init();
+                $data = array(
+
+                    "userId" => $errand_user_id,
+                    "customerBvn" => $bvn,
+                    "phoneNumber" => $phone,
+                    "customerName" => $name,
+
+                );
+
+                $databody = json_encode($data);
+
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/CreateVirtualAccount',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'POST',
+                    CURLOPT_POSTFIELDS => $databody,
+                    CURLOPT_HTTPHEADER => array(
+                        'Content-Type: application/json',
+                        'Accept: application/json',
+                        "Authorization: Bearer $errand_key",
+                    ),
+                ));
+
+                $var = curl_exec($curl);
+
+
+                curl_close($curl);
+                $var = json_decode($var);
+
+
+                $status = $var->code ?? null;
+                $acct_no = $var->data->accountNumber ?? null;
+                $acct_name = $var->data->accountName ?? null;
+
+                $bank = "VFD MFB";
+
+                if ($status == 200) {
+
+                    $create = new VirtualAccount();
+                    $create->v_account_no = $acct_no;
+                    $create->v_account_name = $acct_name;
+                    $create->v_bank_name = $bank;
+                    $create->user_id = Auth::id();
+                    $create->save();
+
+                    $user = User::find(Auth::id());
+                    $user->v_account_no = $acct_no;
+                    $user->v_account_name = $acct_name;
+                    $user->save();
+
+                    $get_user = User::find(Auth::id())->first();
+                }
             }
 
-            if (Auth::user()->b_phone == null) {
-                $phone = Auth::user()->phone;
-            } else {
-                $phone = Auth::user()->b_phone;
-            }
 
-            if (user_status() == 0) {
+            $client = env('CLIENTID');
+            $xauth = env('HASHKEY');
 
-                return response()->json([
-                    'status' => $this->failed,
-                    'message' => 'User has been restricted on ENKPAY',
-                ], 500);
+            $user_id = User::where('bvn', $bvn)->first()->id ?? null;
+            $chk_V_account = VirtualAccount::where('user_id', $user_id)->where('v_bank_name', 'PROVIDUS BANK')->first() ?? null;
+            if (empty($chk_V_account) || $chk_V_account == null) {
 
-            }
+                $curl = curl_init();
+                $data = array(
+                    "account_name" => $name,
+                    "bvn" => $bvn,
+                );
 
-            if (user_status() == 1) {
+                $databody = json_encode($data);
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => 'https://vps.providusbank.com/vas/api/PiPCreateReservedAccountNumber',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'POST',
+                    CURLOPT_POSTFIELDS => $databody,
+                    CURLOPT_HTTPHEADER => array(
+                        'Content-Type: application/json',
+                        'Accept: application/json',
+                        "Client-Id: $client",
+                        "X-Auth-Signature: $xauth",
+                    ),
+                ));
 
-                return response()->json([
-                    'status' => $this->failed,
-                    'message' => 'Please complete your KYC',
-                ], 500);
+                $var = curl_exec($curl);
 
-            }
+                curl_close($curl);
+                $var = json_decode($var);
 
-            if (user_bvn() == null) {
+                $status = $var->responseCode ?? null;
+                $p_acct_no = $var->account_number ?? null;
+                $p_acct_name = $var->account_name ?? null;
 
-                return response()->json([
-                    'status' => $this->failed,
-                    'message' => 'We need your BVN to generate an account for you',
-                ], 500);
+                $pbank = "PROVIDUS BANK";
 
-            }
+                if ($status == 00) {
 
-            if (Auth::user()->v_account_number !== null) {
+                    $create = new VirtualAccount();
+                    $create->v_account_no = $p_acct_no;
+                    $create->v_account_name = $p_acct_name;
+                    $create->v_bank_name = $pbank;
+                    $create->save();
 
-                return response()->json([
-                    'status' => $this->failed,
-                    'message' => 'You already own account number',
-                ], 500);
+                    $user = User::find(Auth::id());
+                    $user->p_account_no = $p_acct_no;
+                    $user->p_account_name = $p_acct_name;
+                    $user->save();
 
-            }
+                    $get_user = User::find(Auth::id())->first();
+                    return response()->json([
 
-            if ($bvn == null) {
+                        'status' => $this->success,
+                        'message' => "Your account has been created successfully",
+                        'data' => $get_user,
 
-                return response()->json([
-                    'status' => $this->failed,
-                    'message' => 'BVN not verified, Kindly update your BVN',
-                ], 500);
+                    ], 200);
+                } else {
 
-            }
-
-            $curl = curl_init();
-            $data = array(
-
-                "userId" => $errand_user_id,
-                "customerBvn" => $bvn,
-                "phoneNumber" => $phone,
-                "customerName" => $name,
-
-            );
-
-            $databody = json_encode($data);
-
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/CreateVirtualAccount',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => $databody,
-                CURLOPT_HTTPHEADER => array(
-                    'Content-Type: application/json',
-                    'Accept: application/json',
-                    "Authorization: Bearer $errand_key",
-                ),
-            ));
-
-            $var = curl_exec($curl);
-
-
-            curl_close($curl);
-            $var = json_decode($var);
-
-
-            $status = $var->code ?? null;
-            $acct_no = $var->data->accountNumber ?? null;
-            $acct_name = $var->data->accountName ?? null;
-
-            $bank = "VFD MICROFINANCE BANK";
-
-            if ($status == 200) {
-
-                $create = new VirtualAccount();
-                $create->v_account_no = $acct_no;
-                $create->v_account_name = $acct_name;
-                $create->v_bank_name = $bank;
-                $create->user_id = Auth::id();
-                $create->save();
-
-                $user = User::find(Auth::id());
-                $user->v_account_no = $acct_no;
-                $user->v_account_name = $acct_name;
-                $user->save();
-
-                $get_user = User::find(Auth::id())->first();
-
-                return response()->json([
-
-                    'status' => $this->success,
-                    'message' => "Your account has been created successfully",
-                    'data' => $get_user,
-
-                ], 200);
-
-            }
-
-                return response()->json([
+                    return response()->json([
 
                         'status' => $this->failed,
                         'message' => 'Error please try again after some time',
 
-                ], 500);
-
-
-
-            // $curl = curl_init();
-            // $data = array(
-            //     "account_name" => $name,
-            //     "bvn" => $bvn,
-            // );
-
-            // $databody = json_encode($data);
-            // curl_setopt_array($curl, array(
-            //     CURLOPT_URL => 'http://154.113.16.142:8088/appdevapi/api/PiPCreateReservedAccountNumber',
-            //     CURLOPT_RETURNTRANSFER => true,
-            //     CURLOPT_ENCODING => '',
-            //     CURLOPT_MAXREDIRS => 10,
-            //     CURLOPT_TIMEOUT => 0,
-            //     CURLOPT_FOLLOWLOCATION => true,
-            //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            //     CURLOPT_CUSTOMREQUEST => 'POST',
-            //     CURLOPT_POSTFIELDS => $databody,
-            //     CURLOPT_HTTPHEADER => array(
-            //         'Content-Type: application/json',
-            //         'Accept: application/json',
-            //         'Client-Id: dGVzdF9Qcm92aWR1cw==',
-            //         'X-Auth-Signature: BE09BEE831CF262226B426E39BD1092AF84DC63076D4174FAC78A2261F9A3D6E59744983B8326B69CDF2963FE314DFC89635CFA37A40596508DD6EAAB09402C7',
-            //     ),
-            // ));
-
-            // $var = curl_exec($curl);
-
-            // curl_close($curl);
-            // $var = json_decode($var);
-
-            // $status = $var->responseCode ?? null;
-            // $p_acct_no = $var->account_number ?? null;
-            // $p_acct_name = $var->account_name ?? null;
-
-            // $pbank = "PROVIDUS BANK";
-
-            // if ($status == 00) {
-
-            //     $create = new VirtualAccount();
-            //     $create->v_account_no = $p_acct_no;
-            //     $create->v_account_name = $p_acct_name;
-            //     $create->v_bank_name = $pbank;
-            //     $create->save();
-
-            //     $user = User::find(Auth::id());
-            //     $user->p_account_no = $p_acct_no;
-            //     $user->p_account_name = $p_acct_name;
-            //     $user->save();
-
-            //     $get_user = User::find(Auth::id())->first();
-            //     return response()->json([
-
-            //         'status' => $this->success,
-            //         'message' => "Your account has been created successfully",
-            //         'data' => $get_user,
-
-            //     ], 200);
-
-            // } else {
-
-            //     return response()->json([
-
-            //         'status' => $this->failed,
-            //         'message' => 'Error please try again after some time',
-
-            //     ], 500);
-
-            // }
-
+                    ], 500);
+                }
+            }
         } catch (\Exception $th) {
             return $th->getMessage();
         }
-
     }
 
     public function get_created_account()
@@ -279,7 +271,6 @@ class VirtualaccountController extends Controller
                     'data' => $var->data,
 
                 ], 200);
-
             }
 
             return response()->json([
@@ -288,11 +279,9 @@ class VirtualaccountController extends Controller
                 'data' => $var->error->message,
 
             ], 500);
-
         } catch (\Exception $th) {
             return $th->getMessage();
         }
-
     }
 
     public function cash_in_webhook(Request $request)
@@ -345,7 +334,7 @@ class VirtualaccountController extends Controller
 
 
                     $device_id = User::where('id', $user_id)
-                    ->first()->device_id ?? null;
+                        ->first()->device_id ?? null;
 
 
                     $first_name = User::where('id', $user_id)
@@ -365,7 +354,6 @@ class VirtualaccountController extends Controller
                             'status' => false,
                             'message' => 'V Account not registred on Enkpay',
                         ], 500);
-
                     }
 
                     if ($check_status == 3) {
@@ -374,7 +362,6 @@ class VirtualaccountController extends Controller
                             'status' => $this->failed,
                             'message' => 'Account has been Restricted on ENKPAY',
                         ], 500);
-
                     }
 
                     $enkpay_profit = $deposit_charges - 10;
@@ -424,7 +411,7 @@ class VirtualaccountController extends Controller
 
                         $curl = curl_init();
 
-                        $datetime = new \DateTime ("now", new DateTimeZone("Europe/Bucharest"));
+                        $datetime = new \DateTime("now", new DateTimeZone("Europe/Bucharest"));
 
                         $date1 = $datetime->format('Y-m-d');
                         $date2 = $datetime->format('H:i:s');
@@ -464,27 +451,27 @@ class VirtualaccountController extends Controller
                         $var = json_decode($var);
 
 
-                        if($device_id != null ){
+                        if ($device_id != null) {
 
                             $data = [
 
                                 "registration_ids" => array($device_id),
 
-                                    "notification" => [
-                                        "title" => "Incoming Transfer",
-                                        "body" => "You have an Incoming transfer from $sender_name",
-                                        "icon" => "ic_notification",
-                                        "click_action" => "OPEN_CHAT_ACTIVITY",
+                                "notification" => [
+                                    "title" => "Incoming Transfer",
+                                    "body" => "You have an Incoming transfer from $sender_name",
+                                    "icon" => "ic_notification",
+                                    "click_action" => "OPEN_CHAT_ACTIVITY",
 
-                                    ],
+                                ],
 
-                                    "data" =>[
-                                        "sender_name" => "$sender_name",
-                                        "sender_bank" => "$sender_bank",
-                                        "amount" => "$Amount"
-                                    ],
+                                "data" => [
+                                    "sender_name" => "$sender_name",
+                                    "sender_bank" => "$sender_bank",
+                                    "amount" => "$Amount"
+                                ],
 
-                                ];
+                            ];
 
                             $dataString = json_encode($data);
 
@@ -510,12 +497,7 @@ class VirtualaccountController extends Controller
 
                             //dd($get_response, $dataString, $headers);
                             curl_close($curl);
-
-
-
-
                         }
-
                     }
 
 
@@ -524,15 +506,13 @@ class VirtualaccountController extends Controller
 
 
                     $get_web_transfer = Webtransfer::where('v_account_no', $VirtualCustomerAccount)
-                    ->where('payable_amount', $Amount)->first()->status ?? null;
+                        ->where('payable_amount', $Amount)->first()->status ?? null;
 
-                    if($get_web_transfer == 0){
+                    if ($get_web_transfer == 0) {
 
                         Webtransfer::where('v_account_no', $VirtualCustomerAccount)
-                        ->where('payable_amount', $Amount)
-                        ->update(['status' => 1]);
-
-
+                            ->where('payable_amount', $Amount)
+                            ->update(['status' => 1]);
                     }
 
                     //send to user
@@ -558,20 +538,16 @@ class VirtualaccountController extends Controller
                         'status' => true,
                         'message' => 'Tranasaction Successsfull',
                     ], 200);
-
                 }
-
             }
 
             return response()->json([
                 'status' => false,
                 'message' => 'Key not Authorized',
             ], 500);
-
         } catch (\Exception $th) {
             return $th->getMessage();
         }
-
     }
 
     public function get_virtual_account(request $request)
@@ -602,11 +578,9 @@ class VirtualaccountController extends Controller
                 'data' => "Contact support to create your bank account",
 
             ], 500);
-
         } catch (\Exception $th) {
             return $th->getMessage();
         }
-
     }
 
     public function virtual_acct_history(Request $request)
@@ -642,11 +616,9 @@ class VirtualaccountController extends Controller
             $var = json_decode($var);
 
             dd($var, $errand_key, $acct_no);
-
         } catch (\Exception $th) {
             return $th->getMessage();
         }
-
     }
 
     //PROVIDUS VIRTUAL ACCOUNT
@@ -654,27 +626,26 @@ class VirtualaccountController extends Controller
     public function providusCashIn(request $request)
     {
 
-            $parametersJson = json_encode($request->all());
-            $headers = json_encode($request->headers->all());
-            $message = 'Log 1';
-            $ip = $request->ip();
+        $parametersJson = json_encode($request->all());
+        $headers = json_encode($request->headers->all());
+        $message = 'Log 1';
+        $ip = $request->ip();
 
-            $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
-            send_notification($result);
+        $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
+        send_notification($result);
 
         try {
 
             $header = $request->header('X-Auth-Signature');
 
 
-            if($header == null){
+            if ($header == null) {
 
                 return response()->json([
-                        'requestSuccessful' => true,
-                        'responseMessage' => 'Key Can not be empty',
-                        'responseCode' => "02",
-                    ], 200);
-
+                    'requestSuccessful' => true,
+                    'responseMessage' => 'Key Can not be empty',
+                    'responseCode' => "02",
+                ], 200);
             }
 
             $sessionId = $request->sessionId;
@@ -709,7 +680,7 @@ class VirtualaccountController extends Controller
 
             if ($verify1 == $header) {
 
-            $deposit_charges = Charge::where('title', 'bwebpay')->first()->amount ;
+                $deposit_charges = Charge::where('title', 'bwebpay')->first()->amount;
 
 
                 $user_id = VirtualAccount::where('v_account_no', $accountNumber)
@@ -747,7 +718,6 @@ class VirtualaccountController extends Controller
                         'responseMessage' => 'V Account no registerd on ENKPAY',
                         'responseCode' => "02",
                     ], 200);
-
                 }
 
                 if ($get_session == $settlementId) {
@@ -758,7 +728,6 @@ class VirtualaccountController extends Controller
                         'responseMessage' => 'duplicate transaction',
                         'responseCode' => "01",
                     ], 200);
-
                 }
 
                 if ($check_status == 3) {
@@ -767,7 +736,6 @@ class VirtualaccountController extends Controller
                         'status' => $this->failed,
                         'message' => 'Account has been Restricted on ENKPAY',
                     ], 500);
-
                 }
 
 
@@ -794,17 +762,15 @@ class VirtualaccountController extends Controller
                 $p_cap = Charge::where('title', 'p_cap')
                     ->first()->amount;
 
-                if($both_commmission > $p_cap){
+                if ($both_commmission > $p_cap) {
 
                     $removed_comm =  $p_cap;
-
-                }else{
+                } else {
                     $removed_comm =  $both_commmission;
-
                 }
 
                 $business_id = VirtualAccount::where('v_account_no', $accountNumber)->first()->business_id ?? null;
-                if(!empty($business_id) || $business_id != null){
+                if (!empty($business_id) || $business_id != null) {
 
                     $amt_to_credit = $transactionAmount - $removed_comm;
 
@@ -815,7 +781,7 @@ class VirtualaccountController extends Controller
                     $balance = User::where('business_id',  $business_id)->first()->main_wallet;
 
 
-                        //update Transactions
+                    //update Transactions
                     $trasnaction = new Transaction();
                     $trasnaction->user_id = $user_id;
                     $trasnaction->ref_trans_id = $trans_id;
@@ -842,7 +808,7 @@ class VirtualaccountController extends Controller
                     $trasnaction->status = 1;
                     $trasnaction->save();
 
-                    $message = "Business funded | $amt_to_credit | $first_name ". " ". $last_name;
+                    $message = "Business funded | $amt_to_credit | $first_name " . " " . $last_name;
                     send_notification($message);
 
                     return response()->json([
@@ -851,9 +817,6 @@ class VirtualaccountController extends Controller
                         'responseMessage' => 'success',
                         'responseCode' => "00",
                     ], 200);
-
-
-
                 }
 
 
@@ -861,13 +824,11 @@ class VirtualaccountController extends Controller
 
                 $n_cap = Charge::where('title', 'n_cap')->first()->amount;
 
-                if($both_commmission > $p_cap){
+                if ($both_commmission > $p_cap) {
 
                     $removed_comm =  $n_cap;
-
-                }else{
+                } else {
                     $removed_comm =  $both_commmission;
-
                 }
 
                 $amt_to_credit = $transactionAmount - $removed_comm;
@@ -911,53 +872,52 @@ class VirtualaccountController extends Controller
 
                 $curl = curl_init();
 
-                $datetime = new \DateTime ("now", new DateTimeZone("Europe/Bucharest"));
+                $datetime = new \DateTime("now", new DateTimeZone("Europe/Bucharest"));
 
                 $date1 = $datetime->format('Y-m-d');
                 $date2 = $datetime->format('H:i:s');
 
                 $serial_no = VirtualAccount::where('v_account_no', $accountNumber)
-                ->first()->serial_no ?? null;
+                    ->first()->serial_no ?? null;
 
                 $epKey = env('EPKEY');
 
-                if(!empty($serial_no) || $serial_no != null){
+                if (!empty($serial_no) || $serial_no != null) {
 
-                $data = array(
+                    $data = array(
 
-                    "Amount" => $transactionAmount,
-                    "DateOfTransaction" => $date1 . "T" . $date2 . "+" . "01:00",
-                    "SenderAccountNumber" => $sourceAccountNumber,
-                    "SenderAccountName" => $sourceAccountName,
-                    "OriginatorBank" => $sourceBankName,
-                    "RecipientAccountNumber" => $VirtualCustomerAccount,
-                    "RecipientAccountName" => $first_name . " " . $last_name,
+                        "Amount" => $transactionAmount,
+                        "DateOfTransaction" => $date1 . "T" . $date2 . "+" . "01:00",
+                        "SenderAccountNumber" => $sourceAccountNumber,
+                        "SenderAccountName" => $sourceAccountName,
+                        "OriginatorBank" => $sourceBankName,
+                        "RecipientAccountNumber" => $VirtualCustomerAccount,
+                        "RecipientAccountName" => $first_name . " " . $last_name,
 
-                );
+                    );
 
-                $post_data = json_encode($data);
+                    $post_data = json_encode($data);
 
-                curl_setopt_array($curl, array(
-                    CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/Webhook/Notify',
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING => '',
-                    CURLOPT_MAXREDIRS => 10,
-                    CURLOPT_TIMEOUT => 0,
-                    CURLOPT_FOLLOWLOCATION => true,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST => 'POST',
-                    CURLOPT_POSTFIELDS => $post_data,
-                    CURLOPT_HTTPHEADER => array(
-                        "epKey: $epKey",
-                        'Content-Type: application/json',
-                    ),
-                ));
+                    curl_setopt_array($curl, array(
+                        CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/Webhook/Notify',
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_ENCODING => '',
+                        CURLOPT_MAXREDIRS => 10,
+                        CURLOPT_TIMEOUT => 0,
+                        CURLOPT_FOLLOWLOCATION => true,
+                        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                        CURLOPT_CUSTOMREQUEST => 'POST',
+                        CURLOPT_POSTFIELDS => $post_data,
+                        CURLOPT_HTTPHEADER => array(
+                            "epKey: $epKey",
+                            'Content-Type: application/json',
+                        ),
+                    ));
 
-                $var = curl_exec($curl);
-                curl_close($curl);
-                $var = json_decode($var);
-
-            }
+                    $var = curl_exec($curl);
+                    curl_close($curl);
+                    $var = json_decode($var);
+                }
 
                 $message = "Your Pool account has been credited |  $transactionAmount | from PROVIDUS Virtual account";
                 send_notification($message);
@@ -987,7 +947,6 @@ class VirtualaccountController extends Controller
                     'responseMessage' => 'success',
                     'responseCode' => "00",
                 ], 200);
-
             }
 
             $parametersJson = json_encode($request->all());
@@ -1004,11 +963,8 @@ class VirtualaccountController extends Controller
                 'responseMessage' => 'Key not authorized',
                 'responseCode' => "02",
             ], 200);
-
         } catch (\Exception $th) {
             return $th->getMessage();
         }
-
     }
-
 }
