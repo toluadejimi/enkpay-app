@@ -811,6 +811,21 @@ class VirtualaccountController extends Controller
                     $balance = User::where('business_id',  $business_id)->first()->main_wallet;
 
 
+                    $status = WebTransfer::latest()->where([
+                        
+                        'v_account_no' => $accountNumber,
+                        'payable_amount' => $transactionAmount,
+                        'status' => 0,
+
+                    
+                    ])->update(['status' => 1]) ?? null;
+
+
+
+
+
+
+
                     //update Transactions
                     $trasnaction = new Transaction();
                     $trasnaction->user_id = $user_id;
