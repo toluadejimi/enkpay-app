@@ -851,12 +851,12 @@ class VirtualaccountController extends Controller
                         'responseMessage' => 'success',
                         'responseCode' => "00",
                     ], 200);
-    
+
 
 
                 }
 
-             
+
 
 
                 $n_cap = Charge::where('title', 'n_cap')->first()->amount;
@@ -872,7 +872,7 @@ class VirtualaccountController extends Controller
 
                 $amt_to_credit = $transactionAmount - $removed_comm;
                 User::where('id',  $user_id)->increment('main_wallet', $amt_to_credit);
-                $balance = User::where('user_id',  $user_id)->first()->main_wallet;
+                $balance = User::where('id',  $user_id)->first()->main_wallet;
 
 
 
@@ -980,7 +980,7 @@ class VirtualaccountController extends Controller
                     });
                 }
 
-          
+
                 return response()->json([
                     'requestSuccessful' => true,
                     'sessionId' => $sessionId,
