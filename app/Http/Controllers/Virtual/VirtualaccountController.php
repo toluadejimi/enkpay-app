@@ -36,6 +36,10 @@ class VirtualaccountController extends Controller
             $bvn = user_bvn() ?? null;
 
 
+
+            
+
+
             $user_id = User::where('bvn', $bvn)->first()->id ?? null;
             $chk_V_account = VirtualAccount::where('user_id', $user_id)->where('v_bank_name', 'VFD MFB')->first() ?? null;
             if (empty($chk_V_account) || $chk_V_account == null) {
@@ -163,6 +167,18 @@ class VirtualaccountController extends Controller
             $chk_V_account = VirtualAccount::where('user_id', $user_id)->where('v_bank_name', 'PROVIDUS BANK')->first() ?? null;
             if (empty($chk_V_account) || $chk_V_account == null) {
 
+                if (Auth::user()->b_name == null) {
+                    $name = first_name() . " " . last_name();
+                } else {
+                    $name = Auth::user()->b_name;
+                }
+    
+                if (Auth::user()->b_phone == null) {
+                    $phone = Auth::user()->phone;
+                } else {
+                    $phone = Auth::user()->b_phone;
+                }
+
                 $curl = curl_init();
                 $data = array(
                     "account_name" => $name,
@@ -205,6 +221,7 @@ class VirtualaccountController extends Controller
                     $create->v_account_no = $p_acct_no;
                     $create->v_account_name = $p_acct_name;
                     $create->v_bank_name = $pbank;
+                    $create->user_id = Auth::id();
                     $create->save();
 
                     $user = User::find(Auth::id());
