@@ -164,8 +164,8 @@ class VirtualaccountController extends Controller
             $xauth = env('HASHKEY');
 
             $user_id = User::where('bvn', $bvn)->first()->id ?? null;
-            $chk_V_account = VirtualAccount::where('user_id', $user_id)->where('v_bank_name', 'PROVIDUS BANK')->first() ?? null;
-            if (empty($chk_V_account) || $chk_V_account == null) {
+            $chk_p_account = VirtualAccount::where('user_id', $user_id)->where('v_bank_name', 'PROVIDUS BANK')->first() ?? null;
+            if (empty($chk_p_account) || $chk_p_account == null) {
 
                 if (Auth::user()->b_name == null) {
                     $name = first_name() . " " . last_name();
@@ -209,7 +209,6 @@ class VirtualaccountController extends Controller
                 curl_close($curl);
                 $var = json_decode($var);
 
-                dd($var, $databody);
 
                 $status = $var->responseCode ?? null;
                 $p_acct_no = $var->account_number ?? null;
