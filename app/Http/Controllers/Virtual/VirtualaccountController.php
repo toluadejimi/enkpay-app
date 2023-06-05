@@ -130,6 +130,7 @@ class VirtualaccountController extends Controller
                 $status = $var->code ?? null;
                 $acct_no = $var->data->accountNumber ?? null;
                 $acct_name = $var->data->accountName ?? null;
+                $error = $var->error->message ?? null;
 
                 $bank = "VFD MFB";
 
@@ -148,6 +149,9 @@ class VirtualaccountController extends Controller
                     $user->save();
 
                     $get_user = User::find(Auth::id())->first();
+
+                    $message = "VFD Account Created | $name";
+                    send_notification($message);
                 }
             }
 
@@ -208,6 +212,9 @@ class VirtualaccountController extends Controller
                     $user->p_account_name = $p_acct_name;
                     $user->save();
 
+                    $message = "Providus Account Created | $name";
+                    send_notification($message);
+
                     $get_user = User::find(Auth::id())->first();
                     return response()->json([
 
@@ -217,6 +224,10 @@ class VirtualaccountController extends Controller
 
                     ], 200);
                 } else {
+
+
+                    $error = "Vaccount Error | $error";
+                    send_notification($error);
 
                     return response()->json([
 
