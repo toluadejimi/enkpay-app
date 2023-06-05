@@ -205,9 +205,6 @@ class VirtualaccountController extends Controller
                 ));
 
                 $var = curl_exec($curl);
-                dd($var, $databody);
-
-
                 curl_close($curl);
                 $var = json_decode($var);
 
