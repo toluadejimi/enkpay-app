@@ -185,11 +185,11 @@ class VirtualaccountController extends Controller
                     "bvn" => $bvn,
                 );
 
-                //$url = 'https://vps.providusbank.com/vps/api/appdevapi/api/PiPCreateReservedAccountNumber';
 
+                
                 $databody = json_encode($data);
                 curl_setopt_array($curl, array(
-                    CURLOPT_URL => 'https://vps.providusbank.com/vas/api/PiPCreateReservedAccountNumber',
+                    CURLOPT_URL => 'https://vps.providusbank.com/vps/api/PiPCreateReservedAccountNumber',
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_ENCODING => '',
                     CURLOPT_MAXREDIRS => 10,
