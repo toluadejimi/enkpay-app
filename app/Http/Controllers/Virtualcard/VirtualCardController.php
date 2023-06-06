@@ -644,6 +644,8 @@ class VirtualCardController extends Controller
 
         $key = env('BKEY');
 
+        dd($key);
+
         if($card_id != null) {
 
 
