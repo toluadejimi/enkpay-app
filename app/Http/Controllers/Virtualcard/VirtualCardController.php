@@ -613,7 +613,7 @@ class VirtualCardController extends Controller
     {
 
 
-        $set = Settings::wherre('id', 1)->first();
+        $set = Settings::where('id', 1)->first();
         $card = Vcard::where('user_id', Auth::id())->first() ?? null;
 
         if($card == null){
