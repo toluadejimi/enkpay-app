@@ -666,7 +666,7 @@ class VirtualCardController extends Controller
             $var = json_decode($var);
             $card_data = $var->data->transactions ?? null;
 
-            dd($card_data, $var);
+            dd($card_data, $var,  env('BKEY'));
 
 
             if($card_data == null){
