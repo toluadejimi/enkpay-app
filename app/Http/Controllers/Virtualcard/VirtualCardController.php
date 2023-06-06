@@ -642,6 +642,8 @@ class VirtualCardController extends Controller
 
         $card_id = VCard::where('id', Auth::id())->first()->card_id ?? null;
 
+        dd($card_id);
+
         if($card_id != null) {
 
 
