@@ -642,6 +642,8 @@ class VirtualCardController extends Controller
 
         $card_id = VCard::where('user_id', Auth::id())->first()->card_id ?? null;
 
+        $key = env('BKEY');
+
         if($card_id != null) {
 
 
@@ -657,7 +659,7 @@ class VirtualCardController extends Controller
                 CURLOPT_CUSTOMREQUEST => "GET",
                 CURLOPT_HTTPHEADER => array(
                     "Content-Type: application/json",
-                    "token: Bearer " . env('BKEY')
+                    "token: Bearer $key", 
                 ),
             ));
 
@@ -665,8 +667,6 @@ class VirtualCardController extends Controller
             curl_close($curl);
             $var = json_decode($var);
             $card_data = $var->data->transactions ?? null;
-
-            dd($card_data, $var, env('BKEY'));
 
 
             if($card_data == null){
