@@ -633,6 +633,7 @@ class VirtualCardController extends Controller
             'state' => $card->state,
             'address' => $card->address,
             'zip_code' => $card->zip_code,
+            'status' => $card->status,
         ]);
 
         }
