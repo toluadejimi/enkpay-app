@@ -640,7 +640,7 @@ class VirtualCardController extends Controller
 
 
 
-        $val = VCard::whereid(Auth::id())->first() ?? null;
+        $val = VCard::where('id', Auth::id())->first() ?? null;
 
         if($val != null) {
 
@@ -691,7 +691,7 @@ class VirtualCardController extends Controller
         return response()->json([
                 'status' => true,
                 'creation_charge' => $set->virtual_createcharge,
-                'rate' => $set->ngn_rate,
+                'rate' => "$set->ngn_rate",
                 'w_rate' => $set->w_rate,
                 'card_transaction' => $data,
                 'card_details' => $card_details,
