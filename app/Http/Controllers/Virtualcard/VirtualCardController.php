@@ -475,6 +475,37 @@ class VirtualCardController extends Controller
 
 
 
+    public function create_details(Request $request)
+    {
+
+
+        $card = Vcard::where('user_id', Auth::id())->first() ?? null;
+
+        if($card == null){
+
+            return response()->json([
+                'status' => false,
+                'message' => "No card found",
+            ], 500);
+
+        }else{
+
+
+            return response()->json([
+                'status' => true,
+                'card_number' => $card->MaskedPAN,
+            ], 500);
+
+        }
+
+
+
+
+
+
+
+
+    }
 
 
 
@@ -576,4 +607,94 @@ class VirtualCardController extends Controller
             ], 500);
         }
     }
+
+
+     public function card_details(Request $request)
+    {
+
+
+        $set = Settings::wherre('id', 1)->first();
+        $card = Vcard::where('user_id', Auth::id())->first() ?? null;
+
+        if($card == null){
+
+                $card_details = "N0 Card Found";
+
+        }else{
+
+             $card_details = array([
+            'card_number' => $card->masked_card,
+            'cvv' => $card->cvv,
+            'expiration' => $card->expiration,
+            'card_type' => $card->card_type,
+            'name_on_card' => $card->name_on_card,
+            'amount' => $card->amount,
+            'city' => $card->city,
+            'state' => $card->state,
+            'address' => $card->address,
+            'zip_code' => $card->zip_code,
+        ]);
+
+        }
+
+
+
+
+        $val = VCard::whereid(Auth::id())->first();
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://issuecards.api.bridgecard.co/v1/issuing/cards/get_card_transactions?card_id=$val->card_id",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_HTTPHEADER => array(
+                "Content-Type: application/json",
+                "token: Bearer " . env('BKEY')
+            ),
+        ));
+
+        $var = curl_exec($curl);
+        curl_close($curl);
+        $var = json_decode($var);
+        $card_data = $var->data->transactions ?? null;
+
+        if($card_data == null){
+
+            $data =  "No Transaction found";
+
+        }else{
+
+            $data = $card_data;
+        }
+
+
+
+        return response()->json([
+                'status' => true,
+                'creation_charge' => $set->virtual_createcharge,
+                'rate' => $set->ngn_rate,
+                'w_rate' => $set->w_rate,
+                'card_transaction' => $data,
+                'card_details' => $card_details,
+
+            ], 200);
+
+
+
+
+
+
+
+
+
+    }
+
+
+
+
+
 }

@@ -139,7 +139,10 @@ Route::post('fund-card', [VirtualCardController::class, 'fund_card']);
 Route::post('block-card', [VirtualCardController::class, 'block_card']);
 Route::post('unblock-card', [VirtualCardController::class, 'unblock_card']);
 Route::post('liquidate-card', [VirtualCardController::class, 'liquidate_card']);
-Route::post('create-card', [VirtualCardController::class, 'create_card']);
+Route::get('card-details', [VirtualCardController::class, 'card_details']);
+
+
+
 
 
 
