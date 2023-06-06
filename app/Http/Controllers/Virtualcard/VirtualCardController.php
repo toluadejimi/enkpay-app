@@ -642,10 +642,10 @@ class VirtualCardController extends Controller
 
         $val = VCard::whereid(Auth::id())->first() ?? null;
 
-        if($val == null){
+if($val == null) {
 
-            $data =  "No Transaction found";
-        }
+    $data =  "No Transaction found";
+}
 
 
 
