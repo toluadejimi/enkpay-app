@@ -640,7 +640,15 @@ class VirtualCardController extends Controller
 
 
 
-        $val = VCard::whereid(Auth::id())->first();
+        $val = VCard::whereid(Auth::id())->first() ?? null;
+
+        if($val == null){
+
+            $data =  "No Transaction found";
+        }
+
+
+
         $curl = curl_init();
         curl_setopt_array($curl, array(
             CURLOPT_URL => "https://issuecards.api.bridgecard.co/v1/issuing/cards/get_card_transactions?card_id=$val->card_id",
