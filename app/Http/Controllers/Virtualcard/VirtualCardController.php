@@ -666,6 +666,8 @@ class VirtualCardController extends Controller
             $var = json_decode($var);
             $card_data = $var->data->transactions ?? null;
 
+            dd($card_data);
+
 
             if($card_data == null){
                 $data =  "No Transaction found";
