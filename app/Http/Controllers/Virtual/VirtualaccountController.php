@@ -803,7 +803,6 @@ class VirtualaccountController extends Controller
                 if (!empty($business_id) || $business_id != null) {
 
                     $amt_to_credit = $transactionAmount - $removed_comm;
-
                     User::where('business_id',  $business_id)->increment('main_wallet', $amt_to_credit);
 
                     $first_name = User::where('business_id',  $business_id)->first()->first_name ?? null;
@@ -831,16 +830,16 @@ class VirtualaccountController extends Controller
                     $trasnaction->user_id = $user_id;
                     $trasnaction->ref_trans_id = $trans_id;
                     $trasnaction->e_ref = $settlementId;
-                    $trasnaction->type = "WEBPAY FUNDING";
+                    $trasnaction->type = "webpay";
                     $trasnaction->transaction_type = "VirtualFundWallet";
                     $trasnaction->title = "Wallet Funding";
                     $trasnaction->main_type = "Transfer";
                     $trasnaction->credit = $amt_to_credit;
-                    $trasnaction->note = "$sourceAccountName | Wallet Funding";
+                    $trasnaction->note = "$sourceAccountName | Web Pay";
                     $trasnaction->fee = $feeAmount;
                     $trasnaction->amount = $transactionAmount;
                     $trasnaction->e_charges = $deposit_charges;
-                    $trasnaction->enkPay_Cashout_profit = 0;
+                    $trasnaction->enkPay_Cashout_profit = $enkpay_commision_amount;
                     $trasnaction->trx_date = $tranDateTime;
                     $trasnaction->p_sessionId = $sessionId;
                     $trasnaction->trx_time = $tranDateTime;
@@ -883,31 +882,31 @@ class VirtualaccountController extends Controller
 
 
                 //update Transactions
-                $trasnaction = new Transaction();
-                $trasnaction->user_id = $user_id;
-                $trasnaction->ref_trans_id = $trans_id;
-                $trasnaction->e_ref = $settlementId;
-                $trasnaction->type = "PROVIDUS FUNDING";
-                $trasnaction->transaction_type = "VirtualFundWallet";
-                $trasnaction->title = "Wallet Funding";
-                $trasnaction->main_type = "Transfer";
-                $trasnaction->credit = $settledAmount;
-                $trasnaction->note = "$sourceAccountName | Wallet Funding";
-                $trasnaction->fee = $feeAmount;
-                $trasnaction->amount = $transactionAmount;
-                $trasnaction->e_charges = $deposit_charges;
-                $trasnaction->enkPay_Cashout_profit = 0;
-                $trasnaction->trx_date = $tranDateTime;
-                $trasnaction->p_sessionId = $sessionId;
-                $trasnaction->trx_time = $tranDateTime;
-                $trasnaction->sender_name = $sourceAccountName;
-                $trasnaction->sender_bank = $sourceBankName;
-                $trasnaction->sender_bank = $sourceBankName;
-                $trasnaction->serial_no = $SerialNumber;
-                $trasnaction->sender_account_no = $sourceAccountNumber;
-                $trasnaction->balance = $balance;
-                $trasnaction->status = 1;
-                $trasnaction->save();
+                    $trasnaction = new Transaction();
+                    $trasnaction->user_id = $user_id;
+                    $trasnaction->ref_trans_id = $trans_id;
+                    $trasnaction->e_ref = $settlementId;
+                    $trasnaction->type = "webpay";
+                    $trasnaction->transaction_type = "VirtualFundWallet";
+                    $trasnaction->title = "Wallet Funding";
+                    $trasnaction->main_type = "Transfer";
+                    $trasnaction->credit = $amt_to_credit;
+                    $trasnaction->note = "$sourceAccountName | Web Pay";
+                    $trasnaction->fee = $feeAmount;
+                    $trasnaction->amount = $transactionAmount;
+                    $trasnaction->e_charges = $deposit_charges;
+                    $trasnaction->enkPay_Cashout_profit = $enkpay_commision_amount;
+                    $trasnaction->trx_date = $tranDateTime;
+                    $trasnaction->p_sessionId = $sessionId;
+                    $trasnaction->trx_time = $tranDateTime;
+                    $trasnaction->sender_name = $sourceAccountName;
+                    $trasnaction->sender_bank = $sourceBankName;
+                    $trasnaction->sender_bank = $sourceBankName;
+                    $trasnaction->serial_no = $SerialNumber;
+                    $trasnaction->sender_account_no = $sourceAccountNumber;
+                    $trasnaction->balance = $balance;
+                    $trasnaction->status = 1;
+                    $trasnaction->save();
 
                 $errand_key = errand_api_key();
 
