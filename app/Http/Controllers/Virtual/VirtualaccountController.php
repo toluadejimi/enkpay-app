@@ -8,6 +8,7 @@ use App\Models\Terminal;
 use App\Models\Transaction;
 use App\Models\User;
 use App\Models\VirtualAccount;
+use App\Models\Webkey;
 use App\Models\Webtransfer;
 use Auth;
 use DateTimeZone;
@@ -37,7 +38,7 @@ class VirtualaccountController extends Controller
 
 
 
-            
+
 
 
             $user_id = User::where('bvn', $bvn)->first()->id ?? null;
@@ -172,7 +173,7 @@ class VirtualaccountController extends Controller
                 } else {
                     $name = Auth::user()->b_name;
                 }
-    
+
                 if (Auth::user()->b_phone == null) {
                     $phone = Auth::user()->phone;
                 } else {
@@ -186,7 +187,7 @@ class VirtualaccountController extends Controller
                 );
 
 
-                
+
                 $databody = json_encode($data);
                 curl_setopt_array($curl, array(
                     CURLOPT_URL => 'https://vps.providusbank.com/vps/api/PiPCreateReservedAccountNumber',
@@ -795,13 +796,16 @@ class VirtualaccountController extends Controller
                 if ($both_commmission > $p_cap) {
 
                     $removed_comm =  $p_cap;
+
                 } else {
                     $removed_comm =  $both_commmission;
                 }
 
                 $business_id = VirtualAccount::where('v_account_no', $accountNumber)->first()->business_id ?? null;
-                if (!empty($business_id) || $business_id != null) {
 
+
+                if (!empty($business_id) || $business_id != null) {
+                    $charge_status = Webkey::where('key', $key)->first()->charge_status ?? null;
                     $amt_to_credit = $transactionAmount - $removed_comm;
                     User::where('business_id',  $business_id)->increment('main_wallet', $amt_to_credit);
 
@@ -811,12 +815,12 @@ class VirtualaccountController extends Controller
 
 
                     $status = WebTransfer::latest()->where([
-                        
+
                         'v_account_no' => $accountNumber,
                         'payable_amount' => $transactionAmount,
                         'status' => 0,
 
-                    
+
                     ])->update(['status' => 1]) ?? null;
 
 

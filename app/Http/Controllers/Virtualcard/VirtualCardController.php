@@ -131,7 +131,7 @@ class VirtualCardController extends Controller
 
         curl_close($curl);
         $var = json_decode($var);
-        $error = $var->message ?? null;
+        $error = $var->message ?? "We can not verify your info at the moment";
         $status = $var->status ?? null;
 
 
@@ -660,7 +660,7 @@ class VirtualCardController extends Controller
                 CURLOPT_CUSTOMREQUEST => "GET",
                 CURLOPT_HTTPHEADER => array(
                     "Content-Type: application/json",
-                    "token: Bearer $key", 
+                    "token: Bearer $key",
                 ),
             ));
 
