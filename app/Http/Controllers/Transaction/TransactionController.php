@@ -1661,6 +1661,10 @@ class TransactionController extends Controller
                 $debit = $user_wallet_banlance - $charged_amount;
                 $enkpay_profit = $transfer_charges - 10;
 
+
+
+                
+
                 if ($wallet == 'main_account') {
 
                     $update = User::where('id', Auth::id())
@@ -2572,7 +2576,7 @@ class TransactionController extends Controller
 
 
 
-       
+
 
         //Cable and Eletric
 

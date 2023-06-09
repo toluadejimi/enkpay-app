@@ -401,7 +401,12 @@ class VirtualaccountController extends Controller
 
                     //credit
                     $enkpay_debit = $Amount - $deposit_charges;
-                    $updated_amount = $main_wallet + $enkpay_debit;
+                    $amt_to_credit = $enkpay_debit - 2;
+                    $updated_amount = $main_wallet + $amt_to_credit;
+                    
+                    User::where('id',  95)->increment('bonus_wallet', 1);
+                    User::where('id',  109)->increment('bonus_wallet', 1);
+
                     $main_wallet = User::where('id', $user_id)
                         ->update([
                             'main_wallet' => $updated_amount,
