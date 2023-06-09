@@ -738,4 +738,19 @@ class ProfileController extends Controller
 
     }
 
+
+
+    public function delete_account(request $request){
+
+
+        User::where('id', Auth::id())->delete
+
+
+
+
+    }
+
+
+
+
 }

@@ -618,7 +618,7 @@ class VirtualCardController extends Controller
 
         if($card == null){
 
-                $card_details = "N0 Card Found";
+                $card_details = [];
 
         }else{
 
@@ -671,7 +671,7 @@ class VirtualCardController extends Controller
 
 
             if($card_data == null){
-                $data =  "No Transaction found";
+                $data =  [];
 
             }else{
                 $data = $card_data;
@@ -681,7 +681,7 @@ class VirtualCardController extends Controller
 
         }else{
 
-            $data =  "No Transaction found";
+            $data = [];
 
         }
 
