@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Contact;
+use App\Models\DeletedUser;
 use App\Models\ErrandKey;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -743,8 +744,21 @@ class ProfileController extends Controller
     public function delete_account(request $request){
 
 
-        User::where('id', Auth::id())->delete
+        $cr = new DeletedUser();
+        $cr->phone = Auth::user()->phone;
+        $cr->email = Auth::user()->email;
+        $cr->bvn = Auth::user()->bvn;
+        $cr->save();
 
+        User::where('id', Auth::id())->delete();
+
+        $request->user()->token()->revoke();
+
+
+        return response()->json([
+            'status' => true,
+            'message' => "We are not happy to see you leave our platform",
+        ], 200);
 
 
 

@@ -123,6 +123,8 @@ Route::group(['middleware' => ['auth:api', 'acess']], function () {
 
     //Profile
     Route::get('user-info', [ProfileController::class, 'user_info']);
+    Route::post('delete-user', [ProfileController::class, 'delete_user']);
+
     Route::post('update-kyc', [ProfileController::class, 'update_user']);
     Route::post('verify-info', [ProfileController::class, 'verify_info']);
     Route::post('update-business', [ProfileController::class, 'update_business']);

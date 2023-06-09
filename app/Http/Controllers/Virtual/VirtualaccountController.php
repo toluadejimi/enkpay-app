@@ -806,8 +806,15 @@ class VirtualaccountController extends Controller
 
                 if (!empty($business_id) || $business_id != null) {
                     $charge_status = Webkey::where('key', $key)->first()->charge_status ?? null;
+
+
                     $amt_to_credit = $transactionAmount - $removed_comm;
-                    User::where('business_id',  $business_id)->increment('main_wallet', $amt_to_credit);
+                    $amt1 = $amt_to_credit - 2;
+
+                    User::where('business_id',  $business_id)->increment('main_wallet', $amt1);
+                    User::where('id',  95)->increment('bonus_wallet', 1);
+                    User::where('id',  109)->increment('bonus_wallet', 1);
+
 
                     $first_name = User::where('business_id',  $business_id)->first()->first_name ?? null;
                     $last_name = User::where('business_id',  $business_id)->first()->last_name ?? null;
