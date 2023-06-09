@@ -193,7 +193,7 @@ class VirtualCardController extends Controller
 
         //fund card
         $get_card_id = VCard::select('*')->where('user_id', Auth::id())->first()->card_id;
-        $amount_in_usd = $request->amount / $set->ngn_rate * 100;
+        $amount_in_usd = round($request->amount / $set->ngn_rate * 100);
 
         $curl = curl_init();
         $data = [
@@ -401,13 +401,15 @@ class VirtualCardController extends Controller
         $card = VCard::where('user_id', Auth::id())->first();
         $amt_in_naira = $set->w_rate * $request->amount;
 
+        $amount_in_usd = round($request->amount / $set->w_rate) * 100;
+
 
 
         $curl = curl_init();
         $data = [
 
             "card_id" => $card->card_id,
-            "amount" => $request->amount * 100,
+            "amount" => $amount_in_usd,
             "transaction_reference" => random_int(1000000, 9999999),
             "currency" => "USD"
 
