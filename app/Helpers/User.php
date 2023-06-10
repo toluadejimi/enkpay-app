@@ -6,6 +6,7 @@ use App\Models\ProvidusBank;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\VfdBank;
+use App\Models\VirtualAccount;
 use Illuminate\Support\Facades\Auth;
 
 if (!function_exists('main_account')) {
@@ -114,6 +115,57 @@ if (!function_exists('select_account')) {
         ];
 
         return $account_array;
+    }
+}
+
+
+
+if (!function_exists('virtual_account')) {
+
+    function virtual_account()
+    {
+
+        $account = VirtualAccount::where('user_id', Auth::id())->get();
+
+
+        $account_array = array();
+        $account_array[0] = [
+            "bank_name" => $account[0]['v_bank_name'],
+            "account_no" => $account[0]['v_account_no'],
+            "account_name" => $account[0]['v_account_name'],
+
+        ];
+        $account_array[1] = [
+            "bank_name" => $account[1]['v_bank_name'],
+            "account_no" => $account[1]['v_account_no'],
+            "account_name" => $account[1]['v_account_name'],
+        ];
+
+
+        return $account_array;
+
+
+
+
+        foreach ($account as $val) {
+
+            $bank_name = $val->v_bank_name ?? null;
+            $account_no = $val->v_account_no ?? null;
+            $account_no = $val->v_account_name ?? null;
+
+        };
+
+
+
+        $account[0] = [
+            "bank_name" => $bank_name ?? null,
+            "account_no" => $account_no ?? null,
+            "account_name" => $account_name ?? null,
+        ];
+
+        dd($account);
+
+        return $virtual_account;
     }
 }
 
