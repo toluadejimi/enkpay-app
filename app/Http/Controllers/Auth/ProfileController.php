@@ -171,7 +171,7 @@ class ProfileController extends Controller
 
             $user = Auth::user();
             $user['token'] = $token;
-            $user['virtual_account'] = virtual_account();
+            // $user['virtual_account'] = virtual_account();
 
             return response()->json([
                 'status' => $this->success,
