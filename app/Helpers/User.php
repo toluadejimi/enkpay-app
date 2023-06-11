@@ -120,7 +120,7 @@ if (!function_exists('select_account')) {
 
 
 
-if (!function_exists('virtual_account')) {
+if (!function_exists('user_virtual_account_list')) {
 
     function virtual_account()
     {

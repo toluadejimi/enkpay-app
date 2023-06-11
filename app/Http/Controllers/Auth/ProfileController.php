@@ -173,7 +173,7 @@ class ProfileController extends Controller
 
             $user = Auth()->user();
             $user['token']=$token;
-            $user['virtual_account']=$virtual_account;
+            $user['user_virtual_account_list']=$virtual_account;
 
 
             return response()->json([

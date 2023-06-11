@@ -145,7 +145,7 @@ public function phone_login(Request $request){
 
         $user = Auth()->user();
         $user['token']=$token;
-        $user['virtual_account']=$virtual_account;
+        $user['user_virtual_account_list']=$virtual_account;
 
         $is_kyc_verified = Auth::user()->is_kyc_verified;
         $status = Auth::user()->status;
@@ -371,7 +371,8 @@ public function email_login(Request $request){
 
         $user = Auth()->user();
         $user['token']=$token;
-        $user['virtual_account']=$virtual_account;
+        $user['user_virtual_account_list']=$virtual_account;
+
 
 
         $is_kyc_verified = Auth::user()->is_kyc_verified;
