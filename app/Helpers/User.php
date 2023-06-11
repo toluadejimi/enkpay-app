@@ -156,7 +156,7 @@ if (!function_exists('user_virtual_account_list')) {
             // ];
     
     
-            return $account_array;
+            return $account_array ?? [];
 
         }
 
