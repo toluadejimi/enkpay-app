@@ -141,11 +141,11 @@ public function phone_login(Request $request){
 
         $feature = Feature::where('id', 1)->first();
         $token = auth()->user()->createToken('API Token')->accessToken;
-        // $virtual_account = virtual_account();
+        $virtual_account = virtual_account();
 
         $user = Auth()->user();
         $user['token']=$token;
-        // $user['virtual_account']=$virtual_account;
+        $user['virtual_account']=$virtual_account;
 
         $is_kyc_verified = Auth::user()->is_kyc_verified;
         $status = Auth::user()->status;
