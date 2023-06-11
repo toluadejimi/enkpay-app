@@ -154,27 +154,6 @@ if (!function_exists('user_virtual_account_list')) {
         return [];
 
 
-
-
-        foreach ($account as $val) {
-
-            $bank_name = $val->v_bank_name ?? null;
-            $account_no = $val->v_account_no ?? null;
-            $account_no = $val->v_account_name ?? null;
-
-        };
-
-
-
-        $account[0] = [
-            "bank_name" => $bank_name ?? null,
-            "account_no" => $account_no ?? null,
-            "account_name" => $account_name ?? null,
-        ];
-
-        dd($account);
-
-        return $virtual_account;
     }
 }
 
