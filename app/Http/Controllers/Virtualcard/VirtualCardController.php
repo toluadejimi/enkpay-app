@@ -238,10 +238,9 @@ class VirtualCardController extends Controller
 
             $balance = Auth::user()->main_wallet;
 
-            Vcard::where('card_id', $get_card_id)->update([
-
-                'amount' => $amount_in_usd / 100,
-            ]);
+            $amt =  $amount_in_usd / 100;
+            
+            VCard::where('user_id', Auth::id())->increment('amount',$amt);
 
             $trasnaction = new Transactions();
             $trasnaction->user_id = Auth::id();
@@ -254,6 +253,8 @@ class VirtualCardController extends Controller
             $trasnaction->balance = $balance;
             $trasnaction->status = 1;
             $trasnaction->save();
+
+
 
             return response()->json([
                 'status' => true,
