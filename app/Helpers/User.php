@@ -125,24 +125,33 @@ if (!function_exists('user_virtual_account_list')) {
     function virtual_account()
     {
 
-        $account = VirtualAccount::where('user_id', Auth::id())->get();
+
+        $account = VirtualAccount::where('user_id', Auth::id())->get() ?? null;
 
 
-        $account_array = array();
-        $account_array[0] = [
-            "bank_name" => $account[0]['v_bank_name'],
-            "account_no" => $account[0]['v_account_no'],
-            "account_name" => $account[0]['v_account_name'],
+        if($account !== null){
 
-        ];
-        $account_array[1] = [
-            "bank_name" => $account[1]['v_bank_name'],
-            "account_no" => $account[1]['v_account_no'],
-            "account_name" => $account[1]['v_account_name'],
-        ];
+            $account_array = array();
+            $account_array[0] = [
+                "bank_name" => $account[0]['v_bank_name'],
+                "account_no" => $account[0]['v_account_no'],
+                "account_name" => $account[0]['v_account_name'],
+    
+            ];
+            $account_array[1] = [
+                "bank_name" => $account[1]['v_bank_name'],
+                "account_no" => $account[1]['v_account_no'],
+                "account_name" => $account[1]['v_account_name'],
+            ];
+    
+    
+            return $account_array;
+
+        }
 
 
-        return $account_array;
+       
+        return [];
 
 
 
