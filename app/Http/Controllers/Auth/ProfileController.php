@@ -169,9 +169,12 @@ class ProfileController extends Controller
             $toBeRemoved = "Bearer ";
             $token = str_replace($toBeRemoved, "", $string);
 
-            $user = Auth::user();
-            $user['token'] = $token;
-            // $user['virtual_account'] = virtual_account();
+            $virtual_account = virtual_account();
+
+            $user = Auth()->user();
+            $user['token']=$token;
+            $user['virtual_account']=$virtual_account;
+
 
             return response()->json([
                 'status' => $this->success,
