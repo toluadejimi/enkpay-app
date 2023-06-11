@@ -131,18 +131,29 @@ if (!function_exists('user_virtual_account_list')) {
 
         if($account !== null){
 
-            $account_array = array();
-            $account_array[0] = [
-                "bank_name" => $account[0]['v_bank_name'],
-                "account_no" => $account[0]['v_account_no'],
-                "account_name" => $account[0]['v_account_name'],
+
+            foreach ($account as $item) {
+                $account_array[] = array(
+                    "bank_name" => $item['v_bank_name'],
+                    "account_no" => $item['v_account_no'],
+                    "account_name" => $item['v_account_name'],
+                );
+            }
+
+            // $account_array = array();
+            // $account_array[0] = [
+            //     "bank_name" => $account[0]['v_bank_name'],
+            //     "account_no" => $account[0]['v_account_no'],
+            //     "account_name" => $account[0]['v_account_name'],
     
-            ];
-            $account_array[1] = [
-                "bank_name" => $account[1]['v_bank_name'],
-                "account_no" => $account[1]['v_account_no'],
-                "account_name" => $account[1]['v_account_name'],
-            ];
+            // ];
+            
+            
+            // $account_array[1] = [
+            //     "bank_name" => $account[1]['v_bank_name'],
+            //     "account_no" => $account[1]['v_account_no'],
+            //     "account_name" => $account[1]['v_account_name'],
+            // ];
     
     
             return $account_array;
