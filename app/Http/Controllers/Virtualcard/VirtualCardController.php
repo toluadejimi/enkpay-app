@@ -517,6 +517,10 @@ class VirtualCardController extends Controller
 
     public function create_card(Request $request)
     {
+
+        dd('hello');
+
+
         $user = User::find(Auth::user()->id);
         $key = Settings::first();
         $bkey = env('BKEY');
