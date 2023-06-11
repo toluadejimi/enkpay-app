@@ -367,8 +367,11 @@ public function email_login(Request $request){
 
         $token = auth()->user()->createToken('API Token')->accessToken;
 
+        $virtual_account = virtual_account();
+
         $user = Auth()->user();
         $user['token']=$token;
+        $user['virtual_account']=$virtual_account;
 
 
         $is_kyc_verified = Auth::user()->is_kyc_verified;
