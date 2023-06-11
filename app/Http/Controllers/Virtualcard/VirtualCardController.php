@@ -518,7 +518,6 @@ class VirtualCardController extends Controller
     public function create_card(Request $request)
     {
 
-        dd('hello');
 
 
         $user = User::find(Auth::user()->id);
@@ -526,15 +525,26 @@ class VirtualCardController extends Controller
         $bkey = env('BKEY');
         $card_fee_ngn =  $key->ngn_rate * $key->virtual_createcharge;
 
+
+
         if (Auth::user()->main_wallet < $card_fee_ngn) {
-            return back()->with('alert', 'Account balance is insufficient, Fund your wallet');
+
+            return response()->json([
+                'status' => false,
+                'message' => "Account balance is insufficient, Fund your wallet",
+            ], 500);
+
+
         }
 
-        $chk_card = VCard::where('user_id', $user->id)->first()->user_id ?? null;
 
-        // if($chk_card == Auth::id()){
-        //     return back()->with('alert', 'You already have a usd card');
-        // }
+        $chk_card = VCard::where('user_id', $user->id)->first()->user_id ?? null;
+        if($chk_card == Auth::id()){
+            return response()->json([
+                'status' => false,
+                'message' => "You already have a usd card",
+            ], 500);
+        }
 
         //create card
 
