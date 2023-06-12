@@ -894,11 +894,11 @@ class VirtualaccountController extends Controller
                     $trasnaction->title = "Wallet Funding";
                     $trasnaction->main_type = "Transfer";
                     $trasnaction->credit = $amt_to_credit;
-                    $trasnaction->note = "$sourceAccountName | Web Pay";
-                    $trasnaction->fee = $feeAmount;
+                    $trasnaction->note = "$sourceAccountName |  $transactionAmount  | Funds Transfer";
+                    $trasnaction->fee = 0;
                     $trasnaction->amount = $transactionAmount;
                     $trasnaction->e_charges = $deposit_charges;
-                    $trasnaction->enkPay_Cashout_profit = $enkpay_commision_amount;
+                    $trasnaction->enkPay_Cashout_profit = 10;
                     $trasnaction->trx_date = $tranDateTime;
                     $trasnaction->p_sessionId = $sessionId;
                     $trasnaction->trx_time = $tranDateTime;
