@@ -894,7 +894,7 @@ class VirtualaccountController extends Controller
                     $trasnaction->title = "Wallet Funding";
                     $trasnaction->main_type = "Transfer";
                     $trasnaction->credit = $amt_to_credit;
-                    $trasnaction->note = "$sourceAccountName |  $transactionAmount  | Funds Transfer";
+                    $trasnaction->note = "$sourceAccountName |  NGN $transactionAmount  | Funds Transfer";
                     $trasnaction->fee = 0;
                     $trasnaction->amount = $transactionAmount;
                     $trasnaction->e_charges = $deposit_charges;
