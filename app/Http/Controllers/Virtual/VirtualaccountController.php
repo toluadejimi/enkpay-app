@@ -27,139 +27,128 @@ class VirtualaccountController extends Controller
 
         try {
 
-
-
-
-
-
             $errand_key = errand_api_key();
             $errand_user_id = errand_id();
             $bvn = user_bvn() ?? null;
-
-
-
-
-
-
             $user_id = User::where('bvn', $bvn)->first()->id ?? null;
-            $chk_V_account = VirtualAccount::where('user_id', $user_id)->where('v_bank_name', 'VFD MFB')->first() ?? null;
-            if (empty($chk_V_account) || $chk_V_account == null) {
-                if (Auth::user()->b_name == null) {
-                    $name = first_name() . " " . last_name();
-                } else {
-                    $name = Auth::user()->b_name;
-                }
 
-                if (Auth::user()->b_phone == null) {
-                    $phone = Auth::user()->phone;
-                } else {
-                    $phone = Auth::user()->b_phone;
-                }
+            // $chk_V_account = VirtualAccount::where('user_id', $user_id)->where('v_bank_name', 'VFD MFB')->first() ?? null;
+            // if (empty($chk_V_account) || $chk_V_account == null) {
+            //     if (Auth::user()->b_name == null) {
+            //         $name = first_name() . " " . last_name();
+            //     } else {
+            //         $name = Auth::user()->b_name;
+            //     }
 
-                if (user_status() == 0) {
+            //     if (Auth::user()->b_phone == null) {
+            //         $phone = Auth::user()->phone;
+            //     } else {
+            //         $phone = Auth::user()->b_phone;
+            //     }
 
-                    return response()->json([
-                        'status' => $this->failed,
-                        'message' => 'User has been restricted on ENKPAY',
-                    ], 500);
-                }
+            //     if (user_status() == 0) {
 
-                if (user_status() == 1) {
+            //         return response()->json([
+            //             'status' => $this->failed,
+            //             'message' => 'User has been restricted on ENKPAY',
+            //         ], 500);
+            //     }
 
-                    return response()->json([
-                        'status' => $this->failed,
-                        'message' => 'Please complete your KYC',
-                    ], 500);
-                }
+            //     if (user_status() == 1) {
 
-                if (user_bvn() == null) {
+            //         return response()->json([
+            //             'status' => $this->failed,
+            //             'message' => 'Please complete your KYC',
+            //         ], 500);
+            //     }
 
-                    return response()->json([
-                        'status' => $this->failed,
-                        'message' => 'We need your BVN to generate an account for you',
-                    ], 500);
-                }
+            //     if (user_bvn() == null) {
 
-                if (Auth::user()->v_account_number !== null) {
+            //         return response()->json([
+            //             'status' => $this->failed,
+            //             'message' => 'We need your BVN to generate an account for you',
+            //         ], 500);
+            //     }
 
-                    return response()->json([
-                        'status' => $this->failed,
-                        'message' => 'You already own account number',
-                    ], 500);
-                }
+            //     if (Auth::user()->v_account_number !== null) {
 
-                if ($bvn == null) {
+            //         return response()->json([
+            //             'status' => $this->failed,
+            //             'message' => 'You already own account number',
+            //         ], 500);
+            //     }
 
-                    return response()->json([
-                        'status' => $this->failed,
-                        'message' => 'BVN not verified, Kindly update your BVN',
-                    ], 500);
-                }
+            //     if ($bvn == null) {
 
-                $curl = curl_init();
-                $data = array(
+            //         return response()->json([
+            //             'status' => $this->failed,
+            //             'message' => 'BVN not verified, Kindly update your BVN',
+            //         ], 500);
+            //     }
 
-                    "userId" => $errand_user_id,
-                    "customerBvn" => $bvn,
-                    "phoneNumber" => $phone,
-                    "customerName" => $name,
+            //     $curl = curl_init();
+            //     $data = array(
 
-                );
+            //         "userId" => $errand_user_id,
+            //         "customerBvn" => $bvn,
+            //         "phoneNumber" => $phone,
+            //         "customerName" => $name,
 
-                $databody = json_encode($data);
+            //     );
 
-                curl_setopt_array($curl, array(
-                    CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/CreateVirtualAccount',
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING => '',
-                    CURLOPT_MAXREDIRS => 10,
-                    CURLOPT_TIMEOUT => 0,
-                    CURLOPT_FOLLOWLOCATION => true,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST => 'POST',
-                    CURLOPT_POSTFIELDS => $databody,
-                    CURLOPT_HTTPHEADER => array(
-                        'Content-Type: application/json',
-                        'Accept: application/json',
-                        "Authorization: Bearer $errand_key",
-                    ),
-                ));
+            //     $databody = json_encode($data);
 
-                $var = curl_exec($curl);
+            //     curl_setopt_array($curl, array(
+            //         CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/CreateVirtualAccount',
+            //         CURLOPT_RETURNTRANSFER => true,
+            //         CURLOPT_ENCODING => '',
+            //         CURLOPT_MAXREDIRS => 10,
+            //         CURLOPT_TIMEOUT => 0,
+            //         CURLOPT_FOLLOWLOCATION => true,
+            //         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            //         CURLOPT_CUSTOMREQUEST => 'POST',
+            //         CURLOPT_POSTFIELDS => $databody,
+            //         CURLOPT_HTTPHEADER => array(
+            //             'Content-Type: application/json',
+            //             'Accept: application/json',
+            //             "Authorization: Bearer $errand_key",
+            //         ),
+            //     ));
 
-
-                curl_close($curl);
-                $var = json_decode($var);
+            //     $var = curl_exec($curl);
 
 
-                $status = $var->code ?? null;
-                $acct_no = $var->data->accountNumber ?? null;
-                $acct_name = $var->data->accountName ?? null;
-                $error = $var->error->message ?? null;
+            //     curl_close($curl);
+            //     $var = json_decode($var);
 
-                $bank = "VFD MFB";
 
-                if ($status == 200) {
+            //     $status = $var->code ?? null;
+            //     $acct_no = $var->data->accountNumber ?? null;
+            //     $acct_name = $var->data->accountName ?? null;
+            //     $error = $var->error->message ?? null;
 
-                    $create = new VirtualAccount();
-                    $create->v_account_no = $acct_no;
-                    $create->v_account_name = $acct_name;
-                    $create->v_bank_name = $bank;
-                    $create->user_id = Auth::id();
-                    $create->save();
+            //     $bank = "VFD MFB";
 
-                    $user = User::find(Auth::id());
-                    $user->v_account_no = $acct_no;
-                    $user->v_account_name = $acct_name;
-                    $user->save();
+            //     if ($status == 200) {
 
-                    $get_user = User::find(Auth::id())->first();
+            //         $create = new VirtualAccount();
+            //         $create->v_account_no = $acct_no;
+            //         $create->v_account_name = $acct_name;
+            //         $create->v_bank_name = $bank;
+            //         $create->user_id = Auth::id();
+            //         $create->save();
 
-                    $message = "VFD Account Created | $name";
-                    send_notification($message);
-                }
-            }
+            //         $user = User::find(Auth::id());
+            //         $user->v_account_no = $acct_no;
+            //         $user->v_account_name = $acct_name;
+            //         $user->save();
 
+            //         $get_user = User::find(Auth::id())->first();
+
+            //         $message = "VFD Account Created | $name";
+            //         send_notification($message);
+            //     }
+            // }
 
             $client = env('CLIENTID');
             $xauth = env('HASHKEY');
@@ -215,6 +204,7 @@ class VirtualaccountController extends Controller
                 $status = $var->responseCode ?? null;
                 $p_acct_no = $var->account_number ?? null;
                 $p_acct_name = $var->account_name ?? null;
+                $error = $var->responseMessage ?? null;
 
                 $pbank = "PROVIDUS BANK";
 
@@ -226,11 +216,6 @@ class VirtualaccountController extends Controller
                     $create->v_bank_name = $pbank;
                     $create->user_id = Auth::id();
                     $create->save();
-
-                    $user = User::find(Auth::id());
-                    $user->p_account_no = $p_acct_no;
-                    $user->p_account_name = $p_acct_name;
-                    $user->save();
 
                     $message = "Providus Account Created | $name";
                     send_notification($message);
@@ -403,7 +388,7 @@ class VirtualaccountController extends Controller
                     $enkpay_debit = $Amount - $deposit_charges;
                     $amt_to_credit = $enkpay_debit - 2;
                     $updated_amount = $main_wallet + $amt_to_credit;
-                    
+
                     User::where('id',  95)->increment('bonus_wallet', 1);
                     User::where('id',  109)->increment('bonus_wallet', 1);
 
@@ -734,6 +719,11 @@ class VirtualaccountController extends Controller
                 $first_name = User::where('id', $user_id)
                     ->first()->first_name ?? null;
 
+
+                $device_id = User::where('id', $user_id)
+                ->first()->device_id ?? null;
+
+
                 $last_name = User::where('id', $user_id)
                     ->first()->last_name ?? null;
 
@@ -776,12 +766,7 @@ class VirtualaccountController extends Controller
 
 
                 //Business Information
-
-
-
                 $web_commission = Charge::where('title', 'bwebpay')->first()->amount;
-
-
                 //Both Commission
                 $amount1 = $web_commission / 100;
                 $amount2 = $amount1 * $transactionAmount;
@@ -811,8 +796,6 @@ class VirtualaccountController extends Controller
 
                 if (!empty($business_id) || $business_id != null) {
                     $charge_status = Webkey::where('key', $key)->first()->charge_status ?? null;
-
-
                     $amt_to_credit = $transactionAmount - $removed_comm;
                     $amt1 = $amt_to_credit - 2;
 
@@ -882,20 +865,24 @@ class VirtualaccountController extends Controller
 
 
 
-                $n_cap = Charge::where('title', 'n_cap')->first()->amount;
+                // $n_cap = Charge::where('title', 'n_cap')->first()->amount;
 
-                if ($both_commmission > $p_cap) {
+                // if ($both_commmission > $p_cap) {
 
-                    $removed_comm =  $n_cap;
-                } else {
-                    $removed_comm =  $both_commmission;
-                }
+                //     $removed_comm =  $n_cap;
+                // } else {
+                //     $removed_comm =  $both_commmission;
+                // }
 
-                $amt_to_credit = $transactionAmount - $removed_comm;
-                User::where('id',  $user_id)->increment('main_wallet', $amt_to_credit);
+                $amt_to_credit = $transactionAmount - 10;
+                    $amt1 = $amt_to_credit - 2;
+
+                    User::where('id',  $user_id)->increment('main_wallet', $amt1);
+                    User::where('id',  95)->increment('bonus_wallet', 1);
+                    User::where('id',  109)->increment('bonus_wallet', 1);
+
+
                 $balance = User::where('id',  $user_id)->first()->main_wallet;
-
-
 
                 //update Transactions
                     $trasnaction = new Transaction();
@@ -924,12 +911,117 @@ class VirtualaccountController extends Controller
                     $trasnaction->status = 1;
                     $trasnaction->save();
 
-                $errand_key = errand_api_key();
 
                 $b_code = env('BCODE');
 
                 $acct_no = $request->acct_no;
 
+
+
+                // Send to Andriod Phones
+                if ($device_id != null) {
+
+                    $data = [
+
+                        "registration_ids" => array($device_id),
+
+                        "notification" => [
+                            "title" => "Incoming Transfer",
+                            "body" => "You have an Incoming transfer from $sourceAccountName",
+                            "icon" => "ic_notification",
+                            "click_action" => "OPEN_CHAT_ACTIVITY",
+
+                        ],
+
+                        "data" => [
+                            "sender_name" => "$sourceAccountName",
+                            "sender_bank" => "$sourceBankName",
+                            "amount" => "$transactionAmount"
+                        ],
+
+                    ];
+
+                    $dataString = json_encode($data);
+
+                    $SERVER_API_KEY = env('FCM_SERVER_KEY');
+
+                    $headers = [
+                        'Authorization: key=' . $SERVER_API_KEY,
+                        'Content-Type: application/json',
+                    ];
+
+
+                    $ch = curl_init();
+
+                    curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+                    curl_setopt($ch, CURLOPT_POST, true);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
+
+                    $get_response = curl_exec($ch);
+
+
+                    //dd($get_response, $dataString, $headers);
+                    curl_close($ch);
+                }
+
+
+
+                  // Send to Iphones
+                  if ($device_id != null) {
+
+                    $data = [
+
+                        "registration_ids" => array($device_id),
+
+                        "notification" => [
+                            "title" => "Incoming Transfer",
+                            "body" => "You have an Incoming transfer from $sourceAccountName",
+                            "icon" => "ic_notification",
+                            "click_action" => "OPEN_CHAT_ACTIVITY",
+
+                        ],
+
+                        "data" => [
+                            "sender_name" => "$sourceAccountName",
+                            "sender_bank" => "$sourceBankName",
+                            "amount" => "$transactionAmount"
+                        ],
+
+                    ];
+
+                    $dataString = json_encode($data);
+
+                    $SERVER_API_KEY = env('IPHONE_FCM_SERVER_KEY');
+
+                    $headers = [
+                        'Authorization: key=' . $SERVER_API_KEY,
+                        'Content-Type: application/json',
+                    ];
+
+
+                    $ch = curl_init();
+
+                    curl_setopt($ch, CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send');
+                    curl_setopt($ch, CURLOPT_POST, true);
+                    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $dataString);
+
+                    $get_response = curl_exec($ch);
+
+
+                    //dd($get_response, $dataString, $headers);
+                    curl_close($ch);
+                }
+
+
+
+
+                //Send to Terminal
                 $curl = curl_init();
 
                 $datetime = new \DateTime("now", new DateTimeZone("Europe/Bucharest"));
