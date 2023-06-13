@@ -132,7 +132,7 @@ class VirtualCardController extends Controller
         $var = json_decode($result);
 
 
-        $error = $var->message ?? $result ?? null;
+        $error = $var->message ?? $var ?? null;
         $status = $var->status ?? null;
 
 
