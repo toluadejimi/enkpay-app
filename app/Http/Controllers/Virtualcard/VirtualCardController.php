@@ -127,16 +127,12 @@ class VirtualCardController extends Controller
             ),
         ));
 
-        $var = curl_exec($curl);
-
-        dd($var);
-
-
+        $result = curl_exec($curl);
         curl_close($curl);
-        $var = json_decode($var);
+        $var = json_decode($result);
 
 
-        $error = $var->message ?? "We can not verify your info at the moment";
+        $error = $var->message ?? $result ?? null;
         $status = $var->status ?? null;
 
 
