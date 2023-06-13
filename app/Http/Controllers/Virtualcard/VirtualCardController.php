@@ -14,7 +14,7 @@ class VirtualCardController extends Controller
 {
 
 
-    public function verify_identity(Request $request)
+    public function verify_card_identity(Request $request)
     {
 
 
@@ -239,7 +239,7 @@ class VirtualCardController extends Controller
             $balance = Auth::user()->main_wallet;
 
             $amt =  $amount_in_usd / 100;
-            
+
             VCard::where('user_id', Auth::id())->increment('amount',$amt);
 
             $trasnaction = new Transactions();

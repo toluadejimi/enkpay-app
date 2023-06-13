@@ -135,8 +135,7 @@ Route::group(['middleware' => ['auth:api', 'acess']], function () {
 
 
 //Virtual Card
-
-Route::post('verify-identity', [VirtualCardController::class, 'verify_identity']);
+Route::post('verify-card-identity', [VirtualCardController::class, 'verify_card_identity']);
 Route::post('fund-card', [VirtualCardController::class, 'fund_card']);
 Route::post('create-card', [VirtualCardController::class, 'create_card']);
 Route::post('block-card', [VirtualCardController::class, 'block_card']);
