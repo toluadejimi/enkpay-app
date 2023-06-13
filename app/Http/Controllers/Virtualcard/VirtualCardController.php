@@ -657,7 +657,7 @@ class VirtualCardController extends Controller
 
             Vcard::where('card_id', $card_id)->update([
 
-                'amount' => $amount
+                'amount' => $amount/100
 
             ]);
         }
