@@ -653,13 +653,14 @@ class VirtualCardController extends Controller
         $var = json_decode($var);
         $amount = $var->data->balance ?? null;
 
-        if ($card != null) {
+if ($card != null) {
 
-            Vcard::where('card_id', $card_id)->update([
+    Vcard::where('card_id', $card_id)->update([
 
-                'amount' => $amount
+        'amount' => $amount
 
-            ]);
+    ]);
+}
 
 
         if ($card == null) {
