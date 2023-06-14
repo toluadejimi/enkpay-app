@@ -4,6 +4,7 @@ use App\Models\AccountInfo;
 use App\Models\ErrandKey;
 use App\Models\ProvidusBank;
 use App\Models\Setting;
+use App\Models\Terminal;
 use App\Models\User;
 use App\Models\VfdBank;
 use App\Models\VirtualAccount;
@@ -129,7 +130,7 @@ if (!function_exists('user_virtual_account_list')) {
         $account = VirtualAccount::where('user_id', Auth::id())->get() ?? null;
 
 
-        if($account !== null){
+        if ($account !== null) {
 
 
             foreach ($account as $item) {
@@ -145,26 +146,43 @@ if (!function_exists('user_virtual_account_list')) {
             //     "bank_name" => $account[0]['v_bank_name'],
             //     "account_no" => $account[0]['v_account_no'],
             //     "account_name" => $account[0]['v_account_name'],
-    
+
             // ];
-            
-            
+
+
             // $account_array[1] = [
             //     "bank_name" => $account[1]['v_bank_name'],
             //     "account_no" => $account[1]['v_account_no'],
             //     "account_name" => $account[1]['v_account_name'],
             // ];
-    
-    
-            return $account_array ?? [];
 
+
+            return $account_array ?? [];
         }
 
 
-       
+
         return [];
+    }
+}
 
 
+
+
+
+if (!function_exists('terminal_info')) {
+
+
+    function terminal_info()
+    {
+
+        $tm = Terminal::select('merchantNo', 'terminalNo', 'merchantName', 'deviceSN' )->where('user_id', Auth::id())->first() ?? null;
+
+        if ($tm != null) {
+            return $tm;
+        }
+
+        return [];
     }
 }
 
@@ -485,9 +503,9 @@ if (!function_exists('send_notification')) {
                 $customer_name = AccountInfo::where('account_no', $account_number)
                     ->where('code', $bank_code)->first()->customer_name ?? null;
 
-                    if($customer_name != null){
-                        return $customer_name;
-                    }
+                if ($customer_name != null) {
+                    return $customer_name;
+                }
 
 
 
@@ -533,14 +551,14 @@ if (!function_exists('send_notification')) {
 
                     if ($status == 200) {
 
-                       $sv = new AccountInfo();
-                       $sv->account_no = $account_number;
-                       $sv->code = $bank_code;
-                       $sv->bankName = $bankName;
-                       $sv->customer_name = $customer_name;
-                       $sv->save();
+                        $sv = new AccountInfo();
+                        $sv->account_no = $account_number;
+                        $sv->code = $bank_code;
+                        $sv->bankName = $bankName;
+                        $sv->customer_name = $customer_name;
+                        $sv->save();
 
-                       return $customer_name;
+                        return $customer_name;
                     }
 
                     return $error;
