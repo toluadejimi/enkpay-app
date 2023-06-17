@@ -237,7 +237,7 @@ class VirtualCardController extends Controller
         if ($status == 'success') {
 
 
-            $balance = Auth::user()->main_wallet;
+            $balance = Auth::user()->main_wallet - $amount_to_charge;
 
             $amt =  $amount_in_usd / 100;
 
