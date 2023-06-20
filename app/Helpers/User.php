@@ -703,7 +703,7 @@ if (!function_exists('send_notification')) {
                     send_notification($message);
                     return 200;
                 } else {
-                    $message = $var->error->message ?? null;
+                    $message = "VFD ERROR | $name | " .$var->error->message ?? null;
                     send_notification($message);
                     return 500;
                 }
@@ -796,7 +796,7 @@ if (!function_exists('send_notification')) {
                 } else {
 
 
-                    $error = "Providus account Error | $error";
+                    $error = "Providus account Error | $name | $error";
                     send_notification($error);
 
                     return 400;
