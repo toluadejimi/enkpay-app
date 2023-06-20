@@ -703,7 +703,7 @@ if (!function_exists('send_notification')) {
                     send_notification($message);
                     return 200;
                 } else {
-                    $message = "VFD ERROR | $name | " .$var->error->message ?? null;
+                    $message = "VFD ERROR | $name | " . $var->error->message ?? null;
                     send_notification($message);
                     return 500;
                 }
@@ -711,7 +711,7 @@ if (!function_exists('send_notification')) {
         }
     }
 
-    function create_p_account($user_id)
+    function create_p_account()
     {
         if (!function_exists('create_p_account')) {
 
@@ -719,88 +719,90 @@ if (!function_exists('send_notification')) {
             $user_id = User::where('bvn', $bvn)->first()->id ?? null;
 
 
+            dd('hellop');
+
+
+
+
             $client = env('CLIENTID');
             $xauth = env('HASHKEY');
 
             $user_id = User::where('bvn', $bvn)->first()->id ?? null;
-            $chk_p_account = VirtualAccount::where('user_id', $user_id)->where('v_bank_name', 'PROVIDUS BANK')->first() ?? null;
-            if (empty($chk_p_account) || $chk_p_account == null) {
 
-                if (Auth::user()->b_name == null) {
-                    $name = first_name() . " " . last_name();
-                } else {
-                    $name = Auth::user()->b_name;
-                }
+            if (Auth::user()->b_name == null) {
+                $name = first_name() . " " . last_name();
+            } else {
+                $name = Auth::user()->b_name;
+            }
 
-                if (Auth::user()->b_phone == null) {
-                    $phone = Auth::user()->phone;
-                } else {
-                    $phone = Auth::user()->b_phone;
-                }
+            if (Auth::user()->b_phone == null) {
+                $phone = Auth::user()->phone;
+            } else {
+                $phone = Auth::user()->b_phone;
+            }
 
-                $curl = curl_init();
-                $data = array(
-                    "account_name" => $name,
-                    "bvn" => $bvn,
-                );
+            $curl = curl_init();
+            $data = array(
+                "account_name" => $name,
+                "bvn" => $bvn,
+            );
 
 
 
-                $databody = json_encode($data);
-                curl_setopt_array($curl, array(
-                    CURLOPT_URL => 'https://vps.providusbank.com/vps/api/PiPCreateReservedAccountNumber',
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING => '',
-                    CURLOPT_MAXREDIRS => 10,
-                    CURLOPT_TIMEOUT => 0,
-                    CURLOPT_FOLLOWLOCATION => true,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST => 'POST',
-                    CURLOPT_POSTFIELDS => $databody,
-                    CURLOPT_HTTPHEADER => array(
-                        'Content-Type: application/json',
-                        'Accept: application/json',
-                        "Client-Id: $client",
-                        "X-Auth-Signature: $xauth",
-                    ),
-                ));
+            $databody = json_encode($data);
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://vps.providusbank.com/vps/api/PiPCreateReservedAccountNumber',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $databody,
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/json',
+                    'Accept: application/json',
+                    "Client-Id: $client",
+                    "X-Auth-Signature: $xauth",
+                ),
+            ));
 
-                $var = curl_exec($curl);
-                curl_close($curl);
-                $var = json_decode($var);
+            $var = curl_exec($curl);
+            curl_close($curl);
+            $var = json_decode($var);
+
+            dd($var);
+
+            $status = $var->responseCode ?? null;
+            $p_acct_no = $var->account_number ?? null;
+            $p_acct_name = $var->account_name ?? null;
+            $error = $var->responseMessage ?? null;
+
+            $pbank = "PROVIDUS BANK";
+
+            if ($status == 00) {
+
+                $create = new VirtualAccount();
+                $create->v_account_no = $p_acct_no;
+                $create->v_account_name = $p_acct_name;
+                $create->v_bank_name = $pbank;
+                $create->user_id = Auth::id();
+                $create->save();
+
+                $message = "Providus Account Created | $name";
+                send_notification($message);
+
+                $get_user = User::find(Auth::id())->first();
+
+                return 200;
+            } else {
 
 
-                $status = $var->responseCode ?? null;
-                $p_acct_no = $var->account_number ?? null;
-                $p_acct_name = $var->account_name ?? null;
-                $error = $var->responseMessage ?? null;
+                $error = "Providus account Error | $name | $error";
+                send_notification($error);
 
-                $pbank = "PROVIDUS BANK";
-
-                if ($status == 00) {
-
-                    $create = new VirtualAccount();
-                    $create->v_account_no = $p_acct_no;
-                    $create->v_account_name = $p_acct_name;
-                    $create->v_bank_name = $pbank;
-                    $create->user_id = Auth::id();
-                    $create->save();
-
-                    $message = "Providus Account Created | $name";
-                    send_notification($message);
-
-                    $get_user = User::find(Auth::id())->first();
-                    
-                    return 200;
-
-                } else {
-
-
-                    $error = "Providus account Error | $name | $error";
-                    send_notification($error);
-
-                    return 400;
-                }
+                return 400;
             }
         }
     }
