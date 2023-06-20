@@ -10,7 +10,14 @@ use App\Models\VfdBank;
 use App\Models\VirtualAccount;
 use Illuminate\Support\Facades\Auth;
 
+
+
+
+
+
 if (!function_exists('main_account')) {
+
+
 
     function main_account()
     {
@@ -176,7 +183,7 @@ if (!function_exists('terminal_info')) {
     function terminal_info()
     {
 
-        $tm = Terminal::select('merchantNo', 'terminalNo', 'merchantName', 'deviceSN' )->where('user_id', Auth::id())->first() ?? null;
+        $tm = Terminal::select('merchantNo', 'terminalNo', 'merchantName', 'deviceSN')->where('user_id', Auth::id())->first() ?? null;
 
         if ($tm != null) {
             return $tm;
@@ -247,8 +254,6 @@ if (!function_exists('send_notification')) {
 
         $var = json_decode($var);
     }
-
-
 
 
     if (!function_exists('store_vfd_banks')) {
@@ -562,6 +567,239 @@ if (!function_exists('send_notification')) {
                     }
 
                     return $error;
+                }
+            }
+        }
+    }
+
+
+
+    if (!function_exists('create_v_account')) {
+        function create_v_account($user_id)
+        {
+
+            $errand_key = errand_api_key();
+            $errand_user_id = errand_id();
+            $bvn = user_bvn() ?? null;
+
+            $user_id = User::where('bvn', $bvn)->first()->id ?? null;
+
+
+
+            $chk_V_account = VirtualAccount::where('user_id', $user_id)->where('v_bank_name', 'VFD MFB')->first() ?? null;
+            if (empty($chk_V_account) || $chk_V_account == null) {
+                if (Auth::user()->b_name == null) {
+                    $name = first_name() . " " . last_name();
+                } else {
+                    $name = Auth::user()->b_name;
+                }
+
+                if (Auth::user()->b_phone == null) {
+                    $phone = Auth::user()->phone;
+                } else {
+                    $phone = Auth::user()->b_phone;
+                }
+
+                if (user_status() == 0) {
+
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'User has been restricted on ENKPAY',
+                    ], 500);
+                }
+
+                if (user_status() == 1) {
+
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Please complete your KYC',
+                    ], 500);
+                }
+
+                if (user_bvn() == null) {
+
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'We need your BVN to generate an account for you',
+                    ], 500);
+                }
+
+                if (Auth::user()->v_account_number !== null) {
+
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'You already own account number',
+                    ], 500);
+                }
+
+                if ($bvn == null) {
+
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'BVN not verified, Kindly update your BVN',
+                    ], 500);
+                }
+
+                $curl = curl_init();
+                $data = array(
+
+                    "userId" => $errand_user_id,
+                    "customerBvn" => $bvn,
+                    "phoneNumber" => $phone,
+                    "customerName" => $name,
+
+                );
+
+                $databody = json_encode($data);
+
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/CreateVirtualAccount',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'POST',
+                    CURLOPT_POSTFIELDS => $databody,
+                    CURLOPT_HTTPHEADER => array(
+                        'Content-Type: application/json',
+                        'Accept: application/json',
+                        "Authorization: Bearer $errand_key",
+                    ),
+                ));
+
+                $var = curl_exec($curl);
+
+
+                curl_close($curl);
+                $var = json_decode($var);
+
+
+                $status = $var->code ?? null;
+                $acct_no = $var->data->accountNumber ?? null;
+                $acct_name = $var->data->accountName ?? null;
+                $error = $var->error->message ?? null;
+
+                $bank = "VFD MFB";
+
+                if ($status == 200) {
+
+                    $create = new VirtualAccount();
+                    $create->v_account_no = $acct_no;
+                    $create->v_account_name = $acct_name;
+                    $create->v_bank_name = $bank;
+                    $create->user_id = Auth::id();
+                    $create->save();
+
+                    $user = User::find(Auth::id());
+                    $user->v_account_no = $acct_no;
+                    $user->v_account_name = $acct_name;
+                    $user->save();
+
+                    $get_user = User::find(Auth::id())->first();
+
+                    $message = "VFD Account Created | $name";
+                    send_notification($message);
+                    return 200;
+                } else {
+                    $message = $var->error->message ?? null;
+                    send_notification($message);
+                    return 500;
+                }
+            }
+        }
+    }
+
+    function create_p_account($user_id)
+    {
+        if (!function_exists('create_p_account')) {
+
+            $bvn = user_bvn() ?? null;
+            $user_id = User::where('bvn', $bvn)->first()->id ?? null;
+
+
+            $client = env('CLIENTID');
+            $xauth = env('HASHKEY');
+
+            $user_id = User::where('bvn', $bvn)->first()->id ?? null;
+            $chk_p_account = VirtualAccount::where('user_id', $user_id)->where('v_bank_name', 'PROVIDUS BANK')->first() ?? null;
+            if (empty($chk_p_account) || $chk_p_account == null) {
+
+                if (Auth::user()->b_name == null) {
+                    $name = first_name() . " " . last_name();
+                } else {
+                    $name = Auth::user()->b_name;
+                }
+
+                if (Auth::user()->b_phone == null) {
+                    $phone = Auth::user()->phone;
+                } else {
+                    $phone = Auth::user()->b_phone;
+                }
+
+                $curl = curl_init();
+                $data = array(
+                    "account_name" => $name,
+                    "bvn" => $bvn,
+                );
+
+
+
+                $databody = json_encode($data);
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => 'https://vps.providusbank.com/vps/api/PiPCreateReservedAccountNumber',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'POST',
+                    CURLOPT_POSTFIELDS => $databody,
+                    CURLOPT_HTTPHEADER => array(
+                        'Content-Type: application/json',
+                        'Accept: application/json',
+                        "Client-Id: $client",
+                        "X-Auth-Signature: $xauth",
+                    ),
+                ));
+
+                $var = curl_exec($curl);
+                curl_close($curl);
+                $var = json_decode($var);
+
+
+                $status = $var->responseCode ?? null;
+                $p_acct_no = $var->account_number ?? null;
+                $p_acct_name = $var->account_name ?? null;
+                $error = $var->responseMessage ?? null;
+
+                $pbank = "PROVIDUS BANK";
+
+                if ($status == 00) {
+
+                    $create = new VirtualAccount();
+                    $create->v_account_no = $p_acct_no;
+                    $create->v_account_name = $p_acct_name;
+                    $create->v_bank_name = $pbank;
+                    $create->user_id = Auth::id();
+                    $create->save();
+
+                    $message = "Providus Account Created | $name";
+                    send_notification($message);
+
+                    $get_user = User::find(Auth::id())->first();
+                    
+                    return 200;
+
+                } else {
+
+
+                    $error = "Providus account Error | $error";
+                    send_notification($error);
+
+                    return 400;
                 }
             }
         }

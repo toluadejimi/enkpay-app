@@ -27,129 +27,11 @@ class VirtualaccountController extends Controller
 
         try {
 
-            $errand_key = errand_api_key();
-            $errand_user_id = errand_id();
+           
             $bvn = user_bvn() ?? null;
             $user_id = User::where('bvn', $bvn)->first()->id ?? null;
 
-            // $chk_V_account = VirtualAccount::where('user_id', $user_id)->where('v_bank_name', 'VFD MFB')->first() ?? null;
-            // if (empty($chk_V_account) || $chk_V_account == null) {
-            //     if (Auth::user()->b_name == null) {
-            //         $name = first_name() . " " . last_name();
-            //     } else {
-            //         $name = Auth::user()->b_name;
-            //     }
-
-            //     if (Auth::user()->b_phone == null) {
-            //         $phone = Auth::user()->phone;
-            //     } else {
-            //         $phone = Auth::user()->b_phone;
-            //     }
-
-            //     if (user_status() == 0) {
-
-            //         return response()->json([
-            //             'status' => $this->failed,
-            //             'message' => 'User has been restricted on ENKPAY',
-            //         ], 500);
-            //     }
-
-            //     if (user_status() == 1) {
-
-            //         return response()->json([
-            //             'status' => $this->failed,
-            //             'message' => 'Please complete your KYC',
-            //         ], 500);
-            //     }
-
-            //     if (user_bvn() == null) {
-
-            //         return response()->json([
-            //             'status' => $this->failed,
-            //             'message' => 'We need your BVN to generate an account for you',
-            //         ], 500);
-            //     }
-
-            //     if (Auth::user()->v_account_number !== null) {
-
-            //         return response()->json([
-            //             'status' => $this->failed,
-            //             'message' => 'You already own account number',
-            //         ], 500);
-            //     }
-
-            //     if ($bvn == null) {
-
-            //         return response()->json([
-            //             'status' => $this->failed,
-            //             'message' => 'BVN not verified, Kindly update your BVN',
-            //         ], 500);
-            //     }
-
-            //     $curl = curl_init();
-            //     $data = array(
-
-            //         "userId" => $errand_user_id,
-            //         "customerBvn" => $bvn,
-            //         "phoneNumber" => $phone,
-            //         "customerName" => $name,
-
-            //     );
-
-            //     $databody = json_encode($data);
-
-            //     curl_setopt_array($curl, array(
-            //         CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/CreateVirtualAccount',
-            //         CURLOPT_RETURNTRANSFER => true,
-            //         CURLOPT_ENCODING => '',
-            //         CURLOPT_MAXREDIRS => 10,
-            //         CURLOPT_TIMEOUT => 0,
-            //         CURLOPT_FOLLOWLOCATION => true,
-            //         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            //         CURLOPT_CUSTOMREQUEST => 'POST',
-            //         CURLOPT_POSTFIELDS => $databody,
-            //         CURLOPT_HTTPHEADER => array(
-            //             'Content-Type: application/json',
-            //             'Accept: application/json',
-            //             "Authorization: Bearer $errand_key",
-            //         ),
-            //     ));
-
-            //     $var = curl_exec($curl);
-
-
-            //     curl_close($curl);
-            //     $var = json_decode($var);
-
-
-            //     $status = $var->code ?? null;
-            //     $acct_no = $var->data->accountNumber ?? null;
-            //     $acct_name = $var->data->accountName ?? null;
-            //     $error = $var->error->message ?? null;
-
-            //     $bank = "VFD MFB";
-
-            //     if ($status == 200) {
-
-            //         $create = new VirtualAccount();
-            //         $create->v_account_no = $acct_no;
-            //         $create->v_account_name = $acct_name;
-            //         $create->v_bank_name = $bank;
-            //         $create->user_id = Auth::id();
-            //         $create->save();
-
-            //         $user = User::find(Auth::id());
-            //         $user->v_account_no = $acct_no;
-            //         $user->v_account_name = $acct_name;
-            //         $user->save();
-
-            //         $get_user = User::find(Auth::id())->first();
-
-            //         $message = "VFD Account Created | $name";
-            //         send_notification($message);
-            //     }
-            // }
-
+          
             $client = env('CLIENTID');
             $xauth = env('HASHKEY');
 
@@ -480,7 +362,7 @@ class VirtualaccountController extends Controller
 
                                 "notification" => [
                                     "title" => "Incoming Transfer",
-                                    "body" => "You have an Incoming transfer from $sender_name",
+                                    "body" => "NGN".number_format($Amount, 2). " Deposit from $sender_name",
                                     "icon" => "ic_notification",
                                     "click_action" => "OPEN_CHAT_ACTIVITY",
 
@@ -741,7 +623,7 @@ class VirtualaccountController extends Controller
                     return response()->json([
                         'requestSuccessful' => true,
                         'sessionId' => $sessionId,
-                        'responseMessage' => 'V Account no registerd on ENKPAY',
+                        'responseMessage' => 'V Account no registered on ENKPAY',
                         'responseCode' => "02",
                     ], 200);
                 }
@@ -874,8 +756,16 @@ class VirtualaccountController extends Controller
                 //     $removed_comm =  $both_commmission;
                 // }
 
-                $amt_to_credit = $transactionAmount - 10;
-                    $amt1 = $amt_to_credit - 2;
+
+                if($settledAmount > 9999){
+                    $charges_to_remove = 58;
+                }else{
+                    $charges_to_remove = 13;
+                }
+
+
+                $amt_to_credit = $settledAmount - $charges_to_remove;
+                $amt1 = $amt_to_credit - 2;
 
                     User::where('id',  $user_id)->increment('main_wallet', $amt1);
                     User::where('id',  95)->increment('bonus_wallet', 1);

@@ -171,6 +171,10 @@ class VirtualCardController extends Controller
         ], 500);
     }
 
+
+
+
+
     public function fund_card(Request $request)
     {
         $set = Settings::first();
@@ -179,8 +183,10 @@ class VirtualCardController extends Controller
 
         $amount_to_charge = $request->amount + $set->ngn_rate;
 
+        $user_wallet = User::where('id', Auth::id())-first()->main_wallet;
 
-        if (Auth::user()->main_wallet < $amount_to_charge) {
+
+        if (Auth::user()->main_wallet < $amount_to_charge ) {
 
             return response()->json([
                 'status' => false,
@@ -189,8 +195,11 @@ class VirtualCardController extends Controller
         }
 
 
-        User::where('id', Auth::id())->decrement('main_wallet', $amount_to_charge);
+        $e_ref = random_int(1000000, 9999999);
 
+
+
+        $ref = "CAD-".random_int(1000000, 9999999);
 
         //fund card
         $get_card_id = VCard::select('*')->where('user_id', Auth::id())->first()->card_id;
@@ -201,7 +210,7 @@ class VirtualCardController extends Controller
 
             "card_id" => $get_card_id,
             "amount" => $amount_in_usd,
-            "transaction_reference" => random_int(1000000, 9999999),
+            "transaction_reference" => $e_ref,
             "currency" => "USD"
 
         ];
@@ -228,43 +237,45 @@ class VirtualCardController extends Controller
         $var = json_decode($var);
         $status = $var->status ?? null;
         $ref = $var->data->transaction_reference ?? null;
-        $message = "Error from Virtual Card Fund" . "|" . $var->message ?? null;
-
-
-        // $ref = "123456789";
-        // $status = 'success';
+        $message = "Error from Virtual Card Funding" . "|" . $var->message ?? null;
 
         if ($status == 'success') {
 
 
-            $balance = Auth::user()->main_wallet - $amount_to_charge;
+            Vcard::where('card_id', $get_card_id)->update([
 
-            $amt =  $amount_in_usd / 100;
+                'amount' => $amount_in_usd / 100,
+            ]);
 
-            VCard::where('user_id', Auth::id())->increment('amount', $amt);
+
+            $balance = $user_wallet - $amount_to_charge;
+            User::where('id', Auth::id())->decrement('main_wallet', $amount_to_charge );
 
             $trasnaction = new Transactions();
             $trasnaction->user_id = Auth::id();
             $trasnaction->e_ref = $ref;
+            $trasnaction->ref_trans_id = $ref;
             $trasnaction->transaction_type = "CardFunding";
+            $trasnaction->title = "USD Card Funding";
+            $trasnaction->type = "CardFunding";
             $trasnaction->amount = $amount_to_charge;
-            $trasnaction->note = "USD CARD FUNDING | USD " . $amount_in_usd / 100;
+            $trasnaction->note = "USD CARD FUNDING | USD ".$amount_in_usd /100;
             $trasnaction->fee = 0;
             $trasnaction->e_charges = 0;
             $trasnaction->balance = $balance;
             $trasnaction->status = 1;
             $trasnaction->save();
 
-
-
             return response()->json([
                 'status' => true,
                 'message' => 'Your card has been funded successfully | USD $' . number_format($amount_in_usd / 100, 2),
 
             ], 200);
+
+
         } else {
 
-            User::where('id', Auth::id())->increment('main_wallet', $amount_to_charge);
+              User::where('id', Auth::id())->increment('main_wallet', $amount_to_charge);
 
             send_notification($message);
 
@@ -274,6 +285,7 @@ class VirtualCardController extends Controller
             ], 500);
         }
     }
+  
 
 
 
