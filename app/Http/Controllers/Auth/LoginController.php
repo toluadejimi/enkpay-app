@@ -24,7 +24,7 @@ use Exception;
 use Laravel\Passport\Passport;
 use Laravel\Passport\HasApiTokens;
 
-
+use function PHPUnit\Framework\isEmpty;
 
 class LoginController extends Controller
 {
@@ -40,6 +40,8 @@ class LoginController extends Controller
     {
 
 
+
+
         // try{
 
 
@@ -51,6 +53,7 @@ class LoginController extends Controller
         Passport::refreshTokensExpireIn(Carbon::now()->addMinutes(20));
 
         $check_status = User::where('phone', $phone)->first()->status ?? null;
+
 
 
 
@@ -73,6 +76,7 @@ class LoginController extends Controller
 
 
 
+
         if (Auth::user()->status == 5) {
 
 
@@ -83,6 +87,9 @@ class LoginController extends Controller
 
             ], 500);
         }
+
+
+
 
         $get_device_id = User::where('device_id', $request->device_id)
             ->first()->device_id ?? null;
@@ -96,12 +103,20 @@ class LoginController extends Controller
         }
 
 
+
+
         //ck account
         $vac = VirtualAccount::where('v_bank_name', 'VFD MFB')->where('user_id', Auth::id())->first() ?? null;
         $pac = VirtualAccount::where('v_bank_name', 'PROVIDUS BANK')->where('user_id', Auth::id())->first() ?? null;
 
+
+
+
+
         if ($vac == null && $pac == null) {
 
+
+            dd('hello1');
             $feature = Feature::where('id', 1)->first();
             $token = auth()->user()->createToken('API Token')->accessToken;
             $virtual_account = virtual_account();
@@ -174,6 +189,7 @@ class LoginController extends Controller
 
         if ($vac != null && $pac != null) {
 
+            dd('hello2');
             $feature = Feature::where('id', 1)->first();
             $token = auth()->user()->createToken('API Token')->accessToken;
             $virtual_account = virtual_account();
@@ -244,11 +260,12 @@ class LoginController extends Controller
             ], 200);
         }
 
-        if ($vac == null && $pac != null) {
+        if (isEmpty($vac) || $vac == null) {
+            dd('hello3');
 
             $user_id = Auth::id();
 
-            $createV = create_v_account($user_id);
+            $createv = create_v_account($user_id);
 
             $feature = Feature::where('id', 1)->first();
             $token = auth()->user()->createToken('API Token')->accessToken;
@@ -320,11 +337,11 @@ class LoginController extends Controller
             ], 200);
         }
 
-        if ($vac != null && $pac = null) {
-            
+
+        if (isEmpty($pac) || $pac = null) {
+
             $user_id = Auth::id();
-
-            create_p_account($user_id);
+            $createp = create_p_account($user_id);
 
             $feature = Feature::where('id', 1)->first();
             $token = auth()->user()->createToken('API Token')->accessToken;
@@ -394,7 +411,8 @@ class LoginController extends Controller
 
 
             ], 200);
-        }
+        } dd('hi');
+
 
 
 
