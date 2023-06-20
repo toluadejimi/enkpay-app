@@ -111,7 +111,150 @@ class LoginController extends Controller
 
 
 
-        if ($pac == null || isEmpty($pac)) {
+        
+
+        if ($vac != null && $pac != null) {
+
+            $feature = Feature::where('id', 1)->first();
+            $token = auth()->user()->createToken('API Token')->accessToken;
+            $virtual_account = virtual_account();
+
+            $user = Auth()->user();
+            $user['token'] = $token;
+            $user['user_virtual_account_list'] = $virtual_account;
+            $user['terminal_info'] = terminal_info();
+
+
+
+            $is_kyc_verified = Auth::user()->is_kyc_verified;
+            $status = Auth::user()->status;
+            $is_phone_verified = Auth::user()->is_phone_verified;
+            $is_email_verified = Auth::user()->is_email_verified;
+            $is_identification_verified = Auth::user()->is_identification_verified;
+
+
+            if ($status !== 2 && $is_kyc_verified == 1 && $is_phone_verified == 1 && $is_email_verified == 1 && $is_identification_verified == 1) {
+
+                $update = User::where('id', Auth::id())
+                    ->update([
+                        'status' => 2
+                    ]);
+            }
+
+            $setting = Setting::select('google_url', 'ios_url', 'version')
+                ->first();
+
+            $acc_no = Auth::user()->v_account_no ?? null;
+
+            if ($acc_no == null) {
+
+                $v_account_no = VirtualAccount::where('user_id', Auth::id())
+                    ->first()->v_account_no ?? null;
+                $v_account_name = VirtualAccount::where('user_id', Auth::id())
+                    ->first()->v_account_name ?? null;
+                $v_bank_name = VirtualAccount::where('user_id', Auth::id())
+                    ->first()->v_bank_name ?? null;
+
+                if ($v_bank_name == null) {
+
+                    return response()->json([
+                        'status' => $this->success,
+                        'data' => $user,
+                        'permission' => $feature,
+                        'setting' => $setting
+
+                    ], 200);
+                }
+
+                User::where('id', Auth::id())
+                    ->update([
+                        'v_account_no' => $v_account_no,
+                        'v_account_name' => $v_account_name,
+                        'v_bank_name' => $v_bank_name,
+                    ]);
+            }
+
+
+            return response()->json([
+                'status' => $this->success,
+                'data' => $user,
+                'permission' => $feature,
+                'setting' => $setting
+
+
+            ], 200);
+        }elseif($vac == null && $pac == null) {
+
+
+            $feature = Feature::where('id', 1)->first();
+            $token = auth()->user()->createToken('API Token')->accessToken;
+            $virtual_account = virtual_account();
+
+            $user = Auth()->user();
+            $user['token'] = $token;
+            $user['user_virtual_account_list'] = $virtual_account;
+            $user['terminal_info'] = terminal_info();
+
+
+
+            $is_kyc_verified = Auth::user()->is_kyc_verified;
+            $status = Auth::user()->status;
+            $is_phone_verified = Auth::user()->is_phone_verified;
+            $is_email_verified = Auth::user()->is_email_verified;
+            $is_identification_verified = Auth::user()->is_identification_verified;
+
+
+            if ($status !== 2 && $is_kyc_verified == 1 && $is_phone_verified == 1 && $is_email_verified == 1 && $is_identification_verified == 1) {
+
+                $update = User::where('id', Auth::id())
+                    ->update([
+                        'status' => 2
+                    ]);
+            }
+
+            $setting = Setting::select('google_url', 'ios_url', 'version')
+                ->first();
+
+            $acc_no = Auth::user()->v_account_no ?? null;
+
+            if ($acc_no == null) {
+
+                $v_account_no = VirtualAccount::where('user_id', Auth::id())
+                    ->first()->v_account_no ?? null;
+                $v_account_name = VirtualAccount::where('user_id', Auth::id())
+                    ->first()->v_account_name ?? null;
+                $v_bank_name = VirtualAccount::where('user_id', Auth::id())
+                    ->first()->v_bank_name ?? null;
+
+                if ($v_bank_name == null) {
+
+                    return response()->json([
+                        'status' => $this->success,
+                        'data' => $user,
+                        'permission' => $feature,
+                        'setting' => $setting
+
+                    ], 200);
+                }
+
+                User::where('id', Auth::id())
+                    ->update([
+                        'v_account_no' => $v_account_no,
+                        'v_account_name' => $v_account_name,
+                        'v_bank_name' => $v_bank_name,
+                    ]);
+            }
+
+
+            return response()->json([
+                'status' => $this->success,
+                'data' => $user,
+                'permission' => $feature,
+                'setting' => $setting
+
+
+            ], 200);
+        }elseif($pac == null || isEmpty($pac)) {
 
 
 
@@ -267,155 +410,7 @@ class LoginController extends Controller
 
 
             ], 200);
-        } dd('hi');
-
-
-        if ($vac == null && $pac == null) {
-
-
-            $feature = Feature::where('id', 1)->first();
-            $token = auth()->user()->createToken('API Token')->accessToken;
-            $virtual_account = virtual_account();
-
-            $user = Auth()->user();
-            $user['token'] = $token;
-            $user['user_virtual_account_list'] = $virtual_account;
-            $user['terminal_info'] = terminal_info();
-
-
-
-            $is_kyc_verified = Auth::user()->is_kyc_verified;
-            $status = Auth::user()->status;
-            $is_phone_verified = Auth::user()->is_phone_verified;
-            $is_email_verified = Auth::user()->is_email_verified;
-            $is_identification_verified = Auth::user()->is_identification_verified;
-
-
-            if ($status !== 2 && $is_kyc_verified == 1 && $is_phone_verified == 1 && $is_email_verified == 1 && $is_identification_verified == 1) {
-
-                $update = User::where('id', Auth::id())
-                    ->update([
-                        'status' => 2
-                    ]);
-            }
-
-            $setting = Setting::select('google_url', 'ios_url', 'version')
-                ->first();
-
-            $acc_no = Auth::user()->v_account_no ?? null;
-
-            if ($acc_no == null) {
-
-                $v_account_no = VirtualAccount::where('user_id', Auth::id())
-                    ->first()->v_account_no ?? null;
-                $v_account_name = VirtualAccount::where('user_id', Auth::id())
-                    ->first()->v_account_name ?? null;
-                $v_bank_name = VirtualAccount::where('user_id', Auth::id())
-                    ->first()->v_bank_name ?? null;
-
-                if ($v_bank_name == null) {
-
-                    return response()->json([
-                        'status' => $this->success,
-                        'data' => $user,
-                        'permission' => $feature,
-                        'setting' => $setting
-
-                    ], 200);
-                }
-
-                User::where('id', Auth::id())
-                    ->update([
-                        'v_account_no' => $v_account_no,
-                        'v_account_name' => $v_account_name,
-                        'v_bank_name' => $v_bank_name,
-                    ]);
-            }
-
-
-            return response()->json([
-                'status' => $this->success,
-                'data' => $user,
-                'permission' => $feature,
-                'setting' => $setting
-
-
-            ], 200);
-        }
-
-        if ($vac != null && $pac != null) {
-
-            $feature = Feature::where('id', 1)->first();
-            $token = auth()->user()->createToken('API Token')->accessToken;
-            $virtual_account = virtual_account();
-
-            $user = Auth()->user();
-            $user['token'] = $token;
-            $user['user_virtual_account_list'] = $virtual_account;
-            $user['terminal_info'] = terminal_info();
-
-
-
-            $is_kyc_verified = Auth::user()->is_kyc_verified;
-            $status = Auth::user()->status;
-            $is_phone_verified = Auth::user()->is_phone_verified;
-            $is_email_verified = Auth::user()->is_email_verified;
-            $is_identification_verified = Auth::user()->is_identification_verified;
-
-
-            if ($status !== 2 && $is_kyc_verified == 1 && $is_phone_verified == 1 && $is_email_verified == 1 && $is_identification_verified == 1) {
-
-                $update = User::where('id', Auth::id())
-                    ->update([
-                        'status' => 2
-                    ]);
-            }
-
-            $setting = Setting::select('google_url', 'ios_url', 'version')
-                ->first();
-
-            $acc_no = Auth::user()->v_account_no ?? null;
-
-            if ($acc_no == null) {
-
-                $v_account_no = VirtualAccount::where('user_id', Auth::id())
-                    ->first()->v_account_no ?? null;
-                $v_account_name = VirtualAccount::where('user_id', Auth::id())
-                    ->first()->v_account_name ?? null;
-                $v_bank_name = VirtualAccount::where('user_id', Auth::id())
-                    ->first()->v_bank_name ?? null;
-
-                if ($v_bank_name == null) {
-
-                    return response()->json([
-                        'status' => $this->success,
-                        'data' => $user,
-                        'permission' => $feature,
-                        'setting' => $setting
-
-                    ], 200);
-                }
-
-                User::where('id', Auth::id())
-                    ->update([
-                        'v_account_no' => $v_account_no,
-                        'v_account_name' => $v_account_name,
-                        'v_bank_name' => $v_bank_name,
-                    ]);
-            }
-
-
-            return response()->json([
-                'status' => $this->success,
-                'data' => $user,
-                'permission' => $feature,
-                'setting' => $setting
-
-
-            ], 200);
-        }
-
-        if (isEmpty($vac) || $vac == null) {
+        } else{
 
             $user_id = Auth::id();
 
@@ -490,6 +485,7 @@ class LoginController extends Controller
 
             ], 200);
         }
+
 
 
      
