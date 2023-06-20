@@ -183,7 +183,7 @@ class VirtualCardController extends Controller
 
         $amount_to_charge = $request->amount + $set->ngn_rate;
 
-        $user_wallet = User::where('id', Auth::id())-first()->main_wallet;
+        $user_wallet = User::where('id', Auth::id())->first()->main_wallet;
 
 
         if (Auth::user()->main_wallet < $amount_to_charge ) {
