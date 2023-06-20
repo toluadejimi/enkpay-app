@@ -895,7 +895,7 @@ class TransactionController extends Controller
     public function self_cash_out(Request $request)
     {
 
-        try {
+        // try {
 
 
 
@@ -1801,9 +1801,9 @@ class TransactionController extends Controller
             }
         }
 
-        } catch (\Exception $th) {
-            return $th->getMessage();
-        }
+        // } catch (\Exception $th) {
+        //     return $th->getMessage();
+        // }
     }
 
     public function get_wallet()
