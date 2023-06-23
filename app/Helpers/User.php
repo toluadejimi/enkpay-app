@@ -189,7 +189,7 @@ if (!function_exists('terminal_info')) {
             return $tm;
         }
 
-        return [];
+        return $tm;
     }
 }
 
