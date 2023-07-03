@@ -285,7 +285,7 @@ class VirtualCardController extends Controller
             ], 500);
         }
     }
-  
+
 
 
 
@@ -458,7 +458,7 @@ class VirtualCardController extends Controller
 
 
         if ($status == 'success') {
-            User::where('id', Auth::id())->increment('main_wallet', $amt_in_naira);
+            // User::where('id', Auth::id())->increment('main_wallet', $amt_in_naira);
 
             $balance = User::where('id', Auth::id())->first()->main_wallet;
 
@@ -528,6 +528,7 @@ class VirtualCardController extends Controller
         $key = Settings::first();
         $bkey = env('BKEY');
         $card_fee_ngn =  $key->ngn_rate * $key->virtual_createcharge;
+
 
 
 
