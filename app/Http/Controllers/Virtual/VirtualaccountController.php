@@ -27,11 +27,11 @@ class VirtualaccountController extends Controller
 
         try {
 
-           
+
             $bvn = user_bvn() ?? null;
             $user_id = User::where('bvn', $bvn)->first()->id ?? null;
 
-          
+
             $client = env('CLIENTID');
             $xauth = env('HASHKEY');
 
@@ -537,7 +537,7 @@ class VirtualaccountController extends Controller
         $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
         send_notification($result);
 
-        try {
+        // try {
 
             $header = $request->header('X-Auth-Signature');
 
@@ -620,15 +620,28 @@ class VirtualaccountController extends Controller
 
                 if ($main_wallet == null && $user_id == null) {
 
+
+                    $message = 'V Account no registered on ENKPAY';
+                    $result = $message;
+                    send_notification($result);
+
+
+
                     return response()->json([
                         'requestSuccessful' => true,
                         'sessionId' => $sessionId,
                         'responseMessage' => 'V Account no registered on ENKPAY',
                         'responseCode' => "02",
                     ], 200);
+
+
                 }
 
                 if ($get_session == $settlementId) {
+
+                    $message = 'duplicate transaction';
+                    $result = $message;
+                    send_notification($result);
 
                     return response()->json([
                         'requestSuccessful' => true,
@@ -639,6 +652,10 @@ class VirtualaccountController extends Controller
                 }
 
                 if ($check_status == 3) {
+
+                    $message = 'Account has been Restricted on ENKPAY';
+                    $result = $message;
+                    send_notification($result);
 
                     return response()->json([
                         'status' => $this->failed,
@@ -1005,9 +1022,11 @@ class VirtualaccountController extends Controller
                 'responseMessage' => 'Key not authorized',
                 'responseCode' => "02",
             ], 200);
-        } catch (\Exception $th) {
-            return $th->getMessage();
-        }
+
+            
+        // } catch (\Exception $th) {
+        //     return $th->getMessage();
+        // }
     }
 
 
