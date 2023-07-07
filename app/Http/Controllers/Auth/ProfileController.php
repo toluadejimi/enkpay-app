@@ -34,8 +34,7 @@ class ProfileController extends Controller
                 'data' => $contact,
 
             ], 200);
-
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
     }
@@ -52,9 +51,6 @@ class ProfileController extends Controller
 
 
         return view('reset-pin', compact('email'));
-
-
-
     }
 
 
@@ -65,9 +61,6 @@ class ProfileController extends Controller
 
 
         return view('reset-password', compact('email'));
-
-
-
     }
 
 
@@ -76,7 +69,6 @@ class ProfileController extends Controller
     {
 
         return view('success');
-
     }
 
 
@@ -97,9 +89,8 @@ class ProfileController extends Controller
         $chk_pin_length = strlen($request->password);
 
 
-        if($chk_pin_length > 4){
+        if ($chk_pin_length > 4) {
             return back()->with('error', 'Your pin digit is more than 4');
-
         }
 
         $check_email = User::where('email', $email)->first();
@@ -108,7 +99,6 @@ class ProfileController extends Controller
         if ($check_email == null) {
 
             return back()->with('error', 'User not found');
-
         }
 
         $update_pin = User::where('email', $email)
@@ -116,7 +106,6 @@ class ProfileController extends Controller
 
 
         return redirect('success')->with('message', 'Your pin has been successfully updated');
-
     }
 
 
@@ -141,7 +130,6 @@ class ProfileController extends Controller
         if ($check_email == null) {
 
             return back()->with('error', 'User not found');
-
         }
 
         $update_pin = User::where('email', $email)
@@ -149,7 +137,6 @@ class ProfileController extends Controller
 
 
         return redirect('success')->with('message', 'Your password has been successfully updated');
-
     }
 
 
@@ -172,8 +159,8 @@ class ProfileController extends Controller
             $virtual_account = virtual_account();
 
             $user = Auth()->user();
-            $user['token']=$token;
-            $user['user_virtual_account_list']=$virtual_account;
+            $user['token'] = $token;
+            $user['user_virtual_account_list'] = $virtual_account;
             $user['terminal_info'] = terminal_info();
 
 
@@ -182,11 +169,9 @@ class ProfileController extends Controller
                 'data' => $user,
 
             ], 200);
-
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
-
     }
 
     public function update_user(request $request)
@@ -240,11 +225,9 @@ class ProfileController extends Controller
             $var = json_decode($var);
 
             dd($var);
-
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
-
     }
 
     public function update_info(request $request)
@@ -301,11 +284,9 @@ class ProfileController extends Controller
             $var = json_decode($var);
 
             dd($var);
-
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
-
     }
 
     public function verify_info(request $request)
@@ -378,57 +359,126 @@ class ProfileController extends Controller
                 'message' => "Sorry we could not verify your account information",
 
             ], 500);
-
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
-
     }
 
     public function verify_identity(request $request)
     {
-        try {
-
-            $identity_type = $request->identity_type;
-            $identity_number = $request->identity_number;
-
-            $update = User::where('id', Auth::id())
-                ->update([
-                    'identification_number' => $identity_number,
-                    'identification_type' => $identity_type,
-                    'is_kyc_verified' => 1,
-                ]);
-
-            if ($identity_type == 'nin') {
-                return response()->json([
-                    'status' => $this->success,
-                    'message' => "NIN Updated Successfully",
-
-                ], 200);
-            }
-
-            if ($identity_type == 'bvn') {
-
-                $update = User::where('id', Auth::id())
-                    ->update([
-                        'bvn' => $identity_number,
-                        'is_bvn_verified' => 1,
-                        'is_kyc_verified' => 1,
 
 
-                    ]);
+        $identity_type = $request->identity_type;
+        $identity_number = $request->identity_number;
 
-                return response()->json([
-                    'status' => $this->success,
-                    'message' => "BVN Updated Successfully",
 
-                ], 200);
-            }
+        $key = env('BKEY');
 
-        } catch (\Exception$th) {
-            return $th->getMessage();
+        if ($request->hasFile('photo')) {
+            $file = $request->file('photo');
+            $fileName = $file->getClientOriginalName();
+            $destinationPath = public_path() . 'upload/selfie';
+            $request->photo->move(public_path('upload/selfie'), $fileName);
+            $file_url = url('') . "/public/upload/selfie/$fileName";
+        } else {
+            $fileName =  Auth::user()->identification_image;
+            $file_url = url('') . "/public/upload/selfie/$fileName";
         }
 
+
+
+        $databody = array(
+
+            "first_name" => Auth::user()->first_name,
+            "last_name" => Auth::user()->last_name,
+
+            "address" => array(
+                "address" => Auth::user()->address_line1,
+                "city" =>   Auth::user()->city,
+                "state" =>  Auth::user()->state,
+                "country" => "Nigeria",
+                "postal_code" => random_int(1000, 9999),
+                "house_no" => random_int(10, 99),
+            ),
+
+            "phone" => Auth::user()->phone,
+            "email_address" => Auth::user()->email,
+
+            "identity" => array(
+                "id_type" => "NIGERIAN_BVN_VERIFICATION",
+                "selfie_image" => $file_url,
+                "bvn" => $identity_number,
+
+            ),
+
+            "meta_data" => array(
+                "user_id" => Auth::id(),
+            ),
+
+
+        );
+
+
+
+        $body = json_encode($databody);
+
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://issuecards.api.bridgecard.co/v1/issuing/cardholder/register_cardholder_synchronously',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => $body,
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json',
+                "token: Bearer $key"
+            ),
+        ));
+
+
+
+        $result = curl_exec($curl);
+        curl_close($curl);
+        $var = json_decode($result);
+
+
+        $error = $var->message ?? $result ?? null;
+        $status = $var->status ?? null;
+
+
+        // $id = $var[0]->id;
+        if ($status == "success") {
+
+            User::where('id', Auth::user()->id)
+                ->update([
+                    'identification_image' => $file_url,
+                    'card_holder_id' => $var->data->cardholder_id,
+                    'is_kyc_verified' => 1,
+                    'is_identification_verified' => 1,
+
+
+                ]);
+
+            $message = " BVN Verification Successful |"  . Auth::user()->first_name . " " .  Auth::user()->last_name;
+            send_notification($message);
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Bvn has been successfully verified',
+            ], 200);
+        }
+
+        $alert = " Bvn verification Error |"  . Auth::user()->first_name . " " .  Auth::user()->last_name . "| $error";
+        send_notification($alert);
+
+        return response()->json([
+            'status' => false,
+            'message' => "$error",
+        ], 500);
     }
 
     public function upload_identity(request $request)
@@ -453,13 +503,12 @@ class ProfileController extends Controller
 
             $is_identification_verified = Auth::user()->is_identification_verified;
 
-            if($is_identification_verified == 2){
+            if ($is_identification_verified == 2) {
 
                 return response()->json([
                     'status' => $this->success,
                     'message' => "We are still verifying your profile, Please wait",
                 ], 200);
-
             }
 
             $file = $request->file('utility_bill');
@@ -492,11 +541,9 @@ class ProfileController extends Controller
                 "status" => $this->success,
                 "message" => "Identification uploaded sucessfully, Your request will be reviewd.",
             ], 200);
-
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
-
     }
 
     public function update_bank_info(request $request)
@@ -521,11 +568,9 @@ class ProfileController extends Controller
                 'message' => "Account has been successfully updated",
 
             ], 200);
-
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
-
     }
 
     public function update_account_info(request $request)
@@ -557,11 +602,9 @@ class ProfileController extends Controller
                 'message' => "Account has been successfully updated",
 
             ], 200);
-
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
-
     }
 
     public function update_business(request $request)
@@ -587,11 +630,9 @@ class ProfileController extends Controller
                 'message' => "Business Details has been successfully updated",
 
             ], 200);
-
-        } catch (\Exception$th) {
+        } catch (\Exception $th) {
             return $th->getMessage();
         }
-
     }
 
     public function forgot_pin(Request $request)
@@ -601,7 +642,7 @@ class ProfileController extends Controller
 
             $email = $request->email;
 
-            if(Auth::user()->email != $email){
+            if (Auth::user()->email != $email) {
 
                 return response()->json([
 
@@ -609,8 +650,6 @@ class ProfileController extends Controller
                     'message' => 'Please enter the email attached to this acccount',
 
                 ], 500);
-
-
             }
 
             $check = User::where('email', $email)
@@ -640,7 +679,6 @@ class ProfileController extends Controller
                     'status' => $this->success,
                     'message' => 'Check your inbox or spam for instructions',
                 ], 200);
-
             } else {
 
                 return response()->json([
@@ -649,15 +687,13 @@ class ProfileController extends Controller
                     'message' => 'User not found on our system',
 
                 ], 500);
-
             }
-        } catch (\Exception$e) {
+        } catch (\Exception $e) {
             return response()->json([
                 'status' => $this->failed,
                 'message' => $e->getMessage(),
             ], 500);
         }
-
     }
 
     public function view_agent_account(Request $request)
@@ -666,77 +702,76 @@ class ProfileController extends Controller
         // try {
 
 
-            $serial_no = $request->SerialNumber;
+        $serial_no = $request->SerialNumber;
 
 
-            $check_serial = Terminal::where('serial_no', $serial_no)
-                ->first()->serial_no ?? null;
+        $check_serial = Terminal::where('serial_no', $serial_no)
+            ->first()->serial_no ?? null;
 
 
-            if ($check_serial == null) {
+        if ($check_serial == null) {
 
-                return response()-s>json([
-                    'status' => $this->failed,
-                    'message' => "Account no available on ENKPAY",
-                ], 500);
+            return response() - s > json([
+                'status' => $this->failed,
+                'message' => "Account no available on ENKPAY",
+            ], 500);
+        }
 
-            }
-
-            $user_id = Terminal::where('serial_no', $serial_no)
+        $user_id = Terminal::where('serial_no', $serial_no)
             ->first()->user_id;
 
 
 
 
-            $firstName = User::where('id', $user_id)
-                ->first()->first_name ?? null;
+        $firstName = User::where('id', $user_id)
+            ->first()->first_name ?? null;
 
 
-            $lastName = User::where('id', $user_id)
-                ->first()->last_name ?? null;
+        $lastName = User::where('id', $user_id)
+            ->first()->last_name ?? null;
 
-            $bvn = User::where('id', $user_id)
+        $bvn = User::where('id', $user_id)
             ->first()->bvn ?? null;
 
-            $b_name = User::where('id', $user_id)
-                ->first()->v_account_name ?? null;
+        $b_name = User::where('id', $user_id)
+            ->first()->v_account_name ?? null;
 
 
-            $accountNumber = VirtualAccount::where('user_id', $user_id)
+        $accountNumber = VirtualAccount::where('user_id', $user_id)
             ->where('serial_no', $serial_no)
             ->first()->v_account_no ?? null;
 
-            $bankName = VirtualAccount::where('user_id', $user_id)
+        $bankName = VirtualAccount::where('user_id', $user_id)
             ->where('serial_no', $serial_no)
             ->first()->v_bank_name ?? null;
 
-            $name = VirtualAccount::where('user_id', $user_id)
+        $name = VirtualAccount::where('user_id', $user_id)
             ->where('serial_no', $serial_no)
             ->first()->v_account_name ?? null;
 
-            $data = User::where('id', $user_id)->first();
+        $data = User::where('id', $user_id)->first();
 
-            // if($b_name == null){
-            //     $name = $firstName." ".$lastName;
-            // }else{
-            //     $name = $b_name;
-            // }
+        // if($b_name == null){
+        //     $name = $firstName." ".$lastName;
+        // }else{
+        //     $name = $b_name;
+        // }
 
-            $data_array = array();
-            $data_array[0] = [
-                "firstName" => $name,
-                //"lastName" => $data->last_name,
-                "bvn" => $bvn,
-                "accountNumber" => $accountNumber,
-                "bankName" => $bankName,
-            ];
+        $data_array = array();
+        $data_array[0] = [
+            "firstName" => $name,
+            //"lastName" => $data->last_name,
+            "bvn" => $bvn,
+            "accountNumber" => $accountNumber,
+            "bankName" => $bankName,
+        ];
 
-            return response()->json([
-                'code' => 200,
-                'message' => "success",
-                'data' => $data_array,
+        return response()->json([
+            'code' => 200,
+            'message' => "success",
+            'data' => $data_array,
 
-            ], 200);
+        ], 200);
 
         // } catch (\Exception$th) {
         //     return $th->getMessage();
@@ -746,7 +781,8 @@ class ProfileController extends Controller
 
 
 
-    public function delete_account(request $request){
+    public function delete_account(request $request)
+    {
 
 
         $cr = new DeletedUser();
@@ -764,12 +800,5 @@ class ProfileController extends Controller
             'status' => true,
             'message' => "We are not happy to see you leave our platform",
         ], 200);
-
-
-
     }
-
-
-
-
 }
