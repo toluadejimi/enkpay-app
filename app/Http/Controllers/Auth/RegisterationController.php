@@ -892,6 +892,15 @@ class RegisterationController extends Controller
 
             // }
 
+            if($request->email == $check_email){
+
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => 'Account with email already exist',
+                ], 500);
+
+            }
+
             $email = $request->email;
             $devide_id = $request->devide_id;
             $phone_no = $request->phone_no;
@@ -959,6 +968,7 @@ class RegisterationController extends Controller
                         'gender' => $gender,
                         'email' => $email,
                         'street' => $street,
+                        'address_line1' => $street,
                         'city' => $city,
                         'state' => $state,
                         'lga' => $lga,
@@ -982,6 +992,7 @@ class RegisterationController extends Controller
                         'dob' => $dob,
                         'gender' => $gender,
                         'email' => $email,
+                        'address_line1' => $street,
                         'street' => $street,
                         'city' => $city,
                         'state' => $state,
