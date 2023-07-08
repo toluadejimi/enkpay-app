@@ -858,14 +858,14 @@ class RegisterationController extends Controller
             $check_email = User::where('email', $request->email)->first()->email ?? null;
             $check_status = User::where('phone', $request->phone_no)->first()->status ?? null;
 
-            if($request->phone_no == $check_phone){
+            // if($request->phone_no == $check_phone){
 
-                return response()->json([
-                    'status' => $this->failed,
-                    'message' => 'Phone Number has been taken',
-                ], 500);
+            //     return response()->json([
+            //         'status' => $this->failed,
+            //         'message' => 'Phone Number has been taken',
+            //     ], 500);
 
-            }
+            // }
 
             $email = $request->email;
             $devide_id = $request->devide_id;

@@ -368,11 +368,13 @@ class ProfileController extends Controller
     {
 
 
+
         $identity_type = $request->identity_type;
         $identity_number = $request->identity_number;
 
 
         $key = env('BKEY');
+
 
         if ($request->hasFile('photo')) {
             $file = $request->file('photo');
