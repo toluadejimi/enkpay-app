@@ -320,6 +320,31 @@ class RegisterationController extends Controller
 
             }
 
+
+            $update_code = User::where('email', $email)
+            ->update([
+                'sms_code' => $sms_code,
+            ]);
+
+            $data = array(
+                'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                'subject' => "One Time Password",
+                'toreceiver' => $email,
+                'sms_code' => $sms_code,
+            );
+
+            Mail::send('emails.registration.otpcode', ["data1" => $data], function ($message) use ($data) {
+                $message->from($data['fromsender']);
+                $message->to($data['toreceiver']);
+                $message->subject($data['subject']);
+            });
+
+            return response()->json([
+                'status' => $this->success,
+                'message' => 'OTP Code has been sent succesfully',
+            ], 200);
+
+
         } catch (\Exception$e) {
             return $e->getMessage();
         }
