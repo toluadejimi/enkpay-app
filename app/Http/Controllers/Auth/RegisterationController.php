@@ -942,6 +942,7 @@ class RegisterationController extends Controller
                 $create->email = $email;
                 $create->email = $device_id;
                 $create->street = $street;
+                $create->address_line1 = $street;
                 $create->city = $city;
                 $create->state = $state;
                 $create->lga = $lga;
