@@ -362,7 +362,7 @@ class VirtualaccountController extends Controller
 
                                 "notification" => [
                                     "title" => "Incoming Transfer",
-                                    "body" => "NGN".number_format($Amount, 2). " Deposit from $sender_name",
+                                    "body" => $sender_name. "| sent | NGN". number_format($Amount),
                                     "icon" => "ic_notification",
                                     "click_action" => "OPEN_CHAT_ACTIVITY",
 
@@ -844,7 +844,7 @@ class VirtualaccountController extends Controller
 
                         "notification" => [
                             "title" => "Incoming Transfer",
-                            "body" => $from. "deposit | NGN". number_format($transactionAmount),
+                            "body" => $from. "| sent | NGN". number_format($transactionAmount),
                             "icon" => "ic_notification",
                             "click_action" => "OPEN_CHAT_ACTIVITY",
 
@@ -895,7 +895,7 @@ class VirtualaccountController extends Controller
 
                         "notification" => [
                             "title" => "Incoming Transfer",
-                            "body" =>  $from. "deposit | NGN". number_format($transactionAmount),
+                            "body" =>  $from. "| sent | NGN". number_format($transactionAmount),
                             "icon" => "ic_notification",
                             "click_action" => "OPEN_CHAT_ACTIVITY",
 
