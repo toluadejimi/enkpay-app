@@ -892,7 +892,10 @@ class RegisterationController extends Controller
 
             // }
 
-            if($request->email == $check_email){
+
+           
+
+            if($request->email != null  &&  $request->email  == $check_email){
 
                 return response()->json([
                     'status' => $this->failed,

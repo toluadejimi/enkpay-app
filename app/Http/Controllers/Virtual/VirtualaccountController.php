@@ -568,6 +568,17 @@ class VirtualaccountController extends Controller
             $channelId = $request->channelId;
             $tranDateTime = $request->tranDateTime;
 
+
+
+            if ($sourceAccountName == null){
+
+                $from = $tranRemarks;
+
+            }else{
+                $from = $sourceAccountName;
+            }
+
+
             $key = env('POKEY');
 
 
@@ -733,7 +744,7 @@ class VirtualaccountController extends Controller
                     $trasnaction->title = "Wallet Funding";
                     $trasnaction->main_type = "Transfer";
                     $trasnaction->credit = $amt_to_credit;
-                    $trasnaction->note = "$sourceAccountName | Web Pay";
+                    $trasnaction->note = "$from | Web Pay";
                     $trasnaction->fee = $feeAmount;
                     $trasnaction->amount = $transactionAmount;
                     $trasnaction->e_charges = $deposit_charges;
@@ -741,8 +752,7 @@ class VirtualaccountController extends Controller
                     $trasnaction->trx_date = $tranDateTime;
                     $trasnaction->p_sessionId = $sessionId;
                     $trasnaction->trx_time = $tranDateTime;
-                    $trasnaction->sender_name = $sourceAccountName;
-                    $trasnaction->sender_bank = $sourceBankName;
+                    $trasnaction->sender_name = $from;
                     $trasnaction->sender_bank = $sourceBankName;
                     $trasnaction->serial_no = $SerialNumber;
                     $trasnaction->sender_account_no = $sourceAccountNumber;
@@ -801,7 +811,7 @@ class VirtualaccountController extends Controller
                     $trasnaction->title = "Wallet Funding";
                     $trasnaction->main_type = "Transfer";
                     $trasnaction->credit = $amt_to_credit;
-                    $trasnaction->note = "$sourceAccountName |  NGN $transactionAmount  | Funds Transfer";
+                    $trasnaction->note = "$from |  NGN $transactionAmount  | Funds Transfer";
                     $trasnaction->fee = 0;
                     $trasnaction->amount = $transactionAmount;
                     $trasnaction->e_charges = $deposit_charges;
@@ -809,7 +819,7 @@ class VirtualaccountController extends Controller
                     $trasnaction->trx_date = $tranDateTime;
                     $trasnaction->p_sessionId = $sessionId;
                     $trasnaction->trx_time = $tranDateTime;
-                    $trasnaction->sender_name = $sourceAccountName;
+                    $trasnaction->sender_name = $from;
                     $trasnaction->sender_bank = $sourceBankName;
                     $trasnaction->sender_bank = $sourceBankName;
                     $trasnaction->serial_no = $SerialNumber;
@@ -834,14 +844,14 @@ class VirtualaccountController extends Controller
 
                         "notification" => [
                             "title" => "Incoming Transfer",
-                            "body" => "You have an Incoming transfer from $sourceAccountName",
+                            "body" => $from. "deposit | NGN". number_format($transactionAmount),
                             "icon" => "ic_notification",
                             "click_action" => "OPEN_CHAT_ACTIVITY",
 
                         ],
 
                         "data" => [
-                            "sender_name" => "$sourceAccountName",
+                            "sender_name" => "$from",
                             "sender_bank" => "$sourceBankName",
                             "amount" => "$transactionAmount"
                         ],
@@ -885,14 +895,14 @@ class VirtualaccountController extends Controller
 
                         "notification" => [
                             "title" => "Incoming Transfer",
-                            "body" => "You have an Incoming transfer from $sourceAccountName",
+                            "body" =>  $from. "deposit | NGN". number_format($transactionAmount),
                             "icon" => "ic_notification",
                             "click_action" => "OPEN_CHAT_ACTIVITY",
 
                         ],
 
                         "data" => [
-                            "sender_name" => "$sourceAccountName",
+                            "sender_name" => "$from",
                             "sender_bank" => "$sourceBankName",
                             "amount" => "$transactionAmount"
                         ],
@@ -948,7 +958,7 @@ class VirtualaccountController extends Controller
                         "Amount" => $transactionAmount,
                         "DateOfTransaction" => $date1 . "T" . $date2 . "+" . "01:00",
                         "SenderAccountNumber" => $sourceAccountNumber,
-                        "SenderAccountName" => $sourceAccountName,
+                        "SenderAccountName" => $from,
                         "OriginatorBank" => $sourceBankName,
                         "RecipientAccountNumber" => $VirtualCustomerAccount,
                         "RecipientAccountName" => $first_name . " " . $last_name,
