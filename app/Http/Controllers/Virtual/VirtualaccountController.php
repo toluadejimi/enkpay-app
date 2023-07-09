@@ -15,6 +15,7 @@ use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Mail;
+use SebastianBergmann\Type\NullType;
 
 class VirtualaccountController extends Controller
 {
@@ -570,13 +571,18 @@ class VirtualaccountController extends Controller
 
 
 
-            if ($sourceAccountName == null){
+            if ($sourceAccountName == 'null' || $sourceAccountName == "null" || $sourceAccountName == null){
 
                 $from = $tranRemarks;
 
             }else{
+
                 $from = $sourceAccountName;
+
             }
+
+
+
 
 
             $key = env('POKEY');
