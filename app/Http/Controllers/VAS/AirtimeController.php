@@ -199,7 +199,7 @@ class AirtimeController extends Controller
                 return response()->json([
 
                     'status' => $this->success,
-                    'message' => 'Airtime Purchase Successfull',
+                    'message' => 'Airtime Purchase Successful',
 
                 ], 200);
 
@@ -210,7 +210,7 @@ class AirtimeController extends Controller
             return response()->json([
 
                 'status' => $this->failed,
-                'message' => 'Service unavilable please try again later',
+                'message' => 'Service unavailable please try again later',
 
             ], 200);
 
