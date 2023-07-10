@@ -893,16 +893,18 @@ class RegisterationController extends Controller
             // }
 
 
-           
 
-            if($request->email != null  &&  $request->email  == $check_email){
 
-                return response()->json([
-                    'status' => $this->failed,
-                    'message' => 'Account with email already exist',
-                ], 500);
 
-            }
+
+            // if($request->email != null  &&  $request->email  == $check_email){
+
+            //     return response()->json([
+            //         'status' => $this->failed,
+            //         'message' => 'Account with email already exist',
+            //     ], 500);
+
+            // }
 
             $email = $request->email;
             $devide_id = $request->devide_id;
