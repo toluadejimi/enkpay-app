@@ -855,6 +855,8 @@ class RegisterationController extends Controller
     public function register(Request $request)
     {
 
+
+
         // try {
 
             $validator = Validator::make($request->all(), [
@@ -948,7 +950,7 @@ class RegisterationController extends Controller
                 $create->email = $device_id;
                 $create->street = $street;
                 $create->address_line1 = $street;
-                $create->city = $city;
+                $create->city = $lga;
                 $create->state = $state;
                 $create->lga = $lga;
                 $create->is_phone_verified = 1;
@@ -975,7 +977,7 @@ class RegisterationController extends Controller
                         'email' => $email,
                         'street' => $street,
                         'address_line1' => $street,
-                        'city' => $city,
+                        'city' => $lga,
                         'state' => $state,
                         'lga' => $lga,
                         'password' => bcrypt($password),
@@ -1000,7 +1002,7 @@ class RegisterationController extends Controller
                         'email' => $email,
                         'address_line1' => $street,
                         'street' => $street,
-                        'city' => $city,
+                        'city' => $lga,
                         'state' => $state,
                         'lga' => $lga,
                         'password' => bcrypt($password),
