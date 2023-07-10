@@ -986,7 +986,7 @@ class TransactionController extends Controller
                     ], 500);
                 }
 
-                
+
 
                 if ($bank_code == null) {
 
@@ -1655,7 +1655,7 @@ class TransactionController extends Controller
 
 
 
-                
+
 
                 if ($wallet == 'main_account') {
 
@@ -3615,14 +3615,17 @@ class TransactionController extends Controller
 
         try {
 
-
+            $amountpaid = Terminal::where('user_id', Auth::id())->first()->amount ?? 0;
             $terminals = Terminal::select('serial_no', 'description', 'transfer_status')->where('user_id', Auth::id())
-                ->get();
+            ->get();
+
 
             return response()->json([
 
                 'status' => $this->success,
                 'data' => $terminals,
+                'amountpaid' => $amountpaid,
+
 
             ], 200);
         } catch (\Exception $th) {

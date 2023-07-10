@@ -294,6 +294,14 @@ class ProfileController extends Controller
 
         try {
 
+
+
+
+
+
+
+
+
             $bank_code = $request->bank_code;
             $account_number = $request->account_number;
             $bvn = $request->bvn;
@@ -368,6 +376,17 @@ class ProfileController extends Controller
     {
 
 
+
+        $phone = User::where('id', Auth::id())->first()->phone ?? null;
+
+        if($phone == null) {
+
+            return response()->json([
+                'status' => $this->failed,
+                'message' => "Please update your phone number",
+            ], 500);
+
+        }
 
         $identity_type = $request->identity_type;
         $identity_number = $request->identity_number;
