@@ -734,12 +734,6 @@ class VirtualaccountController extends Controller
 
                     ])->update(['status' => 1]) ?? null;
 
-
-
-
-
-
-
                     //update Transactions
                     $trasnaction = new Transaction();
                     $trasnaction->user_id = $user_id;

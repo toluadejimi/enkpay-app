@@ -478,7 +478,8 @@ class ProfileController extends Controller
                 ->update([
                     'identification_image' => $file_url,
                     'card_holder_id' => $var->data->cardholder_id,
-                    'is_kyc_verified' => 1,
+                    'is_kyc_verified' => 2,
+                    'is_bvn_verified' => 1,
                     'is_identification_verified' => 1,
 
 

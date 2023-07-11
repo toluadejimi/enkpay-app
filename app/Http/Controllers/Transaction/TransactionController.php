@@ -3639,8 +3639,6 @@ class TransactionController extends Controller
 
         try {
 
-
-
             $serial_no = $request->serial_no;
 
             $total_transactions = Transaction::where('serial_no', $serial_no)
@@ -3650,8 +3648,6 @@ class TransactionController extends Controller
             $daily_transactions = Transaction::where('serial_no', $serial_no)
                 ->whereday('created_at', Carbon::today())->sum('credit');
 
-
-
             $terminal = Terminal::where('user_id', Auth::id())
                 ->get();
 
@@ -3659,9 +3655,6 @@ class TransactionController extends Controller
                 ->where('serial_no', $serial_no)
                 ->whereMonth('created_at', Carbon::now()->month)
                 ->get();
-
-
-
 
             return response()->json([
 
