@@ -470,6 +470,16 @@ class ProfileController extends Controller
         $status = $var->status ?? null;
 
 
+        if($error == 'A cardholder already exists with this BVN'){
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Bvn has been successfully verified',
+            ], 200);
+
+        }
+
+
         // $id = $var[0]->id;
         if ($status == "success") {
 
