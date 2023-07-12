@@ -407,7 +407,6 @@ class ProfileController extends Controller
         }
 
 
-
         $databody = array(
 
             "first_name" => Auth::user()->first_name,
@@ -481,6 +480,7 @@ class ProfileController extends Controller
                     'is_kyc_verified' => 2,
                     'is_bvn_verified' => 1,
                     'is_identification_verified' => 1,
+                    'bvn'=> $identity_number,
 
 
                 ]);
