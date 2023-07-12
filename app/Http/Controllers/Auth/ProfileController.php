@@ -511,8 +511,6 @@ class ProfileController extends Controller
             $validator = Validator::make($request->all(), [
                 'utility_bill' => 'required',
                 'identification_image' => 'required',
-                'selfie' => 'required',
-
             ]);
 
             if ($validator->fails()) {
@@ -543,25 +541,25 @@ class ProfileController extends Controller
             $destinationPath = public_path() . 'upload/identification_image';
             $request->identification_image->move(public_path('upload/identification_image'), $identification_image_fileName);
 
-            $file = $request->file('selfie');
-            $selfie_fileName = $file->getClientOriginalName();
-            $destinationPath = public_path() . 'upload/selfie';
-            $request->selfie->move(public_path('upload/selfie'), $selfie_fileName);
+            // $file = $request->file('selfie');
+            // $selfie_fileName = $file->getClientOriginalName();
+            // $destinationPath = public_path() . 'upload/selfie';
+            // $request->selfie->move(public_path('upload/selfie'), $selfie_fileName);
 
             $update = User::where('id', Auth::id())
                 ->update([
-                    'image' => $selfie_fileName,
+                    // 'image' => $selfie_fileName,
                     'utility_bill' => $utility_bill_fileName,
                     'identification_image' => $identification_image_fileName,
                     'is_identification_verified' => 2,
                 ]);
 
-            $message = "New upload of identity image from" . " " . Auth::id();
+            $message = "New upload of identity image from" . " " . Auth::user()->first_name. " | " .Auth::user()->last_name ;
             send_notification($message);
 
             return response()->json([
                 "status" => $this->success,
-                "message" => "Identification uploaded sucessfully, Your request will be reviewd.",
+                "message" => "Identification uploaded successful, Your request will be reviewed.",
             ], 200);
         } catch (\Exception $th) {
             return $th->getMessage();
