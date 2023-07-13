@@ -377,6 +377,16 @@ class ProfileController extends Controller
 
 
 
+        if(Auth::user()->email == null){
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Verify your email',
+            ], 500);
+
+        }
+
+
         $phone = User::where('id', Auth::id())->first()->phone ?? null;
 
         if($phone == null) {
@@ -468,6 +478,20 @@ class ProfileController extends Controller
 
         $error = $var->message ?? $result ?? null;
         $status = $var->status ?? null;
+
+       
+
+
+        if($error == "The cardholders name doesn't match the name on the BVN provided"){
+
+            $name = Auth::user()->first_name. "  ".Auth::user()->last_name;
+
+            return response()->json([
+                'status' => true,
+                'message' => "$name does not match with the name on the BVN provided",
+            ], 500);
+
+        }
 
 
         if($error == "A cardholder already exists with this BVN"){
