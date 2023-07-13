@@ -470,7 +470,7 @@ class ProfileController extends Controller
         $status = $var->status ?? null;
 
 
-        if($error == 'A cardholder already exists with this BVN'){
+        if($error == "A cardholder already exists with this BVN"){
 
             return response()->json([
                 'status' => true,
