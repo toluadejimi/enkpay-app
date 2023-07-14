@@ -298,6 +298,10 @@ class TransactionController extends Controller
                         'status' => $this->success,
                         'message' => "Transaction Processing",
 
+                        $message = "Transaction |  $TransactionReference | has been sent ";
+                        send_notification($message)
+
+
                     ], 200);
                 }
             }
@@ -815,10 +819,7 @@ class TransactionController extends Controller
 
 
 
-                    $ip = $request->ip();
-                    $message = "Request to transfer NGN $amount | $bank_name  | $destinationAccountNumber ";
-                    $result = "Message========> " . $message . "\n\nIP========> " . $ip;
-                    send_notification($result);
+                  
 
 
 
@@ -840,13 +841,16 @@ class TransactionController extends Controller
                         });
                     }
 
-                    return response()->json([
+                    $name = Auth::user()->first_name. " ".Auth::user()->last_name;
 
+                    $ip = $request->ip();
+                    $message = $name. "| Request to transfer NGN " .$amount. " | " .$bank_name. " | ".$destinationAccountNumber;
+                    $result = "Message========> " . $message . "\n\nIP========> " . $ip;
+                    send_notification($result);
+
+                    return response()->json([
                         'status' => $this->success,
                         'message' => "Transaction Processing",
-
-
-
                     ], 200);
                 } else {
 
