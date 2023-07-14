@@ -744,14 +744,9 @@ class VirtualaccountController extends Controller
                 if ($ip == $ip2) {
 
                 $status = WebTransfer::latest()->where([
-
                     'v_account_no' => $accountNumber,
                     'payable_amount' => $transactionAmount,
                     'status' => 0,
-                    'note' => $tranRemarks,
-
-
-
                 ])->update(['status' => 101]) ?? null;
 
 
