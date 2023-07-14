@@ -756,14 +756,8 @@ class VirtualaccountController extends Controller
 
 
 
-                $wetrf = WebTransfer::latest()->where([
-
-                    'v_account_no' => $accountNumber,
-                    'payable_amount' => $transactionAmount,
-                    'note' => $tranRemarks,
-                ])->first() ?? null;
-
-                $message = $wetrf->trans_id. " | ".$transactionAmount. "| ".$tranRemarks. "| completed";
+                $trans_id = WebTransfer::where('v_account_no', $accountNumber)->where('payable_amount',$transactionAmount)->first()->trans_id ?? null;
+                $message = $trans_id. " | ".$transactionAmount. "| ".$tranRemarks. "| completed";
                 send_notification($message);
 
                 }else{
