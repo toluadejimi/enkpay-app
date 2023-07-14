@@ -536,7 +536,7 @@ class VirtualaccountController extends Controller
         $ip = $request->ip();
 
         $ip2 = env("PIP");
-        
+
         $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
         send_notification($result);
 
@@ -1026,6 +1026,25 @@ class VirtualaccountController extends Controller
                 ], 200);
             }
         }
+
+
+        $sessionId = $request->sessionId;
+        $accountNumber = $request->accountNumber;
+        $tranRemarks = $request->tranRemarks;
+        $settledAmount = $request->settledAmount;
+        $transactionAmount = $request->transactionAmount;
+        $feeAmount = $request->feeAmount;
+        $TransactionTime = $request->TransactionTime;
+        $initiationTranRef = $request->initiationTranRef;
+        $settlementId = $request->settlementId;
+        $sourceAccountNumber = $request->sourceAccountNumber;
+        $PostingType = $request->PostingType;
+        $TransactionReference = $request->TransactionReference;
+        $sourceAccountName = $request->sourceAccountName;
+        $sourceBankName = $request->sourceBankName;
+        $channelId = $request->channelId;
+        $tranDateTime = $request->tranDateTime;
+
 
         $parametersJson = json_encode($request->all());
         $headers = json_encode($request->headers->all());
