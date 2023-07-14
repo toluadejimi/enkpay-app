@@ -36,7 +36,6 @@ class TransactionController extends Controller
 
             $set = Setting::where('id', 1)->first();
 
-
             //VFD BANK
             if ($set->bank == 'vfd') {
 

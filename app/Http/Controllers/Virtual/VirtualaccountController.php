@@ -535,7 +535,7 @@ class VirtualaccountController extends Controller
         $message = 'Log 1';
         $ip = $request->ip();
 
-        $ip2 = "154.113.165.53";
+        $ip2 = env('PROIP');
 
         $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
         send_notification($result);
