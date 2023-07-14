@@ -739,14 +739,39 @@ class VirtualaccountController extends Controller
                 $balance = User::where('business_id', $business_id)->first()->main_wallet;
 
 
+                $ip2 = env('PROIP');
+
+                if ($ip == $ip2) {
+
                 $status = WebTransfer::latest()->where([
 
                     'v_account_no' => $accountNumber,
                     'payable_amount' => $transactionAmount,
                     'status' => 0,
+                    'note' => $tranRemarks,
 
 
-                ])->update(['status' => 1]) ?? null;
+
+                ])->update(['status' => 101]) ?? null;
+
+
+
+                $wetrf = WebTransfer::latest()->where([
+
+                    'v_account_no' => $accountNumber,
+                    'payable_amount' => $transactionAmount,
+                    'note' => $tranRemarks,
+                ])->first() ?? null;
+
+                $message = $wetrf->trans_id. " | ".$transactionAmount. "| ".$tranRemarks. "| completed";
+                send_notification($message);
+
+                }else{
+
+                $message = "ERROR  WRONG IP  =>>>>>>>>>" .$request->ip(). "\n\n wrong ip address want to fund";
+                send_notification($message);
+
+                }
 
                 //update Transactions
                 $trasnaction = new Transaction();

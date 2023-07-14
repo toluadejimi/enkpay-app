@@ -118,6 +118,34 @@ class AirtimeController extends Controller
 
             }
 
+
+
+            $debit = $user_wallet_banlance - $amount;
+
+            if ($wallet == 'main_account') {
+
+                $update = User::where('id', Auth::id())
+                    ->update([
+                        'main_wallet' => $debit,
+                    ]);
+
+            } else {
+                $update = User::where('id', Auth::id())
+                    ->update([
+                        'bonus_wallet' => $debit,
+                    ]);
+            }
+
+            if ($wallet == 'main_account') {
+
+                $balance = $user_wallet_banlance - $amount;
+
+            } else {
+
+                $balance = $user_wallet_banlance - $amount;
+
+            }
+
             $curl = curl_init();
 
             curl_setopt_array($curl, array(
@@ -156,31 +184,6 @@ class AirtimeController extends Controller
 
             if ($status == 'TRANSACTION SUCCESSFUL') {
 
-                $debit = $user_wallet_banlance - $amount;
-
-                if ($wallet == 'main_account') {
-
-                    $update = User::where('id', Auth::id())
-                        ->update([
-                            'main_wallet' => $debit,
-                        ]);
-
-                } else {
-                    $update = User::where('id', Auth::id())
-                        ->update([
-                            'bonus_wallet' => $debit,
-                        ]);
-                }
-
-                if ($wallet == 'main_account') {
-
-                    $balance = $user_wallet_banlance - $amount;
-
-                } else {
-
-                    $balance = $user_wallet_banlance - $amount;
-
-                }
 
                 $title = "Airtime VAS";
 
@@ -225,6 +228,12 @@ class AirtimeController extends Controller
                     });
 
                 }
+
+
+
+                $name = Auth::user()->first_name." ".Auth::user()->last_name;
+                $message = $name. " | NGN". $amount. " | " .$phone;
+                send_error($message);
 
                 return response()->json([
 
