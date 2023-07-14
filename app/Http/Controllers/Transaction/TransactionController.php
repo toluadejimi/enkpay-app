@@ -225,12 +225,11 @@ class TransactionController extends Controller
 
                 //Debit
                 $debited_amount = $transfer_charges + $amount;
-                $debit = $user_wallet_banlance - $debited_amount;
 
                 if ($wallet == 'main_account') {
-                    User::where('id', Auth::id())->decrement('main_wallet', $debit);
+                    User::where('id', Auth::id())->decrement('main_wallet', $debited_amount);
                 } else {
-                    User::where('id', Auth::id())->decrement('bonus_wallet', $debit);
+                    User::where('id', Auth::id())->decrement('bonus_wallet', $debited_amount);
                 }
 
                 $status = 200;
