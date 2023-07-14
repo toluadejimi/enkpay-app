@@ -110,6 +110,19 @@ class DataController extends Controller
 
             $pin = $request->pin;
 
+
+            $user_blance = Auth::user()->main_wallet;
+
+            if ($amount > $user_blance) {
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => 'Insufficient Funds, Fund your main wallet',
+                ], 500);
+
+            }
+
+            
+
             if ($wallet == 'main_account') {
                 $user_wallet_banlance = main_account();
             } else {

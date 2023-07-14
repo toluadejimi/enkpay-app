@@ -176,6 +176,9 @@ class VirtualCardController extends Controller
 
         $user_wallet = User::where('id', Auth::id())->first()->main_wallet;
 
+        $user_blance = Auth::user()->main_wallet;
+
+    
 
         if (Auth::user()->main_wallet < $amount_to_charge ) {
 

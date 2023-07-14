@@ -77,6 +77,17 @@ class AirtimeController extends Controller
                 ], 500);
             }
 
+            $user_blance = Auth::user()->main_wallet;
+
+            if ($amount > $user_blance) {
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => 'Insufficient Funds, Fund your main wallet',
+                ], 500);
+
+            }
+
+
             if ($amount > $user_wallet_banlance) {
 
                 return response()->json([
@@ -84,6 +95,25 @@ class AirtimeController extends Controller
                     'status' => $this->failed,
                     'message' => 'Insufficient Funds, Fund your wallet',
 
+                ], 500);
+
+            }
+
+            $user_blance = Auth::user()->main_wallet;
+
+            if ($amount > $user_blance) {
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => 'Insufficient Funds, Fund your main wallet',
+                ], 500);
+
+            }
+
+
+            if ($amount > $user_blance) {
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => 'Insufficient Funds, Fund your main wallet',
                 ], 500);
 
             }

@@ -151,6 +151,20 @@ class PowerController extends Controller
 
         $pin = $request->pin;
 
+
+
+        $user_blance = Auth::user()->main_wallet;
+
+        if ($amount > $user_blance) {
+            return response()->json([
+                'status' => $this->failed,
+                'message' => 'Insufficient Funds, Fund your main wallet',
+            ], 500);
+
+        }
+
+        
+
         $eletricity_charges = Charge::where('id', 4)
             ->first()->amount;
 
