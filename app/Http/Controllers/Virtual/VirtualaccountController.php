@@ -535,7 +535,7 @@ class VirtualaccountController extends Controller
         $message = 'Log 1';
         $ip = $request->ip();
 
-        $ip2 = env("PIP");
+        $ip2 = "154.113.165.53";
 
         $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
         send_notification($result);
@@ -547,6 +547,15 @@ class VirtualaccountController extends Controller
             $ip = $request->ip();
             $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
             send_notification($result);
+
+
+            return response()->json([
+                'requestSuccessful' => true,
+                'responseMessage' => 'Key Can not be empty',
+                'responseCode' => "02",
+            ], 200);
+
+
         }
 
 
