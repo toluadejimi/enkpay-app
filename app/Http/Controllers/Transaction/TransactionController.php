@@ -2573,7 +2573,7 @@ class TransactionController extends Controller
                     'status' => true,
                     'message' => 'Tranasaction Successsfull',
                 ], 200);
-            } else {
+              } else {
 
                 $parametersJson = json_encode($request->all());
                 $headers = json_encode($request->headers->all());
