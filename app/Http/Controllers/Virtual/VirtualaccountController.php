@@ -536,12 +536,18 @@ class VirtualaccountController extends Controller
         $ip = $request->ip();
 
         $ip2 = env("PIP");
-
+        
         $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
         send_notification($result);
 
-        //
-
+        if ($ip != $ip2) {
+        $parametersJson = json_encode($request->all());
+        $headers = json_encode($request->headers->all());
+        $message = 'ip does not match';
+        $ip = $request->ip();
+        $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
+        send_notification($result);
+        }
 
 
         $header = $request->header('X-Auth-Signature');
