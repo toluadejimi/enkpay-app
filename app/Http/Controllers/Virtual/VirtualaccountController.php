@@ -363,7 +363,7 @@ class VirtualaccountController extends Controller
 
                                 "notification" => [
                                     "title" => "Incoming Transfer",
-                                    "body" => $sender_name. "| sent | NGN". number_format($Amount),
+                                    "body" => $sender_name . "| sent | NGN" . number_format($Amount),
                                     "icon" => "ic_notification",
                                     "click_action" => "OPEN_CHAT_ACTIVITY",
 
@@ -535,13 +535,20 @@ class VirtualaccountController extends Controller
         $message = 'Log 1';
         $ip = $request->ip();
 
+        $ip2 = env("PIP");
+
         $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
         send_notification($result);
 
-        // try {
+        //
 
-            $header = $request->header('X-Auth-Signature');
 
+
+        $header = $request->header('X-Auth-Signature');
+
+
+
+        if ($ip == $ip2) {
 
             if ($header == null) {
 
@@ -571,14 +578,12 @@ class VirtualaccountController extends Controller
 
 
 
-            if ($sourceAccountName == 'null' || $sourceAccountName == "null" || $sourceAccountName == null){
+            if ($sourceAccountName == 'null' || $sourceAccountName == "null" || $sourceAccountName == null) {
 
                 $from = $tranRemarks;
-
-            }else{
+            } else {
 
                 $from = $sourceAccountName;
-
             }
 
 
@@ -620,7 +625,7 @@ class VirtualaccountController extends Controller
 
 
                 $device_id = User::where('id', $user_id)
-                ->first()->device_id ?? null;
+                    ->first()->device_id ?? null;
 
 
                 $last_name = User::where('id', $user_id)
@@ -650,8 +655,6 @@ class VirtualaccountController extends Controller
                         'responseMessage' => 'V Account no registered on ENKPAY',
                         'responseCode' => "02",
                     ], 200);
-
-
                 }
 
                 if ($get_session == $settlementId) {
@@ -702,7 +705,6 @@ class VirtualaccountController extends Controller
                 if ($both_commmission > $p_cap) {
 
                     $removed_comm =  $p_cap;
-
                 } else {
                     $removed_comm =  $both_commmission;
                 }
@@ -715,14 +717,14 @@ class VirtualaccountController extends Controller
                     $amt_to_credit = (int)$transactionAmount - (int)$removed_comm;
                     $amt1 = (int)$amt_to_credit - 2;
 
-                    User::where('business_id',  $business_id)->increment('main_wallet', $amt1);
-                    User::where('id',  95)->increment('bonus_wallet', 1);
-                    User::where('id',  109)->increment('bonus_wallet', 1);
+                    User::where('business_id', $business_id)->increment('main_wallet', $amt1);
+                    User::where('id', 95)->increment('bonus_wallet', 1);
+                    User::where('id', 109)->increment('bonus_wallet', 1);
 
 
-                    $first_name = User::where('business_id',  $business_id)->first()->first_name ?? null;
-                    $last_name = User::where('business_id',  $business_id)->first()->last_name ?? null;
-                    $balance = User::where('business_id',  $business_id)->first()->main_wallet;
+                    $first_name = User::where('business_id', $business_id)->first()->first_name ?? null;
+                    $last_name = User::where('business_id', $business_id)->first()->last_name ?? null;
+                    $balance = User::where('business_id', $business_id)->first()->main_wallet;
 
 
                     $status = WebTransfer::latest()->where([
@@ -784,9 +786,9 @@ class VirtualaccountController extends Controller
                 // }
 
 
-                if($settledAmount > 9999){
+                if ($settledAmount > 9999) {
                     $charges_to_remove = 58;
-                }else{
+                } else {
                     $charges_to_remove = 13;
                 }
 
@@ -794,39 +796,39 @@ class VirtualaccountController extends Controller
                 $amt_to_credit = $settledAmount - $charges_to_remove;
                 $amt1 = $amt_to_credit - 2;
 
-                    User::where('id',  $user_id)->increment('main_wallet', $amt1);
-                    User::where('id',  95)->increment('bonus_wallet', 1);
-                    User::where('id',  109)->increment('bonus_wallet', 1);
+                User::where('id', $user_id)->increment('main_wallet', $amt1);
+                User::where('id', 95)->increment('bonus_wallet', 1);
+                User::where('id', 109)->increment('bonus_wallet', 1);
 
 
-                $balance = User::where('id',  $user_id)->first()->main_wallet;
+                $balance = User::where('id', $user_id)->first()->main_wallet;
 
                 //update Transactions
-                    $trasnaction = new Transaction();
-                    $trasnaction->user_id = $user_id;
-                    $trasnaction->ref_trans_id = $trans_id;
-                    $trasnaction->e_ref = $settlementId;
-                    $trasnaction->type = "webpay";
-                    $trasnaction->transaction_type = "VirtualFundWallet";
-                    $trasnaction->title = "Wallet Funding";
-                    $trasnaction->main_type = "Transfer";
-                    $trasnaction->credit = $amt_to_credit;
-                    $trasnaction->note = "$from |  NGN $transactionAmount  | Funds Transfer";
-                    $trasnaction->fee = 0;
-                    $trasnaction->amount = $transactionAmount;
-                    $trasnaction->e_charges = $deposit_charges;
-                    $trasnaction->enkPay_Cashout_profit = 10;
-                    $trasnaction->trx_date = $tranDateTime;
-                    $trasnaction->p_sessionId = $sessionId;
-                    $trasnaction->trx_time = $tranDateTime;
-                    $trasnaction->sender_name = $from;
-                    $trasnaction->sender_bank = $sourceBankName;
-                    $trasnaction->sender_bank = $sourceBankName;
-                    $trasnaction->serial_no = $SerialNumber;
-                    $trasnaction->sender_account_no = $sourceAccountNumber;
-                    $trasnaction->balance = $balance;
-                    $trasnaction->status = 1;
-                    $trasnaction->save();
+                $trasnaction = new Transaction();
+                $trasnaction->user_id = $user_id;
+                $trasnaction->ref_trans_id = $trans_id;
+                $trasnaction->e_ref = $settlementId;
+                $trasnaction->type = "webpay";
+                $trasnaction->transaction_type = "VirtualFundWallet";
+                $trasnaction->title = "Wallet Funding";
+                $trasnaction->main_type = "Transfer";
+                $trasnaction->credit = $amt_to_credit;
+                $trasnaction->note = "$from |  NGN $transactionAmount  | Funds Transfer";
+                $trasnaction->fee = 0;
+                $trasnaction->amount = $transactionAmount;
+                $trasnaction->e_charges = $deposit_charges;
+                $trasnaction->enkPay_Cashout_profit = 10;
+                $trasnaction->trx_date = $tranDateTime;
+                $trasnaction->p_sessionId = $sessionId;
+                $trasnaction->trx_time = $tranDateTime;
+                $trasnaction->sender_name = $from;
+                $trasnaction->sender_bank = $sourceBankName;
+                $trasnaction->sender_bank = $sourceBankName;
+                $trasnaction->serial_no = $SerialNumber;
+                $trasnaction->sender_account_no = $sourceAccountNumber;
+                $trasnaction->balance = $balance;
+                $trasnaction->status = 1;
+                $trasnaction->save();
 
 
                 $b_code = env('BCODE');
@@ -844,7 +846,7 @@ class VirtualaccountController extends Controller
 
                         "notification" => [
                             "title" => "Incoming Transfer",
-                            "body" => $from. "| sent | NGN". number_format($transactionAmount),
+                            "body" => $from . "| sent | NGN" . number_format($transactionAmount),
                             "icon" => "ic_notification",
                             "click_action" => "OPEN_CHAT_ACTIVITY",
 
@@ -886,8 +888,8 @@ class VirtualaccountController extends Controller
 
 
 
-                  // Send to Iphones
-                  if ($device_id != null) {
+                // Send to Iphones
+                if ($device_id != null) {
 
                     $data = [
 
@@ -895,7 +897,7 @@ class VirtualaccountController extends Controller
 
                         "notification" => [
                             "title" => "Incoming Transfer",
-                            "body" =>  $from. "| sent | NGN". number_format($transactionAmount),
+                            "body" =>  $from . "| sent | NGN" . number_format($transactionAmount),
                             "icon" => "ic_notification",
                             "click_action" => "OPEN_CHAT_ACTIVITY",
 
@@ -1017,37 +1019,26 @@ class VirtualaccountController extends Controller
                     'responseCode' => "00",
                 ], 200);
             }
+        }
 
-            $parametersJson = json_encode($request->all());
-            $headers = json_encode($request->headers->all());
-            $message = 'Key not Authorized';
-            $ip = $request->ip();
+        $parametersJson = json_encode($request->all());
+        $headers = json_encode($request->headers->all());
+        $message = 'Key not Authorized';
+        $ip = $request->ip();
 
-            $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
-            send_notification($result);
+        $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
+        send_notification($result);
 
-            return response()->json([
-                'requestSuccessful' => true,
-                'sessionId' => $sessionId,
-                'responseMessage' => 'Key not authorized',
-                'responseCode' => "02",
-            ], 200);
+        return response()->json([
+            'requestSuccessful' => true,
+            'sessionId' => $sessionId,
+            'responseMessage' => 'Key not authorized',
+            'responseCode' => "02",
+        ], 200);
 
 
         // } catch (\Exception $th) {
         //     return $th->getMessage();
         // }
     }
-
-
-
-
-
-
-
-
-
-
-
-
 }
