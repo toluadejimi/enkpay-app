@@ -206,6 +206,7 @@ class LoginController extends Controller
                 'status' => $this->success,
                 'data' => $user,
                 'permission' => $feature,
+                'isNewDevice' => false,
                 'setting' => $setting
 
 
