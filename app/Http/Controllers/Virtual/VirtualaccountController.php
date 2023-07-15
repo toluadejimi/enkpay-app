@@ -747,7 +747,7 @@ class VirtualaccountController extends Controller
                     'v_account_no' => $accountNumber,
                     'payable_amount' => $transactionAmount,
                     'status' => 0,
-                ])->update(['status' => 101]) ?? null;
+                ])->update(['status' => 1]) ?? null;
 
 
 
