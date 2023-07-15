@@ -126,7 +126,7 @@ class LoginController extends Controller
                     'isNewDevice' => true,
                     'message' => 'New device detected, login with the old device or switch to this device',
 
-                ], 500);
+                ], 200);
             }
         }
 
@@ -649,7 +649,7 @@ class LoginController extends Controller
                     'isNewDevice' => true,
                     'message' => 'New device detected, login with the old device or switch to this device',
 
-                ], 500);
+                ], 200);
             }
         }
 
