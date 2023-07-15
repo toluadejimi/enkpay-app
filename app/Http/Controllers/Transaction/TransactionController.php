@@ -242,11 +242,15 @@ class TransactionController extends Controller
                 if ($status == 200) {
 
                     //Debit
-
+                    $balance = User::where('id', Auth::id())->first()->main_wallet;
                 if ($wallet == 'main_account') {
-                    User::where('id', Auth::id())->decrement('main_wallet', $amoutCharges);
+                    $debit = $balance - $amoutCharges;
+                    User::where('id', Auth::id())->update('main_wallet', $debit);
+
                 } else {
-                    User::where('id', Auth::id())->decrement('bonus_wallet', $amoutCharges);
+                    $balance = User::where('id', Auth::id())->first()->bonus_wallet;
+                    $debit = $balance - $amoutCharges;
+                    User::where('id', Auth::id())->update('bonus_wallet', $debit);
                 }
 
 
