@@ -168,6 +168,20 @@ class VirtualCardController extends Controller
 
     public function fund_card(Request $request)
     {
+
+        if (Auth::user()->status != 2) {
+                
+            $message = Auth::user()->first_name. " ".Auth::user()->last_name. " | Unverified Account trying to func card";
+            send_notification($message);
+
+            return response()->json([
+                'status' => $this->failed,
+                'message' => 'Please verify your account to enjoy enkpay full service',
+            ], 500);
+        }
+
+
+
         $set = Settings::first();
         $user = User::find(Auth::user()->id);
         $key = env('BKEY');
@@ -404,6 +418,17 @@ class VirtualCardController extends Controller
     public function liquidate_card(Request $request)
     {
 
+        if (Auth::user()->status != 2) {
+                
+            $message = Auth::user()->first_name. " ".Auth::user()->last_name. " | Unverified Account trying to liqidate card";
+            send_notification($message);
+
+            return response()->json([
+                'status' => $this->failed,
+                'message' => 'Please verify your account to enjoy enkpay full service',
+            ], 500);
+        }
+
         $set = Settings::first();
         $key = env('BKEY');
         $card = VCard::where('user_id', Auth::id())->first();
@@ -516,6 +541,17 @@ class VirtualCardController extends Controller
     public function create_card(Request $request)
     {
 
+
+        if (Auth::user()->status != 2) {
+                
+            $message = Auth::user()->first_name. " ".Auth::user()->last_name. " | Unverified Account trying to create card";
+            send_notification($message);
+
+            return response()->json([
+                'status' => $this->failed,
+                'message' => 'Please verify your account to enjoy enkpay full service',
+            ], 500);
+        }
 
 
         $user = User::find(Auth::user()->id);

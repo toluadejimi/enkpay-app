@@ -34,6 +34,7 @@ class TransactionController extends Controller
 
 
 
+
             $set = Setting::where('id', 1)->first();
 
             //VFD BANK
@@ -113,6 +114,18 @@ class TransactionController extends Controller
                         'message' => 'You can not make transfer at the moment, Please contact  support',
 
                     ], 500);
+                }
+
+                if (Auth::user()->status != 2) {
+                
+                $message = Auth::user()->first_name. " ".Auth::user()->last_name. " | Unverified Account trying withdraw";
+                send_notification($message);
+
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => 'Please verify your account to enjoy enkpay full service',
+                ], 500);
+
                 }
 
 
@@ -974,6 +987,17 @@ class TransactionController extends Controller
             }
 
 
+
+            if (Auth::user()->status != 2) {
+
+                $message = Auth::user()->first_name. " ".Auth::user()->last_name. " | Unverified Account trying withdraw";
+                send_notification($message);
+
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => 'Please verify your account to enjoy enkpay full service',
+                ], 500);
+            }
 
 
             $account_number = Auth::user()->c_account_number ?? null;

@@ -81,6 +81,20 @@ class DataController extends Controller
     public function buy_data(Request $request)
     {
 
+
+        if (Auth::user()->status != 2) {
+                
+            $message = Auth::user()->first_name. " ".Auth::user()->last_name. " | Unverified Account trying to buy data";
+            send_notification($message);
+
+            return response()->json([
+                'status' => $this->failed,
+                'message' => 'Please verify your account to enjoy enkpay full service',
+            ], 500);
+        }
+
+
+
          return response()->json([
 
                     'status' => $this->failed,

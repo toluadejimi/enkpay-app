@@ -75,6 +75,17 @@ class CableController extends Controller
 
         try {
 
+            if (Auth::user()->status != 2) {
+                
+                $message = Auth::user()->first_name. " ".Auth::user()->last_name. " | Unverified Account trying to buy cable";
+                send_notification($message);
+    
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => 'Please verify your account to enjoy enkpay full service',
+                ], 500);
+            }
+
             $referenceCode = "ENK-" . random_int(1000000, 999999999);
 
             $auth = env('VTAUTH');
