@@ -744,33 +744,19 @@ class VirtualaccountController extends Controller
 
                 if ($ip == $ip2) {
 
-                $status = WebTransfer::latest()->where([
+                $chk_transaction = WebTransfer::latest()->where([
                     'v_account_no' => $accountNumber,
                     'payable_amount' => $transactionAmount,
                     'status' => 0,
-                ])->first()->update(['status' => 1]) ?? null;
+                ])->first() ?? null;
 
-              
-
-            //    $amount = 
-
-               
-            //     $trans = new Validtransfer();
-            //     $trans->amount = $amount;
-            //     $trans->user_id = $user_id;
-            //     $trans->v_account_no = $p_account_no;
-            //     $trans->v_account_name = $p_account_name;
-            //     $trans->bank_name = $p_bank_name;
-            //     $trans->web_charges = $commmission;
-            //     $trans->trans_id = $trans_id;
-            //     $trans->payable_amount = $payable_amount;
-            //     $trans->total_received = $total_received;
-            //     $trans->wc_order = $wc_order;
-            //     $trans->client_id = $client_id;
-            //     $trans->save();
-
-
-
+                if($chk_transaction != null){
+                    $status = WebTransfer::latest()->where([
+                        'v_account_no' => $accountNumber,
+                        'payable_amount' => $transactionAmount,
+                        'status' => 0,
+                    ])->first()->update(['status' => 1]) ?? null;
+                }
 
                 $trans_id = WebTransfer::where('v_account_no', $accountNumber)->where('payable_amount',$transactionAmount)->first()->trans_id ?? null;
                 $message = $trans_id. " | ".$transactionAmount. "| ".$tranRemarks. "| completed";

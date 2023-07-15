@@ -54,10 +54,6 @@ class LoginController extends Controller
 
         $check_status = User::where('phone', $phone)->first()->status ?? null;
 
-
-
-
-
         if ($check_status == 3) {
 
             return response()->json([
@@ -73,6 +69,53 @@ class LoginController extends Controller
                 'message' => 'Phone No or Password Incorrect'
             ], 500);
         }
+
+
+        $get_device_id = Auth::user()->device_id ?? null;
+        $get_deviceIdentifier = Auth::user()->deviceIdentifier ?? null;
+        $get_deviceName = Auth::user()->deviceName ?? null;
+
+        $get_device_id = User::where('device_id', $request->device_id)
+        ->first()->device_id ?? null;
+
+        if ($get_device_id == null ||  $get_deviceIdentifier == null || $get_deviceName == null ) {
+
+            $update = User::where('id', Auth::id())
+                ->update([
+                    'device_id' => $request->device_id ?? null,
+                    'deviceIdentifier' => $request->deviceIdentifier ?? null,
+                    'deviceName' => $request->deviceName ?? null,
+                ]);
+        }
+
+        //chk now
+
+        if($get_deviceIdentifier != null){
+
+            $current_deviceIdentifier = Auth::user()->deviceIdentifier;
+            $new_deviceIdentifier = $request->deviceIdentifier;
+
+            if($new_deviceIdentifier != $current_deviceIdentifier){
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'isNewDevice' => true,
+                    'message' => 'New device detected, login with the old device or switch to this device',
+    
+                ], 500);
+
+
+            }
+
+
+
+
+        }
+       
+
+
+
 
 
 
@@ -91,16 +134,6 @@ class LoginController extends Controller
 
 
 
-        $get_device_id = User::where('device_id', $request->device_id)
-            ->first()->device_id ?? null;
-
-        if ($get_device_id == null) {
-
-            $update = User::where('id', Auth::id())
-                ->update([
-                    'device_id' => $request->device_id ?? null,
-                ]);
-        }
 
 
 
@@ -247,9 +280,11 @@ class LoginController extends Controller
 
 
             return response()->json([
+                
                 'status' => $this->success,
                 'data' => $user,
                 'permission' => $feature,
+                'isNewDevice' => false,
                 'setting' => $setting
 
 
@@ -271,8 +306,6 @@ class LoginController extends Controller
             $user['token'] = $token;
             $user['user_virtual_account_list'] = $virtual_account;
             $user['terminal_info'] = terminal_info();
-
-
 
             $is_kyc_verified = Auth::user()->is_kyc_verified;
             $status = Auth::user()->status;
