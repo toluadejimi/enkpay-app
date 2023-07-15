@@ -99,7 +99,6 @@ class LoginController extends Controller
 
                 $message = Auth::user()->first_name. " ".Auth::user()->last_name. " trying to login  on another device";
                 send_notification($message);
-                $request->user()->token()->revoke();
                 return response()->json([
 
                     'status' => $this->failed,
