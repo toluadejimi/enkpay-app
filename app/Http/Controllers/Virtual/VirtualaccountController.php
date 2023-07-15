@@ -7,6 +7,7 @@ use App\Models\Charge;
 use App\Models\Terminal;
 use App\Models\Transaction;
 use App\Models\User;
+use App\Models\Validtransfer;
 use App\Models\VirtualAccount;
 use App\Models\Webkey;
 use App\Models\Webtransfer;
@@ -747,7 +748,27 @@ class VirtualaccountController extends Controller
                     'v_account_no' => $accountNumber,
                     'payable_amount' => $transactionAmount,
                     'status' => 0,
-                ])->update(['status' => 1]) ?? null;
+                ])->first()->update(['status' => 1]) ?? null;
+
+              
+
+            //    $amount = 
+
+               
+            //     $trans = new Validtransfer();
+            //     $trans->amount = $amount;
+            //     $trans->user_id = $user_id;
+            //     $trans->v_account_no = $p_account_no;
+            //     $trans->v_account_name = $p_account_name;
+            //     $trans->bank_name = $p_bank_name;
+            //     $trans->web_charges = $commmission;
+            //     $trans->trans_id = $trans_id;
+            //     $trans->payable_amount = $payable_amount;
+            //     $trans->total_received = $total_received;
+            //     $trans->wc_order = $wc_order;
+            //     $trans->client_id = $client_id;
+            //     $trans->save();
+
 
 
 
