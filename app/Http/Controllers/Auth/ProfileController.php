@@ -765,7 +765,7 @@ class ProfileController extends Controller
 
         if ($check_serial == null) {
 
-            return response() - s > json([
+            return response()->json([
                 'status' => $this->failed,
                 'message' => "Account no available on ENKPAY",
             ], 500);
