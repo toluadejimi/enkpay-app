@@ -119,7 +119,6 @@ class TransactionController extends Controller
                 $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
                 if ($fa !== null) {
 
-                    dd('hello');
 
                     if ($fa->attempt == 1) {
                         return response()->json([
@@ -231,12 +230,18 @@ class TransactionController extends Controller
                     User::where('id', Auth::id())->decrement('bonus_wallet', $debited_amount);
                 }
 
+
+
+
                 $status = 200;
                 $message = "Error from Errand Pay";
                 $enkpay_profit = $transfer_charges - 10;
                 $trans_id = "ENK-" . random_int(100000, 999999);
 
                 if ($status == 200) {
+
+
+                    $balance = User::where('id', Auth::id())->first()->main_wallet;
 
                     //update Transactions
                     $trasnaction = new Transaction();
@@ -253,7 +258,7 @@ class TransactionController extends Controller
                     $trasnaction->enkpay_Cashout_profit = $enkpay_profit;
                     $trasnaction->receiver_name = $destinationAccountName;
                     $trasnaction->receiver_account_no = $destinationAccountNumber;
-                    $trasnaction->balance = $debit;
+                    $trasnaction->balance = $balance;
                     $trasnaction->status = 0;
                     $trasnaction->save();
 
@@ -268,7 +273,7 @@ class TransactionController extends Controller
                     $trasnaction->enkpay_Cashout_profit = $enkpay_profit;
                     $trasnaction->receiver_name = $destinationAccountName;
                     $trasnaction->receiver_account_no = $destinationAccountNumber;
-                    $trasnaction->receiver_name = $receiver_name;
+                    $trasnaction->receiver_name = $balance;
                     $trasnaction->status = 0;
                     $trasnaction->save();
 
@@ -288,7 +293,7 @@ class TransactionController extends Controller
                     $trasnaction->receiver_name = $receiver_name;
                     $trasnaction->receiver_account_no = $destinationAccountNumber;
                     $trasnaction->receiver_bank = $bank_name;
-                    $trasnaction->balance = $debit;
+                    $trasnaction->balance = $balance;
                     $trasnaction->status = 0;
                     $trasnaction->save();
 
