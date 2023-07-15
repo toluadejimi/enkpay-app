@@ -76,9 +76,9 @@ class LoginController extends Controller
         $get_deviceName = Auth::user()->deviceName ?? null;
 
         $get_device_id = User::where('device_id', $request->device_id)
-        ->first()->device_id ?? null;
+            ->first()->device_id ?? null;
 
-        if ($get_device_id == null ||  $get_deviceIdentifier == null || $get_deviceName == null ) {
+        if ($get_device_id == null ||  $get_deviceIdentifier == null || $get_deviceName == null) {
 
             $update = User::where('id', Auth::id())
                 ->update([
@@ -90,29 +90,25 @@ class LoginController extends Controller
 
         //chk now
 
-        if($get_deviceIdentifier != null){
+        if ($get_deviceIdentifier != null) {
 
             $current_deviceIdentifier = Auth::user()->deviceIdentifier;
             $new_deviceIdentifier = $request->deviceIdentifier;
 
-            if($new_deviceIdentifier != $current_deviceIdentifier){
+            if ($new_deviceIdentifier != $current_deviceIdentifier) {
 
+                $message = Auth::user()->first_name. " ".Auth::user()->last_name. " trying to login  on another device";
+                $request->user()->token()->revoke();
                 return response()->json([
 
                     'status' => $this->failed,
                     'isNewDevice' => true,
                     'message' => 'New device detected, login with the old device or switch to this device',
-    
+
                 ], 500);
-
-
             }
-
-
-
-
         }
-       
+
 
 
 
@@ -143,7 +139,7 @@ class LoginController extends Controller
         $pac = VirtualAccount::where('v_bank_name', 'PROVIDUS BANK')->where('user_id', Auth::id())->first()->user_id ?? null;
 
 
-        if($vac == Auth::id() && $pac == Auth::id()){
+        if ($vac == Auth::id() && $pac == Auth::id()) {
 
             $feature = Feature::where('id', 1)->first();
             $token = auth()->user()->createToken('API Token')->accessToken;
@@ -216,9 +212,9 @@ class LoginController extends Controller
         }
 
 
-        if($vac == null && $pac == null){
+        if ($vac == null && $pac == null) {
 
-            
+
             $feature = Feature::where('id', 1)->first();
             $token = auth()->user()->createToken('API Token')->accessToken;
             $virtual_account = virtual_account();
@@ -265,6 +261,7 @@ class LoginController extends Controller
                         'status' => $this->success,
                         'data' => $user,
                         'permission' => $feature,
+                        'isNewDevice' => false,
                         'setting' => $setting
 
                     ], 200);
@@ -280,7 +277,7 @@ class LoginController extends Controller
 
 
             return response()->json([
-                
+
                 'status' => $this->success,
                 'data' => $user,
                 'permission' => $feature,
@@ -292,7 +289,7 @@ class LoginController extends Controller
         }
 
 
-        if($vac == null && $pac == Auth::id()){
+        if ($vac == null && $pac == Auth::id()) {
 
             $user_id = Auth::id();
 
@@ -342,6 +339,7 @@ class LoginController extends Controller
                         'status' => $this->success,
                         'data' => $user,
                         'permission' => $feature,
+                        'isNewDevice' => false,
                         'setting' => $setting
 
                     ], 200);
@@ -360,6 +358,7 @@ class LoginController extends Controller
                 'status' => $this->success,
                 'data' => $user,
                 'permission' => $feature,
+                'isNewDevice' => false,
                 'setting' => $setting
 
 
@@ -367,9 +366,9 @@ class LoginController extends Controller
         }
 
 
-        if($vac == Auth::id() && $pac == null ){
+        if ($vac == Auth::id() && $pac == null) {
 
-            
+
             $user_id = Auth::id();
 
 
@@ -381,75 +380,73 @@ class LoginController extends Controller
 
             $user_id = User::where('bvn', $bvn)->first()->id ?? null;
 
-                if (Auth::user()->b_name == null) {
-                    $name = first_name() . " " . last_name();
-                } else {
-                    $name = Auth::user()->b_name;
-                }
+            if (Auth::user()->b_name == null) {
+                $name = first_name() . " " . last_name();
+            } else {
+                $name = Auth::user()->b_name;
+            }
 
-                if (Auth::user()->b_phone == null) {
-                    $phone = Auth::user()->phone;
-                } else {
-                    $phone = Auth::user()->b_phone;
-                }
+            if (Auth::user()->b_phone == null) {
+                $phone = Auth::user()->phone;
+            } else {
+                $phone = Auth::user()->b_phone;
+            }
 
-                $curl = curl_init();
-                $data = array(
-                    "account_name" => $name,
-                    "bvn" => $bvn,
-                );
-
-
-
-                $databody = json_encode($data);
-                curl_setopt_array($curl, array(
-                    CURLOPT_URL => 'https://vps.providusbank.com/vps/api/PiPCreateReservedAccountNumber',
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING => '',
-                    CURLOPT_MAXREDIRS => 10,
-                    CURLOPT_TIMEOUT => 0,
-                    CURLOPT_FOLLOWLOCATION => true,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST => 'POST',
-                    CURLOPT_POSTFIELDS => $databody,
-                    CURLOPT_HTTPHEADER => array(
-                        'Content-Type: application/json',
-                        'Accept: application/json',
-                        "Client-Id: $client",
-                        "X-Auth-Signature: $xauth",
-                    ),
-                ));
-
-                $var = curl_exec($curl);
-                curl_close($curl);
-                $var = json_decode($var);
-
-                $status = $var->responseCode ?? null;
-                $p_acct_no = $var->account_number ?? null;
-                $p_acct_name = $var->account_name ?? null;
-                $error = $var->responseMessage ?? null;
-
-                $pbank = "PROVIDUS BANK";
-
-                if ($status == 00) {
-
-                    $create = new VirtualAccount();
-                    $create->v_account_no = $p_acct_no;
-                    $create->v_account_name = $p_acct_name;
-                    $create->v_bank_name = $pbank;
-                    $create->user_id = Auth::id();
-                    $create->save();
-
-                    $message = "Providus Account Created | $name";
-                    send_notification($message);                    
-
-                } else {
+            $curl = curl_init();
+            $data = array(
+                "account_name" => $name,
+                "bvn" => $bvn,
+            );
 
 
-                    $error = "Providus account Error | $name | $error";
-                    send_notification($error);
 
-                }
+            $databody = json_encode($data);
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://vps.providusbank.com/vps/api/PiPCreateReservedAccountNumber',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $databody,
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/json',
+                    'Accept: application/json',
+                    "Client-Id: $client",
+                    "X-Auth-Signature: $xauth",
+                ),
+            ));
+
+            $var = curl_exec($curl);
+            curl_close($curl);
+            $var = json_decode($var);
+
+            $status = $var->responseCode ?? null;
+            $p_acct_no = $var->account_number ?? null;
+            $p_acct_name = $var->account_name ?? null;
+            $error = $var->responseMessage ?? null;
+
+            $pbank = "PROVIDUS BANK";
+
+            if ($status == 00) {
+
+                $create = new VirtualAccount();
+                $create->v_account_no = $p_acct_no;
+                $create->v_account_name = $p_acct_name;
+                $create->v_bank_name = $pbank;
+                $create->user_id = Auth::id();
+                $create->save();
+
+                $message = "Providus Account Created | $name";
+                send_notification($message);
+            } else {
+
+
+                $error = "Providus account Error | $name | $error";
+                send_notification($error);
+            }
 
 
 
@@ -518,32 +515,12 @@ class LoginController extends Controller
                 'status' => $this->success,
                 'data' => $user,
                 'permission' => $feature,
+                'isNewDevice' => false,
                 'setting' => $setting
 
 
             ], 200);
         }
-
-        
-
-   
-
-    
-
-  
-     
-
-
-
-     
-
-
-
-
-
-
-
-
     }
 
 
@@ -600,6 +577,46 @@ class LoginController extends Controller
                 'message' => 'Email or Password Incorrect'
             ], 500);
         }
+
+
+
+        $get_device_id = Auth::user()->device_id ?? null;
+        $get_deviceIdentifier = Auth::user()->deviceIdentifier ?? null;
+        $get_deviceName = Auth::user()->deviceName ?? null;
+
+        $get_device_id = User::where('device_id', $request->device_id)
+            ->first()->device_id ?? null;
+
+        if ($get_device_id == null ||  $get_deviceIdentifier == null || $get_deviceName == null) {
+
+            $update = User::where('id', Auth::id())
+                ->update([
+                    'device_id' => $request->device_id ?? null,
+                    'deviceIdentifier' => $request->deviceIdentifier ?? null,
+                    'deviceName' => $request->deviceName ?? null,
+                ]);
+        }
+
+        //chk now
+
+        if ($get_deviceIdentifier != null) {
+
+            $current_deviceIdentifier = Auth::user()->deviceIdentifier;
+            $new_deviceIdentifier = $request->deviceIdentifier;
+
+            if ($new_deviceIdentifier != $current_deviceIdentifier) {
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'isNewDevice' => true,
+                    'message' => 'New device detected, login with the old device or switch to this device',
+
+                ], 500);
+            }
+        }
+
+
 
 
         if (Auth::user()->status == 5) {
@@ -693,6 +710,7 @@ class LoginController extends Controller
             'status' => $this->success,
             'data' => $user,
             'permission' => $feature,
+            'isNewDevice' => false,
             'setting' => $setting
 
 
@@ -717,4 +735,31 @@ class LoginController extends Controller
             'message' => "Successfully logged out"
         ], 200);
     }
+
+
+
+    public function update_device_identifier(Request $request)
+    {
+
+        $email = $request->email;
+        $deviceIdentifier = $request->deviceIdentifier;
+        $deviceName = $request->deviceName;
+
+        User::where('email', $email)->update([
+            'deviceIdentifier' => $deviceIdentifier,
+            'deviceName' => $deviceName
+        ]);
+
+        return response()->json([
+            'status' => $this->success,
+            'deviceName' => $deviceName,
+            'message' => "You have successfully added ".$deviceName." as your primary device. Login to continue"
+        ], 200);
+
+
+
+    }
+
+
+
 }

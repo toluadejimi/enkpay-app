@@ -111,6 +111,11 @@ Route::get('account-history', [VirtualaccountController::class, 'virtual_acct_hi
 Route::post('phone-login', [LoginController::class, 'phone_login']);
 Route::post('email-login', [LoginController::class, 'email_login']);
 
+Route::post('update-device', [LoginController::class, 'update_device_identifier']);
+
+
+
+
 //Contact
 Route::get('contact', [ProfileController::class, 'contact']);
 
