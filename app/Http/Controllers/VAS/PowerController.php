@@ -128,7 +128,7 @@ class PowerController extends Controller
 
             if (Auth::user()->status != 2) {
                 
-                $message = Auth::user()->first_name. " ".Auth::user()->last_name. " | Unverified Account trying to buy power";
+                $message = Auth::user()->first_name."  ".Auth::user()->last_name. " | Unverified Account trying to buy power";
                 send_notification($message);
     
                 return response()->json([
