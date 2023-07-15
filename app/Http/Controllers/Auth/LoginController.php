@@ -78,15 +78,33 @@ class LoginController extends Controller
         $get_device_id = User::where('device_id', $request->device_id)
             ->first()->device_id ?? null;
 
-        if ($get_device_id == null ||  $get_deviceIdentifier == null || $get_deviceName == null) {
+        if ($get_device_id == null) {
 
             $update = User::where('id', Auth::id())
                 ->update([
                     'device_id' => $request->device_id ?? null,
-                    'deviceIdentifier' => $request->deviceIdentifier ?? null,
+                ]);
+        }
+
+        if ($get_deviceName == null) {
+
+            $update = User::where('id', Auth::id())
+                ->update([
                     'deviceName' => $request->deviceName ?? null,
                 ]);
         }
+
+        if ($get_deviceIdentifier == null) {
+
+            $update = User::where('id', Auth::id())
+                ->update([
+                    'deviceIdentifier' => $request->deviceIdentifier ?? null,
+                ]);
+        }
+
+
+
+
 
         //chk now
 
