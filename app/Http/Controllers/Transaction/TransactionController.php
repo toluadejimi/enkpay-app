@@ -225,6 +225,7 @@ class TransactionController extends Controller
                 $debited_amount = $transfer_charges + $amount;
 
                 if ($wallet == 'main_account') {
+
                     User::where('id', Auth::id())->decrement('main_wallet', $debited_amount);
                 } else {
                     User::where('id', Auth::id())->decrement('bonus_wallet', $debited_amount);
@@ -241,12 +242,11 @@ class TransactionController extends Controller
                 if ($status == 200) {
 
                     //Debit
-                $debited_amount = $transfer_charges + $amount;
 
                 if ($wallet == 'main_account') {
-                    User::where('id', Auth::id())->decrement('main_wallet', $debited_amount);
+                    User::where('id', Auth::id())->decrement('main_wallet', $amoutCharges);
                 } else {
-                    User::where('id', Auth::id())->decrement('bonus_wallet', $debited_amount);
+                    User::where('id', Auth::id())->decrement('bonus_wallet', $amoutCharges);
                 }
 
 
@@ -260,7 +260,7 @@ class TransactionController extends Controller
                     $trasnaction->main_type = "Transfer";
                     $trasnaction->transaction_type = "BankTransfer";
                     $trasnaction->title = "Bank Transfer";
-                    $trasnaction->debit = $debited_amount;
+                    $trasnaction->debit = $amoutCharges;
                     $trasnaction->amount = $amount;
                     $trasnaction->note = "BANK TRANSFER TO | $receiver_name | $destinationAccountNumber | $bank_name  ";
                     $trasnaction->fee = 0;
@@ -275,7 +275,7 @@ class TransactionController extends Controller
                     $trasnaction = new PendingTransaction();
                     $trasnaction->user_id = Auth::id();
                     $trasnaction->ref_trans_id = $trans_id;
-                    $trasnaction->debit = $debited_amount;
+                    $trasnaction->debit = $amoutCharges;
                     $trasnaction->amount = $amount;
                     $trasnaction->bank_code = $amount;
                     $trasnaction->bank_code = $destinationBankCode;
@@ -294,7 +294,7 @@ class TransactionController extends Controller
                     $trasnaction->main_type = "Transfer";
                     $trasnaction->transaction_type = "BankTransfer";
                     $trasnaction->title = "Bank Transfer";
-                    $trasnaction->debit = $debited_amount;
+                    $trasnaction->debit = $amoutCharges;
                     $trasnaction->amount = $amount;
                     $trasnaction->note = "BANK TRANSFER TO | $receiver_name | $destinationAccountNumber | $bank_name  ";
                     $trasnaction->bank_code = $destinationBankCode;
