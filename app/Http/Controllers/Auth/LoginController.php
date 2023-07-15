@@ -117,9 +117,12 @@ class LoginController extends Controller
 
                 $message = Auth::user()->first_name. " ".Auth::user()->last_name. " trying to login  on another device";
                 send_notification($message);
+
+                $user = Auth()->user();
                 return response()->json([
 
                     'status' => $this->failed,
+                    'data' => $user,
                     'isNewDevice' => true,
                     'message' => 'New device detected, login with the old device or switch to this device',
 
@@ -597,8 +600,6 @@ class LoginController extends Controller
             ], 500);
         }
 
-
-
         $get_device_id = Auth::user()->device_id ?? null;
         $get_deviceIdentifier = Auth::user()->deviceIdentifier ?? null;
         $get_deviceName = Auth::user()->deviceName ?? null;
@@ -606,17 +607,29 @@ class LoginController extends Controller
         $get_device_id = User::where('device_id', $request->device_id)
             ->first()->device_id ?? null;
 
-        if ($get_device_id == null ||  $get_deviceIdentifier == null || $get_deviceName == null) {
+        if ($get_device_id == null) {
 
             $update = User::where('id', Auth::id())
                 ->update([
                     'device_id' => $request->device_id ?? null,
-                    'deviceIdentifier' => $request->deviceIdentifier ?? null,
+                ]);
+        }
+
+        if ($get_deviceName == null) {
+
+            $update = User::where('id', Auth::id())
+                ->update([
                     'deviceName' => $request->deviceName ?? null,
                 ]);
         }
 
-        //chk now
+        if ($get_deviceIdentifier == null) {
+
+            $update = User::where('id', Auth::id())
+                ->update([
+                    'deviceIdentifier' => $request->deviceIdentifier ?? null,
+                ]);
+        }
 
         if ($get_deviceIdentifier != null) {
 
@@ -625,17 +638,20 @@ class LoginController extends Controller
 
             if ($new_deviceIdentifier != $current_deviceIdentifier) {
 
+                $message = Auth::user()->first_name. " ".Auth::user()->last_name. " trying to login  on another device";
+                send_notification($message);
+
+                $user = Auth()->user();
                 return response()->json([
 
                     'status' => $this->failed,
+                    'data' => $user,
                     'isNewDevice' => true,
                     'message' => 'New device detected, login with the old device or switch to this device',
 
                 ], 500);
             }
         }
-
-
 
 
         if (Auth::user()->status == 5) {
