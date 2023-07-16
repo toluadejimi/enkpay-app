@@ -852,6 +852,9 @@ class RegisterationController extends Controller
         }
     }
 
+
+ 
+
     public function register(Request $request)
     {
 

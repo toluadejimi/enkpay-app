@@ -115,7 +115,7 @@ class LoginController extends Controller
 
             if ($new_deviceIdentifier != $current_deviceIdentifier) {
 
-                $message = Auth::user()->first_name. " ".Auth::user()->last_name. " trying to login  on another device";
+                $message = Auth::user()->first_name . " " . Auth::user()->last_name . " trying to login  on another device";
                 send_notification($message);
 
                 $user = Auth()->user();
@@ -638,7 +638,7 @@ class LoginController extends Controller
 
             if ($new_deviceIdentifier != $current_deviceIdentifier) {
 
-                $message = Auth::user()->first_name. " ".Auth::user()->last_name. " trying to login  on another device";
+                $message = Auth::user()->first_name . " " . Auth::user()->last_name . " trying to login  on another device";
                 send_notification($message);
 
                 $user = Auth()->user();
@@ -779,22 +779,42 @@ class LoginController extends Controller
         $email = $request->email;
         $deviceIdentifier = $request->deviceIdentifier;
         $deviceName = $request->deviceName;
+        $code = $request->code;
 
-        User::where('email', $email)->update([
-            'deviceIdentifier' => $deviceIdentifier,
-            'deviceName' => $deviceName
-        ]);
+        if($code == null){
+        return response()->json([
+            'status' => $this->failed,
+            'message' => 'Code can not be empty',
+        ], 500);
+        }
+
+
+        if($email == null){
+            return response()->json([
+                'status' => $this->failed,
+                'message' => 'Email can not be empty',
+            ], 500);
+        }
+
+        $get_code = User::where('email', $email)->first()->sms_code ?? null;
+
+        if ($code == $get_code) {
+            $update = User::where('email', $email)
+                ->update([
+                    'deviceIdentifier' => $deviceIdentifier,
+                    'deviceName' => $deviceName
+                ]);
+            return response()->json([
+                'status' => $this->success,
+                'deviceName' => $deviceName,
+                'message' => "You have successfully added " . $deviceName . " as your primary device. Login to continue"
+            ], 200);
+        }
 
         return response()->json([
-            'status' => $this->success,
-            'deviceName' => $deviceName,
-            'message' => "You have successfully added ".$deviceName." as your primary device. Login to continue"
-        ], 200);
-
-
+            'status' => $this->failed,
+            'message' => 'Invalid OTP code, try again',
+        ], 500);
 
     }
-
-
-
 }
