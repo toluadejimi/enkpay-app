@@ -271,7 +271,7 @@ class AirtimeController extends Controller
             return response()->json([
 
                 'status' => $this->failed,
-                'message' => "Service unavailable please try again later, NGN $amount has been refunded back to your wallet",
+                'message' => "Service unavailable please try again later, \n\n NGN $amount has been refunded back to your wallet",
 
             ], 200);
 
