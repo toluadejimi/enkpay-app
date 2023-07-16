@@ -7,6 +7,7 @@ use App\Models\Contact;
 use App\Models\DeletedUser;
 use App\Models\ErrandKey;
 use App\Models\User;
+use App\Models\Verification;
 use Illuminate\Http\Request;
 use App\Models\VirtualAccount;
 use App\Models\Terminal;
@@ -556,6 +557,14 @@ class ProfileController extends Controller
 
 
             $is_identification_verified = Auth::user()->is_identification_verified;
+            $ver = new Verification();
+            $ver->name = Auth::user()->first_name. " ".Auth::user()->last_name;
+            $ver->phone = Auth::user()->phone ?? null;
+            $ver->phone = Auth::user()->email ?? null;
+            $ver->user_id = Auth::user()->id ?? null;
+            $ver->save();
+
+
 
             if ($is_identification_verified == 2) {
 
