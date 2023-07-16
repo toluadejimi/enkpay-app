@@ -158,6 +158,14 @@ class AirtimeController extends Controller
 
             }
 
+
+            $name = Auth::user()->first_name." ".Auth::user()->last_name;
+            $message = $name. " Wants to buy recharge card | NGN". $amount. " | " .$phone;
+            send_error($message);
+
+
+
+
             $curl = curl_init();
 
             curl_setopt_array($curl, array(
@@ -257,6 +265,8 @@ class AirtimeController extends Controller
             }
 
             send_error($message);
+
+            User::where('id', Auth::id())->increment('main_wallet', $amount);
 
             return response()->json([
 
