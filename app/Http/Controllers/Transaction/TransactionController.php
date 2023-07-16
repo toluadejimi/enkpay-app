@@ -331,11 +331,10 @@ class TransactionController extends Controller
                     }
 
 
-
+                    $wallet = Auth::user()->main_wallet;
                     $name = Auth::user()->first_name . " " . Auth::user()->last_name;
-
                     $ip = $request->ip();
-                    $message = $name . "| Request to transfer NGN " . $amount . " | " . $bank_name . " | " . $destinationAccountNumber;
+                    $message = $name . "| Request to transfer NGN " . $amount . " | " . $bank_name . " | " . $destinationAccountNumber ." User balance | $wallet ";
                     $result = "Message========> " . $message . "\n\nIP========> " . $ip;
                     send_notification($result);
 
@@ -1121,6 +1120,15 @@ class TransactionController extends Controller
                         'bonus_wallet' => $debit,
                     ]);
             }
+
+
+            $wallet = Auth::user()->main_wallet;
+            $name = Auth::user()->first_name . " " . Auth::user()->last_name;
+            $ip = $request->ip();
+            $message = $name . "| Request to transfer NGN " . $amount . " | " . $bank_code . " | " . $destinationAccountNumber ." balance | $wallet ";
+            $result = "Message========> " . $message . "\n\nIP========> " . $ip;
+            send_notification($result);
+
 
             $curl = curl_init();
             $data = array(

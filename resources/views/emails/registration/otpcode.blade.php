@@ -46,7 +46,7 @@
     <td style="padding: 18px 0px 18px 0px; line-height: 22px; text-align: inherit;" valign="top" bgcolor="" height="100%">
     <div>
     <h3 style="text-align: center;">Your ENKPAY Verification Code:</h3>
-    <h1 style="text-align: center; font-family: arial; color: #000000; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal;">{{ $data1["sms_code"] }}</h1>
+    <h1 style="text-align: center; font-family: arial; color: #000000; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal;">{{ $data1["sms_code"] ?? $sms_code }}</h1>
     <div>&nbsp;</div>
     </div>
     </td>

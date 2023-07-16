@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\State;
 use App\Models\StateLga;
 use App\Models\User;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -273,23 +274,27 @@ class RegisterationController extends Controller
 
                 $token = $user->createToken('API Token')->accessToken;
 
-                $data = array(
-                    'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
-                    'subject' => "One Time Password",
-                    'toreceiver' => $email,
-                    'sms_code' => $sms_code,
-                );
+                
 
-                Mail::send('emails.registration.otpcode', ["data1" => $data], function ($message) use ($data) {
-                    $message->from($data['fromsender']);
-                    $message->to($data['toreceiver']);
-                    $message->subject($data['subject']);
-                });
+                // $data = array(
+                //     'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                //     'subject' => "One Time Password",
+                //     'toreceiver' => $email,
+                //     'sms_code' => $sms_code,
+                // );
 
-                return response()->json([
-                    'status' => $this->success,
-                    'message' => "OTP Code has been sent succesfully to $email",
-                ], 200);
+                // Mail::send('emails.registration.otpcode', ["data1" => $data], function ($message) use ($data) {
+                //     $message->from($data['fromsender']);
+                //     $message->to($data['toreceiver']);
+                //     $message->subject($data['subject']);
+                // });
+
+                // return response()->json([
+                //     'status' => $this->success,
+                //     'message' => "OTP Code has been sent succesfully to $email",
+                // ], 200);
+
+                
 
             }
 
@@ -391,23 +396,79 @@ class RegisterationController extends Controller
                         'email' => $email,
                     ]);
 
-                $data = array(
-                    'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
-                    'subject' => "One Time Password",
-                    'toreceiver' => $email,
-                    'sms_code' => $sms_code,
-                );
+                // $data = array(
+                //     'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                //     'subject' => "One Time Password",
+                //     'toreceiver' => $email,
+                //     'sms_code' => $sms_code,
+                // );
 
-                Mail::send('emails.registration.otpcode', ["data1" => $data], function ($message) use ($data) {
-                    $message->from($data['fromsender']);
-                    $message->to($data['toreceiver']);
-                    $message->subject($data['subject']);
-                });
+                // Mail::send('emails.registration.otpcode', ["data1" => $data], function ($message) use ($data) {
+                //     $message->from($data['fromsender']);
+                //     $message->to($data['toreceiver']);
+                //     $message->subject($data['subject']);
+                // });
 
-                return response()->json([
-                    'status' => $this->success,
-                    'message' => "OTP Code has been sent succesfully to $email",
-                ], 200);
+                // return response()->json([
+                //     'status' => $this->success,
+                //     'message' => "OTP Code has been sent succesfully to $email",
+                // ], 200);
+
+                $api_key = env('EMAILKEY');
+
+                $from = env('FROM_API');
+    
+                $email = $request->email;
+    
+                $sms_code = random_int(1000, 9999);
+    
+                $check_email = User::where('email', $email)->first()->email ?? null;
+    
+                if ($check_email == $email) {
+    
+                    $update_code = User::where('email', $email)
+                        ->update([
+                            'sms_code' => $sms_code,
+                        ]);
+
+    
+    
+                    $client = new Client([
+                        'base_uri' => 'https://api.elasticemail.com',
+                    ]);
+            
+                    // The response to get
+                    $res = $client->request('GET', '/v2/email/send', [
+                        'query' => [
+            
+                            'apikey' => "$api_key",
+                            'from' => "$from",
+                            'fromName' => 'ENKPAY',
+                            'sender' => "$email",
+                            'senderName' => 'ENKPAY',
+                            'subject' => 'Verification Code',
+                            'to' => "$email",
+                            'bodyHtml' => view('emails.registration.otpcode', compact('sms_code'))->render(),
+                            'encodingType' => 0,
+            
+                        ],
+                    ]);
+            
+                    $body = $res->getBody();
+                    $array_body = json_decode($body);
+    
+                    return response()->json([
+                        'status' => $this->success,
+                        'message' => "OTP Code has been sent succesfully to $email",
+                    ], 200);
+    
+                } else {
+    
+                    return response()->json([
+                        'status' => $this->failed,
+                        'message' => 'Email could not be found on Enkpay',
+                    ], 500);
+                }
 
             }
 
@@ -418,23 +479,80 @@ class RegisterationController extends Controller
                         'sms_code' => $sms_code,
                     ]);
 
-                $data = array(
-                    'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
-                    'subject' => "One Time Password",
-                    'toreceiver' => $email,
-                    'sms_code' => $sms_code,
-                );
+                // $data = array(
+                //     'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                //     'subject' => "One Time Password",
+                //     'toreceiver' => $email,
+                //     'sms_code' => $sms_code,
+                // );
 
-                Mail::send('emails.registration.otpcode', ["data1" => $data], function ($message) use ($data) {
-                    $message->from($data['fromsender']);
-                    $message->to($data['toreceiver']);
-                    $message->subject($data['subject']);
-                });
+                // Mail::send('emails.registration.otpcode', ["data1" => $data], function ($message) use ($data) {
+                //     $message->from($data['fromsender']);
+                //     $message->to($data['toreceiver']);
+                //     $message->subject($data['subject']);
+                // });
 
-                return response()->json([
-                    'status' => $this->success,
-                    'message' => 'OTP Code has been sent succesfully',
-                ], 200);
+                // return response()->json([
+                //     'status' => $this->success,
+                //     'message' => 'OTP Code has been sent succesfully',
+                // ], 200);
+
+
+                $api_key = env('EMAILKEY');
+
+                $from = env('FROM_API');
+    
+                $email = $request->email;
+    
+                $sms_code = random_int(1000, 9999);
+    
+                $check_email = User::where('email', $email)->first()->email ?? null;
+    
+                if ($check_email == $email) {
+    
+                    $update_code = User::where('email', $email)
+                        ->update([
+                            'sms_code' => $sms_code,
+                        ]);
+
+    
+    
+                    $client = new Client([
+                        'base_uri' => 'https://api.elasticemail.com',
+                    ]);
+            
+                    // The response to get
+                    $res = $client->request('GET', '/v2/email/send', [
+                        'query' => [
+            
+                            'apikey' => "$api_key",
+                            'from' => "$from",
+                            'fromName' => 'ENKPAY',
+                            'sender' => "$email",
+                            'senderName' => 'ENKPAY',
+                            'subject' => 'Verification Code',
+                            'to' => "$email",
+                            'bodyHtml' => view('emails.registration.otpcode', compact('sms_code'))->render(),
+                            'encodingType' => 0,
+            
+                        ],
+                    ]);
+            
+                    $body = $res->getBody();
+                    $array_body = json_decode($body);
+    
+                    return response()->json([
+                        'status' => $this->success,
+                        'message' => "OTP Code has been sent succesfully to $email",
+                    ], 200);
+    
+                } else {
+    
+                    return response()->json([
+                        'status' => $this->failed,
+                        'message' => 'Email could not be found on Enkpay',
+                    ], 500);
+                }
 
             }
 
@@ -609,7 +727,14 @@ class RegisterationController extends Controller
     public function resend_email_otp(Request $request)
     {
 
+        
+
+
         try {
+
+            $api_key = env('EMAILKEY');
+
+            $from = env('FROM_API');
 
             $email = $request->email;
 
@@ -624,18 +749,43 @@ class RegisterationController extends Controller
                         'sms_code' => $sms_code,
                     ]);
 
-                $data = array(
-                    'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
-                    'subject' => "One Time Password",
-                    'toreceiver' => $email,
-                    'sms_code' => $sms_code,
-                );
+                // $data = array(
+                //     'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                //     'subject' => "One Time Password",
+                //     'toreceiver' => $email,
+                //     'sms_code' => $sms_code,
+                // );
 
-                Mail::send('emails.registration.otpcode', ["data1" => $data], function ($message) use ($data) {
-                    $message->from($data['fromsender']);
-                    $message->to($data['toreceiver']);
-                    $message->subject($data['subject']);
-                });
+                // Mail::send('emails.registration.otpcode', ["data1" => $data], function ($message) use ($data) {
+                //     $message->from($data['fromsender']);
+                //     $message->to($data['toreceiver']);
+                //     $message->subject($data['subject']);
+                // });
+
+
+                $client = new Client([
+                    'base_uri' => 'https://api.elasticemail.com',
+                ]);
+        
+                // The response to get
+                $res = $client->request('GET', '/v2/email/send', [
+                    'query' => [
+        
+                        'apikey' => "$api_key",
+                        'from' => "$from",
+                        'fromName' => 'ENKPAY',
+                        'sender' => "$email",
+                        'senderName' => 'ENKPAY',
+                        'subject' => 'Verification Code',
+                        'to' => "$email",
+                        'bodyHtml' => view('emails.registration.otpcode', compact('sms_code'))->render(),
+                        'encodingType' => 0,
+        
+                    ],
+                ]);
+        
+                $body = $res->getBody();
+                $array_body = json_decode($body);
 
                 return response()->json([
                     'status' => $this->success,
@@ -646,7 +796,7 @@ class RegisterationController extends Controller
 
                 return response()->json([
                     'status' => $this->failed,
-                    'message' => 'Email cound not be found on Enkpay',
+                    'message' => 'Email could not be found on Enkpay',
                 ], 500);
             }
 
