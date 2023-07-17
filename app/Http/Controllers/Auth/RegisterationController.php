@@ -541,7 +541,6 @@ class RegisterationController extends Controller
                     $body = $res->getBody();
                     $array_body = json_decode($body);
 
-                    dd($array_body);
 
                     return response()->json([
                         'status' => $this->success,
