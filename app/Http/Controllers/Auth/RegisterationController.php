@@ -522,7 +522,7 @@ class RegisterationController extends Controller
                     ]);
 
                     // The response to get
-                    $res = $client->request('POST', '/v2/email/send', [
+                    $res = $client->request('GET', '/v2/email/send', [
                         'query' => [
 
                             'apikey' => "$api_key",
