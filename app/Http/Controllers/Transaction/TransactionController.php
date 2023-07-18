@@ -2902,6 +2902,7 @@ class TransactionController extends Controller
 
                     return response()->json([
                         'status' => false,
+                        'e_ref' => $TransactionReference,
                         'message' => 'Tranasaction not found',
                     ], 500);
                 
