@@ -2893,7 +2893,6 @@ class TransactionController extends Controller
 
 
 
-            if ($TransactionType == 'FundTransfer') {
 
                 //check transaction
                 $e_ref = Transaction::where('e_ref', $TransactionReference)
@@ -2924,8 +2923,6 @@ class TransactionController extends Controller
                 }
 
                 //update Transactions
-
-            }
 
             $amount4 = number_format($Amount, 2);
             $message = "NGN $amount4 left pool Account by  $full_name";
