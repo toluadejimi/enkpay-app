@@ -2882,6 +2882,15 @@ class TransactionController extends Controller
 
 
 
+            $status = Transaction::where('e_ref', $TransactionReference)->first()->status ?? null;
+
+            if($status == 1){
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Tranasaction alredy confimed',
+                ], 500);
+            }
+
 
 
             if ($TransactionType == 'FundTransfer') {
@@ -2892,26 +2901,15 @@ class TransactionController extends Controller
 
                 if ($e_ref !== null) {
 
-                    $status = Transaction::where('e_ref', $TransactionReference)->first()->status;
-
-                    if($status == 1){
-
-                        return response()->json([
-                            'status' => false,
-                            'message' => 'Tranasaction alredy confimed',
-                        ], 500);
-
-                    }
 
                     Transaction::where('e_ref', $TransactionReference)
-                        ->where('status', 0)
                         ->update([
+                            'status' => 1,
                             'note' => "EP Transfer | $DestinationAccountName | $DestinationBankName ",
                             'fee' => $Fee,
                             'receiver_name' => $DestinationAccountName,
                             'receiver_account_no' => $DestinationAccountNumber,
                             'receiver_bank' => $DestinationBankName,
-                            'status' => 1,
                         ]);
 
                     $amount4 = number_format($Amount, 2);
