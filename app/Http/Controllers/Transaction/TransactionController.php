@@ -2896,7 +2896,7 @@ class TransactionController extends Controller
 
                 //check transaction
                 $e_ref = Transaction::where('e_ref', $TransactionReference)
-                    ->first()->serial_no ?? null;
+                    ->first()->TransactionReference ?? null;
 
                 if ($e_ref == null) {
 
