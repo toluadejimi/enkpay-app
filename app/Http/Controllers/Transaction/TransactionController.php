@@ -2892,6 +2892,17 @@ class TransactionController extends Controller
 
                 if ($e_ref !== null) {
 
+                    $status = Transaction::where('e_ref', $TransactionReference)->first()->status;
+
+                    if($status == 1){
+
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'Tranasaction alredy confimed',
+                        ], 500);
+
+                    }
+
                     Transaction::where('e_ref', $TransactionReference)
                         ->where('status', 0)
                         ->update([
