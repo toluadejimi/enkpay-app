@@ -2916,7 +2916,7 @@ class TransactionController extends Controller
                             'receiver_account_no' => $DestinationAccountNumber,
                             'receiver_bank' => $DestinationBankName,
                         ]);
-                }
+                
 
                 //update Transactions
 
@@ -2930,10 +2930,6 @@ class TransactionController extends Controller
                 'message' => 'Tranasaction Successsfull',
             ], 200);
         }
-
-        // } catch (\Exception$th) {
-        //     return $th->getMessage();
-        // }
 
 
 
