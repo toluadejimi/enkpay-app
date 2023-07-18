@@ -2927,7 +2927,6 @@ class TransactionController extends Controller
 
             return response()->json([
                 'status' => true,
-                'update' => $update,
                 'message' => 'Tranasaction Successsfull',
             ], 200);
         }
