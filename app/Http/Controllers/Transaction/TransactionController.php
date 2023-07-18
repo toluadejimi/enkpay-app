@@ -2898,8 +2898,14 @@ class TransactionController extends Controller
                 $e_ref = Transaction::where('e_ref', $TransactionReference)
                     ->first()->serial_no ?? null;
 
-                if ($e_ref != null) {
+                if ($e_ref == null) {
 
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Tranasaction not found',
+                    ], 500);
+                
+                }
 
                    $update =  Transaction::where('e_ref', $TransactionReference)
                         ->update([
@@ -2910,16 +2916,6 @@ class TransactionController extends Controller
                             'receiver_account_no' => $DestinationAccountNumber,
                             'receiver_bank' => $DestinationBankName,
                         ]);
-
-                    $amount4 = number_format($Amount, 2);
-                    $message = "NGN $amount4 left pool Account by  $full_name";
-                    send_notification($message);
-
-                    return response()->json([
-                        'status' => true,
-                        'update' => $update,
-                        'message' => 'Tranasaction Successsfull',
-                    ], 200);
                 }
 
                 //update Transactions
@@ -2930,6 +2926,7 @@ class TransactionController extends Controller
 
             return response()->json([
                 'status' => true,
+                'update' => $update,
                 'message' => 'Tranasaction Successsfull',
             ], 200);
         }
