@@ -2902,7 +2902,7 @@ class TransactionController extends Controller
                 if ($e_ref !== null) {
 
 
-                    Transaction::where('e_ref', $TransactionReference)
+                   $update =  Transaction::where('e_ref', $TransactionReference)
                         ->update([
                             'status' => 1,
                             'note' => "EP Transfer | $DestinationAccountName | $DestinationBankName ",
@@ -2918,6 +2918,7 @@ class TransactionController extends Controller
 
                     return response()->json([
                         'status' => true,
+                        'update' => $update,
                         'message' => 'Tranasaction Successsfull',
                     ], 200);
                 }
