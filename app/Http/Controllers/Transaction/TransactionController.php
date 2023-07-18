@@ -2893,7 +2893,7 @@ class TransactionController extends Controller
                 if ($e_ref !== null) {
 
                     Transaction::where('e_ref', $TransactionReference)
-                        ->where('status', 0)->where('amount', $Amount)
+                        ->where('status', 0)
                         ->update([
                             'note' => "EP Transfer | $DestinationAccountName | $DestinationBankName ",
                             'fee' => $Fee,
