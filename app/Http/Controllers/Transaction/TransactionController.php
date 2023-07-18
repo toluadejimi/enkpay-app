@@ -117,7 +117,7 @@ class TransactionController extends Controller
                 }
 
                 if (Auth::user()->status != 2) {
-                
+
                 $message = Auth::user()->first_name. " ".Auth::user()->last_name. " | Unverified Account trying withdraw";
                 send_notification($message);
 
@@ -234,7 +234,7 @@ class TransactionController extends Controller
                     ], 500);
                 }
 
-             
+
 
 
 
@@ -249,12 +249,12 @@ class TransactionController extends Controller
                   $debited_amount = $transfer_charges + $amount;
 
                   if ($wallet == 'main_account') {
-  
+
                       User::where('id', Auth::id())->decrement('main_wallet', $debited_amount);
                   } else {
                       User::where('id', Auth::id())->decrement('bonus_wallet', $debited_amount);
                   }
-  
+
 
                     $balance = User::where('id', Auth::id())->first()->main_wallet;
 
@@ -2855,8 +2855,8 @@ class TransactionController extends Controller
 
 
             //Get user ID
-            $user_id = Terminal::where('serial_no', $SerialNumber)
-                ->first()->user_id ?? null;
+            $user_id = Transaction::wherewhere('e_ref', $TransactionReference)
+            ->first()->user_id ?? null;
 
             $f_name = User::where('id', $user_id)
                 ->first()->first_name ?? null;
