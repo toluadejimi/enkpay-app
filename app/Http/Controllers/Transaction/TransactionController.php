@@ -2855,7 +2855,7 @@ class TransactionController extends Controller
 
 
             //Get user ID
-            $user_id = Transaction::wherewhere('e_ref', $TransactionReference)
+            $user_id = Transaction::where('e_ref', $TransactionReference)
             ->first()->user_id ?? null;
 
             $f_name = User::where('id', $user_id)
