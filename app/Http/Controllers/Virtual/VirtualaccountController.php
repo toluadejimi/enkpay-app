@@ -543,23 +543,23 @@ class VirtualaccountController extends Controller
         $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
         send_notification($result);
 
-        if ($ip != $ip2) {
-            $parametersJson = json_encode($request->all());
-            $headers = json_encode($request->headers->all());
-            $message = 'ip does not match';
-            $ip = $request->ip();
-            $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
-            send_notification($result);
+        // if ($ip != $ip2) {
+        //     $parametersJson = json_encode($request->all());
+        //     $headers = json_encode($request->headers->all());
+        //     $message = 'ip does not match';
+        //     $ip = $request->ip();
+        //     $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
+        //     send_notification($result);
 
 
-            return response()->json([
-                'requestSuccessful' => true,
-                'responseMessage' => 'IP does not match',
-                'responseCode' => "02",
-            ], 200);
+        //     return response()->json([
+        //         'requestSuccessful' => true,
+        //         'responseMessage' => 'IP does not match',
+        //         'responseCode' => "02",
+        //     ], 200);
 
 
-        }
+        // }
 
 
         $header = $request->header('X-Auth-Signature');
