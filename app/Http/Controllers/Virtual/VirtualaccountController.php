@@ -30,7 +30,7 @@ class VirtualaccountController extends Controller
         try {
 
 
-           
+
 
             $bvn = user_bvn() ?? null;
             $user_id = User::where('bvn', $bvn)->first()->id ?? null;
@@ -554,7 +554,7 @@ class VirtualaccountController extends Controller
 
             return response()->json([
                 'requestSuccessful' => true,
-                'responseMessage' => 'Key Can not be empty',
+                'responseMessage' => 'IP does not match',
                 'responseCode' => "02",
             ], 200);
 
@@ -724,8 +724,8 @@ class VirtualaccountController extends Controller
                 $removed_comm =  $both_commmission;
             }
 
-            $business_id = VirtualAccount::where('v_account_no', $accountNumber)->first()->business_id ?? null;
 
+            $business_id = VirtualAccount::where('v_account_no', $accountNumber)->first()->business_id ?? null;
 
             if (!empty($business_id) || $business_id != null) {
                 $charge_status = Webkey::where('key', $key)->first()->charge_status ?? null;
