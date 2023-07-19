@@ -170,12 +170,12 @@ class VirtualCardController extends Controller
     {
 
         if (Auth::user()->status != 2) {
-                
+
             $message = Auth::user()->first_name. " ".Auth::user()->last_name. " | Unverified Account trying to func card";
             send_notification($message);
 
             return response()->json([
-                'status' => $this->failed,
+                'status' => false,
                 'message' => 'Please verify your account to enjoy enkpay full service',
             ], 500);
         }
@@ -192,7 +192,7 @@ class VirtualCardController extends Controller
 
         $user_blance = Auth::user()->main_wallet;
 
-    
+
 
         if (Auth::user()->main_wallet < $amount_to_charge ) {
 
@@ -419,12 +419,12 @@ class VirtualCardController extends Controller
     {
 
         if (Auth::user()->status != 2) {
-                
+
             $message = Auth::user()->first_name. " ".Auth::user()->last_name. " | Unverified Account trying to liqidate card";
             send_notification($message);
 
             return response()->json([
-                'status' => $this->failed,
+                'status' => false,
                 'message' => 'Please verify your account to enjoy enkpay full service',
             ], 500);
         }
@@ -543,12 +543,12 @@ class VirtualCardController extends Controller
 
 
         if (Auth::user()->status != 2) {
-                
+
             $message = Auth::user()->first_name. " ".Auth::user()->last_name. " | Unverified Account trying to create card";
             send_notification($message);
 
             return response()->json([
-                'status' => $this->failed,
+                'status' => false,
                 'message' => 'Please verify your account to enjoy enkpay full service',
             ], 500);
         }
