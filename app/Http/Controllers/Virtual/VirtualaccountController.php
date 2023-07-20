@@ -746,29 +746,27 @@ class VirtualaccountController extends Controller
 
                 if ($ip == $ip2) {
 
-                $chk_transaction = WebTransfer::latest()->where([
-                    'v_account_no' => $accountNumber,
-                    'payable_amount' => $transactionAmount,
-                    'status' => 0,
-                ])->first() ?? null;
-
-                if($chk_transaction != null){
-                    $status = WebTransfer::latest()->where([
+                    $chk_transaction = WebTransfer::latest()->where([
                         'v_account_no' => $accountNumber,
                         'payable_amount' => $transactionAmount,
                         'status' => 0,
-                    ])->first()->update(['status' => 1]) ?? null;
-                }
+                    ])->first() ?? null;
 
-                $trans_id = WebTransfer::where('v_account_no', $accountNumber)->where('payable_amount',$transactionAmount)->first()->trans_id ?? null;
-                $message = $trans_id. " | ".$transactionAmount. "| ".$tranRemarks. "| completed";
-                send_notification($message);
+                    if ($chk_transaction != null) {
+                        $status = WebTransfer::latest()->where([
+                            'v_account_no' => $accountNumber,
+                            'payable_amount' => $transactionAmount,
+                            'status' => 0,
+                        ])->first()->update(['status' => 1]) ?? null;
+                    }
 
-                }else{
+                    $trans_id = WebTransfer::where('v_account_no', $accountNumber)->where('payable_amount', $transactionAmount)->first()->trans_id ?? null;
+                    $message = $trans_id . " | " . $transactionAmount . "| " . $tranRemarks . "| completed";
+                    send_notification($message);
+                } else {
 
-                $message = "ERROR  WRONG IP  =>>>>>>>>>" .$request->ip(). "\n\n wrong ip address want to fund";
-                send_notification($message);
-
+                    $message = "ERROR  WRONG IP  =>>>>>>>>>" . $request->ip() . "\n\n wrong ip address want to fund";
+                    send_notification($message);
                 }
 
                 //update Transactions
@@ -811,15 +809,6 @@ class VirtualaccountController extends Controller
 
 
 
-            // $n_cap = Charge::where('title', 'n_cap')->first()->amount;
-
-            // if ($both_commmission > $p_cap) {
-
-            //     $removed_comm =  $n_cap;
-            // } else {
-            //     $removed_comm =  $both_commmission;
-            // }
-
 
             if ($settledAmount > 9999) {
                 $charges_to_remove = 58;
@@ -827,6 +816,13 @@ class VirtualaccountController extends Controller
                 $charges_to_remove = 13;
             }
 
+            if ($settledAmount <= 200) {
+                $charges_to_remove = 0;
+            }
+
+            if ($settledAmount <= 900) {
+                $charges_to_remove = 7;
+            }
 
             $amt_to_credit = $settledAmount - $charges_to_remove;
             $amt1 = $amt_to_credit - 2;
@@ -1025,7 +1021,7 @@ class VirtualaccountController extends Controller
                 $var = json_decode($var);
             }
 
-            $message = "Your Pool account has been credited |  $transactionAmount | from PROVIDUS Virtual account";
+            $message = "Account Funded  NGN |  $transactionAmount | $first_name " . " " . $last_name;
             send_notification($message);
 
             //send to user
