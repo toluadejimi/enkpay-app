@@ -257,6 +257,7 @@ class TransactionController extends Controller
 
 
                     $balance = User::where('id', Auth::id())->first()->main_wallet;
+                    $user_balance = $debited_amount - $balance;
 
                     //update Transactions
                     $trasnaction = new Transaction();
@@ -334,7 +335,7 @@ class TransactionController extends Controller
                     $wallet = Auth::user()->main_wallet;
                     $name = Auth::user()->first_name . " " . Auth::user()->last_name;
                     $ip = $request->ip();
-                    $message = $name . "| Request to transfer NGN " . $amount . " | " . $bank_name . " | " . $destinationAccountNumber ." User balance | $wallet ";
+                    $message = $name . "| Request to transfer NGN " . $amount . " | " . $bank_name . " | " . $destinationAccountNumber ." User balance | $user_balance ";
                     $result = "Message========> " . $message . "\n\nIP========> " . $ip;
                     send_notification($result);
 
@@ -1122,10 +1123,15 @@ class TransactionController extends Controller
             }
 
 
+            $debited_amount = $transfer_charges + $amount;
+
+            $balance = User::where('id', Auth::id())->first()->main_wallet;
+            $user_balance = $debited_amount - $balance;
+
             $wallet = Auth::user()->main_wallet;
             $name = Auth::user()->first_name . " " . Auth::user()->last_name;
             $ip = $request->ip();
-            $message = $name . "| Request to transfer NGN " . $amount . " | " . $bank_code . " | " . $destinationAccountNumber ." balance | $wallet ";
+            $message = $name . "| Request to transfer NGN " . $amount . " | " . $bank_code . " | " . $destinationAccountNumber ." balance | $user_balance  ";
             $result = "Message========> " . $message . "\n\nIP========> " . $ip;
             send_notification($result);
 
@@ -2905,7 +2911,7 @@ class TransactionController extends Controller
                         'e_ref' => $TransactionReference,
                         'message' => 'Tranasaction not found',
                     ], 500);
-                
+
                 }
 
                    $update =  Transaction::where('e_ref', $TransactionReference)
@@ -2917,7 +2923,7 @@ class TransactionController extends Controller
                             'receiver_account_no' => $DestinationAccountNumber,
                             'receiver_bank' => $DestinationBankName,
                         ]);
-                
+
 
                 //update Transactions
 
