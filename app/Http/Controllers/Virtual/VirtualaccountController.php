@@ -816,11 +816,11 @@ class VirtualaccountController extends Controller
                 $charges_to_remove = 13;
             }
 
-            if ($settledAmount <= 200) {
+            if ($settledAmount < 200) {
                 $charges_to_remove = 0;
             }
 
-            if ($settledAmount <= 900) {
+            if ($settledAmount < 900) {
                 $charges_to_remove = 7;
             }
 
