@@ -121,7 +121,7 @@ class TransactionController extends Controller
 
                     $name = Auth::user()->first_name . " " . Auth::user()->last_name;
                     $ip = $request->ip();
-                    $message = $name . "| Double Transaction Detected";
+                    $message = $name . "| Multiple Transaction Detected\n\n Please Log out and Login again";
                     $result = "Message========> " . $message . "\n\nIP========> " . $ip;
                     send_notification($result);
 
