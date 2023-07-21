@@ -74,6 +74,8 @@ class LoginController extends Controller
         $get_device_id = Auth::user()->device_id ?? null;
         $get_deviceIdentifier = Auth::user()->deviceIdentifier ?? null;
         $get_deviceName = Auth::user()->deviceName ?? null;
+        $get_ip = Auth::user()->ip_address ?? null;
+
 
         $get_device_id = User::where('device_id', $request->device_id)
             ->first()->device_id ?? null;
@@ -101,6 +103,18 @@ class LoginController extends Controller
                     'deviceIdentifier' => $request->deviceIdentifier ?? null,
                 ]);
         }
+
+
+        if ($get_ip == null) {
+
+            $update = User::where('id', Auth::id())
+                ->update([
+                    'ip_address' => $request->ip() ?? null,
+                ]);
+        }
+
+
+
 
 
 
@@ -604,6 +618,10 @@ class LoginController extends Controller
         $get_deviceIdentifier = Auth::user()->deviceIdentifier ?? null;
         $get_deviceName = Auth::user()->deviceName ?? null;
 
+        $get_ip = Auth::user()->ip_address ?? null;
+
+     
+
         $get_device_id = User::where('device_id', $request->device_id)
             ->first()->device_id ?? null;
 
@@ -628,6 +646,14 @@ class LoginController extends Controller
             $update = User::where('id', Auth::id())
                 ->update([
                     'deviceIdentifier' => $request->deviceIdentifier ?? null,
+                ]);
+        }
+
+        if ($get_ip == null) {
+
+            $update = User::where('id', Auth::id())
+                ->update([
+                    'ip_address' => $request->ip() ?? null,
                 ]);
         }
 

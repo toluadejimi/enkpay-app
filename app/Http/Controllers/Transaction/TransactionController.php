@@ -34,6 +34,9 @@ class TransactionController extends Controller
 
 
 
+           
+
+
 
             $set = Setting::where('id', 1)->first();
 
@@ -84,9 +87,6 @@ class TransactionController extends Controller
                 }
 
 
-
-
-
                 $wallet = $request->wallet;
                 $amount = $request->amount;
                 $destinationAccountNumber = $request->account_number;
@@ -103,6 +103,35 @@ class TransactionController extends Controller
                 $transfer_charges = Charge::where('title', 'transfer_fee')->first()->amount;
                 $bank_name = VfdBank::select('bankName')->where('code', $destinationBankCode)->first()->bankName ?? null;
                 $amoutCharges = $amount + $transfer_charges;
+
+
+                $ckid = PendingTransaction::where('user_id', Auth::id())->first()->user_id ?? null;
+                if($ckid == Auth::id()){
+                    return response()->json([
+
+                        'status' => $this->failed,
+                        'message' => 'Please wait for some time and try again',
+
+                    ], 500);  
+                }
+
+
+                $ck_ip = User::where('id', Auth::id())->first()->ip_address ?? null;
+                if($ck_ip != $request->ip()){
+
+                    $name = Auth::user()->first_name . " " . Auth::user()->last_name;
+                    $ip = $request->ip();
+                    $message = $name . "| Double Transaction Detected";
+                    $result = "Message========> " . $message . "\n\nIP========> " . $ip;
+                    send_notification($result);
+
+                    return response()->json([
+
+                        'status' => $this->failed,
+                        'message' => 'Double Transaction Detected',
+
+                    ], 500);  
+                }
 
 
                 if (Auth::user()->status == 5) {
@@ -277,6 +306,9 @@ class TransactionController extends Controller
                     $trasnaction->balance = $balance;
                     $trasnaction->status = 0;
                     $trasnaction->save();
+
+
+
 
                     //update Transactions
                     $trasnaction = new PendingTransaction();
@@ -2839,6 +2871,19 @@ class TransactionController extends Controller
         if ($request->ServiceCode == 'FT1') {
 
 
+
+            $ckid = PendingTransaction::where('user_id', Auth::id())->first()->user_id ?? null;
+            if($ckid == Auth::id()){
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'Please wait for some time and try again',
+
+                ], 500);  
+            }
+
+
+
             $StatusCode = $request->StatusCode;
             $StatusDescription = $request->StatusDescription;
             $SerialNumber = $request->SerialNumber;
@@ -2896,6 +2941,9 @@ class TransactionController extends Controller
                     'message' => 'Tranasaction alredy confimed',
                 ], 500);
             }
+
+
+
 
 
 
@@ -3196,6 +3244,7 @@ class TransactionController extends Controller
 
         if ($transaction_type == 'outward' && $serviceCode == 'FT1') {
 
+
             //Get user ID
             $user_id = Terminal::where('serial_no', $SerialNumber)
                 ->first()->user_id ?? null;
@@ -3267,12 +3316,30 @@ class TransactionController extends Controller
                 $trasnaction->transaction_type = "EP TRANSFER";
                 $trasnaction->debit = $amount;
                 $trasnaction->amount = $amount;
-                $trasnaction->title = "EP Transfer";
+                $trasnaction->title = "POS Transfer";
                 $trasnaction->balance = $debit;
                 $trasnaction->main_type = "Transfer";
                 $trasnaction->serial_no = $SerialNumber;
                 $trasnaction->enkPay_Cashout_profit = $enkpayprofit;
                 $trasnaction->save();
+
+
+
+                //pending trnasaction
+                  $trasnaction = new PendingTransaction();
+                  $trasnaction->user_id = $user_id;
+                  $trasnaction->ref_trans_id = $trans_id;
+                  $trasnaction->debit = $debit;
+                  $trasnaction->amount = $amount;
+                  $trasnaction->bank_code = $amount;
+                  $trasnaction->bank_code = "POS TRANSFER";
+                  $trasnaction->enkpay_Cashout_profit = 0;
+                  $trasnaction->receiver_name = "POS TRANSFER";
+                  $trasnaction->receiver_account_no = 0;
+                  $trasnaction->receiver_name = 0;
+                  $trasnaction->status = 0;
+                  $trasnaction->save();
+
 
                 $amount4 = number_format($amount, 2);
                 $message = "NGN $amount4 is about to leave your pool Account by $full_name using EP Transfer";
