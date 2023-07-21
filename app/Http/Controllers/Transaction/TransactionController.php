@@ -121,14 +121,14 @@ class TransactionController extends Controller
 
                     $name = Auth::user()->first_name . " " . Auth::user()->last_name;
                     $ip = $request->ip();
-                    $message = $name . "| Multiple Transaction Detected\n\n Please Log out and Login again";
+                    $message = $name . "| Multiple Transaction Detected Mother fuckers";
                     $result = "Message========> " . $message . "\n\nIP========> " . $ip;
                     send_notification($result);
 
                     return response()->json([
 
                         'status' => $this->failed,
-                        'message' => 'Double Transaction Detected',
+                        'message' => "Multiple Transaction Detected \n\n Please Log out and Login then try again",
 
                     ], 500);  
                 }
