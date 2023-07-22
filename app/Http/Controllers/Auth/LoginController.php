@@ -125,27 +125,28 @@ class LoginController extends Controller
 
         //chk now
 
-        if ($get_deviceIdentifier != null) {
+        // if ($get_deviceIdentifier != null) {
 
-            $current_deviceIdentifier = Auth::user()->deviceIdentifier;
-            $new_deviceIdentifier = $request->deviceIdentifier;
 
-            if ($new_deviceIdentifier != $current_deviceIdentifier) {
+        //     $current_deviceIdentifier = Auth::user()->deviceIdentifier;
+        //     $new_deviceIdentifier = $request->deviceIdentifier;
 
-                $message = Auth::user()->first_name . " " . Auth::user()->last_name . " trying to login  on another device";
-                send_notification($message);
+        //     if ($new_deviceIdentifier != $current_deviceIdentifier) {
 
-                $user = Auth()->user();
-                return response()->json([
+        //         $message = Auth::user()->first_name . " " . Auth::user()->last_name . " trying to login  on another device";
+        //         send_notification($message);
 
-                    'status' => $this->failed,
-                    'data' => $user,
-                    'isNewDevice' => true,
-                    'message' => 'New device detected, login with the old device or switch to this device',
+        //         $user = Auth()->user();
+        //         return response()->json([
 
-                ], 200);
-            }
-        }
+        //             'status' => $this->failed,
+        //             'data' => $user,
+        //             'isNewDevice' => true,
+        //             'message' => 'New device detected, login with the old device or switch to this device',
+
+        //         ], 200);
+        //     }
+        // }
 
 
 
