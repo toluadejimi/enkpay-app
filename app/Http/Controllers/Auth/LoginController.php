@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Models\OauthAccessToken;
 use App\Models\VirtualAccount;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -42,8 +43,6 @@ class LoginController extends Controller
 
 
 
-        // try{
-
 
         $phone = $request->phone;
         $credentials = request(['phone', 'password']);
@@ -68,6 +67,13 @@ class LoginController extends Controller
                 'status' => $this->failed,
                 'message' => 'Phone No or Password Incorrect'
             ], 500);
+        }
+
+
+        $get_token = OauthAccessToken::where('user_id', Auth::id())->first()->user_id ?? null;
+
+        if($get_token != null){
+            OauthAccessToken::where('user_id', Auth::id())->delete();
         }
 
 
@@ -161,6 +167,7 @@ class LoginController extends Controller
 
 
 
+      
 
 
 
@@ -617,6 +624,11 @@ class LoginController extends Controller
 
         $get_ip = Auth::user()->ip_address ?? null;
 
+        $get_token = OauthAccessToken::where('user_id', Auth::id())->first()->user_id ?? null;
+
+        if($get_token != null){
+            OauthAccessToken::where('user_id', Auth::id())->delete();
+        }
      
 
         $get_device_id = User::where('device_id', $request->device_id)

@@ -75,22 +75,7 @@ class CableController extends Controller
 
         try {
 
-            $ck_ip = User::where('id', Auth::id())->first()->ip_address ?? null;
-            if($ck_ip != $request->ip()){
-    
-                $name = Auth::user()->first_name . " " . Auth::user()->last_name;
-                $ip = $request->ip();
-                $message = $name . "| Multiple Transaction Detected Mother fuckers";
-                $result = "Message========> " . $message . "\n\nIP========> " . $ip;
-                send_notification($result);
-    
-                return response()->json([
-    
-                    'status' => $this->failed,
-                    'message' => "Multiple Transaction Detected \n\n Please Log out and Login then try again",
-    
-                ], 500);  
-            }
+   
 
             if (Auth::user()->status != 2) {
                 
