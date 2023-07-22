@@ -649,13 +649,13 @@ class LoginController extends Controller
                 ]);
         }
 
-        if ($get_ip == null) {
+    
 
-            $update = User::where('id', Auth::id())
+               User::where('id', Auth::id())
                 ->update([
                     'ip_address' => $request->ip() ?? null,
                 ]);
-        }
+     
 
         if ($get_deviceIdentifier != null) {
 
