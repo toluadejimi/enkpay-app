@@ -956,22 +956,35 @@ class TransactionController extends Controller
     public function self_cash_out(Request $request)
     {
 
-        $ck_ip = User::where('id', Auth::id())->first()->ip_address ?? null;
-        if($ck_ip != $request->ip()){
 
-            $name = Auth::user()->first_name . " " . Auth::user()->last_name;
-            $ip = $request->ip();
-            $message = $name . "| Multiple Transaction Detected Mother fuckers";
-            $result = "Message========> " . $message . "\n\nIP========> " . $ip;
-            send_notification($result);
+        $ckid = PendingTransaction::where('user_id', Auth::id())->first()->user_id ?? null;
+                if($ckid == Auth::id()){
+                    return response()->json([
 
-            return response()->json([
+                        'status' => $this->failed,
+                        'message' => 'Please wait for some time and try again',
 
-                'status' => $this->failed,
-                'message' => "Multiple Transaction Detected \n\n Please Log out and Login then try again",
-
-            ], 500);  
+                    ], 500);  
         }
+
+
+
+        // $ck_ip = User::where('id', Auth::id())->first()->ip_address ?? null;
+        // if($ck_ip != $request->ip()){
+
+        //     $name = Auth::user()->first_name . " " . Auth::user()->last_name;
+        //     $ip = $request->ip();
+        //     $message = $name . "| Multiple Transaction Detected Mother fuckers";
+        //     $result = "Message========> " . $message . "\n\nIP========> " . $ip;
+        //     send_notification($result);
+
+        //     return response()->json([
+
+        //         'status' => $this->failed,
+        //         'message' => "Multiple Transaction Detected \n\n Please Log out and Login then try again",
+
+        //     ], 500);  
+        // }
 
 
         $set = Setting::where('id', 1)->first();

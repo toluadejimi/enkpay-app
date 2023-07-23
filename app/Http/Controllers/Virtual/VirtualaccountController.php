@@ -543,25 +543,6 @@ class VirtualaccountController extends Controller
         $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
         send_notification($result);
 
-        // if ($ip != $ip2) {
-        //     $parametersJson = json_encode($request->all());
-        //     $headers = json_encode($request->headers->all());
-        //     $message = 'ip does not match';
-        //     $ip = $request->ip();
-        //     $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
-        //     send_notification($result);
-
-
-        //     return response()->json([
-        //         'requestSuccessful' => true,
-        //         'responseMessage' => 'IP does not match',
-        //         'responseCode' => "02",
-        //     ], 200);
-
-
-        // }
-
-
         $header = $request->header('X-Auth-Signature');
 
 
@@ -594,29 +575,14 @@ class VirtualaccountController extends Controller
 
 
         if ($sourceAccountName == 'null' || $sourceAccountName == "null" || $sourceAccountName == null) {
-
             $from = $tranRemarks;
         } else {
-
             $from = $sourceAccountName;
         }
 
-
-
-
-
         $key = env('POKEY');
-
-
         $trans_id = "ENK-" . random_int(100000, 999999);
-
         $verify1 = hash('sha512', $key);
-
-        //dd($verify1, $header);
-
-        //$verify2 = strtoupper($verify1);
-
-        //dd($key, $verify2, $verify1, $header);
 
         if ($verify1 == $header) {
 
@@ -809,23 +775,31 @@ class VirtualaccountController extends Controller
 
 
 
-
-            if ($settledAmount > 9999) {
-                $charges_to_remove = 58;
-            } else {
-                $charges_to_remove = 13;
-            }
-
-            if ($settledAmount < 200) {
+            if ($settledAmount <= 200) {
                 $charges_to_remove = 0;
+                $commission = 0;
+            }elseif($settledAmount < 900){
+                $charges_to_remove = 10;
+                $commission = 2;
+
+            }elseif($settledAmount > 9999) {
+                $charges_to_remove = 58;
+                $commission = 2;
+
+            } else {
+               $charges_to_remove = 10;
+               $commission = 2;
+
             }
 
-            if ($settledAmount < 900) {
-                $charges_to_remove = 7;
-            }
+          
+
+           
+
+           
 
             $amt_to_credit = $settledAmount - $charges_to_remove;
-            $amt1 = $amt_to_credit - 2;
+            $amt1 = $amt_to_credit - $commission;
 
             User::where('id', $user_id)->increment('main_wallet', $amt1);
             User::where('id', 95)->increment('bonus_wallet', 1);
@@ -833,6 +807,9 @@ class VirtualaccountController extends Controller
 
 
             $balance = User::where('id', $user_id)->first()->main_wallet;
+
+            $charge = $charges_to_remove ?? $removed_comm;
+            dd($charges_to_remove, $amt1);
 
             //update Transactions
             $trasnaction = new Transaction();
@@ -843,12 +820,12 @@ class VirtualaccountController extends Controller
             $trasnaction->transaction_type = "VirtualFundWallet";
             $trasnaction->title = "Wallet Funding";
             $trasnaction->main_type = "Transfer";
-            $trasnaction->credit = $amt_to_credit;
+            $trasnaction->credit = $amt1;
             $trasnaction->note = "$from |  NGN $transactionAmount  | Funds Transfer";
             $trasnaction->fee = 0;
             $trasnaction->amount = $transactionAmount;
             $trasnaction->e_charges = $deposit_charges;
-            $trasnaction->enkPay_Cashout_profit = 10;
+            $trasnaction->enkPay_Cashout_profit = $charge;
             $trasnaction->trx_date = $tranDateTime;
             $trasnaction->p_sessionId = $sessionId;
             $trasnaction->trx_time = $tranDateTime;
