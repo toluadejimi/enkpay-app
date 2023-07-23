@@ -809,7 +809,6 @@ class VirtualaccountController extends Controller
             $balance = User::where('id', $user_id)->first()->main_wallet;
 
             $charge = $charges_to_remove ?? $removed_comm;
-            dd($charges_to_remove, $amt1);
 
             //update Transactions
             $trasnaction = new Transaction();
