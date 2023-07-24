@@ -84,6 +84,20 @@ class DeviceOrderController extends Controller
 
 }
 
+
+public function pos_properties(){
+
+
+    return response()->json([
+
+        'status' => true,
+        'status_code' => 200
+
+    ]);
+
+
+}
+
 public function bank_details(){
 
 

@@ -36,6 +36,15 @@ class VirtualaccountController extends Controller
             $user_id = User::where('bvn', $bvn)->first()->id ?? null;
 
 
+            if($bvn == null ){
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => 'Please complete your verification before creating an account',
+                ], 500);
+            }
+           
+
+
             $client = env('CLIENTID');
             $xauth = env('HASHKEY');
 

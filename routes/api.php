@@ -53,6 +53,10 @@ Route::post('register', [RegisterationController::class, 'register']);
 
 
 
+//properties
+Route::get('pos-properties', [DeviceOrderController::class, 'pos_properties']);
+
+
 
 //Device Order
 Route::post('order-device', [DeviceOrderController::class, 'order_device']);
