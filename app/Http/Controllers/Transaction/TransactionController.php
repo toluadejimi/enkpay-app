@@ -119,12 +119,13 @@ class TransactionController extends Controller
 
                 $ckid = PendingTransaction::where('user_id', Auth::id())->first()->user_id ?? null;
                 if($ckid == Auth::id()){
+
+                    
+                    $message = Auth::user()->first_name. " " .Auth::user()->last_name. " | has reached this double endpoint";
+                    send_notification($message);
+
+
                     return response()->json([
-
-
-                        $message = Auth::user()->first_name. " " .Auth::user()->last_name. " | has reached this double endpoint";
-                        send_notification($message);
-
                         'status' => $this->failed,
                         'message' => 'Please wait for some time and try again',
 
@@ -2108,7 +2109,7 @@ class TransactionController extends Controller
 
         try {
 
-            
+
             if (Auth::user()->status == 7) {
 
 
