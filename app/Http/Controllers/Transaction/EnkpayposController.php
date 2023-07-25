@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Transaction;
 
 use App\Http\Controllers\Controller;
+use App\Models\Charge;
+use App\Models\Terminal;
+use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
 

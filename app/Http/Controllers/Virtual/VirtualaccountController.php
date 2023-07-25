@@ -625,7 +625,7 @@ class VirtualaccountController extends Controller
 
             $check_status = User::where('id', $user_id)->first()->status ?? null;
 
-            $VirtualCustomerAccount = User::where('v_account_no', $accountNumber)->first()->v_account_no ?? null;
+            $VirtualCustomerAccount = $accountNumber;
 
             $get_session = Transaction::where('e_ref', $settlementId)->first()->e_ref ?? null;
 
@@ -995,7 +995,7 @@ class VirtualaccountController extends Controller
                     CURLOPT_CUSTOMREQUEST => 'POST',
                     CURLOPT_POSTFIELDS => $post_data,
                     CURLOPT_HTTPHEADER => array(
-                        "epKey: $epKey",
+                        'epKey: ep_live_jFrIZdxqSzAdraLqbvhUfVYs',
                         'Content-Type: application/json',
                     ),
                 ));
