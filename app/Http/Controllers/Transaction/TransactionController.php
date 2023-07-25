@@ -1182,6 +1182,27 @@ class TransactionController extends Controller
             }
 
 
+            if ($amoutCharges > Auth::user()->main_wallet) {
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'Insufficient Funds, fund your account',
+
+                ], 500);
+            }
+
+            if ($amoutCharges > Auth::user()->bonus_wallet) {
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'Insufficient Funds, fund your account',
+
+                ], 500);
+            }
+
+
 
      
 
