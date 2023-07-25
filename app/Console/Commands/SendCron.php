@@ -54,9 +54,9 @@ class SendCron extends Command
 
 
         $trx = PendingTransaction::where('status', 0)
-        ->where('created_at','<', Carbon::now()->subMinutes(1))->first() ?? null;
+        ->where('created_at','<', Carbon::now()->subMinutes(2))->first() ?? null;
 
-        
+
 
         if (!empty($trx) || $trx != null) {
 
@@ -113,7 +113,10 @@ class SendCron extends Command
                 PendingTransaction::where('ref_trans_id', $trx->ref_trans_id)->delete();
 
 
-                $message = "Transaction |  $TransactionReference | has been sent ";
+                $message = "Transaction |  $TransactionReference | NGN $trx->amount | has been sent to VFD ";
+
+
+
                 send_notification($message);
             } else {
 
