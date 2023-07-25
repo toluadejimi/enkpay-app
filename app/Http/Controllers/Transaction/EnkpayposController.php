@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Transaction;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class EnkpayposController extends Controller
@@ -138,15 +139,18 @@ class EnkpayposController extends Controller
                 $trasnaction->save();
             }
 
+            $f_name = User::where('id',$user_id)->first()->first_name ?? null;
+            $l_name = User::where('id',$user_id)->first()->last_name ?? null;
+
             $ip = $request->ip();
             $amount4 = number_format($removed_comission, 2);
-            $message = "NGN $amount4 enter pool Account by $user_id using Card on Terminal";
-            $result = "Service========>" . $ServiceCode . "\n\nRefrence========>" . $TransactionReference . "\n\nSerial No========>" . $SerialNumber . "\n\nDate & Time========>". "\n\nMessage========> " . $message . "\n\nIP========> " . $ip;
+            $result = $f_name." ".$l_name. "| fund NGN ".$amount4. " | using Card POS" . "\n\nIP========> " . $ip;
             send_notification($result);
+
 
             return response()->json([
                 'status' => true,
-                'message' => 'Tranasaction Successsfull',
+                'message' => 'Transaction Successful',
             ], 200);
         // } else {
 

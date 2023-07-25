@@ -120,7 +120,7 @@ class TransactionController extends Controller
                 $ckid = PendingTransaction::where('user_id', Auth::id())->first()->user_id ?? null;
                 if($ckid == Auth::id()){
 
-                    
+
                     $message = Auth::user()->first_name. " " .Auth::user()->last_name. " | has reached this double endpoint";
                     send_notification($message);
 
@@ -2575,10 +2575,12 @@ class TransactionController extends Controller
                     $trasnaction->save();
                 }
 
+                $f_name = User::where('id',$user_id)->first()->first_name ?? null;
+                $l_name = User::where('id',$user_id)->first()->last_name ?? null;
+
                 $ip = $request->ip();
                 $amount4 = number_format($removed_comission, 2);
-                $message = "NGN $amount4 enter pool Account by $user_id using Card on Terminal";
-                $result = "Service========>" . $ServiceCode . "\n\nRefrence========>" . $TransactionReference . "\n\nSerial No========>" . $SerialNumber . "\n\nDate & Time========>" . $TransactionDate . " | " . $TransactionTime . "\n\nMessage========> " . $message . "\n\nIP========> " . $ip;
+                $result = $f_name." ".$l_name. "| fund NGN ".$amount4. " | using Card POS" . "\n\nIP========> " . $ip;
                 send_notification($result);
 
                 return response()->json([
@@ -2729,11 +2731,16 @@ class TransactionController extends Controller
                     $trasnaction->save();
                 }
 
+
+                
+                $f_name = User::where('id',$user_id)->first()->first_name ?? null;
+                $l_name = User::where('id',$user_id)->first()->last_name ?? null;
+
                 $ip = $request->ip();
                 $amount4 = number_format($removed_comission, 2);
-                $message = "NGN $amount4 enter pool Account by $user_id using Card on Terminal";
-                $result = "Service========>" . $ServiceCode . "\n\nRefrence========>" . $TransactionReference . "\n\nSerial No========>" . $SerialNumber . "\n\nDate & Time========>" . $TransactionDate . " | " . $TransactionTime . "\n\nMessage========> " . $message . "\n\nIP========> " . $ip;
+                $result = $f_name." ".$l_name. "| fund NGN ".$amount4. " | using Card POS" . "\n\nIP========> " . $ip;
                 send_notification($result);
+
 
                 return response()->json([
                     'status' => true,
