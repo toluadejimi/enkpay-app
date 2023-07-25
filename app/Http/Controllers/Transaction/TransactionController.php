@@ -974,6 +974,11 @@ class TransactionController extends Controller
 
 
 
+    
+
+
+       
+
 
         $pos_trx = Feature::where('id', 1)->first()->pos_transfer ?? null;
         if($pos_trx == 0){
@@ -1105,6 +1110,48 @@ class TransactionController extends Controller
 
             $amoutCharges = $amount + $transfer_charges;
 
+            if ($wallet == 'main_account') {
+                $user_wallet_banlance = main_account();
+            } else {
+                $user_wallet_banlance = bonus_account();
+            }
+
+
+            if ($amoutCharges > $user_wallet_banlance) {
+
+                return response()->json([
+    
+                    'status' => $this->failed,
+                    'message' => 'Insufficient Funds, fund your account',
+    
+                ], 500);
+            }
+    
+    
+            if ($amoutCharges > Auth::user()->main_wallet) {
+    
+                return response()->json([
+    
+                    'status' => $this->failed,
+                    'message' => 'Insufficient Funds, fund your account',
+    
+                ], 500);
+            }
+
+
+            if ($amoutCharges > Auth::user()->bonus_wallet) {
+
+                return response()->json([
+    
+                    'status' => $this->failed,
+                    'message' => 'Insufficient Funds, fund your account',
+    
+                ], 500);
+            }
+    
+
+
+
 
             $user_email = user_email();
             $first_name = first_name();
@@ -1133,11 +1180,7 @@ class TransactionController extends Controller
                 ], 500);
             }
 
-            if ($wallet == 'main_account') {
-                $user_wallet_banlance = main_account();
-            } else {
-                $user_wallet_banlance = bonus_account();
-            }
+           
 
             $user_pin = Auth()->user()->pin;
 
