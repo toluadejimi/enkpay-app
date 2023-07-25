@@ -24,13 +24,23 @@ class AirtimeController extends Controller
         try {
 
 
-           
+            if (Auth::user()->status == 7) {
+
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => "You can not make any transaction at the moment, \n\n Please contact  support",
+
+                ], 500);
+            }
+
 
             if (Auth::user()->status != 2) {
-                
+
                 $message = Auth::user()->first_name. " ".Auth::user()->last_name. " | Unverified Account trying to buy airtime";
                 send_notification($message);
-    
+
                 return response()->json([
                     'status' => $this->failed,
                     'message' => 'Please verify your account to enjoy enkpay full service',

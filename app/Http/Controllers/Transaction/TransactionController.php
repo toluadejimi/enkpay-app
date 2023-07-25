@@ -451,7 +451,7 @@ class TransactionController extends Controller
                 $amoutCharges = $amount + $transfer_charges;
 
 
-                if (Auth::user()->status == 5) {
+                if (Auth::user()->status == 7) {
 
 
                     return response()->json([
@@ -973,6 +973,7 @@ class TransactionController extends Controller
 
 
 
+
         $pos_trx = Feature::where('id', 1)->first()->pos_transfer ?? null;
         if($pos_trx == 0){
 
@@ -1003,6 +1004,18 @@ class TransactionController extends Controller
 
 
 
+        }
+
+
+        if (Auth::user()->status == 7) {
+
+
+            return response()->json([
+
+                'status' => $this->failed,
+                'message' => 'You can not make transfer at the moment, Please contact  support',
+
+            ], 500);
         }
 
 
@@ -2095,6 +2108,17 @@ class TransactionController extends Controller
 
         try {
 
+            
+            if (Auth::user()->status == 7) {
+
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => "You can not make any transaction at the moment, \n\n Please contact  support",
+
+                ], 500);
+            }
 
 
             $ck_ip = User::where('id', Auth::id())->first()->ip_address ?? null;
