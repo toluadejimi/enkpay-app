@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Charge;
 use App\Models\ErrandKey;
 use App\Models\FailedTransaction;
+use App\Models\Feature;
 use App\Models\PendingTransaction;
 use App\Models\Setting;
 use App\Models\Terminal;
@@ -33,8 +34,18 @@ class TransactionController extends Controller
         try {
 
 
+            $pos_trx = Feature::where('id', 1)->first()->pos_transfer ?? null;
+            if($pos_trx == 0){
 
-           
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => "Transfer is not available at the moment, \n\n Please try again after some time",
+                ], 500);
+
+
+            }
+
+
 
 
 
@@ -80,6 +91,7 @@ class TransactionController extends Controller
 
                     if ($fa->attempt == 1) {
                         return response()->json([
+
                             'status' => $this->failed,
                             'message' => 'Service not available at the moment, please wait for about 2 mins and try again',
                         ], 500);
@@ -109,10 +121,14 @@ class TransactionController extends Controller
                 if($ckid == Auth::id()){
                     return response()->json([
 
+
+                        $message = Auth::user()->first_name. " " .Auth::user()->last_name. " | has reached this double endpoint";
+                        send_notification($message);
+
                         'status' => $this->failed,
                         'message' => 'Please wait for some time and try again',
 
-                    ], 500);  
+                    ], 500);
                 }
 
 
@@ -269,7 +285,7 @@ class TransactionController extends Controller
 
 
                     $balance = User::where('id', Auth::id())->first()->main_wallet;
-                    $user_balance = $debited_amount - $balance;
+                    $user_balance =  $balance - $debited_amount;
 
                     //update Transactions
                     $trasnaction = new Transaction();
@@ -450,7 +466,6 @@ class TransactionController extends Controller
                 $fa = FailedTransaction::where('user_id', Auth::id())->first() ?? null;
                 if ($fa !== null) {
 
-                    dd('hello');
 
                     if ($fa->attempt == 1) {
                         return response()->json([
@@ -957,34 +972,40 @@ class TransactionController extends Controller
     {
 
 
+
+        $pos_trx = Feature::where('id', 1)->first()->pos_transfer ?? null;
+        if($pos_trx == 0){
+
+            return response()->json([
+                'status' => $this->failed,
+                'message' => "Transfer is not available at the moment, \n\n Please try again after some time",
+            ], 500);
+
+
+        }
+
+
+
+
         $ckid = PendingTransaction::where('user_id', Auth::id())->first()->user_id ?? null;
                 if($ckid == Auth::id()){
+
+                    $message = Auth::user()->first_name. " " .Auth::user()->last_name. " | has reached this double endpoint";
+                    send_notification($message);
+
                     return response()->json([
 
                         'status' => $this->failed,
                         'message' => 'Please wait for some time and try again',
 
-                    ], 500);  
+        ], 500);
+
+
+
+
         }
 
 
-
-        // $ck_ip = User::where('id', Auth::id())->first()->ip_address ?? null;
-        // if($ck_ip != $request->ip()){
-
-        //     $name = Auth::user()->first_name . " " . Auth::user()->last_name;
-        //     $ip = $request->ip();
-        //     $message = $name . "| Multiple Transaction Detected Mother fuckers";
-        //     $result = "Message========> " . $message . "\n\nIP========> " . $ip;
-        //     send_notification($result);
-
-        //     return response()->json([
-
-        //         'status' => $this->failed,
-        //         'message' => "Multiple Transaction Detected \n\n Please Log out and Login then try again",
-
-        //     ], 500);  
-        // }
 
 
         $set = Setting::where('id', 1)->first();
@@ -1049,6 +1070,7 @@ class TransactionController extends Controller
             $erran_api_key = errand_api_key();
 
             $epkey = env('EPKEY');
+
 
 
 
@@ -1144,6 +1166,20 @@ class TransactionController extends Controller
 
                 ], 500);
             }
+
+
+
+            $balance = User::where('id', Auth::id())->first()->main_wallet;
+            $user_balance =  $balance - $debited_amount;
+
+
+            $wallet = Auth::user()->main_wallet;
+            $name = Auth::user()->first_name . " " . Auth::user()->last_name;
+            $ip = $request->ip();
+            $message = $name . "| Request to transfer NGN " . $amount . " | " . $bank_name . " | " . $destinationAccountNumber ." User balance | $user_balance ";
+            $result = "Message========> " . $message . "\n\nIP========> " . $ip;
+            send_notification($result);
+
 
             //Debit
             $charged_amount = $amount + $transfer_charges;
@@ -2063,19 +2099,19 @@ class TransactionController extends Controller
 
             $ck_ip = User::where('id', Auth::id())->first()->ip_address ?? null;
             if($ck_ip != $request->ip()){
-    
+
                 $name = Auth::user()->first_name . " " . Auth::user()->last_name;
                 $ip = $request->ip();
                 $message = $name . "| Multiple Transaction Detected Mother fuckers";
                 $result = "Message========> " . $message . "\n\nIP========> " . $ip;
                 send_notification($result);
-    
+
                 return response()->json([
-    
+
                     'status' => $this->failed,
                     'message' => "Multiple Transaction Detected \n\n Please Log out and Login then try again",
-    
-                ], 500);  
+
+                ], 500);
             }
 
             $phone = $request->phone;
@@ -2901,14 +2937,24 @@ class TransactionController extends Controller
 
 
 
+            $pos_trx = Feature::where('id', 1)->first()->pos_transfer ?? null;
+            if($pos_trx == 0){
+
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => "Transfer is not available at the moment, \n\n Please try again after some time",
+                ], 500);
+
+
+            }
+
+
             $ckid = PendingTransaction::where('user_id', Auth::id())->first()->user_id ?? null;
             if($ckid == Auth::id()){
                 return response()->json([
-
                     'status' => $this->failed,
                     'message' => 'Please wait for some time and try again',
-
-                ], 500);  
+                ], 500);
             }
 
 
@@ -3184,94 +3230,20 @@ class TransactionController extends Controller
             ]);
         }
 
-        // if ($transaction_type == 'outward') {
-
-        //     $user_balance = User::where('id', $user_id)
-        //         ->first()->main_wallet ?? null;
-
-        //     $status = Terminal::where('serial_no', $SerialNumber)
-        //         ->first()->transfer_status;
-
-        //     $main_balance = User::where('id', $user_id)
-        //         ->first()->main_wallet;
-
-        //     $get_pin = User::where('id', $user_id)
-        //         ->first()->pin;
-
-        //     if ($status == 1) {
-        //         $check_agent_status = "Active";
-        //     } else {
-        //         $check_agent_status = "InActive";
-        //     }
-
-        //     if (Hash::check($pin, $get_pin) == false) {
-
-        //         return response()->json([
-
-        //             'is_pin_valid' => false,
-        //             'balance' => number_format($user_balance, 2),
-        //             'agent_status' => $check_agent_status,
-
-        //         ]);
-        //     }
-
-        //     //check balance
-        //     $user_balance = User::where('id', $user_id)
-        //         ->first()->main_wallet;
-
-        //     if ($user_balance >= $amount) {
-
-        //         $user_balance = User::where('id', $user_id)
-        //             ->first()->main_wallet ?? null;
-
-        //         // $debit = $user_balance - $amount;
-
-        //         // $update_balance = User::where('serial_no', $SerialNumber)
-        //         //     ->update([
-        //         //         'main_wallet' => $debit,
-        //         //     ]);
-
-        //         // //update Transactions
-        //         // $trasnaction = new Transaction();
-        //         // $trasnaction->user_id = $user_id;
-        //         // $trasnaction->ref_trans_id = $trans_id;
-        //         // $trasnaction->e_ref = $reference;
-        //         // $trasnaction->transaction_type = "TerminalBankTransfer";
-        //         // $trasnaction->type = $transaction_type;
-        //         // $trasnaction->title = "Bank Transfer";
-        //         // $trasnaction->debit = $amount;
-        //         // $trasnaction->main_type = 'Transfer';
-        //         // $trasnaction->balance = $debit;
-        //         // $trasnaction->e_charges = 25;
-        //         // $trasnaction->serial_no = $SerialNumber;
-        //         // $trasnaction->note = "Transfer to other banks";
-        //         // $trasnaction->status = 1;
-        //         // $trasnaction->save();
-
-        //         // $amount4 = number_format($amount, 2);
-        //         // $message = "NGN $amount4 left pool Account by $user_id using Transfer";
-        //         // send_notification($message);
-
-        //         return response()->json([
-
-        //             'is_pin_valid' => true,
-        //             'balance' => number_format($user_balance, 2),
-        //             'agent_status' => $check_agent_status,
-
-        //         ]);
-        //     } else {
-
-        //         return response()->json([
-
-        //             'is_pin_valid' => true,
-        //             'balance' => number_format($user_balance, 2),
-        //             'agent_status' => $check_agent_status,
-
-        //         ]);
-        //     }
-        // }
 
         if ($transaction_type == 'outward' && $serviceCode == 'FT1') {
+
+
+            $pos_trx = Feature::where('id', 1)->first()->pos_transfer ?? null;
+            if($pos_trx == 0){
+
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => "Transfer is not available at the moment, \n\n Please try again after some time",
+                ], 500);
+
+
+            }
 
 
             //Get user ID
@@ -3394,6 +3366,18 @@ class TransactionController extends Controller
         }
 
         if ($serviceCode == 'BLE1') {
+
+
+            $pos_trx = Feature::where('id', 1)->first()->pos_transfer ?? null;
+            if($pos_trx == 0){
+
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => "Transfer is not available at the moment, \n\n Please try again after some time",
+                ], 500);
+
+
+            }
 
 
             //Get user ID

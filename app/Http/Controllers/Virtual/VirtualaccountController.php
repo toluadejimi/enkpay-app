@@ -42,7 +42,7 @@ class VirtualaccountController extends Controller
                     'message' => 'Please complete your verification before creating an account',
                 ], 500);
             }
-           
+
 
 
             $client = env('CLIENTID');
@@ -531,7 +531,6 @@ class VirtualaccountController extends Controller
             curl_close($curl);
             $var = json_decode($var);
 
-            dd($var, $errand_key, $acct_no);
         } catch (\Exception $th) {
             return $th->getMessage();
         }
@@ -801,11 +800,11 @@ class VirtualaccountController extends Controller
 
             }
 
-          
 
-           
 
-           
+
+
+
 
             $amt_to_credit = $settledAmount - $charges_to_remove;
             $amt1 = $amt_to_credit - $commission;
@@ -1004,7 +1003,12 @@ class VirtualaccountController extends Controller
                 $var = curl_exec($curl);
                 curl_close($curl);
                 $var = json_decode($var);
+
+
             }
+
+
+
 
             $message = "Account Funded  NGN |  $transactionAmount | $first_name " . " " . $last_name;
             send_notification($message);
