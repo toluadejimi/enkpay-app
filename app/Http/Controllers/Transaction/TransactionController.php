@@ -1191,18 +1191,6 @@ class TransactionController extends Controller
             $debit = $user_wallet_banlance - $charged_amount;
             $enkpay_profit = $transfer_charges - 10;
 
-
-            $balance = User::where('id', Auth::id())->first()->main_wallet;
-            $user_balance =  $balance - $charged_amount;
-
-
-            $wallet = Auth::user()->main_wallet;
-            $name = Auth::user()->first_name . " " . Auth::user()->last_name;
-            $ip = $request->ip();
-            $message = $name . "| Request to transfer NGN " . $amount . " | " . $bank_code . " | " . $destinationAccountNumber ." User balance | $user_balance ";
-            $result = "Message========> " . $message . "\n\nIP========> " . $ip;
-            send_notification($result);
-
             if ($wallet == 'main_account') {
 
                 $update = User::where('id', Auth::id())
@@ -1219,14 +1207,12 @@ class TransactionController extends Controller
 
 
             $debited_amount = $transfer_charges + $amount;
-
             $balance = User::where('id', Auth::id())->first()->main_wallet;
-            $user_balance = $debited_amount - $balance;
-
+            $user_balance =  $balance - $debited_amount;
             $wallet = Auth::user()->main_wallet;
             $name = Auth::user()->first_name . " " . Auth::user()->last_name;
             $ip = $request->ip();
-            $message = $name . "| Request to transfer NGN " . $amount . " | " . $bank_code . " | " . $destinationAccountNumber ." balance | $user_balance  ";
+            $message = $name . "| Request to transfer NGN " . $amount . " | " . $bank_code . " | " . $destinationAccountNumber ." User balance | $user_balance ";
             $result = "Message========> " . $message . "\n\nIP========> " . $ip;
             send_notification($result);
 
