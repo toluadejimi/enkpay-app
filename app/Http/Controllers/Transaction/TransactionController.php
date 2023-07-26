@@ -117,14 +117,13 @@ class TransactionController extends Controller
                 $amoutCharges = $amount + $transfer_charges;
 
 
+
                 $ckid = PendingTransaction::where('user_id', Auth::id())->first()->user_id ?? null;
                 if($ckid == Auth::id()){
 
-
                     $message = Auth::user()->first_name. " " .Auth::user()->last_name. " | has reached this double endpoint";
                     send_notification($message);
-
-
+                    
                     return response()->json([
                         'status' => $this->failed,
                         'message' => 'Please wait for some time and try again',
@@ -974,10 +973,10 @@ class TransactionController extends Controller
 
 
 
-    
 
 
-       
+
+
 
 
         $pos_trx = Feature::where('id', 1)->first()->pos_transfer ?? null;
@@ -1120,21 +1119,21 @@ class TransactionController extends Controller
             if ($amoutCharges < $user_wallet_banlance) {
 
                 return response()->json([
-    
+
                     'status' => $this->failed,
                     'message' => 'Insufficient Funds, fund your account',
-    
+
                 ], 500);
             }
-    
-    
+
+
             if ($amoutCharges < Auth::user()->main_wallet) {
-    
+
                 return response()->json([
-    
+
                     'status' => $this->failed,
                     'message' => 'Insufficient Funds, fund your account',
-    
+
                 ], 500);
             }
 
@@ -1142,13 +1141,13 @@ class TransactionController extends Controller
             if ($amoutCharges < Auth::user()->bonus_wallet) {
 
                 return response()->json([
-    
+
                     'status' => $this->failed,
                     'message' => 'Insufficient Funds, fund your account',
-    
+
                 ], 500);
             }
-    
+
 
 
 
@@ -1180,7 +1179,7 @@ class TransactionController extends Controller
                 ], 500);
             }
 
-           
+
 
             $user_pin = Auth()->user()->pin;
 
@@ -1247,7 +1246,7 @@ class TransactionController extends Controller
 
 
 
-     
+
 
 
             //Debit
@@ -3412,19 +3411,19 @@ class TransactionController extends Controller
 
 
                 // //pending trnasaction
-                //   $trasnaction = new PendingTransaction();
-                //   $trasnaction->user_id = $user_id;
-                //   $trasnaction->ref_trans_id = $trans_id;
-                //   $trasnaction->debit = $debit;
-                //   $trasnaction->amount = $amount;
-                //   $trasnaction->bank_code = $amount;
-                //   $trasnaction->bank_code = "POS TRANSFER";
-                //   $trasnaction->enkpay_Cashout_profit = 0;
-                //   $trasnaction->receiver_name = "POS TRANSFER";
-                //   $trasnaction->receiver_account_no = 0;
-                //   $trasnaction->receiver_name = 0;
-                //   $trasnaction->status = 0;
-                //   $trasnaction->save();
+                  $trasnaction = new PendingTransaction();
+                  $trasnaction->user_id = $user_id;
+                  $trasnaction->ref_trans_id = $trans_id;
+                  $trasnaction->debit = 0;
+                  $trasnaction->amount = 0;
+                  $trasnaction->bank_code = 0;
+                  $trasnaction->bank_code = "POS TRANSFER";
+                  $trasnaction->enkpay_Cashout_profit = 0;
+                  $trasnaction->receiver_name = "POS TRANSFER";
+                  $trasnaction->receiver_account_no = 0;
+                  $trasnaction->receiver_name = 0;
+                  $trasnaction->status = 1;
+                  $trasnaction->save();
 
 
                 $amount4 = number_format($amount, 2);

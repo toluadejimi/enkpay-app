@@ -112,12 +112,11 @@ class SendCron extends Command
                 Transaction::where('ref_trans_id', $trx->ref_trans_id)->update(['status' => 1, 'e_ref' => $TransactionReference]);
                 PendingTransaction::where('ref_trans_id', $trx->ref_trans_id)->delete();
 
-
                 $message = "Transaction |  $TransactionReference | NGN $trx->amount | has been sent to VFD ";
 
-
-
                 send_notification($message);
+
+                
             } else {
 
 
