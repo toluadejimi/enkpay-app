@@ -3411,20 +3411,20 @@ class TransactionController extends Controller
 
 
 
-                //pending trnasaction
-                  $trasnaction = new PendingTransaction();
-                  $trasnaction->user_id = $user_id;
-                  $trasnaction->ref_trans_id = $trans_id;
-                  $trasnaction->debit = $debit;
-                  $trasnaction->amount = $amount;
-                  $trasnaction->bank_code = $amount;
-                  $trasnaction->bank_code = "POS TRANSFER";
-                  $trasnaction->enkpay_Cashout_profit = 0;
-                  $trasnaction->receiver_name = "POS TRANSFER";
-                  $trasnaction->receiver_account_no = 0;
-                  $trasnaction->receiver_name = 0;
-                  $trasnaction->status = 0;
-                  $trasnaction->save();
+                // //pending trnasaction
+                //   $trasnaction = new PendingTransaction();
+                //   $trasnaction->user_id = $user_id;
+                //   $trasnaction->ref_trans_id = $trans_id;
+                //   $trasnaction->debit = $debit;
+                //   $trasnaction->amount = $amount;
+                //   $trasnaction->bank_code = $amount;
+                //   $trasnaction->bank_code = "POS TRANSFER";
+                //   $trasnaction->enkpay_Cashout_profit = 0;
+                //   $trasnaction->receiver_name = "POS TRANSFER";
+                //   $trasnaction->receiver_account_no = 0;
+                //   $trasnaction->receiver_name = 0;
+                //   $trasnaction->status = 0;
+                //   $trasnaction->save();
 
 
                 $amount4 = number_format($amount, 2);
@@ -3502,11 +3502,11 @@ class TransactionController extends Controller
             ]);
         }
 
-        // } catch (\Exception$th) {
-        //     return $th->getMessage();
-        // }
-
     }
+
+
+
+
 
     public function transactiion_status(Request $request)
     {
