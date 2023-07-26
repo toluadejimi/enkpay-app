@@ -1117,7 +1117,7 @@ class TransactionController extends Controller
             }
 
 
-            if ($amoutCharges > $user_wallet_banlance) {
+            if ($amoutCharges < $user_wallet_banlance) {
 
                 return response()->json([
     
@@ -1128,7 +1128,7 @@ class TransactionController extends Controller
             }
     
     
-            if ($amoutCharges > Auth::user()->main_wallet) {
+            if ($amoutCharges < Auth::user()->main_wallet) {
     
                 return response()->json([
     
@@ -1139,7 +1139,7 @@ class TransactionController extends Controller
             }
 
 
-            if ($amoutCharges > Auth::user()->bonus_wallet) {
+            if ($amoutCharges < Auth::user()->bonus_wallet) {
 
                 return response()->json([
     
