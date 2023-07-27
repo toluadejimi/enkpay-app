@@ -8,8 +8,8 @@ use App\Models\Terminal;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Http\Request;
-use ParagonIE_Sodium_Compat;
-use Illuminate\Support\Facades\Crypt;
+use Defuse\Crypto\Crypto;
+use Defuse\Crypto\Key;
 
 class EnkpayposController extends Controller
 {
@@ -19,33 +19,41 @@ class EnkpayposController extends Controller
     {
 
 
-        // Read the public key
-        $publicKey = file_get_contents('/path/to/public_key.pem');
+        // Configuration settings for the key
+        $config = array(
+            "digest_alg" => "sha512",
+            "private_key_bits" => 4096,
+            "private_key_type" => OPENSSL_KEYTYPE_RSA,
+        );
 
-        // Data to encrypt
-        $dataToEncrypt = 'Sensitive data to be encrypted';
+        // Create the private and public key
+        $res = openssl_pkey_new($config);
 
-        // Encrypt the data using the public key
-        $encryptedData = ParagonIE_Sodium_Compat::crypto_box_seal($dataToEncrypt, $publicKey);
+        // Extract the private key into $private_key
+        openssl_pkey_export($res, $private_key);
 
-        // Convert the encrypted data to a base64-encoded string
-        $encryptedDataString = base64_encode($encryptedData);
-
-        // Now you can store or transmit the encrypted data as needed
-
-
-
-
-
+        // Extract the public key into $public_key
+        $public_key = openssl_pkey_get_details($res);
+        $public_key = $public_key["key"];
 
 
 
+            // Something to encrypt
+        $text = '{This is the text to encrypt';
+
+        echo "This is the original text: $text\n\n";
+
+        // Encrypt using the public key
+        openssl_public_encrypt($text, $encrypted, $public_key);
+
+        $encrypted_hex = bin2hex($encrypted);
+        echo "This is the encrypted text: $encrypted_hex\n\n";
+
+        // Decrypt the data using the private key
+        openssl_private_decrypt($encrypted, $decrypted, $private_key);
 
 
-
-
-
-
+        dd($public_key, $private_key, $encrypted_hex, $decrypted);
 
 
 
