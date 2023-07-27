@@ -2947,29 +2947,6 @@ class TransactionController extends Controller
         if ($request->ServiceCode == 'FT1') {
 
 
-
-            $pos_trx = Feature::where('id', 1)->first()->pos_transfer ?? null;
-            if($pos_trx == 0){
-
-                return response()->json([
-                    'status' => $this->failed,
-                    'message' => "Transfer is not available at the moment, \n\n Please try again after some time",
-                ], 500);
-
-
-            }
-
-
-            $ckid = PendingTransaction::where('user_id', Auth::id())->first()->user_id ?? null;
-            if($ckid == Auth::id()){
-                return response()->json([
-                    'status' => $this->failed,
-                    'message' => 'Please wait for some time and try again',
-                ], 500);
-            }
-
-
-
             $StatusCode = $request->StatusCode;
             $StatusDescription = $request->StatusDescription;
             $SerialNumber = $request->SerialNumber;
@@ -3071,6 +3048,9 @@ class TransactionController extends Controller
             ], 200);
         }
 
+
+
+        //completed
 
 
 

@@ -108,7 +108,7 @@ class SendCron extends Command
             if ($status == 200) {
 
 
-                Transfer::where('ref_trans_id', $trx->ref_trans_id)->update(['status' => 2, 'e_ref' => $TransactionReference]);
+                Transfer::where('ref_trans_id', $trx->ref_trans_id)->update(['status' => 1, 'e_ref' => $TransactionReference]);
                 Transaction::where('ref_trans_id', $trx->ref_trans_id)->update(['status' => 1, 'e_ref' => $TransactionReference]);
                 PendingTransaction::where('ref_trans_id', $trx->ref_trans_id)->delete();
 
@@ -116,7 +116,7 @@ class SendCron extends Command
 
                 send_notification($message);
 
-                
+
             } else {
 
 
