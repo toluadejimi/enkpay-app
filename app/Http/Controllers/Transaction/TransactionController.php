@@ -1174,7 +1174,7 @@ class TransactionController extends Controller
                 ], 500);
             }
 
-       
+
 
             if ($amount < 100) {
 
@@ -3124,7 +3124,7 @@ class TransactionController extends Controller
                 ], 500);
             }
 
-            $ch = Transfer::where('e_ref', $TransactionReference)->where('status', 2)->update([
+            $ch = Transfer::where('e_ref', $TransactionReference)->where('status', 1)->update([
                 'status' => 3,
             ]);
 
