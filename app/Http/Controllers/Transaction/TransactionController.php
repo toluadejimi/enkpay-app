@@ -3120,8 +3120,6 @@ class TransactionController extends Controller
             User::where('id', $trx->user_id)->increment('main_wallet', $trx->debit);
 
             $balance = User::where('id', $trx->user_id)->first()->main_wallet;
-
-
             $trasnaction = new Transaction();
             $trasnaction->user_id = $trx->user_id;
             $trasnaction->ref_trans_id = $trx->ref_trans_id;
@@ -3131,10 +3129,10 @@ class TransactionController extends Controller
             $trasnaction->amount = $trx->debit;
             $trasnaction->serial_no = $SerialNumber;
             $trasnaction->title = "Reversal";
-            $trasnaction->note = "Revasal | $DestinationAccountName | $DestinationAccountNumber";
+            $trasnaction->note = "Reversal | $DestinationAccountName | $DestinationAccountNumber";
             $trasnaction->fee = $Fee;
             $trasnaction->balance = $balance;
-            $trasnaction->main_type = "Revasal";
+            $trasnaction->main_type = "Reversal";
             $trasnaction->status = 3;
             $trasnaction->save();
 

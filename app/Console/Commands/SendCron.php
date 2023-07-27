@@ -108,9 +108,13 @@ class SendCron extends Command
             if ($status == 200) {
 
 
-                Transfer::where('ref_trans_id', $trx->ref_trans_id)->update(['status' => 1, 'e_ref' => $TransactionReference]);
-                Transaction::where('ref_trans_id', $trx->ref_trans_id)->update(['status' => 1, 'e_ref' => $TransactionReference]);
+                Transfer::where('ref_trans_id', $trx->ref_trans_id)->update(['status' => 0, 'e_ref' => $TransactionReference]);
+                Transaction::where('ref_trans_id', $trx->ref_trans_id)->update(['status' => 0, 'e_ref' => $TransactionReference]);
                 PendingTransaction::where('ref_trans_id', $trx->ref_trans_id)->delete();
+                $user_id = PendingTransaction::where('ref_trans_id', $trx->ref_trans_id)->first()->user_id ?? null;
+                PendingTransaction::where('user_id', $user_id)->delete();
+
+
 
                 $message = "Transaction |  $TransactionReference | NGN $trx->amount | has been sent to VFD ";
 
@@ -120,7 +124,14 @@ class SendCron extends Command
             } else {
 
 
-                PendingTransaction::where('ref_trans_id', $trx->ref_trans_id)->update(['status' => 4]);
+                User::where('id', $trx->user_id)->increment('main_wallet', $trx->debit);
+
+                $balance = User::where('id', $trx->user_id)->first()->main_wallet;
+
+
+
+
+                PendingTransaction::where('ref_trans_id', $trx->ref_trans_id)->update(['status' => 3]);
                 Transaction::where('ref_trans_id', $trx->ref_trans_id)->update(['status' => 3]);
                 $transfer_charges = Charge::where('title', 'transfer_fee')->first()->amount;
 
@@ -128,15 +139,29 @@ class SendCron extends Command
 
                 //credit
                 $credit = $user_wallet_banlance + $trx->amount + $transfer_charges;
-
-
                 $update = User::where('id', $trx->user_id)
                     ->update([
                         'main_wallet' => $credit,
                     ]);
 
-                $usr = User::where('id', $trx->user_id)->first();
 
+                    $trasnaction = new Transaction();
+                    $trasnaction->user_id = $trx->user_id;
+                    $trasnaction->ref_trans_id = $trx->ref_trans_id;
+                    $trasnaction->transaction_type = "Reversal";
+                    $trasnaction->debit = 0;
+                    $trasnaction->amount = $trx->amount;
+                    $trasnaction->serial_no = 0;
+                    $trasnaction->title = "Reversal";
+                    $trasnaction->note = "Reversal";
+                    $trasnaction->fee = 25;
+                    $trasnaction->balance = $credit;
+                    $trasnaction->main_type = "Reversal";
+                    $trasnaction->status = 3;
+                    $trasnaction->save();
+
+
+                $usr = User::where('id', $trx->user_id)->first();
                 $message = "Transaction reversed | $error ";
                 $full_name = $usr->first_name . "  " . $usr->last_name;
 
