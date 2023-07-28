@@ -2419,12 +2419,12 @@ class TransactionController extends Controller
     {
 
 
-        $parametersJson = json_encode($request->all());
-        $message = 'Log 1';
-        $ip = $request->ip();
+        // // $parametersJson = json_encode($request->all());
+        // // $message = 'Log 1';
+        // // $ip = $request->ip();
 
-        $result = "Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
-        send_notification($result);
+        // $result = "Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
+        // send_notification($result);
 
 
 
@@ -2841,28 +2841,35 @@ class TransactionController extends Controller
         }
 
         //AIRTIME / DATA
-        if (($request->ServiceCode == 'BAT1') || ($request->ServiceCode == 'BAT2') || ($request->ServiceCode == 'BAT3') || ($request->ServiceCode == 'BAT4')
+        if (($request->ServiceCode == 'BAT1') || ($request->serviceCode == 'BAT1') || ($request->ServiceCode == 'BAT2') || ($request->ServiceCode == 'BAT3') || ($request->ServiceCode == 'BAT4')
 
             || ($request->ServiceCode == 'BMD1') || ($request->ServiceCode == 'BMD2') || ($request->ServiceCode == 'BMD3') || ($request->ServiceCode == 'BMD4')
 
             || ($request->ServiceCode == 'BMD5')
         ) {
 
+
+
+
+
+
             $StatusCode = $request->StatusCode;
             $StatusDescription = $request->StatusDescription;
-            $SerialNumber = $request->SerialNumber;
-            $Amount = $request->Amount;
+            $SerialNumber = $request->SerialNumber ?? $request->serial_number;
+            $Amount = $request->Amount ?? $request->amount;
             $Currency = $request->Currency;
             $TransactionDate = $request->TransactionDate;
             $TransactionTime = $request->TransactionTime;
-            $TransactionType = $request->TransactionType;
+            $TransactionType = $request->TransactionType ?? $request->transaction_type;
             $ServiceCode = $request->ServiceCode;
-            $TransactionReference = $request->TransactionReference;
+            $TransactionReference = $request->TransactionReference ?? $request->reference;
             $Fee = $request->Fee;
             $PostingType = $request->PostingType;
             $BillCategory = $request->AdditionalDetails['BillCategory'] ?? null;
             $BillService = $request->AdditionalDetails['BillService'] ?? null;
             $Beneficiary = $request->AdditionalDetails['Beneficiary'] ?? null;
+
+
 
             $key = env('ERIP');
 
@@ -2902,8 +2909,20 @@ class TransactionController extends Controller
                     ], 500);
                 }
 
+
+                if($Amount > $main_wallet){
+
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Insufficent Funds',
+                    ], 500);
+
+                }
+
                 //debit
                 $debit_wallet = $main_wallet - $Amount;
+
+
 
                 $main_wallet_update = User::where('id', $user_id)
                     ->update([
@@ -3346,6 +3365,8 @@ class TransactionController extends Controller
 
         if ($serviceCode == 'BLE1') {
 
+
+            dd('hello');
 
             $pos_trx = Feature::where('id', 1)->first()->pos_transfer ?? null;
             if($pos_trx == 0){
