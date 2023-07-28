@@ -3363,10 +3363,135 @@ class TransactionController extends Controller
             }
         }
 
+
+
+        if (($request->serviceCode == 'BAT1') ||  ($request->serviceCode == 'BAT2') || ($request->serviceCode == 'BAT3') || ($request->serviceCode == 'BAT4')
+
+            || ($request->serviceCode == 'BMD1') || ($request->serviceCode == 'BMD2') || ($request->serviceCode == 'BMD3') || ($request->serviceCode == 'BMD4')
+
+            || ($request->serviceCode == 'BMD5')
+        ) {
+
+            $pos_trx = Feature::where('id', 1)->first()->pos_transfer ?? null;
+            if($pos_trx == 0){
+
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => "Transfer is not available at the moment, \n\n Please try again after some time",
+                ], 500);
+
+
+            }
+
+
+            //Get user ID
+            $user_id = Terminal::where('serial_no', $SerialNumber)
+                ->first()->user_id ?? null;
+
+            $status = Terminal::where('serial_no', $SerialNumber)
+                ->first()->transfer_status;
+
+            $get_pin = User::where('id', $user_id)
+                ->first()->pin;
+
+            $f_name = User::where('id', $user_id)
+                ->first()->first_name ?? null;
+
+            $l_name = User::where('id', $user_id)
+                ->first()->last_name ?? null;
+
+            $full_name = $f_name . " " . $l_name;
+
+            if ($status == 1) {
+                $check_agent_status = "Active";
+            } else {
+                $check_agent_status = "InActive";
+            }
+
+
+            $user_balance = User::where('id', $user_id)
+                ->first()->main_wallet;
+            //chk pin
+
+            if (Hash::check($pin, $get_pin) == false) {
+
+                return response()->json([
+
+                    'is_pin_valid' => false,
+                    'balance' => number_format($user_balance, 2),
+                    'agent_status' => $check_agent_status,
+
+                ]);
+            }
+
+
+
+            //check balance and debit
+            $user_balance = User::where('id', $user_id)
+                ->first()->main_wallet;
+
+
+            //$debit_amount = $amount + $transfer_fee;
+
+
+            if ($user_balance >= $amount) {
+
+                $debit = $user_balance - $amount;
+
+                User::where('id', $user_id)
+                    ->update([
+                        'main_wallet' => $debit,
+                    ]);
+
+                //update Transactions
+                $trasnaction = new Transaction();
+                $trasnaction->user_id = $user_id;
+                $trasnaction->ref_trans_id = $trans_id;
+                $trasnaction->e_ref = $reference;
+                $trasnaction->transaction_type = "EP TRANSFER";
+                $trasnaction->debit = $amount;
+                $trasnaction->amount = $amount;
+                $trasnaction->title = "POS Transfer";
+                $trasnaction->balance = $debit;
+                $trasnaction->main_type = "Transfer";
+                $trasnaction->serial_no = $SerialNumber;
+                $trasnaction->enkPay_Cashout_profit = 0;
+                $trasnaction->save();
+
+
+                $amount4 = number_format($amount, 2);
+                $message = "NGN $amount4 is about to leave your pool Account by $full_name using VAS POS";
+                send_notification($message);
+
+                return response()->json([
+
+                    'is_pin_valid' => true,
+                    'balance' => number_format($user_balance, 2),
+                    'agent_status' => $check_agent_status,
+
+                ]);
+            } else {
+
+                return response()->json([
+
+                    'is_pin_valid' => true,
+                    'balance' => number_format($user_balance, 2),
+                    'agent_status' => $check_agent_status,
+
+                ]);
+            }
+        }
+
+
+
+
+
+
+
+
         if ($serviceCode == 'BLE1') {
 
 
-            dd('hello');
 
             $pos_trx = Feature::where('id', 1)->first()->pos_transfer ?? null;
             if($pos_trx == 0){
@@ -3418,6 +3543,14 @@ class TransactionController extends Controller
         }
 
     }
+
+
+
+
+
+
+   
+
 
 
 
