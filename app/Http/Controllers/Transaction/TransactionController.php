@@ -3076,9 +3076,7 @@ class TransactionController extends Controller
 
 
 
-            $trx = Transfer::where('e_ref', $TransactionReference)->first();
-
-
+            $trx = Transaction::where('e_ref', $request->TransactionReference)->first() ?? null;
 
             if ($trx == null) {
 
@@ -3104,18 +3102,10 @@ class TransactionController extends Controller
                 ], 500);
             }
 
-            $ch = Transfer::where('e_ref', $TransactionReference)->where('status', 1)->update([
+            $ch = Transaction::where('e_ref', $TransactionReference)->where('status', 0)->update([
                 'status' => 3,
             ]);
 
-
-            if ($ch == 0) {
-
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Transaction reversed already or not found',
-                ], 500);
-            }
 
             User::where('id', $trx->user_id)->increment('main_wallet', $trx->debit);
 
