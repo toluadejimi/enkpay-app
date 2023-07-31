@@ -807,3 +807,49 @@ function create_p_account()
         }
     }
 }
+
+
+
+
+    if (!function_exists('decryption')) {
+
+        function decryption($encryptedStr) {
+            $s_key = env('SKEY');
+            $INV_key = env('INVKEY');
+
+            $key = base64_decode($s_key);
+            $iv = base64_decode($INV_key);
+            $cipherText = base64_decode($encryptedStr);
+            $decryptedText = openssl_decrypt($cipherText, 'AES-256-CFB', $key, OPENSSL_RAW_DATA, $iv);
+            return $decryptedText;
+        }
+
+    }
+
+
+
+
+    if (!function_exists('encrypt')) {
+
+        function encrypt($strToEncrypt) {
+
+
+        $s_key = env('SKEY');
+        $INV_key = env('INVKEY');
+
+                $key = base64_decode($s_key);
+                $iv = base64_decode($INV_key);
+                $cipherText = openssl_encrypt($strToEncrypt, 'AES-256-CFB', $key, OPENSSL_RAW_DATA, $iv);
+                return base64_encode($cipherText);
+
+
+        }
+
+
+    }
+
+
+
+
+
+

@@ -702,7 +702,17 @@ class VirtualCardController extends Controller
 
             Vcard::where('card_id', $card_id)->update([
 
-                'amount' => $amount/100
+                'card_number' => $card->masked_card,
+                'cvv' => $card->cvv,
+                'expiration' => $card->expiration,
+                'card_type' => $card->card_type,
+                'name_on_card' => $card->name_on_card,
+                'amount' => $card->amount/100,
+                'city' => $card->city,
+                'state' => $card->state,
+                'address' => $card->address,
+                'zip_code' => $card->zip_code,
+                'status' => $card->status,
 
             ]);
         }
@@ -711,6 +721,8 @@ class VirtualCardController extends Controller
         if ($card == null) {
 
             $card_details = [];
+
+
         } else {
 
             $card_details = array([
@@ -767,11 +779,6 @@ class VirtualCardController extends Controller
 
             $data = [];
         }
-
-
-
-
-
 
 
         return response()->json([
