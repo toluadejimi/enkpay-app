@@ -33,7 +33,6 @@ use Illuminate\Support\Facades\Route;
 // });
 
 
-Route::post('pos', [EnkpayposController::class, 'enkpayPos']);
 
 
 
@@ -125,6 +124,10 @@ Route::get('contact', [ProfileController::class, 'contact']);
 
 
 Route::group(['middleware' => ['auth:api', 'acess']], function () {
+
+    //ENKPAY POS
+    Route::post('pos', [EnkpayposController::class, 'enkpayPos']);
+
 
 
     //Fogot Pin

@@ -7,6 +7,7 @@ use App\Models\Charge;
 use App\Models\Terminal;
 use App\Models\Transaction;
 use App\Models\User;
+use Auth;
 use Illuminate\Http\Request;
 use Defuse\Crypto\Crypto;
 use Defuse\Crypto\Key;
@@ -38,6 +39,7 @@ class EnkpayposController extends Controller
         $transactionType = $decodedData['transactionType'];
         $cardName = $decodedData['cardName'];
 
+
         
 
 
@@ -51,9 +53,7 @@ class EnkpayposController extends Controller
         // if ($eip == $ip) {
 
         //Get user ID
-        $user_id = Terminal::where('serial_no', $terminalID)
-            ->first()->user_id ?? null;
-
+        $user_id = Auth::id();
         //Main Wallet
         $main_wallet = User::where('id', $user_id)
             ->first()->main_wallet ?? null;
