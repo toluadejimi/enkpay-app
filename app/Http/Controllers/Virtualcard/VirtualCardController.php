@@ -698,21 +698,31 @@ class VirtualCardController extends Controller
         $var = json_decode($var);
         $amount = $var->data->balance ?? null;
 
-        if ($card != null) {
+        if ($card->masked_card == null) {
 
             Vcard::where('card_id', $card_id)->update([
 
-                'card_number' => $card->masked_card,
-                'cvv' => $card->cvv,
-                'expiration' => $card->expiration,
-                'card_type' => $card->card_type,
-                'name_on_card' => $card->name_on_card,
-                'amount' => $card->amount/100,
-                'city' => $card->city,
-                'state' => $card->state,
-                'address' => $card->address,
-                'zip_code' => $card->zip_code,
-                'status' => $card->status,
+                'masked_card' => $var->data->card_number,
+                'cvv' => $var->data->cvv,
+                'expiration' => $var->data->expiry_month. " / " .$var->data->expiry_year,
+                'card_type' => $var->data->brand,
+                'name_on_card' => $var->data->card_name,
+                'amount' => $var->data->balance/100,
+                'city' => $var->data->billing_address->billing_city,
+                'state' => $var->data->billing_address->state,
+                'address' => $var->data->billing_address->billing_address1,
+                'zip_code' => $var->data->billing_address->billing_zip_code,
+                'status' => 1
+
+            ]);
+        }
+
+
+
+        if ($card->masked_card != null) {
+
+            Vcard::where('card_id', $card_id)->update([
+                'amount' => $var->data->balance/100
 
             ]);
         }
