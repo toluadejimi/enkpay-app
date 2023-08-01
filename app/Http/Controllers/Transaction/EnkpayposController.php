@@ -19,6 +19,11 @@ class EnkpayposController extends Controller
     public function enkpayPos(request $request)
     {
 
+      
+        $result = $request->data;
+        send_notification($result);
+
+
 
         $encryptedStr = $request->data;
         $encrypted =  decryption($encryptedStr);
@@ -26,6 +31,9 @@ class EnkpayposController extends Controller
         $jsonData = trim($encrypted, "\x04\x03\x02\x01\x00\x05\x06\x07\x08\x09");
         $jsonString = iconv('UTF-8', 'ISO-8859-1//IGNORE', $jsonData);
         $decodedData = json_decode($jsonString, true);
+
+
+
 
 
 
