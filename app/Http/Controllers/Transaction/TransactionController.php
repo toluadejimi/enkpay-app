@@ -3048,8 +3048,12 @@ class TransactionController extends Controller
                         ]);
 
 
-                //update Transactions
 
+            //Clear pending
+            PendingTransaction::where('user_id', Auth::id())->delete() ?? null;
+            
+            
+            //update Transactions
             $amount4 = number_format($Amount, 2);
             $message = "$TransactionReference | NGN $amount4 left pool Account by  $full_name";
             send_notification($message);
