@@ -23,9 +23,11 @@ class EnkpayposController extends Controller
         $encryptedStr = $request->data;
         $encrypted =  decryption($encryptedStr);
         $resust = json_decode($encrypted);
-        $jsonData = rtrim($encrypted, "\x04");
+        $jsonData = trim($encrypted, "\x04\x03\x02\x01\x00\x05\x06\x07\x08\x09");
         $jsonString = iconv('UTF-8', 'ISO-8859-1//IGNORE', $jsonData);
         $decodedData = json_decode($jsonString, true);
+
+
 
         $RRN = $decodedData['RRN'];
         $userID = $decodedData['userID'];
