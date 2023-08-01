@@ -3151,6 +3151,9 @@ class TransactionController extends Controller
 
             $full_name = $f_name . " " . $l_name;
 
+            PendingTransaction::where('e_ref', $TransactionReference)->delete() ?? null;
+
+
 
             $amount4 = number_format($trx->debit, 2);
             $message = "$TransactionReference | NGN $amount4 has been reversed to  $full_name";
@@ -3326,6 +3329,7 @@ class TransactionController extends Controller
                   $trasnaction = new PendingTransaction();
                   $trasnaction->user_id = $user_id;
                   $trasnaction->ref_trans_id = $trans_id;
+                  $trasnaction->e_ref = $reference;
                   $trasnaction->debit = 0;
                   $trasnaction->amount = 0;
                   $trasnaction->bank_code = 0;
