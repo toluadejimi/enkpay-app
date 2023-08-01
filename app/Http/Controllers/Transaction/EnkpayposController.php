@@ -21,7 +21,6 @@ class EnkpayposController extends Controller
 
 
         $encryptedStr = $request->data;
-
         $encrypted =  decryption($encryptedStr);
         $resust = json_decode($encrypted);
         $jsonData = rtrim($encrypted, "\x04");
@@ -29,6 +28,7 @@ class EnkpayposController extends Controller
         $decodedData = json_decode($jsonString, true);
 
         $RRN = $decodedData['RRN'];
+        $userID = $decodedData['userID'];
         $STAN = $decodedData['STAN'];
         $amount = $decodedData['amount'];
         $expireDate = $decodedData['expireDate'];
@@ -53,7 +53,7 @@ class EnkpayposController extends Controller
         // if ($eip == $ip) {
 
         //Get user ID
-        $user_id = Auth::id();
+        $user_id = $userID;
         //Main Wallet
         $main_wallet = User::where('id', $user_id)
             ->first()->main_wallet ?? null;

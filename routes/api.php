@@ -100,6 +100,10 @@ Route::get('get-states', [RegisterationController::class, 'get_states']);
 Route::post('get-lga', [RegisterationController::class, 'get_lga']);
 
 
+//ENKPAY POS
+Route::post('pos', [EnkpayposController::class, 'enkpayPos']);
+
+
 //Charges
 Route::get('transfer-charges', [TransactionController::class, 'transfer_charges']);
 
@@ -125,8 +129,7 @@ Route::get('contact', [ProfileController::class, 'contact']);
 
 Route::group(['middleware' => ['auth:api', 'acess']], function () {
 
-    //ENKPAY POS
-    Route::post('pos', [EnkpayposController::class, 'enkpayPos']);
+
 
 
 
