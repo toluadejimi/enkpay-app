@@ -187,7 +187,7 @@ class EnkpayposController extends Controller
 
 
             return response()->json([
-                'status' => true,
+                'status' => false,
                 'message' => 'Transaction Failed',
             ], 500);
 
