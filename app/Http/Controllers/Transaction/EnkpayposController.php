@@ -30,7 +30,7 @@ class EnkpayposController extends Controller
 
 
         $RRN = $decodedData['RRN'];
-        $userID = $decodedData['userID'];
+        $userID = $decodedData['UserID'];
         $STAN = $decodedData['STAN'];
         $amount = $decodedData['amount'];
         $expireDate = $decodedData['expireDate'];
