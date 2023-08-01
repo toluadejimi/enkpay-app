@@ -3050,7 +3050,7 @@ class TransactionController extends Controller
 
 
             //Clear pending
-            PendingTransaction::where('user_id', Auth::id())->delete() ?? null;
+            PendingTransaction::where('e_ref', $TransactionReference)->delete() ?? null;
             
             
             //update Transactions
