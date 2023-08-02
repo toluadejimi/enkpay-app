@@ -116,6 +116,8 @@ Route::get('account-history', [VirtualaccountController::class, 'virtual_acct_hi
 
 //Login
 Route::post('phone-login', [LoginController::class, 'phone_login']);
+Route::post('pin-login', [LoginController::class, 'pin_login']);
+
 Route::post('email-login', [LoginController::class, 'email_login']);
 
 Route::post('update-device', [LoginController::class, 'update_device_identifier']);
