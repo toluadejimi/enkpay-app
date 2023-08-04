@@ -957,7 +957,7 @@ class TransactionController extends Controller
                     }
 
                     $full_name = Auth::user()->first_name. " ".Auth::user()->last_name;
-                 
+
                     $amount4 = number_format($debited_amount, 2);
                     $message = "$trans_id | NGN $amount4 has been reversed to  $full_name";
                     send_notification($message);
@@ -1921,7 +1921,7 @@ class TransactionController extends Controller
                 }
 
                 $full_name = Auth::user()->first_name. " ".Auth::user()->last_name;
-             
+
                 $amount4 = number_format($charged_amount, 2);
                 $message = "$trans_id | NGN $amount4 has been reversed to  $full_name";
                 send_notification($message);
@@ -3040,7 +3040,6 @@ class TransactionController extends Controller
                    $update =  Transaction::where('e_ref', $TransactionReference)
                         ->update([
                             'status' => 1,
-                            'note' => "EP Transfer | $DestinationAccountName | $DestinationBankName ",
                             'fee' => $Fee,
                             'receiver_name' => $DestinationAccountName,
                             'receiver_account_no' => $DestinationAccountNumber,
@@ -3051,8 +3050,8 @@ class TransactionController extends Controller
 
             //Clear pending
             PendingTransaction::where('e_ref', $TransactionReference)->delete() ?? null;
-            
-            
+
+
             //update Transactions
             $amount4 = number_format($Amount, 2);
             $message = "$TransactionReference | NGN $amount4 left pool Account by  $full_name";
