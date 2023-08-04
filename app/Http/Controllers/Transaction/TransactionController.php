@@ -3040,10 +3040,6 @@ class TransactionController extends Controller
                    $update =  Transaction::where('e_ref', $TransactionReference)
                         ->update([
                             'status' => 1,
-                            'fee' => $Fee,
-                            'receiver_name' => $DestinationAccountName,
-                            'receiver_account_no' => $DestinationAccountNumber,
-                            'receiver_bank' => $DestinationBankName,
                         ]);
 
 
