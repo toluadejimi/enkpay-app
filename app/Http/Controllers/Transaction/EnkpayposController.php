@@ -11,6 +11,7 @@ use Auth;
 use Illuminate\Http\Request;
 use Defuse\Crypto\Crypto;
 use Defuse\Crypto\Key;
+use Illuminate\Support\Facades\Hash;
 
 class EnkpayposController extends Controller
 {
@@ -19,38 +20,75 @@ class EnkpayposController extends Controller
     public function enkpayPos(request $request)
     {
 
-      
-        $result = $request->data;
-        send_notification($result);
+
+
+        $key = $request->header('dataKey');
+        $RRN = $request->RRN;
+        $userID = $request->UserID;
+        $STAN = $request->STAN;
+        $amount = $request->amount;
+        $expireDate = $request->expireDate;
+        $message = $request->message;
+        $pan = $request->pan;
+        $responseCode = $request->responseCode;
+        $terminalID = $request->terminalID;
+        $transactionType = $request->transactionType;
+        $cardName = $request->cardName;
+        $DataKey = env('DATAKEY');
 
 
 
-        $encryptedStr = $request->data;
-        $encrypted =  decryption($encryptedStr);
-        $resust = json_decode($encrypted);
-        $jsonData = trim($encrypted, "\x04\x03\x02\x01\x00\x05\x06\x07\x08\x09");
-        $jsonString = iconv('UTF-8', 'ISO-8859-1//IGNORE', $jsonData);
-        $decodedData = json_decode($jsonString, true);
+        if($key == null){
+
+            $result = "No Key Passed";
+            send_notification($result);
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Empty Key',
+            ], 500);
+
+        }
+
+
+        if($key != $DataKey){
+
+            $result = "Invalid Key | $key";
+            send_notification($result);
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid Request',
+            ], 500);
+
+        }
 
 
 
 
 
 
-        $RRN = $decodedData['RRN'];
-        $userID = $decodedData['UserID'];
-        $STAN = $decodedData['STAN'];
-        $amount = $decodedData['amount'];
-        $expireDate = $decodedData['expireDate'];
-        $message = $decodedData['message'];
-        $pan = $decodedData['pan'];
-        $responseCode = $decodedData['responseCode'];
-        $terminalID = $decodedData['terminalID'];
-        $transactionType = $decodedData['transactionType'];
-        $cardName = $decodedData['cardName'];
+        // $encryptedStr = $request->data;
+        // $encrypted =  decryption($encryptedStr);
+        // $resust = json_decode($encrypted);
+        // $jsonData = trim($encrypted, "\x04\x03\x02\x01\x00\x05\x06\x07\x08\x09");
+        // $jsonString = iconv('UTF-8', 'ISO-8859-1//IGNORE', $jsonData);
+        // $decodedData = json_decode($jsonString, true);
+
+        // $RRN = $decodedData['RRN'];
+        // $userID = $decodedData['UserID'];
+        // $STAN = $decodedData['STAN'];
+        // $amount = $decodedData['amount'];
+        // $expireDate = $decodedData['expireDate'];
+        // $message = $decodedData['message'];
+        // $pan = $decodedData['pan'];
+        // $responseCode = $decodedData['responseCode'];
+        // $terminalID = $decodedData['terminalID'];
+        // $transactionType = $decodedData['transactionType'];
+        // $cardName = $decodedData['cardName'];
 
 
-        
+
 
 
         $trans_id = "ENK-" . random_int(100000, 999999);
@@ -109,7 +147,7 @@ class EnkpayposController extends Controller
         }
 
 
-    
+
 
         if ($responseCode == 00) {
 
@@ -142,7 +180,7 @@ class EnkpayposController extends Controller
 
             $f_name = User::where('id', $user_id)->first()->first_name ?? null;
             $l_name = User::where('id', $user_id)->first()->last_name ?? null;
-    
+
             $ip = $request->ip();
             $amount4 = number_format($removed_comission, 2);
             $result = $f_name . " " . $l_name . "| fund NGN " . $amount4 . " | using ENKPPAY POS" . "\n\nIP========> " . $ip;
@@ -179,7 +217,7 @@ class EnkpayposController extends Controller
 
             $f_name = User::where('id', $user_id)->first()->first_name ?? null;
             $l_name = User::where('id', $user_id)->first()->last_name ?? null;
-    
+
             $ip = $request->ip();
             $amount4 = number_format($removed_comission, 2);
             $result = $f_name . " " . $l_name . "| fund NGN " . $amount4 . " | Failed on ENKPAY POS" . "\n\nIP========> " . $ip;
@@ -193,6 +231,6 @@ class EnkpayposController extends Controller
 
         }
 
-      
+
     }
 }
