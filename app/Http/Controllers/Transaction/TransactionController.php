@@ -927,39 +927,39 @@ class TransactionController extends Controller
                 } else {
 
 
-                    $balance = User::where('id', Auth::id())->first()->main_wallet;
-                    $trasnaction = new Transaction();
-                    $trasnaction->user_id = Auth::id();
-                    $trasnaction->ref_trans_id = $trans_id;
-                    $trasnaction->type = "Reversal";
-                    $trasnaction->main_type = "Reversal";
-                    $trasnaction->transaction_type = "Reversal";
-                    $trasnaction->title = "Reversal";
-                    $trasnaction->credit = $debited_amount;
-                    $trasnaction->amount = $amount;
-                    $trasnaction->note = "Reversal  for | $destinationAccountName | $destinationAccountNumber | $bank_name  ";
-                    $trasnaction->fee = 0;
-                    $trasnaction->enkpay_Cashout_profit = 0;
-                    $trasnaction->receiver_name = $receiver_name;
-                    $trasnaction->receiver_account_no = $destinationAccountNumber;
-                    $trasnaction->receiver_bank = $bank_name;
-                    $trasnaction->balance = $debit;
-                    $trasnaction->status = 3;
-                    $trasnaction->save();
+                    // $balance = User::where('id', Auth::id())->first()->main_wallet;
+                    // $trasnaction = new Transaction();
+                    // $trasnaction->user_id = Auth::id();
+                    // $trasnaction->ref_trans_id = $trans_id;
+                    // $trasnaction->type = "Reversal";
+                    // $trasnaction->main_type = "Reversal";
+                    // $trasnaction->transaction_type = "Reversal";
+                    // $trasnaction->title = "Reversal";
+                    // $trasnaction->credit = $debited_amount;
+                    // $trasnaction->amount = $amount;
+                    // $trasnaction->note = "Reversal  for | $destinationAccountName | $destinationAccountNumber | $bank_name  ";
+                    // $trasnaction->fee = 0;
+                    // $trasnaction->enkpay_Cashout_profit = 0;
+                    // $trasnaction->receiver_name = $receiver_name;
+                    // $trasnaction->receiver_account_no = $destinationAccountNumber;
+                    // $trasnaction->receiver_bank = $bank_name;
+                    // $trasnaction->balance = $debit;
+                    // $trasnaction->status = 3;
+                    // $trasnaction->save();
 
 
-                    if ($wallet == 'main_account') {
-                        User::where('id', Auth::id()->first()->increment('main_wallet', $amount));
-                    }
+                    // if ($wallet == 'main_account') {
+                    //     User::where('id', Auth::id()->first()->increment('main_wallet', $amount));
+                    // }
 
-                    if ($wallet == 'bonus_account') {
-                        User::where('id', Auth::id()->first()->increment('bonus_wallet', $amount));
-                    }
+                    // if ($wallet == 'bonus_account') {
+                    //     User::where('id', Auth::id()->first()->increment('bonus_wallet', $amount));
+                    // }
 
                     $full_name = Auth::user()->first_name. " ".Auth::user()->last_name;
 
                     $amount4 = number_format($debited_amount, 2);
-                    $message = "$trans_id | NGN $amount4 has been reversed to  $full_name";
+                    $message = "$trans_id | NGN $amount4 has been hit an error  $full_name";
                     send_notification($message);
 
                     return response()->json([
@@ -1891,39 +1891,39 @@ class TransactionController extends Controller
             }else {
 
 
-                $balance = User::where('id', Auth::id())->first()->main_wallet;
-                $trasnaction = new Transaction();
-                $trasnaction->user_id = Auth::id();
-                $trasnaction->ref_trans_id = $trans_id;
-                $trasnaction->type = "Reversal";
-                $trasnaction->main_type = "Reversal";
-                $trasnaction->transaction_type = "Reversal";
-                $trasnaction->title = "Reversal";
-                $trasnaction->credit = $charged_amount;
-                $trasnaction->amount = $amount;
-                $trasnaction->note = "Reversal  for | $destinationAccountName | $destinationAccountNumber | $bank_name  ";
-                $trasnaction->fee = 0;
-                $trasnaction->enkpay_Cashout_profit = 0;
-                $trasnaction->receiver_name = $receiver_name;
-                $trasnaction->receiver_account_no = $destinationAccountNumber;
-                $trasnaction->receiver_bank = $bank_name;
-                $trasnaction->balance = $debit;
-                $trasnaction->status = 3;
-                $trasnaction->save();
+                // $balance = User::where('id', Auth::id())->first()->main_wallet;
+                // $trasnaction = new Transaction();
+                // $trasnaction->user_id = Auth::id();
+                // $trasnaction->ref_trans_id = $trans_id;
+                // $trasnaction->type = "Reversal";
+                // $trasnaction->main_type = "Reversal";
+                // $trasnaction->transaction_type = "Reversal";
+                // $trasnaction->title = "Reversal";
+                // $trasnaction->credit = $charged_amount;
+                // $trasnaction->amount = $amount;
+                // $trasnaction->note = "Reversal  for | $destinationAccountName | $destinationAccountNumber | $bank_name  ";
+                // $trasnaction->fee = 0;
+                // $trasnaction->enkpay_Cashout_profit = 0;
+                // $trasnaction->receiver_name = $receiver_name;
+                // $trasnaction->receiver_account_no = $destinationAccountNumber;
+                // $trasnaction->receiver_bank = $bank_name;
+                // $trasnaction->balance = $debit;
+                // $trasnaction->status = 3;
+                // $trasnaction->save();
 
 
-                if ($wallet == 'main_account') {
-                    User::where('id', Auth::id()->first()->increment('main_wallet', $amount));
-                }
+                // if ($wallet == 'main_account') {
+                //     User::where('id', Auth::id()->first()->increment('main_wallet', $amount));
+                // }
 
-                if ($wallet == 'bonus_account') {
-                    User::where('id', Auth::id()->first()->increment('bonus_wallet', $amount));
-                }
+                // if ($wallet == 'bonus_account') {
+                //     User::where('id', Auth::id()->first()->increment('bonus_wallet', $amount));
+                // }
 
                 $full_name = Auth::user()->first_name. " ".Auth::user()->last_name;
 
                 $amount4 = number_format($charged_amount, 2);
-                $message = "$trans_id | NGN $amount4 has been reversed to  $full_name";
+                $message = "$trans_id | NGN $amount4 has hit error  $full_name";
                 send_notification($message);
 
                 return response()->json([
