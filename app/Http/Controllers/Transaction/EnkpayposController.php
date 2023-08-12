@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Transaction;
 
 use App\Http\Controllers\Controller;
 use App\Models\Charge;
+use App\Models\PosLog;
 use App\Models\Terminal;
 use App\Models\Transaction;
 use App\Models\User;
@@ -16,6 +17,79 @@ use Illuminate\Support\Facades\Hash;
 class EnkpayposController extends Controller
 {
     //ENPAY POS
+
+
+
+     public function enkpayPosLogs(request $request)
+    {
+
+        $key = $request->header('dataKey');
+        $RRN = $request->RRN;
+        $userID = $request->UserID;
+        $STAN = $request->STAN;
+        $amount = $request->amount;
+        $expireDate = $request->expireDate;
+        $message = $request->message;
+        $pan = $request->pan;
+        $responseCode = $request->responseCode;
+        $terminalID = $request->terminalID;
+        $transactionType = $request->transactionType;
+        $cardName = $request->cardName;
+        $userID = $request->UserID;
+        $DataKey = env('DATAKEY');
+
+
+        if($key == null){
+
+            $result = "No Key Passed";
+            send_notification($result);
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Empty Key',
+            ], 500);
+
+        }
+
+
+        if($key != $DataKey){
+
+            $result = "Invalid Key | $key";
+            send_notification($result);
+
+            return response()->json([
+                'status' => false,
+                'message' => 'Invalid Request',
+            ], 500);
+
+        }
+
+
+          //update Transactions
+          $trasnaction = new PosLog();
+          $trasnaction->user_id = $userID;
+          $trasnaction->e_ref = $RRN;
+          $trasnaction->transaction_type = $transactionType;
+          $trasnaction->title = "POS Transasction Log";
+          $trasnaction->amount = $amount;
+          $trasnaction->sender_name = $pan;
+          $trasnaction->serial_no = $terminalID;
+          $trasnaction->sender_account_no = $pan;
+          $trasnaction->status = 1;
+          $trasnaction->save();
+
+
+
+          return response()->json([
+            'status' => true,
+            'message' => 'Log saved Successfully',
+        ], 200);
+
+
+
+
+
+    }
 
     public function enkpayPos(request $request)
     {
@@ -62,8 +136,6 @@ class EnkpayposController extends Controller
             ], 500);
 
         }
-
-
 
 
 
