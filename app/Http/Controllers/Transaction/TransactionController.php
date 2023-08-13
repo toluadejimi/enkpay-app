@@ -274,7 +274,6 @@ class TransactionController extends Controller
                 }
 
 
-                dd("hello");
 
 
 
