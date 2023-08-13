@@ -123,20 +123,13 @@ class SendCron extends Command
 
             } else {
 
-
-                User::where('id', $trx->user_id)->increment('main_wallet', $trx->debit);
-
                 $balance = User::where('id', $trx->user_id)->first()->main_wallet;
-
-
-
-
                 PendingTransaction::where('ref_trans_id', $trx->ref_trans_id)->update(['status' => 3]);
                 Transaction::where('ref_trans_id', $trx->ref_trans_id)->update(['status' => 3]);
                 $transfer_charges = Charge::where('title', 'transfer_fee')->first()->amount;
-
                 $user_wallet_banlance = User::where('id', $trx->user_id)->first()->main_wallet;
 
+                
                 //credit
                 $credit = $user_wallet_banlance + $trx->amount + $transfer_charges;
                 $update = User::where('id', $trx->user_id)

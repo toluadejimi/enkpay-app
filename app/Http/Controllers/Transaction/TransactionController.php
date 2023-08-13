@@ -215,6 +215,17 @@ class TransactionController extends Controller
                     ], 500);
                 }
 
+
+                if ($amount > 250000) {
+
+                    return response()->json([
+
+                        'status' => $this->failed,
+                        'message' => 'You can not transfer more than NGN 250,000.00 at a time',
+
+                    ], 500);
+                }
+
                 if (Auth()->user()->status == 1 && $amount > 20000) {
 
                     return response()->json([
@@ -263,6 +274,7 @@ class TransactionController extends Controller
                 }
 
 
+                dd("hello");
 
 
 
@@ -3118,7 +3130,13 @@ class TransactionController extends Controller
             ]);
 
 
-            User::where('id', $trx->user_id)->increment('main_wallet', $trx->debit);
+            $wallet = User::where('id', $trx->user_id)->first()->main_wallet;
+            $update = $trx->debit + $wallet;
+            User::where('id', $trx->user_id)->update(['main_wallet' => $update]);
+
+
+
+
 
             $balance = User::where('id', $trx->user_id)->first()->main_wallet;
             $trasnaction = new Transaction();
