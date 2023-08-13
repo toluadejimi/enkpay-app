@@ -23,7 +23,6 @@ class EnkpayposController extends Controller
      public function enkpayPosLogs(request $request)
     {
 
-        dd('hello');
 
         $key = $request->header('dataKey');
         $RRN = $request->RRN;
