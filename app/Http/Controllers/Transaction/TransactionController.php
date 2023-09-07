@@ -2855,10 +2855,6 @@ class TransactionController extends Controller
         ) {
 
 
-
-
-
-
             $StatusCode = $request->StatusCode;
             $StatusDescription = $request->StatusDescription;
             $SerialNumber = $request->SerialNumber ?? $request->serial_number;
@@ -2938,21 +2934,10 @@ class TransactionController extends Controller
                 if ($TransactionType == 'BillsPayment') {
 
                     //update Transactions
-                    $trasnaction = new Transaction();
-                    $trasnaction->user_id = $user_id;
-                    $trasnaction->ref_trans_id = $trans_id;
-                    $trasnaction->e_ref = $TransactionReference;
-                    $trasnaction->transaction_type = $TransactionType;
-                    $trasnaction->debit = $Amount;
-                    $trasnaction->amount = $Amount;
-                    $trasnaction->serial_no = $SerialNumber;
-                    $trasnaction->title = "EP Bills";
-                    $trasnaction->note = "EP VAS | $BillService | $BillCategory | $Beneficiary ";
-                    $trasnaction->fee = $Fee;
-                    $trasnaction->balance = $debit_wallet;
-                    $trasnaction->main_type = "EPvas";
-                    $trasnaction->status = 1;
-                    $trasnaction->save();
+                    Transaction::where('ref_trans_id', $TransactionReference)->update([
+                        'status' => 1
+                    ]);
+               
                 }
 
                 $amount4 = number_format($Amount, 2);
@@ -3462,12 +3447,12 @@ class TransactionController extends Controller
                 $trasnaction->user_id = $user_id;
                 $trasnaction->ref_trans_id = $trans_id;
                 $trasnaction->e_ref = $reference;
-                $trasnaction->transaction_type = "EP TRANSFER";
+                $trasnaction->transaction_type = "EP Bills";
                 $trasnaction->debit = $amount;
                 $trasnaction->amount = $amount;
-                $trasnaction->title = "POS Transfer";
+                $trasnaction->title = "EP Bills";
                 $trasnaction->balance = $debit;
-                $trasnaction->main_type = "Transfer";
+                $trasnaction->main_type = "EPvas";
                 $trasnaction->serial_no = $SerialNumber;
                 $trasnaction->enkPay_Cashout_profit = 0;
                 $trasnaction->save();
