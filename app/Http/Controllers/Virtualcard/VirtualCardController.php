@@ -285,10 +285,7 @@ class VirtualCardController extends Controller
 
         } else {
 
-              User::where('id', Auth::id())->increment('main_wallet', $amount_to_charge);
-
             send_notification($message);
-
             return response()->json([
                 'status' => false,
                 'message' => 'Service not available at the moment, Please try again later',
