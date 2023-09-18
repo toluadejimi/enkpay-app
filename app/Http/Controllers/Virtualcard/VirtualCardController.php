@@ -7,8 +7,8 @@ use App\Models\Settings;
 use App\Models\Transactions;
 use App\Models\User;
 use App\Models\VCard;
-use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class VirtualCardController extends Controller
 {
@@ -169,7 +169,7 @@ class VirtualCardController extends Controller
     public function fund_card(Request $request)
     {
 
-      
+
 
         if (Auth::user()->status != 2) {
 
@@ -205,7 +205,7 @@ class VirtualCardController extends Controller
         }
 
 
-        $e_ref = random_int(1000000, 9999999);
+        $e_ref = trx();
 
 
 

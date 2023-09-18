@@ -158,7 +158,7 @@ class PowerController extends Controller
 
         $request_id = date('YmdHis') . Str::random(4);
 
-        $referenceCode = "ENK-" . random_int(1000000, 999999999);
+        $referenceCode = trx();
 
         $serviceid = User::where('id', Auth::id())
             ->first()->eletric_company;

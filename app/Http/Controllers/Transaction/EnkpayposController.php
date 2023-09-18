@@ -8,7 +8,6 @@ use App\Models\PosLog;
 use App\Models\Terminal;
 use App\Models\Transaction;
 use App\Models\User;
-use Auth;
 use Illuminate\Http\Request;
 use Defuse\Crypto\Crypto;
 use Defuse\Crypto\Key;
@@ -164,7 +163,7 @@ class EnkpayposController extends Controller
 
 
 
-        $trans_id = "ENK-" . random_int(100000, 999999);
+        $trans_id = trx();
 
         //$verify1 = hash('sha512', $key);
 

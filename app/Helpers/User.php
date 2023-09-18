@@ -256,6 +256,19 @@ if (!function_exists('send_notification')) {
 }
 
 
+if (!function_exists('trx')) {
+
+    function trx()
+    {
+
+        $refcode = "ENK-" . random_int(1000000, 999999999).date('Ymd His');
+
+        return $refcode;
+
+    }
+}
+
+
 if (!function_exists('store_vfd_banks')) {
     function store_vfd_banks()
     {

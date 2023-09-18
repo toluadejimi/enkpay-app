@@ -11,9 +11,9 @@ use App\Models\Validtransfer;
 use App\Models\VirtualAccount;
 use App\Models\Webkey;
 use App\Models\Webtransfer;
-use Auth;
 use DateTimeZone;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Mail;
 use SebastianBergmann\Type\NullType;
@@ -222,7 +222,7 @@ class VirtualaccountController extends Controller
 
             $deposit_charges = Charge::where('id', 2)->first()->amount;
 
-            $trans_id = "ENK-" . random_int(100000, 999999);
+            $trans_id = trx();
             $verify1 = hash('sha512', $key);
 
             if ($verify1 == $header) {
@@ -610,7 +610,7 @@ class VirtualaccountController extends Controller
             $key = env('POKEY');
 
 
-            $trans_id = "ENK-" . random_int(100000, 999999);
+            $trans_id = trx();
 
             $verify1 = hash('sha512', $key);
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\Charge;
 use App\Models\Terminal;
@@ -10,7 +11,6 @@ use App\Models\Transaction;
 use App\Models\User;
 use App\Models\VirtualAccount;
 use App\Models\Webtransfer;
-use Auth;
 use DateTimeZone;
 use Illuminate\Support\Facades\Hash;
 use Mail;
@@ -35,7 +35,7 @@ class WebpaymentController extends Controller
 
         $arrays = explode(" ", $string );
 
-      
+
 
         $id = $arrays[0];
         $payable_amount =$arrays[1];
@@ -112,13 +112,13 @@ class WebpaymentController extends Controller
 
 
 
-        
+
 
         $credit_marchant = User::where('id',$id)->increment('main_wallet', $amount);
 
         $marchant_balance = User::where('id',$id)->first()->main_wallet;
 
-     
+
 
 
         $trasnaction = new Transaction();

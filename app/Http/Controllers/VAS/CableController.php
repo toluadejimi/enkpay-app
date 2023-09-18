@@ -104,7 +104,7 @@ class CableController extends Controller
                 ], 500);
             }
 
-            $referenceCode = "ENK-" . random_int(1000000, 999999999);
+            $referenceCode = trx();
 
             $auth = env('VTAUTH');
 

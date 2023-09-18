@@ -14,9 +14,9 @@ use App\Models\Transaction;
 use App\Models\Transfer;
 use App\Models\User;
 use App\Models\VfdBank;
-use Auth;
 use DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Mail;
 use Carbon\Carbon;
@@ -110,7 +110,7 @@ class TransactionController extends Controller
                 $get_description = $request->narration;
                 $pin = $request->pin;
 
-                $referenceCode = "ENK-" . random_int(1000000, 999999999);
+                $referenceCode = trx();
 
                 $transfer_charges = Charge::where('title', 'transfer_fee')->first()->amount;
                 $bank_name = VfdBank::select('bankName')->where('code', $destinationBankCode)->first()->bankName ?? null;
@@ -280,7 +280,7 @@ class TransactionController extends Controller
                 $status = 200;
                 $message = "Error from Errand Pay";
                 $enkpay_profit = $transfer_charges - 10;
-                $trans_id = "ENK-" . random_int(100000, 999999);
+                $trans_id = trx();
 
                 if ($status == 200) {
 
@@ -455,7 +455,7 @@ class TransactionController extends Controller
                 $get_description = $request->narration;
                 $pin = $request->pin;
 
-                $referenceCode = "ENK-" . random_int(1000000, 999999999);
+                $referenceCode = trx();
 
                 $transfer_charges = Charge::where('title', 'transfer_fee')->first()->amount;
 
@@ -612,7 +612,7 @@ class TransactionController extends Controller
 
                 $message = "Error from Errand Pay | $error ";
 
-                $trans_id = "ENK-" . random_int(100000, 999999);
+                $trans_id = trx();
 
                 $TransactionReference = $var->data->reference ?? null;
 
@@ -747,7 +747,7 @@ class TransactionController extends Controller
                 $destinationAccountName = null; //resolve_bank($account_number, $bank_code);
 
                 $bank_name = VfdBank::select('bankName')->where('code', $destinationBankCode)->first()->bankName ?? null;
-                $referenceCode = "ENK-" . random_int(1000000, 999999999);
+                $referenceCode = trx();
                 $transfer_charges = Charge::where('title', 'transfer_fee')->first()->amount;
 
                 $amoutCharges = $amount + $transfer_charges;
@@ -849,7 +849,7 @@ class TransactionController extends Controller
                 }
 
 
-                $trans_id = "ENK-" . random_int(100000, 999999);
+                $trans_id = trx();
 
 
                 $enkpay_profit = $transfer_charges - 10;
@@ -1099,7 +1099,7 @@ class TransactionController extends Controller
             $get_description = "Self Cash out to bank account";
             $pin = $request->pin;
 
-            $referenceCode = "ENK-" . random_int(1000000, 999999999);
+            $referenceCode = trx();
 
             $transfer_charges = Charge::where('title', 'transfer_fee')->first()->amount;
             $bank_name = VfdBank::select('bankName')->where('code', $destinationBankCode)->first()->bankName ?? null;
@@ -1250,7 +1250,7 @@ class TransactionController extends Controller
             $status = 200;
             $message = "Error from Errand Pay";
             $enkpay_profit = $transfer_charges - 10;
-            $trans_id = "ENK-" . random_int(100000, 999999);
+            $trans_id = trx();
 
             if ($status == 200) {
 
@@ -1426,7 +1426,7 @@ class TransactionController extends Controller
             $get_description = "Cash out to " . "|" . $destinationAccountNumber . " | " . $destinationAccountName;
             $pin = $request->pin;
 
-            $referenceCode = "ENK-" . random_int(1000000, 999999999);
+            $referenceCode = trx();
 
             $transfer_charges = Charge::where('title', 'transfer_fee')->first()->amount;
 
@@ -1576,7 +1576,7 @@ class TransactionController extends Controller
 
             $message = "Error from Bank Transfer" . "  |  " . $var->error->message ?? null;
 
-            $trans_id = "ENK-" . random_int(100000, 999999);
+            $trans_id = trx();
 
             $TransactionReference = $var->data->reference ?? null;
 
@@ -1709,7 +1709,7 @@ class TransactionController extends Controller
             $get_description = "Cash out to " . "|" . $destinationAccountNumber . " | " . $destinationAccountName;
             $pin = $request->pin;
 
-            $referenceCode = "ENK-" . random_int(1000000, 999999999);
+            $referenceCode = trx();
 
             $transfer_charges = Charge::where('title', 'transfer_fee')->first()->amount;
 
@@ -2144,7 +2144,7 @@ class TransactionController extends Controller
             $sender_l_name = last_name() ?? null;
             $sender_full_name = $sender_f_name . "  " . $sender_l_name;
 
-            $trans_id = "ENK-" . random_int(100000, 999999);
+            $trans_id = trx();
 
             //check
 
@@ -2461,7 +2461,7 @@ class TransactionController extends Controller
             $eip = env('EIP');
             //$eip = '127.0.0.1';
 
-            $trans_id = "ENK-" . random_int(100000, 999999);
+            $trans_id = trx();
 
             //$verify1 = hash('sha512', $key);
 
@@ -2615,7 +2615,7 @@ class TransactionController extends Controller
             $eip = env('EIP');
             //$eip = '127.0.0.1';
 
-            $trans_id = "ENK-" . random_int(100000, 999999);
+            $trans_id = trx();
 
             //$verify1 = hash('sha512', $key);
 
@@ -2777,7 +2777,7 @@ class TransactionController extends Controller
             $BillService = $request->AdditionalDetails['BillService'] ?? null;
             $Beneficiary = $request->AdditionalDetails['Beneficiary'] ?? null;
 
-            $trans_id = "ENK-" . random_int(100000, 999999);
+            $trans_id = trx();
 
             $terminal_charge = Charge::where('title', 'terminal_charge')
                 ->first()->amount;
@@ -2875,7 +2875,7 @@ class TransactionController extends Controller
 
             $key = env('ERIP');
 
-            $trans_id = "ENK-" . random_int(100000, 999999);
+            $trans_id = trx();
 
             $verify1 = hash('sha512', $key);
 
@@ -2937,7 +2937,7 @@ class TransactionController extends Controller
                     Transaction::where('ref_trans_id', $TransactionReference)->update([
                         'status' => 1
                     ]);
-               
+
                 }
 
                 $amount4 = number_format($Amount, 2);
@@ -2973,7 +2973,7 @@ class TransactionController extends Controller
             $DestinationAccountNumber = $request->AdditionalDetails['DestinationAccountNumber'] ?? null;
             $DestinationBankName = $request->AdditionalDetails['DestinationBankName'] ?? null;
 
-            $trans_id = "ENK-" . random_int(100000, 999999);
+            $trans_id = trx();
 
 
 
@@ -3182,7 +3182,7 @@ class TransactionController extends Controller
 
         $oip = env('ERIP');
 
-        $trans_id = "ENK-" . random_int(100000, 999999);
+        $trans_id = trx();
 
         //Get user ID
         $user_id = Terminal::where('serial_no', $SerialNumber)
