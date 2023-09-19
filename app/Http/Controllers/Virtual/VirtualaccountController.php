@@ -601,7 +601,7 @@ class VirtualaccountController extends Controller
 
         $trans_id = trx();
 
-        $verify1 = hash('sha512', $key);
+        // $verify1 = hash('sha512', $key);
 
         // dd($verify1, $header);
 
@@ -609,7 +609,7 @@ class VirtualaccountController extends Controller
 
         // dd($key, $verify2, $verify1, $header);
 
-        if ($verify1 == $header) {
+        if ($key == $header) {
 
             $deposit_charges = Charge::where('title', 'bwebpay')->first()->amount;
 
