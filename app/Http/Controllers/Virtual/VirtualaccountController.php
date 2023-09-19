@@ -555,6 +555,8 @@ class VirtualaccountController extends Controller
 
 
         $key = env('HASHKEY');
+        $key2 = env('HASHKEY2');
+
         $header = $request->header('X-Auth-Signature');
 
         if ($header == null) {
@@ -566,7 +568,7 @@ class VirtualaccountController extends Controller
             ], 200);
         }
 
-        if ($key != $header) {
+        if ($key != $header || $key2 != $header) {
 
             $sessionId = $request->sessionId;
 
