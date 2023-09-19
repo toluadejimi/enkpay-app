@@ -547,11 +547,13 @@ class VirtualaccountController extends Controller
         $ip = $request->ip();
 
         $ip2 = env('PROIP');
+        $ip3 = env('PROIP2');
+
 
         $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
         send_notification($result);
 
-        if ($ip != $ip2) {
+        if ($ip != $ip2 || $ip != $ip3 ) {
         $parametersJson = json_encode($request->all());
         $headers = json_encode($request->headers->all());
         $message = 'ip does not match';
@@ -614,11 +616,11 @@ class VirtualaccountController extends Controller
 
             $verify1 = hash('sha512', $key);
 
-            //dd($verify1, $header);
+            // dd($verify1, $header);
 
-            //$verify2 = strtoupper($verify1);
+            // $verify2 = strtoupper($verify1);
 
-            //dd($key, $verify2, $verify1, $header);
+            // dd($key, $verify2, $verify1, $header);
 
         if ($verify1 == $header) {
 
