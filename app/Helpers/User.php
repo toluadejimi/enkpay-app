@@ -716,7 +716,7 @@ if (!function_exists('create_v_account')) {
                 send_notification($message);
                 return 200;
             } else {
-                $message = "VFD ERROR | $name | " . $var->error->message ?? null;
+                $message = "VFD ERROR | $name | " . $error ?? null;
                 send_notification($message);
                 return 500;
             }
