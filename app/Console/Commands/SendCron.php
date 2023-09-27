@@ -101,6 +101,7 @@ class SendCron extends Command
 
             $var = json_decode($var);
 
+
             $error = $var->error->message ?? null;
             $TransactionReference = $var->data->reference ?? null;
             $status = $var->code ?? null;
@@ -113,7 +114,6 @@ class SendCron extends Command
                 PendingTransaction::where('ref_trans_id', $trx->ref_trans_id)->delete();
                 $user_id = PendingTransaction::where('ref_trans_id', $trx->ref_trans_id)->first()->user_id ?? null;
                 PendingTransaction::where('user_id', $user_id)->delete();
-
 
 
                 $message = "Transaction |  $TransactionReference | NGN $trx->amount | has been sent to VFD ";
@@ -129,7 +129,7 @@ class SendCron extends Command
                 $transfer_charges = Charge::where('title', 'transfer_fee')->first()->amount;
                 $user_wallet_banlance = User::where('id', $trx->user_id)->first()->main_wallet;
 
-                
+
                 //credit
                 $credit = $user_wallet_banlance + $trx->amount + $transfer_charges;
                 $update = User::where('id', $trx->user_id)

@@ -87,6 +87,12 @@ Route::post('v1/merchant-details', [ProfileController::class, 'view_agent_accoun
 
 //Transactions
 Route::post('transaction-status', [TransactionController::class, 'transactiion_status']);
+Route::post('test-transaction', [TransactionController::class, 'test_transaction']);
+
+
+
+
+
 
 //Get Pool Banalce
 Route::get('pool-balance', [TransactionController::class, 'pool_account']);

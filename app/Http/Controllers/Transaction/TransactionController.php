@@ -3947,4 +3947,53 @@ class TransactionController extends Controller
             return $th->getMessage();
         }
     }
+
+
+    public function test_transaction(request $request){
+
+        $erran_api_key = errand_api_key();
+        $epkey = env('EPKEY');
+        $curl = curl_init();
+        $data = array(
+
+            "amount" => "100",
+            "destinationAccountNumber" => "0017019120",
+            "destinationBankCode" => "221",
+            "destinationAccountName" => "Adejimi Tolulope",
+
+        );
+
+        $post_data = json_encode($data);
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => $post_data,
+            CURLOPT_HTTPHEADER => array(
+                "Authorization: Bearer $erran_api_key",
+                "EpKey: $epkey",
+                'Content-Type: application/json',
+            ),
+        ));
+
+        $var = curl_exec($curl);
+
+        dd($var, $post_data, $epkey, $erran_api_key);
+
+        curl_close($curl);
+
+        $var = json_decode($var);
+
+    }
+
+
+
+
+
 }
