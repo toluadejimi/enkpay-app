@@ -3986,11 +3986,13 @@ class TransactionController extends Controller
 
         $server_ip = request()->server('SERVER_ADDR');
 
-        dd($var, $server_ip, $post_data, $epkey, $erran_api_key);
 
         curl_close($curl);
 
         $var = json_decode($var);
+
+        dd($var, $server_ip, $post_data, $epkey, $erran_api_key);
+
 
     }
 
