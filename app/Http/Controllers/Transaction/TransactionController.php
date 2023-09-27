@@ -3984,7 +3984,9 @@ class TransactionController extends Controller
 
         $var = curl_exec($curl);
 
-        dd($var, $post_data, $epkey, $erran_api_key);
+        $server_ip = request()->server('SERVER_ADDR');
+
+        dd($var, $server_ip, $post_data, $epkey, $erran_api_key);
 
         curl_close($curl);
 
