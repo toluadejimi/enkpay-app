@@ -3989,9 +3989,9 @@ class TransactionController extends Controller
 
         curl_close($curl);
 
-        $var = json_decode($var);
+        $result = json_decode($var);
 
-        dd($var, $server_ip, $post_data, $epkey, $erran_api_key);
+        dd($result, $var $server_ip, $post_data, $epkey, $erran_api_key);
 
 
     }
