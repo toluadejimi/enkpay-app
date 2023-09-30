@@ -767,7 +767,7 @@ class VirtualaccountController extends Controller
                 $trasnaction->sender_bank = $sourceBankName;
                 $trasnaction->serial_no = $SerialNumber;
                 $trasnaction->sender_account_no = $sourceAccountNumber;
-                $trasnaction->receiver_account = $accountNumber;
+                $trasnaction->receiver_account_no = $accountNumber;
                 $trasnaction->balance = $balance;
                 $trasnaction->status = 1;
                 $trasnaction->save();
