@@ -629,7 +629,7 @@ class LoginController extends Controller
             if (!auth()->attempt($credentials)) {
                 return response()->json([
                     'status' => $this->failed,
-                    'message' => "pIncorrect Pin \n\n Please try again!"
+                    'message' => "Incorrect Pin \n\n Please try again!"
                 ], 500);
             }
 
@@ -700,7 +700,7 @@ class LoginController extends Controller
 
         }
 
- 
+
             $credentials = request(['phone', 'password']);
             Passport::tokensExpireIn(Carbon::now()->addMinutes(20));
             Passport::refreshTokensExpireIn(Carbon::now()->addMinutes(20));
