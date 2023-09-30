@@ -749,7 +749,7 @@ class VirtualaccountController extends Controller
                 if( $web_trans_id == null){
                     $refid = $trans_id;
                 }else{
-                    $refid = $web_trans_id
+                    $refid = $web_trans_id;
                 }
 
 
