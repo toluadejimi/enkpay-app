@@ -744,13 +744,19 @@ class VirtualaccountController extends Controller
 
 
                 $web_trans_id = WebTransfer::where('v_account_no', $accountNumber)
-                ->where('payable_amount', $transactionAmount)->first()->trans_id;
+                ->where('payable_amount', $transactionAmount)->first()->trans_id ?? null;
+
+                if( $web_trans_id == null){
+                    $refid = $trans_id;
+                }else{
+                    $refid = $web_trans_id
+                }
 
 
                 //update Transactions
                 $trasnaction = new Transaction();
                 $trasnaction->user_id = $user_id;
-                $trasnaction->ref_trans_id = $web_trans_id ?? $trans_id;
+                $trasnaction->ref_trans_id = $refid;
                 $trasnaction->e_ref = $settlementId;
                 $trasnaction->type = "webpay";
                 $trasnaction->transaction_type = "VirtualFundWallet";
