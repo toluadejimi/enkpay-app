@@ -33,7 +33,7 @@ class Kernel extends ConsoleKernel
 
 
         $schedule->command('app:solve-credit')
-        ->everyMinute();
+        ->twiceDaily(11, 18);
 
 
 
