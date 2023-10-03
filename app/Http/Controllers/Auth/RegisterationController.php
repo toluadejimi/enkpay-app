@@ -1068,7 +1068,13 @@ class RegisterationController extends Controller
             $first_name = $request->first_name;
             $last_name = $request->last_name;
             $gender = $request->gender;
-            $dob = $request->dob;
+
+            //$dob = $request->dob;
+
+            $date = str_replace('/', '-', $request->dob);
+            $dob = date('Y-m-d', strtotime($date));
+
+
             $street = $request->street;
             $state = $request->state;
             $lga = $request->lga;
@@ -1098,7 +1104,14 @@ class RegisterationController extends Controller
                 $create->first_name = $first_name;
                 $create->phone = $phone_no;
                 $create->last_name = $last_name;
-                $create->dob = $dob;
+                // $create->dob = $dob;
+
+                  //$dob = $request->dob;
+
+                $date = str_replace('/', '-', $request->dob);
+                $dob = date('Y-m-d', strtotime($date));
+
+                
                 $create->gender = $gender;
                 $create->email = $email;
                 $create->email = $device_id;
