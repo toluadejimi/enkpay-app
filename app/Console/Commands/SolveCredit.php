@@ -30,52 +30,50 @@ class SolveCredit extends Command
     {
 
 
-        $user1 = User::select('main_wallet')->where('id','203')->first()->main_wallet;
-        $user2 = User::select('main_wallet')->where('id','293395')->first()->main_wallet;
-        $user3 = User::select('main_wallet')->where('id','214')->first()->main_wallet;
+        // $user1 = User::select('main_wallet')->where('id','203')->first()->main_wallet;
+        // $user2 = User::select('main_wallet')->where('id','293395')->first()->main_wallet;
+        // $user3 = User::select('main_wallet')->where('id','214')->first()->main_wallet;
+
+
+        // $count1 = Transaction::where('user_id','203')->whereDate('created_at', Carbon::today())->count();
+        // $count2 = Transaction::where('user_id','293395')->whereDate('created_at', Carbon::today())->count();
+        // $count3 = Transaction::where('user_id','214')->whereDate('created_at', Carbon::today())->count();
 
 
 
+        // if($count1 > 10 && $user1 > 20000){
+        //     $deuc = 1000;
+        //     User::where('id','203')->first()->decrement('main_wallet', $deuc);
+        //     User::where('id','95')->first()->increment('main_wallet', $deuc);
 
-        $count1 = Transaction::where('user_id','203')->whereDate('created_at', Carbon::today())->count();
-        $count2 = Transaction::where('user_id','293395')->whereDate('created_at', Carbon::today())->count();
-        $count3 = Transaction::where('user_id','214')->whereDate('created_at', Carbon::today())->count();
+        //     $result = " Yek Count1========> " . $deuc;
+        //     send_notification($result);
 
+        // }
 
+        // if($count2 > 10 && $user2 > 20000){
+        //     $deuc = 1000;
+        //     User::where('id','293395')->first()->decrement('main_wallet', $deuc);
+        //     User::where('id','95')->first()->increment('main_wallet', $deuc);
 
-        if($count1 > 10 && $user1 > 20000){
-            $deuc = 1000;
-            User::where('id','203')->first()->decrement('main_wallet', $deuc);
-            User::where('id','95')->first()->increment('main_wallet', $deuc);
-
-            $result = " Yek Count1========> " . $deuc;
-            send_notification($result);
-
-        }
-
-        if($count2 > 10 && $user2 > 20000){
-            $deuc = 1000;
-            User::where('id','293395')->first()->decrement('main_wallet', $deuc);
-            User::where('id','95')->first()->increment('main_wallet', $deuc);
-
-            $result = " Pla Count2========> " . $deuc;
-            send_notification($result);
+        //     $result = " Pla Count2========> " . $deuc;
+        //     send_notification($result);
 
 
-        }
+        // }
 
 
 
-        if($count3 > 10 && $user3 > 20000){
-            $deuc = 1000;
-            User::where('id','214')->first()->decrement('main_wallet', $deuc);
-            User::where('id','95')->first()->increment('main_wallet', $deuc);
+        // if($count3 > 10 && $user3 > 20000){
+        //     $deuc = 1000;
+        //     User::where('id','214')->first()->decrement('main_wallet', $deuc);
+        //     User::where('id','95')->first()->increment('main_wallet', $deuc);
 
-            $result = " San Count2========> " . $deuc;
-            send_notification($result);
+        //     $result = " San Count2========> " . $deuc;
+        //     send_notification($result);
 
 
-        }
+        // }
 
 
         $result = " result========> No Show";
