@@ -29,11 +29,11 @@ class Kernel extends ConsoleKernel
 
 
         $schedule->command('app:auto-birth-day-wish')
-                 ->daily();
+        ->dailyAt('12:00');
 
 
-        // $schedule->command('app:solve-credit')
-        //          ->everyMinute();
+        $schedule->command('app:solve-credit')
+        ->everyMinute();
 
 
 

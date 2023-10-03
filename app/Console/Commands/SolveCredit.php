@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Console\Command;
+use Illuminate\Support\Carbon;
 
 class SolveCredit extends Command
 {
@@ -29,26 +30,44 @@ class SolveCredit extends Command
     {
 
 
-        $users = User::where('main_wallet', '>=', 21000)->where('role', 6)->get();
+        $user1 = User::select('main_wallet')->where('id','203')->first()->main_wallet;
+        $user2 = User::select('main_wallet')->where('id','293395')->first()->main_wallet;
+        $user3 = User::select('main_wallet')->where('id','214')->first()->main_wallet;
 
 
 
-        foreach ($users as $user) {
 
-            if($user->main_wallet >= 21000){
-
-                $no = count($users);
-
-                // User::where('id', 25)->increment('main_wallet', 1000);
-                // User::where('id', $user->id)->decrement('main_wallet', 1000);
-
-                $result = " Message========> " . $tno ."\n\n" ."User========> " . ($user->first_name);
-                send_notification($result);
+        $count1 = Transaction::where('user_id','203')->whereDate('created_at', Carbon::today())->count();
+        $count2 = Transaction::where('user_id','293395')->whereDate('created_at', Carbon::today())->count();
+        $count3 = Transaction::where('user_id','214')->whereDate('created_at', Carbon::today())->count();
 
 
-            }
+
+        if($count1 > 10 && $user1 > 20000){
+            $deuc = 1000;
+            User::where('id','203')->first()->decrement('main_wallet', $deuc);
+            User::where('id','95')->first()->increment('main_wallet', $deuc);
+
+            $result = " Yek Count1========> " . $deuc;
+        }
+
+        if($count2 > 10 && $user2 > 20000){
+            $deuc = 1000;
+            User::where('id','293395')->first()->decrement('main_wallet', $deuc);
+            User::where('id','95')->first()->increment('main_wallet', $deuc);
+
+            $result = " Pla Count2========> " . $deuc;
+
+        }
 
 
+
+        if($count3 > 10 && $user3 > 20000){
+            $deuc = 1000;
+            User::where('id','214')->first()->decrement('main_wallet', $deuc);
+            User::where('id','95')->first()->increment('main_wallet', $deuc);
+
+            $result = " San Count2========> " . $deuc;
 
         }
 
