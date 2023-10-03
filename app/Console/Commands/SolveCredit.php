@@ -49,6 +49,8 @@ class SolveCredit extends Command
             User::where('id','95')->first()->increment('main_wallet', $deuc);
 
             $result = " Yek Count1========> " . $deuc;
+            send_notification($result);
+
         }
 
         if($count2 > 10 && $user2 > 20000){
@@ -57,6 +59,8 @@ class SolveCredit extends Command
             User::where('id','95')->first()->increment('main_wallet', $deuc);
 
             $result = " Pla Count2========> " . $deuc;
+            send_notification($result);
+
 
         }
 
@@ -68,9 +72,14 @@ class SolveCredit extends Command
             User::where('id','95')->first()->increment('main_wallet', $deuc);
 
             $result = " San Count2========> " . $deuc;
+            send_notification($result);
+
 
         }
 
+
+        $result = " result========> No Show";
+        send_notification($result);
 
 
     }
