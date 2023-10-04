@@ -91,8 +91,8 @@ final class Facade
             new Telemetry\System(
                 new Telemetry\SystemStopWatchWithOffset($offset),
                 new Telemetry\SystemMemoryMeter,
-                $this->garbageCollectorStatusProvider()
-            )
+                $this->garbageCollectorStatusProvider(),
+            ),
         );
 
         $this->sealed = true;
@@ -126,7 +126,7 @@ final class Facade
     {
         return new DispatchingEmitter(
             $this->deferredDispatcher(),
-            $this->createTelemetrySystem()
+            $this->createTelemetrySystem(),
         );
     }
 
@@ -135,7 +135,7 @@ final class Facade
         return new Telemetry\System(
             new Telemetry\SystemStopWatch,
             new Telemetry\SystemMemoryMeter,
-            $this->garbageCollectorStatusProvider()
+            $this->garbageCollectorStatusProvider(),
         );
     }
 
@@ -143,7 +143,7 @@ final class Facade
     {
         if ($this->deferringDispatcher === null) {
             $this->deferringDispatcher = new DeferringDispatcher(
-                new DirectDispatcher($this->typeMap())
+                new DirectDispatcher($this->typeMap()),
             );
         }
 
@@ -169,6 +169,8 @@ final class Facade
             Application\Started::class,
             Application\Finished::class,
 
+            Test\DataProviderMethodCalled::class,
+            Test\DataProviderMethodFinished::class,
             Test\MarkedIncomplete::class,
             Test\AfterLastTestMethodCalled::class,
             Test\AfterLastTestMethodFinished::class,
@@ -228,6 +230,9 @@ final class Facade
             TestRunner\Started::class,
             TestRunner\DeprecationTriggered::class,
             TestRunner\WarningTriggered::class,
+            TestRunner\GarbageCollectionDisabled::class,
+            TestRunner\GarbageCollectionTriggered::class,
+            TestRunner\GarbageCollectionEnabled::class,
 
             TestSuite\Filtered::class,
             TestSuite\Finished::class,
@@ -240,7 +245,7 @@ final class Facade
         foreach ($defaultEvents as $eventClass) {
             $typeMap->addMapping(
                 $eventClass . 'Subscriber',
-                $eventClass
+                $eventClass,
             );
         }
     }

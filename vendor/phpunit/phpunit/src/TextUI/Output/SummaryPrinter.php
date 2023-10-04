@@ -33,7 +33,7 @@ final class SummaryPrinter
         if ($result->numberOfTestsRun() === 0) {
             $this->printWithColor(
                 'fg-black, bg-yellow',
-                'No tests executed!'
+                'No tests executed!',
             );
 
             return;
@@ -49,8 +49,8 @@ final class SummaryPrinter
                     $result->numberOfTestsRun(),
                     $result->numberOfTestsRun() === 1 ? '' : 's',
                     $result->numberOfAssertions(),
-                    $result->numberOfAssertions() === 1 ? '' : 's'
-                )
+                    $result->numberOfAssertions() === 1 ? '' : 's',
+                ),
             );
 
             return;
@@ -62,54 +62,54 @@ final class SummaryPrinter
             if (!$result->hasTestsWithIssues()) {
                 $this->printWithColor(
                     $color,
-                    'OK, but some tests were skipped!'
+                    'OK, but some tests were skipped!',
                 );
             } else {
                 $this->printWithColor(
                     $color,
-                    'OK, but there are issues!'
+                    'OK, but there were issues!',
                 );
             }
         } else {
-            if ($result->hasTestErroredEvents()) {
+            if ($result->hasTestErroredEvents() || $result->hasTestTriggeredPhpunitErrorEvents()) {
                 $color = 'fg-white, bg-red';
 
                 $this->printWithColor(
                     $color,
-                    'ERRORS!'
+                    'ERRORS!',
                 );
             } elseif ($result->hasTestFailedEvents()) {
                 $color = 'fg-white, bg-red';
 
                 $this->printWithColor(
                     $color,
-                    'FAILURES!'
+                    'FAILURES!',
                 );
-            } elseif ($result->hasWarningEvents()) {
+            } elseif ($result->hasWarnings()) {
                 $this->printWithColor(
                     $color,
-                    'WARNINGS!'
+                    'WARNINGS!',
                 );
-            } elseif ($result->hasDeprecationEvents()) {
+            } elseif ($result->hasDeprecations()) {
                 $this->printWithColor(
                     $color,
-                    'DEPRECATIONS!'
+                    'DEPRECATIONS!',
                 );
-            } elseif ($result->hasNoticeEvents()) {
+            } elseif ($result->hasNotices()) {
                 $this->printWithColor(
                     $color,
-                    'NOTICES!'
+                    'NOTICES!',
                 );
             }
         }
 
         $this->printCountString($result->numberOfTestsRun(), 'Tests', $color, true);
         $this->printCountString($result->numberOfAssertions(), 'Assertions', $color, true);
-        $this->printCountString($result->numberOfTestErroredEvents() + $result->numberOfTestsWithTestTriggeredErrorEvents(), 'Errors', $color);
+        $this->printCountString($result->numberOfErrors(), 'Errors', $color);
         $this->printCountString($result->numberOfTestFailedEvents(), 'Failures', $color);
-        $this->printCountString($result->numberOfWarningEvents(), 'Warnings', $color);
-        $this->printCountString($result->numberOfDeprecationEvents(), 'Deprecations', $color);
-        $this->printCountString($result->numberOfNoticeEvents(), 'Notices', $color);
+        $this->printCountString($result->numberOfWarnings(), 'Warnings', $color);
+        $this->printCountString($result->numberOfDeprecations(), 'Deprecations', $color);
+        $this->printCountString($result->numberOfNotices(), 'Notices', $color);
         $this->printCountString($result->numberOfTestSuiteSkippedEvents() + $result->numberOfTestSkippedEvents(), 'Skipped', $color);
         $this->printCountString($result->numberOfTestMarkedIncompleteEvents(), 'Incomplete', $color);
         $this->printCountString($result->numberOfTestsWithTestConsideredRiskyEvents(), 'Risky', $color);
@@ -125,9 +125,9 @@ final class SummaryPrinter
                     '%s%s: %d',
                     $this->countPrinted ? ', ' : '',
                     $name,
-                    $count
+                    $count,
                 ),
-                false
+                false,
             );
 
             $this->countPrinted = true;

@@ -70,12 +70,17 @@ use Throwable;
  */
 final class PhptTestCase implements Reorderable, SelfDescribing, Test
 {
+    /**
+     * @psalm-var non-empty-string
+     */
     private readonly string $filename;
     private readonly AbstractPhpProcess $phpUtil;
     private string $output = '';
 
     /**
      * Constructs a test case with the given filename.
+     *
+     * @psalm-param non-empty-string $filename
      *
      * @throws Exception
      */
@@ -117,7 +122,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
         $emitter = EventFacade::emitter();
 
         $emitter->testPreparationStarted(
-            $this->valueObjectForEvents()
+            $this->valueObjectForEvents(),
         );
 
         try {
@@ -177,7 +182,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
             $this->renderForCoverage(
                 $code,
                 CodeCoverage::instance()->codeCoverage()->collectsBranchAndPathCoverage(),
-                $codeCoverageCacheDirectory
+                $codeCoverageCacheDirectory,
             );
         }
 
@@ -193,7 +198,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
                 true,
                 TestStatus::unknown(),
                 [],
-                []
+                [],
             );
         }
 
@@ -221,7 +226,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
                     $trace[0]['file'],
                     $trace[0]['line'],
                     $trace,
-                    $comparisonFailure ? $diff : ''
+                    $comparisonFailure ? $diff : '',
                 );
             }
 
@@ -399,7 +404,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
 
             EventFacade::emitter()->testSkipped(
                 $this->valueObjectForEvents(),
-                $message
+                $message,
             );
 
             EventFacade::emitter()->testFinished($this->valueObjectForEvents(), 0);
@@ -508,7 +513,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
                     !is_readable($testDirectory . $externalFilename)) {
                     throw new PhptExternalFileCannotBeLoadedException(
                         $section,
-                        $testDirectory . $externalFilename
+                        $testDirectory . $externalFilename,
                     );
                 }
 
@@ -566,7 +571,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
                 "'" . dirname($this->filename) . "'",
                 "'" . $this->filename . "'",
             ],
-            $code
+            $code,
         );
     }
 
@@ -589,7 +594,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
         $files = $this->getCoverageFiles();
 
         $template = new Template(
-            __DIR__ . '/../Util/PHP/Template/PhptTestCase.tpl'
+            __DIR__ . '/../Util/PHP/Template/PhptTestCase.tpl',
         );
 
         $composerAutoload = '\'\'';
@@ -625,7 +630,7 @@ final class PhptTestCase implements Reorderable, SelfDescribing, Test
                 'coverageFile'               => $files['coverage'],
                 'driverMethod'               => $pathCoverage ? 'forLineAndPathCoverage' : 'forLineCoverage',
                 'codeCoverageCacheDirectory' => $codeCoverageCacheDirectory,
-            ]
+            ],
         );
 
         file_put_contents($files['job'], $job);
