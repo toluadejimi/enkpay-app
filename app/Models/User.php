@@ -40,5 +40,9 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'type' => 'integer',
+        'is_phone_verified'=> 'integer',
+        'is_email_verified' => 'integer',
+        'is_bvn_verified' => 'integer',
     ];
 }

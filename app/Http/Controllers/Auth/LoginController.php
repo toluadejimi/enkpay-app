@@ -41,9 +41,6 @@ class LoginController extends Controller
     {
 
 
-
-
-
         $phone = $request->phone;
         $credentials = request(['phone', 'password']);
 
