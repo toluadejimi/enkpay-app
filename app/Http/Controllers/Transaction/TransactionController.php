@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Mail;
 use Carbon\Carbon;
+use GuzzleHttp\Client as GuzzleClient;
 
 
 class TransactionController extends Controller
@@ -35,14 +36,12 @@ class TransactionController extends Controller
 
 
             $pos_trx = Feature::where('id', 1)->first()->pos_transfer ?? null;
-            if($pos_trx == 0){
+            if ($pos_trx == 0) {
 
                 return response()->json([
                     'status' => $this->failed,
                     'message' => "Transfer is not available at the moment, \n\n Please try again after some time",
                 ], 500);
-
-
             }
 
 
@@ -119,9 +118,9 @@ class TransactionController extends Controller
 
 
                 $ckid = PendingTransaction::where('user_id', Auth::id())->first()->user_id ?? null;
-                if($ckid == Auth::id()){
+                if ($ckid == Auth::id()) {
 
-                    $message = Auth::user()->first_name. " " .Auth::user()->last_name. " | has reached this double endpoint";
+                    $message = Auth::user()->first_name . " " . Auth::user()->last_name . " | has reached this double endpoint";
                     send_notification($message);
 
                     return response()->json([
@@ -146,14 +145,13 @@ class TransactionController extends Controller
 
                 if (Auth::user()->status != 2) {
 
-                $message = Auth::user()->first_name. " ".Auth::user()->last_name. " | Unverified Account trying withdraw";
-                send_notification($message);
+                    $message = Auth::user()->first_name . " " . Auth::user()->last_name . " | Unverified Account trying withdraw";
+                    send_notification($message);
 
-                return response()->json([
-                    'status' => $this->failed,
-                    'message' => 'Please verify your account to enjoy enkpay full service',
-                ], 500);
-
+                    return response()->json([
+                        'status' => $this->failed,
+                        'message' => 'Please verify your account to enjoy enkpay full service',
+                    ], 500);
                 }
 
 
@@ -284,15 +282,15 @@ class TransactionController extends Controller
 
                 if ($status == 200) {
 
-                  //Debit
-                  $debited_amount = $transfer_charges + $amount;
+                    //Debit
+                    $debited_amount = $transfer_charges + $amount;
 
-                  if ($wallet == 'main_account') {
+                    if ($wallet == 'main_account') {
 
-                      User::where('id', Auth::id())->decrement('main_wallet', $debited_amount);
-                  } else {
-                      User::where('id', Auth::id())->decrement('bonus_wallet', $debited_amount);
-                  }
+                        User::where('id', Auth::id())->decrement('main_wallet', $debited_amount);
+                    } else {
+                        User::where('id', Auth::id())->decrement('bonus_wallet', $debited_amount);
+                    }
 
 
                     $balance = User::where('id', Auth::id())->first()->main_wallet;
@@ -377,7 +375,7 @@ class TransactionController extends Controller
                     $wallet = Auth::user()->main_wallet;
                     $name = Auth::user()->first_name . " " . Auth::user()->last_name;
                     $ip = $request->ip();
-                    $message = $name . "| Request to transfer NGN " . $amount . " | " . $bank_name . " | " . $destinationAccountNumber ." User balance | $user_balance ";
+                    $message = $name . "| Request to transfer NGN " . $amount . " | " . $bank_name . " | " . $destinationAccountNumber . " User balance | $user_balance ";
                     $result = "Message========> " . $message . "\n\nIP========> " . $ip;
                     send_notification($result);
 
@@ -967,7 +965,7 @@ class TransactionController extends Controller
                     //     User::where('id', Auth::id()->first()->increment('bonus_wallet', $amount));
                     // }
 
-                    $full_name = Auth::user()->first_name. " ".Auth::user()->last_name;
+                    $full_name = Auth::user()->first_name . " " . Auth::user()->last_name;
 
                     $amount4 = number_format($debited_amount, 2);
                     $message = "$trans_id | NGN $amount4 has been hit an error  $full_name";
@@ -990,35 +988,29 @@ class TransactionController extends Controller
     {
 
         $pos_trx = Feature::where('id', 1)->first()->pos_transfer ?? null;
-        if($pos_trx == 0){
+        if ($pos_trx == 0) {
 
             return response()->json([
                 'status' => $this->failed,
                 'message' => "Transfer is not available at the moment, \n\n Please try again after some time",
             ], 500);
-
-
         }
 
 
 
 
         $ckid = PendingTransaction::where('user_id', Auth::id())->first()->user_id ?? null;
-                if($ckid == Auth::id()){
+        if ($ckid == Auth::id()) {
 
-                    $message = Auth::user()->first_name. " " .Auth::user()->last_name. " | has reached this double endpoint";
-                    send_notification($message);
+            $message = Auth::user()->first_name . " " . Auth::user()->last_name . " | has reached this double endpoint";
+            send_notification($message);
 
-                    return response()->json([
+            return response()->json([
 
-                        'status' => $this->failed,
-                        'message' => 'Please wait for some time and try again',
+                'status' => $this->failed,
+                'message' => 'Please wait for some time and try again',
 
-        ], 500);
-
-
-
-
+            ], 500);
         }
 
 
@@ -1108,9 +1100,9 @@ class TransactionController extends Controller
 
 
             $ckid = PendingTransaction::where('user_id', Auth::id())->first()->user_id ?? null;
-            if($ckid == Auth::id()){
+            if ($ckid == Auth::id()) {
 
-                $message = Auth::user()->first_name. " " .Auth::user()->last_name. " | has reached this double endpoint";
+                $message = Auth::user()->first_name . " " . Auth::user()->last_name . " | has reached this double endpoint";
                 send_notification($message);
 
                 return response()->json([
@@ -1135,14 +1127,13 @@ class TransactionController extends Controller
 
             if (Auth::user()->status != 2) {
 
-            $message = Auth::user()->first_name. " ".Auth::user()->last_name. " | Unverified Account trying withdraw";
-            send_notification($message);
+                $message = Auth::user()->first_name . " " . Auth::user()->last_name . " | Unverified Account trying withdraw";
+                send_notification($message);
 
-            return response()->json([
-                'status' => $this->failed,
-                'message' => 'Please verify your account to enjoy enkpay full service',
-            ], 500);
-
+                return response()->json([
+                    'status' => $this->failed,
+                    'message' => 'Please verify your account to enjoy enkpay full service',
+                ], 500);
             }
 
 
@@ -1254,15 +1245,15 @@ class TransactionController extends Controller
 
             if ($status == 200) {
 
-              //Debit
-              $debited_amount = $transfer_charges + $amount;
+                //Debit
+                $debited_amount = $transfer_charges + $amount;
 
-              if ($wallet == 'main_account') {
+                if ($wallet == 'main_account') {
 
-                  User::where('id', Auth::id())->decrement('main_wallet', $debited_amount);
-              } else {
-                  User::where('id', Auth::id())->decrement('bonus_wallet', $debited_amount);
-              }
+                    User::where('id', Auth::id())->decrement('main_wallet', $debited_amount);
+                } else {
+                    User::where('id', Auth::id())->decrement('bonus_wallet', $debited_amount);
+                }
 
 
                 $balance = User::where('id', Auth::id())->first()->main_wallet;
@@ -1347,7 +1338,7 @@ class TransactionController extends Controller
                 $wallet = Auth::user()->main_wallet;
                 $name = Auth::user()->first_name . " " . Auth::user()->last_name;
                 $ip = $request->ip();
-                $message = $name . "| Request to transfer NGN " . $amount . " | " . $bank_name . " | " . $destinationAccountNumber ." User balance | $user_balance ";
+                $message = $name . "| Request to transfer NGN " . $amount . " | " . $bank_name . " | " . $destinationAccountNumber . " User balance | $user_balance ";
                 $result = "Message========> " . $message . "\n\nIP========> " . $ip;
                 send_notification($result);
 
@@ -1899,7 +1890,7 @@ class TransactionController extends Controller
                     'message' => "Transaction Processing",
 
                 ], 200);
-            }else {
+            } else {
 
 
                 // $balance = User::where('id', Auth::id())->first()->main_wallet;
@@ -1931,7 +1922,7 @@ class TransactionController extends Controller
                 //     User::where('id', Auth::id()->first()->increment('bonus_wallet', $amount));
                 // }
 
-                $full_name = Auth::user()->first_name. " ".Auth::user()->last_name;
+                $full_name = Auth::user()->first_name . " " . Auth::user()->last_name;
 
                 $amount4 = number_format($charged_amount, 2);
                 $message = "$trans_id | NGN $amount4 has hit error  $full_name";
@@ -2108,7 +2099,7 @@ class TransactionController extends Controller
 
 
             $ck_ip = User::where('id', Auth::id())->first()->ip_address ?? null;
-            if($ck_ip != $request->ip()){
+            if ($ck_ip != $request->ip()) {
 
                 $name = Auth::user()->first_name . " " . Auth::user()->last_name;
                 $ip = $request->ip();
@@ -2560,12 +2551,12 @@ class TransactionController extends Controller
                     $trasnaction->save();
                 }
 
-                $f_name = User::where('id',$user_id)->first()->first_name ?? null;
-                $l_name = User::where('id',$user_id)->first()->last_name ?? null;
+                $f_name = User::where('id', $user_id)->first()->first_name ?? null;
+                $l_name = User::where('id', $user_id)->first()->last_name ?? null;
 
                 $ip = $request->ip();
                 $amount4 = number_format($removed_comission, 2);
-                $result = $f_name." ".$l_name. "| fund NGN ".$amount4. " | using Card POS" . "\n\nIP========> " . $ip;
+                $result = $f_name . " " . $l_name . "| fund NGN " . $amount4 . " | using Card POS" . "\n\nIP========> " . $ip;
                 send_notification($result);
 
                 return response()->json([
@@ -2718,12 +2709,12 @@ class TransactionController extends Controller
 
 
 
-                $f_name = User::where('id',$user_id)->first()->first_name ?? null;
-                $l_name = User::where('id',$user_id)->first()->last_name ?? null;
+                $f_name = User::where('id', $user_id)->first()->first_name ?? null;
+                $l_name = User::where('id', $user_id)->first()->last_name ?? null;
 
                 $ip = $request->ip();
                 $amount4 = number_format($removed_comission, 2);
-                $result = $f_name." ".$l_name. "| fund NGN ".$amount4. " | using Card POS" . "\n\nIP========> " . $ip;
+                $result = $f_name . " " . $l_name . "| fund NGN " . $amount4 . " | using Card POS" . "\n\nIP========> " . $ip;
                 send_notification($result);
 
 
@@ -2731,7 +2722,7 @@ class TransactionController extends Controller
                     'status' => true,
                     'message' => 'Tranasaction Successsfull',
                 ], 200);
-              } else {
+            } else {
 
                 $parametersJson = json_encode($request->all());
                 $headers = json_encode($request->headers->all());
@@ -2912,13 +2903,12 @@ class TransactionController extends Controller
                 }
 
 
-                if($Amount > $main_wallet){
+                if ($Amount > $main_wallet) {
 
                     return response()->json([
                         'status' => false,
                         'message' => 'Insufficent Funds',
                     ], 500);
-
                 }
 
                 //debit
@@ -2937,7 +2927,6 @@ class TransactionController extends Controller
                     Transaction::where('ref_trans_id', $TransactionReference)->update([
                         'status' => 1
                     ]);
-
                 }
 
                 $amount4 = number_format($Amount, 2);
@@ -2980,7 +2969,7 @@ class TransactionController extends Controller
 
             //Get user ID
             $user_id = Transaction::where('e_ref', $TransactionReference)
-            ->first()->user_id ?? null;
+                ->first()->user_id ?? null;
 
             $f_name = User::where('id', $user_id)
                 ->first()->first_name ?? null;
@@ -3008,7 +2997,7 @@ class TransactionController extends Controller
 
             $status = Transaction::where('e_ref', $TransactionReference)->first()->status ?? null;
 
-            if($status == 1){
+            if ($status == 1) {
                 return response()->json([
                     'status' => false,
                     'message' => 'Tranasaction alredy confimed',
@@ -3019,24 +3008,23 @@ class TransactionController extends Controller
 
 
 
-                //check transaction
-                $e_ref = Transaction::where('e_ref', $TransactionReference)
-                    ->first()->e_ref ?? null;
+            //check transaction
+            $e_ref = Transaction::where('e_ref', $TransactionReference)
+                ->first()->e_ref ?? null;
 
-                if ($e_ref == null) {
+            if ($e_ref == null) {
 
-                    return response()->json([
-                        'status' => false,
-                        'e_ref' => $TransactionReference,
-                        'message' => 'Tranasaction not found',
-                    ], 500);
+                return response()->json([
+                    'status' => false,
+                    'e_ref' => $TransactionReference,
+                    'message' => 'Tranasaction not found',
+                ], 500);
+            }
 
-                }
-
-                   $update =  Transaction::where('e_ref', $TransactionReference)
-                        ->update([
-                            'status' => 1,
-                        ]);
+            $update =  Transaction::where('e_ref', $TransactionReference)
+                ->update([
+                    'status' => 1,
+                ]);
 
 
 
@@ -3231,14 +3219,12 @@ class TransactionController extends Controller
 
 
             $pos_trx = Feature::where('id', 1)->first()->pos_transfer ?? null;
-            if($pos_trx == 0){
+            if ($pos_trx == 0) {
 
                 return response()->json([
                     'status' => $this->failed,
                     'message' => "Transfer is not available at the moment, \n\n Please try again after some time",
                 ], 500);
-
-
             }
 
 
@@ -3323,20 +3309,20 @@ class TransactionController extends Controller
 
 
                 // //pending trnasaction
-                  $trasnaction = new PendingTransaction();
-                  $trasnaction->user_id = $user_id;
-                  $trasnaction->ref_trans_id = $trans_id;
-                  $trasnaction->e_ref = $reference;
-                  $trasnaction->debit = 0;
-                  $trasnaction->amount = 0;
-                  $trasnaction->bank_code = 0;
-                  $trasnaction->bank_code = "POS TRANSFER";
-                  $trasnaction->enkpay_Cashout_profit = 0;
-                  $trasnaction->receiver_name = "POS TRANSFER";
-                  $trasnaction->receiver_account_no = 0;
-                  $trasnaction->receiver_name = 0;
-                  $trasnaction->status = 1;
-                  $trasnaction->save();
+                $trasnaction = new PendingTransaction();
+                $trasnaction->user_id = $user_id;
+                $trasnaction->ref_trans_id = $trans_id;
+                $trasnaction->e_ref = $reference;
+                $trasnaction->debit = 0;
+                $trasnaction->amount = 0;
+                $trasnaction->bank_code = 0;
+                $trasnaction->bank_code = "POS TRANSFER";
+                $trasnaction->enkpay_Cashout_profit = 0;
+                $trasnaction->receiver_name = "POS TRANSFER";
+                $trasnaction->receiver_account_no = 0;
+                $trasnaction->receiver_name = 0;
+                $trasnaction->status = 1;
+                $trasnaction->save();
 
 
                 $amount4 = number_format($amount, 2);
@@ -3372,14 +3358,12 @@ class TransactionController extends Controller
         ) {
 
             $pos_trx = Feature::where('id', 1)->first()->pos_transfer ?? null;
-            if($pos_trx == 0){
+            if ($pos_trx == 0) {
 
                 return response()->json([
                     'status' => $this->failed,
                     'message' => "Transfer is not available at the moment, \n\n Please try again after some time",
                 ], 500);
-
-
             }
 
 
@@ -3493,14 +3477,12 @@ class TransactionController extends Controller
 
 
             $pos_trx = Feature::where('id', 1)->first()->pos_transfer ?? null;
-            if($pos_trx == 0){
+            if ($pos_trx == 0) {
 
                 return response()->json([
                     'status' => $this->failed,
                     'message' => "Transfer is not available at the moment, \n\n Please try again after some time",
                 ], 500);
-
-
             }
 
 
@@ -3540,7 +3522,6 @@ class TransactionController extends Controller
 
             ]);
         }
-
     }
 
 
@@ -3949,56 +3930,53 @@ class TransactionController extends Controller
     }
 
 
-    public function test_transaction(request $request){
+    public function test_transaction(request $request)
+    {
 
-        $erran_api_key = errand_api_key();
-        $epkey = env('EPKEY');
+
+
+        $username = env('MUSERNAME');
+        $prkey = env('MPRKEY');
+        $sckey = env('MSCKEY');
+        $timestamp = time();
+        $hased =  hash('sha512', $timestamp . $prkey);
+        $auth = " magtipon 7sXu31mGhm:DE8wKCPYTVVz4bvoRyrhPRyhjX4Y1iMkpfxtwceXUHwNXYLE+x7QkQ1eiyZfZUMlOkBr137TtFBu7UkQYQC9Eg==";
+        $Authorization = "magtipon " . $username . ":" . base64_encode($hased);
+
+
+
+
         $curl = curl_init();
-        $data = array(
-
-            "amount" => "100",
-            "destinationAccountNumber" => "0017019120",
-            "destinationBankCode" => "221",
-            "destinationAccountName" => "Adejimi Tolulope",
-
-        );
-
-        $post_data = json_encode($data);
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
+            CURLOPT_URL => 'http://magtipon-sandbox.3lineng.com/api/v1/banks',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 0,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => $post_data,
+            CURLOPT_CUSTOMREQUEST => 'GET',
             CURLOPT_HTTPHEADER => array(
-                "Authorization: Bearer $erran_api_key",
-                "EpKey: $epkey",
-                'Content-Type: application/json',
+                "Authorization: $Authorization",
+                "Timestamp: $timestamp"
             ),
         ));
 
         $var = curl_exec($curl);
-
-        $server_ip = request()->server('SERVER_ADDR');
+        $result = json_decode($var);
         $httpStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-
 
         curl_close($curl);
 
-        $result = json_decode($var);
 
-        dd($result, $var, $server_ip, $httpStatus, $post_data, $epkey, $erran_api_key);
+        dd($var, $result, $httpStatus, $Authorization, $timestamp, $prkey);
+
+
+
+
+
 
 
     }
-
-
-
-
-
 }
