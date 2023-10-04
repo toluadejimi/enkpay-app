@@ -44,5 +44,13 @@ class User extends Authenticatable
         'is_phone_verified'=> 'integer',
         'is_email_verified' => 'integer',
         'is_bvn_verified' => 'integer',
+        'is_active' => 'integer',
+        'is_identification_verified' => 'integer',
+        'is_kyc_verified' => 'integer',
+        'main_wallet' => 'integer',
+        'bonus_wallet' => 'integer',
+        'status' => 'integer',
+
+
     ];
 }
