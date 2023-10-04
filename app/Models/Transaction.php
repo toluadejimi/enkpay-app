@@ -17,4 +17,21 @@ class Transaction extends Model
     ];
 
 
+
+    protected $casts = [
+        'user_id'=> 'integer',
+        'debit' => 'double',
+        'credit' => 'double',
+        'balance' => 'double',
+        'amount' => 'double',
+        'fee' => 'double',
+        'from_user_id' => 'integer',
+        'main_wallet' => 'integer',
+        'terminal_id' => 'integer',
+        'status' => 'integer',
+        'e_charges' => 'integer',
+
+    ];
+
+
 }
