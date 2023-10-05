@@ -20,19 +20,19 @@ class Transaction extends Model
 
     protected $casts = [
         'user_id'=> 'integer',
-        'debit' => 'double',
-        'credit' => 'double',
-        'balance' => 'double',
-        'amount' => 'double',
-        'fee' => 'double',
+        'debit' => 'integer',
+        'credit' => 'integer',
+        'balance' => 'integer',
+        'amount' => 'integer',
+        'fee' => 'integer',
         'from_user_id' => 'integer',
         'main_wallet' => 'integer',
         'terminal_id' => 'integer',
         'status' => 'integer',
         'e_charges' => 'integer',
-        'charge' => 'double',
-        'enkPay_Cashout_profit' => 'double',
-        'enkPay_Cashout_profit' => 'double',
+        'charge' => 'integer',
+        'enkPay_Cashout_profit' => 'integer',
+        'enkPay_Cashout_profit' => 'integer',
         'resolve' => 'integer',
 
 
