@@ -4056,9 +4056,13 @@ class TransactionController extends Controller
 
 
             $statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            $serverIpAddress = gethostbyname(gethostname());
 
 
-            dd($var, $statusCode);
+
+
+
+            dd($var, $statusCode, $serverIpAddress);
 
 
 
