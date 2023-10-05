@@ -27,7 +27,6 @@ class Transaction extends Model
         'fee' => 'integer',
         'from_user_id' => 'integer',
         'main_wallet' => 'integer',
-        'terminal_id' => 'integer',
         'status' => 'integer',
         'e_charges' => 'integer',
         'charge' => 'integer',
