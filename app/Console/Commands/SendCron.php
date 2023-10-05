@@ -167,13 +167,6 @@ class SendCron extends Command
         }
 
 
-        echo "hello i'm working fine";
-
-
-        $result = " Message========> No Transaction";
-        send_notification($result);
-
-
 
 
 

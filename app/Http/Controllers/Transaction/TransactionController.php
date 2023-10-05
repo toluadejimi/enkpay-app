@@ -3939,77 +3939,120 @@ class TransactionController extends Controller
 
 
 
-        $username = env('MUSERNAME');
-        $prkey = env('MPRKEY');
-        $sckey = env('MSCKEY');
+        // $username = env('MUSERNAME');
+        // $prkey = env('MPRKEY');
+        // $sckey = env('MSCKEY');
     
-        $unixTimeStamp = timestamp();
-        $sha = sha512($unixTimeStamp.$prkey);
-        $authHeader = 'magtipon ' . $username . ':' . base64_encode(hex2bin($sha));
+        // $unixTimeStamp = timestamp();
+        // $sha = sha512($unixTimeStamp.$prkey);
+        // $authHeader = 'magtipon ' . $username . ':' . base64_encode(hex2bin($sha));
 
 
-        $refid = guid();
+        // $refid = guid();
 
-        $ref = sha512($refid.$prkey);
+        // $ref = sha512($refid.$prkey);
 
-        $signature = base64_encode(hex2bin($ref)); 
-
-
-        $databody = array(
-
-            "Amount" => 60000,
-            "RequestRef" => $refid,
-            "CustomerDetails" => array(
-                "Fullname" => "Manager App",
-                "MobilePhone" => "08063412603",
-                "Email" => "apimanager@magtipon.com"
-            ),
-            "BeneficiaryDetails" => array(
-                "Fullname" => "Manager App",
-                "MobilePhone" => "08063412603",
-                "Email" => "apimanager@magtipon.com"
-            ),
-            "BankDetails" => array(
-                "BankType" => "comm",
-                "BankCode" => "011",
-                "AccountNumber" => "1010101010",
-                "AccountType" => "10"
-            ),
-
-            "Signature" => $signature,
-        );
+        // $signature = base64_encode(hex2bin($ref)); 
 
 
-        $post_data = json_encode($databody);
+        // $databody = array(
+
+        //     "Amount" => 60000,
+        //     "RequestRef" => $refid,
+        //     "CustomerDetails" => array(
+        //         "Fullname" => "Manager App",
+        //         "MobilePhone" => "08063412603",
+        //         "Email" => "apimanager@magtipon.com"
+        //     ),
+        //     "BeneficiaryDetails" => array(
+        //         "Fullname" => "Manager App",
+        //         "MobilePhone" => "08063412603",
+        //         "Email" => "apimanager@magtipon.com"
+        //     ),
+        //     "BankDetails" => array(
+        //         "BankType" => "comm",
+        //         "BankCode" => "011",
+        //         "AccountNumber" => "1010101010",
+        //         "AccountType" => "10"
+        //     ),
+
+        //     "Signature" => $signature,
+        // );
 
 
-        $curl = curl_init();
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => 'http://magtipon-sandbox.buildbankng.com/api/v1/transaction/fundstransfer',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => $post_data,
-            CURLOPT_HTTPHEADER => array(
-                "Authorization: $authHeader",
-                "Timestamp: $unixTimeStamp",
-                'Content-Type: application/json',
-            ),
-        ));
-
-        $var = curl_exec($curl);
-        $result = json_decode($var);
-        $httpStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-
-        curl_close($curl);
+        // $post_data = json_encode($databody);
 
 
-        dd($result, $unixTimeStamp, $authHeader);
+        // $curl = curl_init();
+
+        // curl_setopt_array($curl, array(
+        //     CURLOPT_URL => 'http://magtipon-sandbox.buildbankng.com/api/v1/transaction/fundstransfer',
+        //     CURLOPT_RETURNTRANSFER => true,
+        //     CURLOPT_ENCODING => '',
+        //     CURLOPT_MAXREDIRS => 10,
+        //     CURLOPT_TIMEOUT => 0,
+        //     CURLOPT_FOLLOWLOCATION => true,
+        //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        //     CURLOPT_CUSTOMREQUEST => 'POST',
+        //     CURLOPT_POSTFIELDS => $post_data,
+        //     CURLOPT_HTTPHEADER => array(
+        //         "Authorization: $authHeader",
+        //         "Timestamp: $unixTimeStamp",
+        //         'Content-Type: application/json',
+        //     ),
+        // ));
+
+        // $var = curl_exec($curl);
+        // $result = json_decode($var);
+        // $httpStatus = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+        // curl_close($curl);
+
+
+        // dd($result, $unixTimeStamp, $authHeader);
+
+
+
+        $erran_api_key = errand_api_key();
+
+            $epkey = env('EPKEY');
+
+            $curl = curl_init();
+            $data = array(
+
+                "amount" => 100,
+                "destinationAccountNumber" => 0017019120,
+                "destinationBankCode" => 221,
+                "destinationAccountName" => "Adejimi Tolulope",
+
+            );
+
+            $post_data = json_encode($data);
+
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $post_data,
+                CURLOPT_HTTPHEADER => array(
+                    "Authorization: Bearer $erran_api_key",
+                    "EpKey: $epkey",
+                    'Content-Type: application/json',
+                ),
+            ));
+
+            $var = curl_exec($curl);
+
+            curl_close($curl);
+
+            $var = json_decode($var);
+
+            dd($var);
 
 
 
