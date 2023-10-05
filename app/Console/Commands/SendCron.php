@@ -164,10 +164,12 @@ class SendCron extends Command
             }
 
 
-            $result = " Message========> No Transaction";
-            send_notification($result);
         }
 
+
+
+        $result = " Message========> No Transaction";
+        send_notification($result);
 
 
 
