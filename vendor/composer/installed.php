@@ -3,7 +3,7 @@
         'name' => 'laravel/laravel',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '62db0b7838e8d27da4528972858a2356e5edcfdf',
+        'reference' => 'bd0b6e57eff6b50ad9bee2ca73b7fafa07446e6e',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -113,9 +113,9 @@
             'dev_requirement' => true,
         ),
         'firebase/php-jwt' => array(
-            'pretty_version' => 'v6.8.1',
-            'version' => '6.8.1.0',
-            'reference' => '5dbc8959427416b8ee09a100d7a8588c00fb2e26',
+            'pretty_version' => 'v6.9.0',
+            'version' => '6.9.0.0',
+            'reference' => 'f03270e63eaccf3019ef0f32849c497385774e11',
             'type' => 'library',
             'install_path' => __DIR__ . '/../firebase/php-jwt',
             'aliases' => array(),
@@ -409,7 +409,7 @@
         'laravel/laravel' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '62db0b7838e8d27da4528972858a2356e5edcfdf',
+            'reference' => 'bd0b6e57eff6b50ad9bee2ca73b7fafa07446e6e',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -764,9 +764,9 @@
             'dev_requirement' => false,
         ),
         'phpunit/php-code-coverage' => array(
-            'pretty_version' => '10.1.6',
-            'version' => '10.1.6.0',
-            'reference' => '56f33548fe522c8d82da7ff3824b42829d324364',
+            'pretty_version' => '10.1.7',
+            'version' => '10.1.7.0',
+            'reference' => '355324ca4980b8916c18b9db29f3ef484078f26e',
             'type' => 'library',
             'install_path' => __DIR__ . '/../phpunit/php-code-coverage',
             'aliases' => array(),
@@ -919,8 +919,8 @@
         'psr/log-implementation' => array(
             'dev_requirement' => false,
             'provided' => array(
-                0 => '1.0|2.0|3.0',
-                1 => '3.0.0',
+                0 => '3.0.0',
+                1 => '1.0|2.0|3.0',
             ),
         ),
         'psr/simple-cache' => array(
