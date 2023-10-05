@@ -3930,6 +3930,10 @@ class TransactionController extends Controller
     }
 
 
+
+  
+
+
     public function test_transaction(request $request)
     {
 
@@ -3938,28 +3942,63 @@ class TransactionController extends Controller
         $username = env('MUSERNAME');
         $prkey = env('MPRKEY');
         $sckey = env('MSCKEY');
-        $timestamp = time();
-        $hased =  hash('sha512', $timestamp . $prkey);
-        $auth = " magtipon 7sXu31mGhm:DE8wKCPYTVVz4bvoRyrhPRyhjX4Y1iMkpfxtwceXUHwNXYLE+x7QkQ1eiyZfZUMlOkBr137TtFBu7UkQYQC9Eg==";
-        $Authorization = "magtipon " . $username . ":" . base64_encode($hased);
+    
+        $unixTimeStamp = timestamp();
+        $sha = sha512($unixTimeStamp.$prkey);
+        $authHeader = 'magtipon ' . $username . ':' . base64_encode(hex2bin($sha));
 
 
+        $refid = guid();
+
+        $ref = sha512($refid.$prkey);
+
+        $signature = base64_encode(hex2bin($ref)); 
+
+
+        $databody = array(
+
+            "Amount" => 60000,
+            "RequestRef" => $refid,
+            "CustomerDetails" => array(
+                "Fullname" => "Manager App",
+                "MobilePhone" => "08063412603",
+                "Email" => "apimanager@magtipon.com"
+            ),
+            "BeneficiaryDetails" => array(
+                "Fullname" => "Manager App",
+                "MobilePhone" => "08063412603",
+                "Email" => "apimanager@magtipon.com"
+            ),
+            "BankDetails" => array(
+                "BankType" => "comm",
+                "BankCode" => "011",
+                "AccountNumber" => "1010101010",
+                "AccountType" => "10"
+            ),
+
+            "Signature" => $signature,
+        );
+
+
+        $post_data = json_encode($databody);
 
 
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'http://magtipon-sandbox.3lineng.com/api/v1/banks',
+            CURLOPT_URL => 'http://magtipon-sandbox.buildbankng.com/api/v1/transaction/fundstransfer',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 0,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => $post_data,
             CURLOPT_HTTPHEADER => array(
-                "Authorization: $Authorization",
-                "Timestamp: $timestamp"
+                "Authorization: $authHeader",
+                "Timestamp: $unixTimeStamp",
+                'Content-Type: application/json',
             ),
         ));
 
@@ -3970,7 +4009,7 @@ class TransactionController extends Controller
         curl_close($curl);
 
 
-        dd($var, $result, $httpStatus, $Authorization, $timestamp, $prkey);
+        dd($result, $unixTimeStamp, $authHeader);
 
 
 
@@ -3979,4 +4018,7 @@ class TransactionController extends Controller
 
 
     }
+
+
+
 }

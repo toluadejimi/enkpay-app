@@ -861,6 +861,24 @@ function create_p_account()
     }
 
 
+    function guid() {
+        function s4() {
+            return substr(md5(uniqid(rand(), true)), 0, 4);
+        }
+
+        return s4() . s4() . s4() . s4() . s4() . s4() . s4() . s4();
+    }
+
+    function timestamp() {
+        return substr(strval(time()), 0, 10);
+    }
+
+    function sha512($message) {
+        return hash('sha512', $message);
+    }
+
+
+
 
 
 

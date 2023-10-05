@@ -30,6 +30,14 @@ class Transaction extends Model
         'terminal_id' => 'integer',
         'status' => 'integer',
         'e_charges' => 'integer',
+        'charge' => 'double',
+        'enkPay_Cashout_profit' => 'double',
+        'enkPay_Cashout_profit' => 'double',
+        'resolve' => 'integer',
+
+
+        
+
 
     ];
 
