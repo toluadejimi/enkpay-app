@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Hash;
 use Mail;
 use Carbon\Carbon;
 use GuzzleHttp\Client as GuzzleClient;
+use Illuminate\Http\Response;
+
 
 
 class TransactionController extends Controller
@@ -4052,7 +4054,9 @@ class TransactionController extends Controller
 
             $var = json_decode($var);
 
-            $statusCode = $request->getStatusCode();
+
+            $statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
 
             dd($var, $statusCode);
 
