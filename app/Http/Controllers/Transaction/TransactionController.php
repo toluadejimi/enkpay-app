@@ -4052,7 +4052,9 @@ class TransactionController extends Controller
 
             $var = json_decode($var);
 
-            dd($var);
+            $statusCode = $request->getStatusCode();
+
+            dd($var, $statusCode);
 
 
 
