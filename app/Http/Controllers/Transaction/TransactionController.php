@@ -4021,8 +4021,8 @@ class TransactionController extends Controller
             $data = array(
 
                 "amount" => 100,
-                "destinationAccountNumber" => 0017019120,
-                "destinationBankCode" => 221,
+                "destinationAccountNumber" => "0017019120",
+                "destinationBankCode" => "221",
                 "destinationAccountName" => "Adejimi Tolulope",
 
             );
