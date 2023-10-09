@@ -382,6 +382,107 @@ class TransactionController extends Controller
                     send_notification($result);
 
 
+
+
+                    $erran_api_key = errand_api_key();
+
+                    $epkey = env('EPKEY');
+
+                    $curl = curl_init();
+                    $data = array(
+
+                        "amount" => $amount,
+                        "destinationAccountNumber" => $destinationAccountNumber,
+                        "destinationBankCode" => $destinationBankCode,
+                        "destinationAccountName" => $receiver_name,
+
+                    );
+
+                    $post_data = json_encode($data);
+
+                    curl_setopt_array($curl, array(
+                        CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_ENCODING => '',
+                        CURLOPT_MAXREDIRS => 10,
+                        CURLOPT_TIMEOUT => 0,
+                        CURLOPT_FOLLOWLOCATION => true,
+                        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                        CURLOPT_CUSTOMREQUEST => 'POST',
+                        CURLOPT_POSTFIELDS => $post_data,
+                        CURLOPT_HTTPHEADER => array(
+                            "Authorization: Bearer $erran_api_key",
+                            "EpKey: $epkey",
+                            'Content-Type: application/json',
+                        ),
+                    ));
+
+                    $var = curl_exec($curl);
+
+                    curl_close($curl);
+
+                    $var = json_decode($var);
+
+
+                    $error = $var->error->message ?? null;
+                    $TransactionReference = $var->data->reference ?? null;
+                    $status = $var->code ?? null;
+
+                    if ($status == 200) {
+
+
+                        Transfer::where('ref_trans_id', $trans_id)->update(['status' => 0, 'e_ref' => $TransactionReference]);
+                        Transaction::where('ref_trans_id', $trans_id)->update(['status' => 0, 'e_ref' => $TransactionReference]);
+                        PendingTransaction::where('ref_trans_id', $trans_id)->delete();
+                        $user_id = PendingTransaction::where('ref_trans_id', $trans_id)->first()->user_id ?? null;
+                        PendingTransaction::where('user_id', $user_id)->delete();
+                        $message = "Transaction |  $TransactionReference | NGN $amount | has been sent to VFD ";
+
+                        send_notification($message);
+                    } else {
+
+                        $balance = User::where('id', Auth::id())->first()->main_wallet;
+                        PendingTransaction::where('ref_trans_id', $trans_id)->update(['status' => 3]);
+                        Transaction::where('ref_trans_id', $trans_id)->update(['status' => 3]);
+                        $transfer_charges = Charge::where('title', 'transfer_fee')->first()->amount;
+                        $user_wallet_banlance = User::where('id', $trans_id)->first()->main_wallet;
+
+
+                        //credit
+                        $credit = $user_wallet_banlance + $amount + $transfer_charges;
+                        $update = User::where('id', Auth::id())
+                            ->update([
+                                'main_wallet' => $credit,
+                            ]);
+
+
+                        $trasnaction = new Transaction();
+                        $trasnaction->user_id = Auth::id();
+                        $trasnaction->ref_trans_id = $trans_id;
+                        $trasnaction->transaction_type = "Reversal";
+                        $trasnaction->debit = 0;
+                        $trasnaction->amount = $amount;
+                        $trasnaction->serial_no = 0;
+                        $trasnaction->title = "Reversal";
+                        $trasnaction->note = "Reversal";
+                        $trasnaction->fee = 25;
+                        $trasnaction->balance = $credit;
+                        $trasnaction->main_type = "Reversal";
+                        $trasnaction->status = 3;
+                        $trasnaction->save();
+
+
+                        $usr = User::where('id', Auth::id())->first();
+                        $message = "Transaction reversed | $error ";
+                        $full_name = $usr->first_name . "  " . $usr->last_name;
+
+
+                        $result = " Message========> " . $message . "\n\nCustomer Name========> " . $full_name;
+                        send_notification($result);
+                    }
+
+
+
                     return response()->json([
                         'status' => $this->success,
                         'message' => "Transaction Processing",
@@ -3933,7 +4034,7 @@ class TransactionController extends Controller
 
 
 
-  
+
 
 
     public function test_transaction(request $request)
@@ -3944,7 +4045,7 @@ class TransactionController extends Controller
         // $username = env('MUSERNAME');
         // $prkey = env('MPRKEY');
         // $sckey = env('MSCKEY');
-    
+
         // $unixTimeStamp = timestamp();
         // $sha = sha512($unixTimeStamp.$prkey);
         // $authHeader = 'magtipon ' . $username . ':' . base64_encode(hex2bin($sha));
@@ -3954,7 +4055,7 @@ class TransactionController extends Controller
 
         // $ref = sha512($refid.$prkey);
 
-        // $signature = base64_encode(hex2bin($ref)); 
+        // $signature = base64_encode(hex2bin($ref));
 
 
         // $databody = array(
@@ -4015,63 +4116,8 @@ class TransactionController extends Controller
 
 
 
-        $erran_api_key = errand_api_key();
-
-            $epkey = env('EPKEY');
-
-            $curl = curl_init();
-            $data = array(
-
-                "amount" => 100,
-                "destinationAccountNumber" => "0017019120",
-                "destinationBankCode" => "221",
-                "destinationAccountName" => "Adejimi Tolulope",
-
-            );
-
-            $post_data = json_encode($data);
-
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => $post_data,
-                CURLOPT_HTTPHEADER => array(
-                    "Authorization: Bearer $erran_api_key",
-                    "EpKey: $epkey",
-                    'Content-Type: application/json',
-                ),
-            ));
-
-            $var = curl_exec($curl);
-
-            curl_close($curl);
-
-            $var = json_decode($var);
-
-
-            $statusCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-            $serverIpAddress = gethostbyname(gethostname());
-
-
-
-
-
-            dd($var, $statusCode, $serverIpAddress);
-
-
-
-
 
 
 
     }
-
-
-
 }

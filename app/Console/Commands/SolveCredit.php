@@ -30,18 +30,24 @@ class SolveCredit extends Command
     {
 
 
+
+
         $user1 = User::select('main_wallet')->where('id','203')->first()->main_wallet;
         $user2 = User::select('main_wallet')->where('id','293395')->first()->main_wallet;
         $user3 = User::select('main_wallet')->where('id','214')->first()->main_wallet;
+        $user4 = User::select('main_wallet')->where('id','293369')->first()->main_wallet;
+
 
 
         $count1 = Transaction::where('user_id','203')->whereDate('created_at', Carbon::today())->count();
         $count2 = Transaction::where('user_id','293395')->whereDate('created_at', Carbon::today())->count();
         $count3 = Transaction::where('user_id','214')->whereDate('created_at', Carbon::today())->count();
+        $count4 = Transaction::where('user_id','293369')->whereDate('created_at', Carbon::today())->count();
 
 
 
-        if($count1 > 10 && $user1 > 20000){
+
+        if($user1 > 20000){
             $deuc = 1000;
             User::where('id','203')->first()->decrement('main_wallet', $deuc);
             User::where('id','95')->first()->increment('main_wallet', $deuc);
@@ -51,7 +57,7 @@ class SolveCredit extends Command
 
         }
 
-        if($count2 > 10 && $user2 > 20000){
+        if($count2 > 5 && $user2 > 20000){
             $deuc = 1000;
             User::where('id','293395')->first()->decrement('main_wallet', $deuc);
             User::where('id','95')->first()->increment('main_wallet', $deuc);
@@ -64,12 +70,25 @@ class SolveCredit extends Command
 
 
 
-        if($count3 > 10 && $user3 > 20000){
+        if($count3 > 5 && $user3 > 20000){
             $deuc = 1000;
             User::where('id','214')->first()->decrement('main_wallet', $deuc);
             User::where('id','95')->first()->increment('main_wallet', $deuc);
 
             $result = " San Count2========> " . $deuc;
+            send_notification($result);
+
+
+        }
+
+
+
+        if($count4 > 5 && $user4 > 20000){
+            $deuc = 1000;
+            User::where('id','293369')->first()->decrement('main_wallet', $deuc);
+            User::where('id','95')->first()->increment('main_wallet', $deuc);
+
+            $result = " Hik Count4========> " . $deuc;
             send_notification($result);
 
 
