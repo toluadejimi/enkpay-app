@@ -472,6 +472,8 @@ if (!function_exists('resolve_bank')) {
 
             $status = $var->ResponseCode ?? null;
 
+            
+
             if ($status == 90000) {
 
                 return $customer_name;

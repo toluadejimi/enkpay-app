@@ -28,10 +28,9 @@ class EmailPush extends Command
      */
     public function handle()
     {
-        
 
-        $mail = EmailSend::where('status', 0)
-        ->where('created_at','<', Carbon::now()->subMinutes(1))->first() ?? null;
+
+        $mail = EmailSend::where('status', 0)->first() ?? null;
 
 
         $user_email = User::where('email', $mail->receiver_email)->first()->email ?? null;
