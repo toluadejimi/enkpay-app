@@ -33,8 +33,10 @@ class EmailPush extends Command
 
         $mail = EmailSend::where('status', 0)->first() ?? null;
 
+        if($mail != null){
 
-        $user_email = User::where('email', $mail->receiver_email)->first()->email ?? null;
+
+            $user_email = User::where('email', $mail->receiver_email)->first()->email ?? null;
 
 
 
@@ -65,3 +67,9 @@ class EmailPush extends Command
 
     }
 }
+
+        }
+
+
+    }
+
