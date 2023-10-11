@@ -6,6 +6,7 @@ use App\Models\EmailSend;
 use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Mail;
 
 class EmailPush extends Command
 {
