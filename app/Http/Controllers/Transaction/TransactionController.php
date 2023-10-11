@@ -857,14 +857,14 @@ class TransactionController extends Controller
                     $trasnaction->title = "Bank Transfer";
                     $trasnaction->debit = $amoutCharges;
                     $trasnaction->amount = $amount;
-                    $trasnaction->note = "BANK TRANSFER TO | $receiver_name | $destinationAccountNumber | $bank_name  ";
+                    $trasnaction->note = "BANK TRANSFER TO | $receiver_name | $destinationAccountNumber | $e_ref  ";
                     $trasnaction->bank_code = $destinationBankCode;
                     $trasnaction->enkpay_Cashout_profit = $enkpay_profit;
                     $trasnaction->receiver_name = $receiver_name;
                     $trasnaction->receiver_account_no = $destinationAccountNumber;
                     $trasnaction->receiver_bank = $bank_name;
                     $trasnaction->balance = $balance;
-                    $trasnaction->status = 0;
+                    $trasnaction->status = 1;
                     $trasnaction->save();
 
 
