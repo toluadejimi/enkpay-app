@@ -739,28 +739,6 @@ class TransactionController extends Controller
                     $user_balance =  $balance - $debited_amount;
 
                     //update Transactions
-                    $trasnaction = new Transaction();
-                    $trasnaction->user_id = Auth::id();
-                    $trasnaction->ref_trans_id = $trans_id;
-                    $trasnaction->type = "InterBankTransfer";
-                    $trasnaction->main_type = "Transfer";
-                    $trasnaction->transaction_type = "BankTransfer";
-                    $trasnaction->title = "Bank Transfer";
-                    $trasnaction->debit = $amoutCharges;
-                    $trasnaction->amount = $amount;
-                    $trasnaction->note = "BANK TRANSFER TO | $receiver_name | $destinationAccountNumber | $bank_name  ";
-                    $trasnaction->fee = 0;
-                    $trasnaction->enkpay_Cashout_profit = $enkpay_profit;
-                    $trasnaction->receiver_name = $destinationAccountName;
-                    $trasnaction->receiver_account_no = $destinationAccountNumber;
-                    $trasnaction->balance = $balance;
-                    $trasnaction->status = 0;
-                    $trasnaction->save();
-
-
-
-
-                    //update Transactions
                     $trasnaction = new PendingTransaction();
                     $trasnaction->user_id = Auth::id();
                     $trasnaction->ref_trans_id = $trans_id;
@@ -844,6 +822,28 @@ class TransactionController extends Controller
 
                 curl_close($curl);
                     if($status == 90000){
+
+
+                    //update Transactions
+                    $trasnaction = new Transaction();
+                    $trasnaction->user_id = Auth::id();
+                    $trasnaction->ref_trans_id = $trans_id;
+                    $trasnaction->e_ref = $e_ref;
+                    $trasnaction->type = "InterBankTransfer";
+                    $trasnaction->main_type = "Transfer";
+                    $trasnaction->transaction_type = "BankTransfer";
+                    $trasnaction->title = "Bank Transfer";
+                    $trasnaction->debit = $amoutCharges;
+                    $trasnaction->amount = $amount;
+                    $trasnaction->note = "BANK TRANSFER TO | $receiver_name | $destinationAccountNumber  \n $e_ref  ";
+                    $trasnaction->fee = 0;
+                    $trasnaction->enkpay_Cashout_profit = $enkpay_profit;
+                    $trasnaction->receiver_name = $destinationAccountName;
+                    $trasnaction->receiver_account_no = $destinationAccountNumber;
+                    $trasnaction->balance = $balance;
+                    $trasnaction->status = 1;
+                    $trasnaction->save();
+
 
 
                     //Transfers
