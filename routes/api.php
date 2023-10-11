@@ -91,6 +91,16 @@ Route::post('test-transaction', [TransactionController::class, 'test_transaction
 
 
 
+Route::post('transfer-reverse', [TransactionController::class, 'transfer_reverse']);
+
+Route::post('pending-transaction', [TransactionController::class, 'pending_transaction']);
+
+
+
+
+
+
+
 
 
 

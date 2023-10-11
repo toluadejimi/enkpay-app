@@ -24,7 +24,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('send:cron')
+        $schedule->command('app:email-push')
         ->everyFiveMinutes();
 
 
