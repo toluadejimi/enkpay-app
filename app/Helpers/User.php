@@ -472,7 +472,7 @@ if (!function_exists('resolve_bank')) {
 
             $status = $var->ResponseCode ?? null;
 
-            
+
 
             if ($status == 90000) {
 
@@ -933,6 +933,63 @@ function create_p_account()
 
     function sha512($message) {
         return hash('sha512', $message);
+    }
+
+
+    function ttmfb_balance(){
+
+
+        $username = env('MUSERNAME');
+        $prkey = env('MPRKEY');
+        $sckey = env('MSCKEY');
+
+        $unixTimeStamp = timestamp();
+        $sha = sha512($unixTimeStamp.$prkey);
+        $authHeader = 'magtipon ' . $username . ':' . base64_encode(hex2bin($sha));
+
+
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "http://magtipon.buildbankng.com/api/v1/account/balance",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'GET',
+            //CURLOPT_POSTFIELDS => $body,
+            CURLOPT_HTTPHEADER => array(
+                "Authorization: $authHeader",
+                "Timestamp: $unixTimeStamp",
+                'Content-Type: application/json',
+            ),
+        ));
+
+        $var = curl_exec($curl);
+        curl_close($curl);
+        $var = json_decode($var);
+
+
+        $balance = $var->Balance ?? null;
+        $error = $var->error->message ?? null;
+
+        $status = $var->ResponseCode ?? null;
+
+        if($status == 90000){
+
+            return $balance;
+
+        }else{
+
+            return "No Network";
+        }
+
+
+
+
     }
 
 

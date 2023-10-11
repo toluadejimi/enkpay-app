@@ -33,43 +33,33 @@ class EmailPush extends Command
 
         $mail = EmailSend::where('status', 0)->first() ?? null;
 
-        if($mail != null){
+        if($mail != null) {
 
 
             $user_email = User::where('email', $mail->receiver_email)->first()->email ?? null;
 
 
 
-        if ($user_email !== null) {
+            if ($user_email !== null) {
 
-            $data = array(
-                'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
-                'subject' => "Bank Transfer",
-                'toreceiver' => $mail->receiver_email,
-                'amount' => $mail->amount,
-                'first_name' => $mail->first_name,
-            );
+                $data = array(
+                    'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                    'subject' => "Bank Transfer",
+                    'toreceiver' => $mail->receiver_email,
+                    'amount' => $mail->amount,
+                    'first_name' => $mail->first_name,
+                );
 
-            Mail::send('emails.transaction.banktransfer', ["data1" => $data], function ($message) use ($data) {
-                $message->from($data['fromsender']);
-                $message->to($data['toreceiver']);
-                $message->subject($data['subject']);
-            });
+                Mail::send('emails.transaction.banktransfer', ["data1" => $data], function ($message) use ($data) {
+                    $message->from($data['fromsender']);
+                    $message->to($data['toreceiver']);
+                    $message->subject($data['subject']);
+                });
 
 
-            EmailSend::where('receiver_email', $mail->receiver_email)->delete();
+                EmailSend::where('receiver_email', $mail->receiver_email)->delete();
 
+            }
         }
-
-
-
-
-
     }
 }
-
-        }
-
-
-    }
-

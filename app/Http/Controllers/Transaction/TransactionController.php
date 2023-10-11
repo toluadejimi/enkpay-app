@@ -561,6 +561,8 @@ class TransactionController extends Controller
 
 
 
+
+
                 // $ckid = PendingTransaction::where('user_id', Auth::id())->first()->user_id ?? null;
                 // if ($ckid == Auth::id()) {
 
@@ -719,13 +721,33 @@ class TransactionController extends Controller
 
                 $status = 200;
                 $enkpay_profit = $transfer_charges - 10;
+
+                $debited_amount = $transfer_charges + $amount;
                 //$trans_id = trx();
+
+              
+                $chk_bal = ttmfb_balance() ?? 0;
+
+                if($chk_bal < $debited_amount){
+
+                    $name = Auth::user()->first_name . " " . Auth::user()->last_name;
+                    $message = $name . "| Error " . "| insufficient funds ".  number_format($chk_bal, 2);
+                    $result = "Message========> " . $message ;
+                    send_notification($result);
+
+                    return response()->json([
+                        'status' => $this->failed,
+                        'message' => "Service not available at the moment, \n please wait and try again later",
+
+                    ], 500);
+
+                }
 
                 if ($status == 200) {
 
                     $trans_id = guid();
                     //Debit
-                    $debited_amount = $transfer_charges + $amount;
+                    
 
                     if ($wallet == 'main_account') {
 
@@ -888,10 +910,12 @@ class TransactionController extends Controller
 
                     PendingTransaction::where('user_id', Auth::id())->delete() ?? null;
 
+                    User::where('id', Auth::id())->increment('bonus_wallet', 1);
+
 
                     return response()->json([
                         'status' => $this->success,
-                        'message' => "Transaction Completed",
+                        'message' => "Transaction Completed \n You earned 1 NGN bonus",
 
                     ], 200);
 
