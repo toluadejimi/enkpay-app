@@ -3820,6 +3820,12 @@ class TransactionController extends Controller
         if ($transaction_type == 'outward' && $serviceCode == 'FT1') {
 
 
+
+             return response()->json([
+                    'status' => $this->failed,
+                    'message' => "Not Available",
+            ], 500);
+
             $pos_trx = Feature::where('id', 1)->first()->pos_transfer ?? null;
             if ($pos_trx == 0) {
 
