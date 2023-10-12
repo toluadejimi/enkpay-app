@@ -995,6 +995,62 @@ function create_p_account()
 
 
 
+    if (!function_exists('get_pool')) {
+
+        function get_pool()
+        {
+    
+            try {
+    
+                $api = errand_api_key();
+                $epKey = env('EPKEY');
+    
+                $curl = curl_init();
+    
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiGetBalance',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'GET',
+                    CURLOPT_HTTPHEADER => array(
+                        'Accept: application/json',
+                        'Content-Type: application/json',
+                        "epKey: $epKey",
+                        "Authorization: Bearer $api",
+                    ),
+                ));
+    
+                $var = curl_exec($curl);
+    
+    
+                curl_close($curl);
+    
+                $var = json_decode($var);
+    
+    
+                $code = $var->code ?? null;
+    
+                if ($code == null) {
+    
+                    return "Network Issue";
+                }
+    
+                if ($var->code == 200) {
+                    return $var->data->balance;
+                }
+            } catch (\Exception $th) {
+                return $th->getMessage();
+            }
+        }
+    }
+
+
+
+
 
 
 

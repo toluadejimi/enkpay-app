@@ -7,6 +7,7 @@ use App\Models\PendingTransaction;
 use App\Models\Transaction;
 use App\Models\Transfer;
 use App\Models\User;
+use App\Models\Setting;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Log;
@@ -32,6 +33,29 @@ class SendCron extends Command
      */
     public function handle()
     {
+
+
+
+        $ttmfb_balance = ttmfb_balance() ?? 0;
+        $vfd_balance = get_pool() ?? 0;
+
+
+
+        Setting::where('id', 1)->update([
+
+            'ttmfb_balance' => $ttmfb_balance,
+            'vfd_balance' => $vfd_balance
+
+
+        ]);
+
+
+        $result = " Message========> Balance Updated";
+        send_notification($result);
+
+
+
+
 
 
         // $anchorTime = Carbon::createFromFormat("Y-m-d H:i:s", $created_at);

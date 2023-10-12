@@ -32,6 +32,10 @@ class Kernel extends ConsoleKernel
         ->dailyAt('12:00');
 
 
+        $schedule->command('app:send-cron')
+        ->everyFiveMinutes();
+
+
         $schedule->command('app:solve-credit')
         ->twiceDaily(11, 18);
 
