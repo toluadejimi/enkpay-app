@@ -32,7 +32,7 @@ class Kernel extends ConsoleKernel
         ->dailyAt('12:00');
 
 
-        $schedule->command('app:send-cron')
+        $schedule->command('send:cron')
         ->everyFiveMinutes();
 
 
