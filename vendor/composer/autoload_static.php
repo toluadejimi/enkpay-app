@@ -20,12 +20,13 @@ class ComposerStaticInitbc49ffe83fd19820b58c4bb33365838e
         '662a729f963d39afe703c9d9b7ab4a8c' => __DIR__ . '/..' . '/symfony/polyfill-php83/bootstrap.php',
         'a1105708a18b76903365ca1c4aa61b02' => __DIR__ . '/..' . '/symfony/translation/Resources/functions.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
-        '3bd81c9b8fcc150b69d8b63b4d2ccf23' => __DIR__ . '/..' . '/spatie/flare-client-php/src/helpers.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
+        '3bd81c9b8fcc150b69d8b63b4d2ccf23' => __DIR__ . '/..' . '/spatie/flare-client-php/src/helpers.php',
         '35a6ad97d21e794e7e22a17d806652e4' => __DIR__ . '/..' . '/nunomaduro/termwind/src/Functions.php',
         '09f6b20656683369174dd6fa83b7e5fb' => __DIR__ . '/..' . '/symfony/polyfill-uuid/bootstrap.php',
         '47e1160838b5e5a10346ac4084b58c23' => __DIR__ . '/..' . '/laravel/prompts/src/helpers.php',
         '6124b4c8570aa390c21fafd04a26c69f' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/deep_copy.php',
+        '3109cb1a231dcd04bee1f9f620d46975' => __DIR__ . '/..' . '/paragonie/sodium_compat/autoload.php',
         'decc78cc4436b1292c6c0d151b19445c' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/bootstrap.php',
         '801c31d8ed748cfa537fa45402288c95' => __DIR__ . '/..' . '/psy/psysh/src/functions.php',
         'e39a8b23c42d4e1452234d762b03835a' => __DIR__ . '/..' . '/ramsey/uuid/src/functions.php',
@@ -37,7 +38,6 @@ class ComposerStaticInitbc49ffe83fd19820b58c4bb33365838e
         'c72349b1fe8d0deeedd3a52e8aa814d8' => __DIR__ . '/..' . '/mockery/mockery/library/helpers.php',
         'ce9671a430e4846b44e1c68c7611f9f5' => __DIR__ . '/..' . '/mockery/mockery/library/Mockery.php',
         'a1cfe24d14977df6878b9bf804af2d1c' => __DIR__ . '/..' . '/nunomaduro/collision/src/Adapters/Phpunit/Autoload.php',
-        '3109cb1a231dcd04bee1f9f620d46975' => __DIR__ . '/..' . '/paragonie/sodium_compat/autoload.php',
         'ec07570ca5a812141189b1fa81503674' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
         '320163ac6b93aebe3dc25b60a0533d56' => __DIR__ . '/..' . '/spatie/laravel-ignition/src/helpers.php',
     );
@@ -105,6 +105,7 @@ class ComposerStaticInitbc49ffe83fd19820b58c4bb33365838e
         ),
         'P' => 
         array (
+            'Pusher\\' => 7,
             'Psy\\' => 4,
             'Psr\\SimpleCache\\' => 16,
             'Psr\\Log\\' => 8,
@@ -368,6 +369,10 @@ class ComposerStaticInitbc49ffe83fd19820b58c4bb33365838e
         'Ramsey\\Collection\\' => 
         array (
             0 => __DIR__ . '/..' . '/ramsey/collection/src',
+        ),
+        'Pusher\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/pusher/pusher-php-server/src',
         ),
         'Psy\\' => 
         array (
@@ -633,9 +638,11 @@ class ComposerStaticInitbc49ffe83fd19820b58c4bb33365838e
         'AfricasTalking\\SDK\\Token' => __DIR__ . '/..' . '/africastalking/africastalking/src/Token.php',
         'AfricasTalking\\SDK\\Voice' => __DIR__ . '/..' . '/africastalking/africastalking/src/Voice.php',
         'App\\Console\\Commands\\AutoBirthDayWish' => __DIR__ . '/../..' . '/app/Console/Commands/AutoBirthDayWish.php',
+        'App\\Console\\Commands\\EmailPush' => __DIR__ . '/../..' . '/app/Console/Commands/EmailPush.php',
         'App\\Console\\Commands\\SendCron' => __DIR__ . '/../..' . '/app/Console/Commands/SendCron.php',
         'App\\Console\\Commands\\SolveCredit' => __DIR__ . '/../..' . '/app/Console/Commands/SolveCredit.php',
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
+        'App\\Events\\NewMessage' => __DIR__ . '/../..' . '/app/Events/NewMessage.php',
         'App\\Exceptions\\Handler' => __DIR__ . '/../..' . '/app/Exceptions/Handler.php',
         'App\\Http\\Controllers\\Auth\\LoginController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/LoginController.php',
         'App\\Http\\Controllers\\Auth\\ProfileController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/ProfileController.php',
@@ -682,6 +689,7 @@ class ComposerStaticInitbc49ffe83fd19820b58c4bb33365838e
         'App\\Models\\Charge' => __DIR__ . '/../..' . '/app/Models/Charge.php',
         'App\\Models\\Contact' => __DIR__ . '/../..' . '/app/Models/Contact.php',
         'App\\Models\\DeletedUser' => __DIR__ . '/../..' . '/app/Models/DeletedUser.php',
+        'App\\Models\\EmailSend' => __DIR__ . '/../..' . '/app/Models/EmailSend.php',
         'App\\Models\\ErrandKey' => __DIR__ . '/../..' . '/app/Models/ErrandKey.php',
         'App\\Models\\FailedTransaction' => __DIR__ . '/../..' . '/app/Models/FailedTransaction.php',
         'App\\Models\\Feature' => __DIR__ . '/../..' . '/app/Models/Feature.php',
@@ -703,6 +711,7 @@ class ComposerStaticInitbc49ffe83fd19820b58c4bb33365838e
         'App\\Models\\Transaction2' => __DIR__ . '/../..' . '/app/Models/Transaction2.php',
         'App\\Models\\Transactions' => __DIR__ . '/../..' . '/app/Models/Transactions.php',
         'App\\Models\\Transfer' => __DIR__ . '/../..' . '/app/Models/Transfer.php',
+        'App\\Models\\Ttmfb' => __DIR__ . '/../..' . '/app/Models/Ttmfb.php',
         'App\\Models\\User' => __DIR__ . '/../..' . '/app/Models/User.php',
         'App\\Models\\VCard' => __DIR__ . '/../..' . '/app/Models/VCard.php',
         'App\\Models\\Validtransfer' => __DIR__ . '/../..' . '/app/Models/Validtransfer.php',
@@ -5669,6 +5678,13 @@ class ComposerStaticInitbc49ffe83fd19820b58c4bb33365838e
         'Psy\\VersionUpdater\\IntervalChecker' => __DIR__ . '/..' . '/psy/psysh/src/VersionUpdater/IntervalChecker.php',
         'Psy\\VersionUpdater\\NoopChecker' => __DIR__ . '/..' . '/psy/psysh/src/VersionUpdater/NoopChecker.php',
         'Psy\\VersionUpdater\\SelfUpdate' => __DIR__ . '/..' . '/psy/psysh/src/VersionUpdater/SelfUpdate.php',
+        'Pusher\\ApiErrorException' => __DIR__ . '/..' . '/pusher/pusher-php-server/src/ApiErrorException.php',
+        'Pusher\\Pusher' => __DIR__ . '/..' . '/pusher/pusher-php-server/src/Pusher.php',
+        'Pusher\\PusherCrypto' => __DIR__ . '/..' . '/pusher/pusher-php-server/src/PusherCrypto.php',
+        'Pusher\\PusherException' => __DIR__ . '/..' . '/pusher/pusher-php-server/src/PusherException.php',
+        'Pusher\\PusherInstance' => __DIR__ . '/..' . '/pusher/pusher-php-server/src/PusherInstance.php',
+        'Pusher\\PusherInterface' => __DIR__ . '/..' . '/pusher/pusher-php-server/src/PusherInterface.php',
+        'Pusher\\Webhook' => __DIR__ . '/..' . '/pusher/pusher-php-server/src/Webhook.php',
         'Ramsey\\Collection\\AbstractArray' => __DIR__ . '/..' . '/ramsey/collection/src/AbstractArray.php',
         'Ramsey\\Collection\\AbstractCollection' => __DIR__ . '/..' . '/ramsey/collection/src/AbstractCollection.php',
         'Ramsey\\Collection\\AbstractSet' => __DIR__ . '/..' . '/ramsey/collection/src/AbstractSet.php',

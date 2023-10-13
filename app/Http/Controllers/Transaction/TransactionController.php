@@ -24,6 +24,7 @@ use Mail;
 use Carbon\Carbon;
 use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Http\Response;
+use App\Events\NewMessage;
 
 
 
@@ -4546,13 +4547,13 @@ class TransactionController extends Controller
     {
 
 
-                    $username = env('MUSERNAME');
-                    $prkey = env('MPRKEY');
-                    $sckey = env('MSCKEY');
+                    // $username = env('MUSERNAME');
+                    // $prkey = env('MPRKEY');
+                    // $sckey = env('MSCKEY');
 
-                    $unixTimeStamp = timestamp();
-                    $sha = sha512($unixTimeStamp.$prkey);
-                    $authHeader = 'magtipon ' . $username . ':' . base64_encode(hex2bin($sha));
+                    // $unixTimeStamp = timestamp();
+                    // $sha = sha512($unixTimeStamp.$prkey);
+                    // $authHeader = 'magtipon ' . $username . ':' . base64_encode(hex2bin($sha));
 
 
 
@@ -4626,44 +4627,9 @@ class TransactionController extends Controller
                 //     $apiData->save();
                 // }
 
-                $bank_code =
-                $accountNumber =
+                $result = event(new NewMessage('Hello World! I am an event 😄'));
 
 
-                $curl = curl_init();
-                curl_setopt_array($curl, array(
-                    CURLOPT_URL => "http://magtipon.buildbankng.com/api/v1/bank/$bank_code/account/$accountNumber",
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING => '',
-                    CURLOPT_MAXREDIRS => 10,
-                    CURLOPT_TIMEOUT => 0,
-                    CURLOPT_FOLLOWLOCATION => true,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST => 'GET',
-                    //CURLOPT_POSTFIELDS => $body,
-                    CURLOPT_HTTPHEADER => array(
-                        "Authorization: $authHeader",
-                        "Timestamp: $unixTimeStamp",
-                        'Content-Type: application/json',
-                    ),
-                ));
-
-                $var = curl_exec($curl);
-                curl_close($curl);
-                $var = json_decode($var);
-
-
-
-
-
-                return response()->json([
-
-                    'status' => true,
-                    'result' => $result,
-
-
-
-                ], 200);
 
 
 
