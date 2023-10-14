@@ -1,8 +1,10 @@
 <?php
 
+use App\Events\RealTimeMessage;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\ProfileController;
-
+use App\Events\NewMessage;
+use App\Http\Controllers\TestController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,9 +21,19 @@ use App\Http\Controllers\Auth\ProfileController;
 
 
 
-Route::get('/', function () {
-    return view('welcome');
+Route::get('/t', function () {
+
+    event(new \App\Events\SendMessage());
+
+    dd('Event Run Successfully.');
+
 });
+
+
+
+
+//Route::get('/', [TestController::class, 'testevent']);
+//
 
 
 
@@ -38,3 +50,6 @@ Route::get('success', [ProfileController::class, 'success']);
 
 
 
+
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

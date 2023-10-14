@@ -180,6 +180,8 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
+        Ladumor\OneSignal\OneSignalServiceProvider::class,
+
 
         /*
          * Package Service Providers...
@@ -191,7 +193,7 @@ return [
         App\Providers\AppServiceProvider::class,
         App\Providers\HelperServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
-        // App\Providers\BroadcastServiceProvider::class,
+        App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Infobip\Support\Laravel\InfobipServiceProvider::class,
@@ -212,6 +214,8 @@ return [
     */
 
     'aliases' => Facade::defaultAliases()->merge([
+        'OneSignal' =>\Ladumor\OneSignal\OneSignal::class,
+
         // 'ExampleClass' => App\Example\ExampleClass::class,
 
     ])->toArray(),

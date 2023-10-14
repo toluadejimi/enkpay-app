@@ -20,11 +20,15 @@ use DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Ladumor\OneSignal\OneSignal;
 use Mail;
 use Carbon\Carbon;
 use GuzzleHttp\Client as GuzzleClient;
 use Illuminate\Http\Response;
 use App\Events\NewMessage;
+use App\Notifications\DepositAlert;
+use App\Notifications\SampleNotification;
+use Illuminate\Support\Facades\Notification;
 
 
 
@@ -726,7 +730,7 @@ class TransactionController extends Controller
                 $debited_amount = $transfer_charges + $amount;
                 //$trans_id = trx();
 
-              
+
                 $chk_bal = ttmfb_balance() ?? 0;
 
                 if($chk_bal < $debited_amount){
@@ -748,7 +752,7 @@ class TransactionController extends Controller
 
                     $trans_id = guid();
                     //Debit
-                    
+
 
                     if ($wallet == 'main_account') {
 
@@ -4541,6 +4545,148 @@ class TransactionController extends Controller
 
 
 
+    public function move_money(){
+
+        $pool_b = get_pool();
+
+
+
+        if($pool_b < 10){
+
+            $result = " Message========> Amount is less than NGN 10";
+            send_notification($result);
+
+        }
+
+        if($pool_b > 250010){
+
+
+            $erran_api_key = errand_api_key();
+
+            $epkey = env('EPKEY');
+
+            $curl = curl_init();
+            $data = array(
+
+                "amount" => 250000,
+                "destinationAccountNumber" => "5401005443",
+                "destinationBankCode" => "101",
+                "destinationAccountName" => "Enkwave",
+
+            );
+
+            $post_data = json_encode($data);
+
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $post_data,
+                CURLOPT_HTTPHEADER => array(
+                    "Authorization: Bearer $erran_api_key",
+                    "EpKey: $epkey",
+                    'Content-Type: application/json',
+                ),
+            ));
+
+            $var = curl_exec($curl);
+
+            curl_close($curl);
+
+            $var = json_decode($var);
+
+
+            $error = $var->error->message ?? null;
+            $TransactionReference = $var->data->reference ?? null;
+            $status = $var->code ?? null;
+
+
+            if ($status == 200){
+
+                $result = " Message========> 250,000 has been sent out". "\nRef ======> $TransactionReference";
+                send_notification($result);
+            }
+
+            $result = " Message========> $error";
+            send_notification($result);
+
+
+
+
+
+        }
+
+        if($pool_b < 250010){
+
+            $amount = $pool_b - 10;
+
+            $erran_api_key = errand_api_key();
+
+            $epkey = env('EPKEY');
+
+            $curl = curl_init();
+            $data = array(
+
+                "amount" => $amount,
+                "destinationAccountNumber" => "5401005443",
+                "destinationBankCode" => "101",
+                "destinationAccountName" => "Enkwave",
+
+            );
+
+            $post_data = json_encode($data);
+
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $post_data,
+                CURLOPT_HTTPHEADER => array(
+                    "Authorization: Bearer $erran_api_key",
+                    "EpKey: $epkey",
+                    'Content-Type: application/json',
+                ),
+            ));
+
+            $var = curl_exec($curl);
+
+            curl_close($curl);
+
+            $var = json_decode($var);
+
+
+            $error = $var->error->message ?? null;
+            $TransactionReference = $var->data->reference ?? null;
+            $status = $var->code ?? null;
+
+
+            if ($status == 200){
+
+                $result = " Message========> $amount has been sent out". "\nRef ======> $TransactionReference";
+                send_notification($result);
+            }
+
+            $result = " Message========> $error";
+            send_notification($result);
+
+
+        }
+
+
+
+
+    }
+
 
 
     public function test_transaction(request $request)
@@ -4627,9 +4773,17 @@ class TransactionController extends Controller
                 //     $apiData->save();
                 // }
 
-                $result = event(new NewMessage('Hello World! I am an event 😄'));
+
+                $notificationId = ['c51503d4-b8ba-4cf3-88dd-6927ffc71071'];
 
 
+                    $fieldsh['include_player_ids'] = $notificationId;
+
+                    $notificationMsgi = 'Hello !! It is a notification test.!';
+
+                    $result = OneSignal::sendPush($fieldsh, $notificationMsgi);
+
+                    dd($result);
 
 
 
