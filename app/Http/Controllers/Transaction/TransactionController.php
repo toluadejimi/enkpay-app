@@ -4551,14 +4551,14 @@ class TransactionController extends Controller
 
 
 
-        if($pool_b < 10){
+        if($pool_b < 25){
 
             $result = " Message========> Amount is less than NGN 10";
             send_notification($result);
 
         }
 
-        if($pool_b > 250010){
+        if($pool_b > 250025){
 
 
             $erran_api_key = errand_api_key();
@@ -4621,9 +4621,9 @@ class TransactionController extends Controller
 
         }
 
-        if($pool_b < 250010){
+        if($pool_b < 250025){
 
-            $amount = $pool_b - 10;
+            $amount = $pool_b - 25;
 
             $erran_api_key = errand_api_key();
 
