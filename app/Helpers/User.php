@@ -999,14 +999,14 @@ function create_p_account()
 
         function get_pool()
         {
-    
+
             try {
-    
+
                 $api = errand_api_key();
                 $epKey = env('EPKEY');
-    
+
                 $curl = curl_init();
-    
+
                 curl_setopt_array($curl, array(
                     CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiGetBalance',
                     CURLOPT_RETURNTRANSFER => true,
@@ -1023,22 +1023,22 @@ function create_p_account()
                         "Authorization: Bearer $api",
                     ),
                 ));
-    
+
                 $var = curl_exec($curl);
-    
-    
+
+
                 curl_close($curl);
-    
+
                 $var = json_decode($var);
-    
-    
+
+
                 $code = $var->code ?? null;
-    
+
                 if ($code == null) {
-    
+
                     return "Network Issue";
                 }
-    
+
                 if ($var->code == 200) {
                     return $var->data->balance;
                 }
