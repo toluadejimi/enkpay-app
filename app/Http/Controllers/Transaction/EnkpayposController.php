@@ -36,10 +36,16 @@ class EnkpayposController extends Controller
         $transactionType = $request->transactionType;
         $cardName = $request->cardName;
         $userID = $request->UserID;
-        $DataKey = env('DATAKEY');
+        $ApiKey = $request->API_KEY;
+        $DataKey = env('DATAKEY')
 
 
-        if($key == null){
+
+
+
+
+
+        if($ApiKey == null){
 
             $result = "No Key Passed";
             send_notification($result);
@@ -52,7 +58,7 @@ class EnkpayposController extends Controller
         }
 
 
-        if($key != $DataKey){
+        if($ApiKey != $DataKey){
 
             $result = "Invalid Key | $key";
             send_notification($result);
@@ -96,7 +102,7 @@ class EnkpayposController extends Controller
 
 
 
-        $key = $request->header('dataKey');
+        $key = $request->header('API_KEY');
         $RRN = $request->RRN;
         $userID = $request->UserID;
         $STAN = $request->STAN;
