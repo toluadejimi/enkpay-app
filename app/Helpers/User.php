@@ -9,6 +9,7 @@ use App\Models\Ttmfb;
 use App\Models\User;
 use App\Models\VfdBank;
 use App\Models\VirtualAccount;
+use App\Models\TidConfig;
 use Illuminate\Support\Facades\Auth;
 
 
@@ -192,6 +193,35 @@ if (!function_exists('terminal_info')) {
         return $tm;
     }
 }
+
+
+
+
+
+if (!function_exists('tid_config')) {
+
+
+    function tid_config()
+    {
+
+        $tm = TidConfig::select('ip', 'port', 'ssl', 'compKey1', 'compKey2')->where('user_id', Auth::id())->first() ?? null;
+        if ($tm != null) {
+            return $tm;
+        }
+
+        return $tm;
+    }
+
+
+
+
+
+
+}
+
+
+
+
 
 if (!function_exists('send_error')) {
 

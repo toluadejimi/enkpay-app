@@ -248,7 +248,7 @@ class PowerController extends Controller
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://vtpass.com/api/pay',
+            // CURLOPT_URL => 'https://vtpass.com/api/pay',
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -283,9 +283,9 @@ class PowerController extends Controller
 
         $get_message = $var->response_description ?? null;
 
-        $get_var_status = $var->response_description ;
+        $get_var_status = $var->response_description ?? null ;
 
-        // $status = 'TRANSACTION SUCCESSFUL';
+        //$status = 'TRANSACTION SUCCESSFUL';
         // $token = "11182766373746646";
 
 
@@ -364,7 +364,7 @@ class PowerController extends Controller
             if (!empty(user_email())) {
 
                 $data = array(
-                    'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                    'fromsender' => 'noreply@enkpay.com', 'EnkPay',
                     'subject' => "Electricity Receipt",
                     'toreceiver' => $email,
                     'recepit' => $recepit,
