@@ -276,19 +276,21 @@ class PowerController extends Controller
 
         $var = json_decode($var);
 
-        //dd($var, $token = $var->purchased_code);
+        //dd($serviceid, $variation_code, $var->response_description);
 
 
         $token = $var->purchased_code ?? null;
 
-        //$get_message = $var->content ?? null;
+        $get_message = $var->response_description ?? null;
 
-        $get_var_status = $var->response_description;
+        $get_var_status = $var->response_description ;
 
         // $status = 'TRANSACTION SUCCESSFUL';
         // $token = "11182766373746646";
 
-        $message = "Error Message from VAS ELECTRIC";
+
+
+        $message = $get_message ?? "Error Message from VAS ELECTRIC";
 
         if ($get_var_status == 'TRANSACTION SUCCESSFUL') {
 
