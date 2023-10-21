@@ -4513,8 +4513,8 @@ class TransactionController extends Controller
 
             $serial_no = $request->serial_no;
 
-            $total_transactions = Transaction::where('serial_no', $serial_no)
-            ->sum('credit');
+            $total_transactions = Transaction::where('serial_no', $serial_no);
+            //->sum('credit');
 
             dd($total_transactions);
 
