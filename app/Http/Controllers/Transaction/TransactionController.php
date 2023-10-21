@@ -4510,6 +4510,8 @@ class TransactionController extends Controller
 
         try {
 
+            dd($request->serial_no);
+
             $serial_no = $request->serial_no;
 
             $total_transactions = Transaction::where('serial_no', $serial_no)
