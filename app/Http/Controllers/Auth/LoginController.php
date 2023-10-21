@@ -139,8 +139,7 @@ class LoginController extends Controller
             $user['token'] = $token;
             $user['user_virtual_account_list'] = $virtual_account;
             $user['terminal_info'] = terminal_info();
-            $user['tid_config'] = tid_config();
-
+            $tid_config = tid_config();
             
 
 
@@ -169,7 +168,9 @@ class LoginController extends Controller
                 'data' => $user,
                 'permission' => $feature,
                 'isNewDevice' => false,
-                'setting' => $setting
+                'setting' => $setting,
+                'tid_config' => $tid_config
+
 
 
             ], 200);
@@ -574,7 +575,9 @@ class LoginController extends Controller
         $user['token'] = $token;
         $user['user_virtual_account_list'] = $virtual_account;
         $user['terminal_info'] = terminal_info();
-        $user['tid_config'] = tid_config();
+        
+        
+        $tid_config = tid_config();
 
 
 
@@ -608,7 +611,9 @@ class LoginController extends Controller
             'data' => $user,
             'permission' => $feature,
             'isNewDevice' => false,
-            'setting' => $setting
+            'setting' => $setting,
+            'tid_config' => $tid_config
+
 
 
         ], 200);
