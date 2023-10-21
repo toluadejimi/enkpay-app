@@ -185,7 +185,7 @@ if (!function_exists('terminal_info')) {
     function terminal_info()
     {
 
-        $tm = Terminal::select('merchantNo', 'terminalNo', 'merchantName', 'deviceSN')->first() ?? null;
+        $tm = Terminal::select('merchantNo', 'terminalNo', 'merchantName', 'deviceSN')->where('user_id', Auth::id())->first() ?? null;
         if ($tm != null) {
             return $tm;
         }
