@@ -139,6 +139,10 @@ class LoginController extends Controller
             $user['token'] = $token;
             $user['user_virtual_account_list'] = $virtual_account;
             $user['terminal_info'] = terminal_info();
+            $user['tid_config'] = tid_config();
+
+            
+
 
             $is_kyc_verified = Auth::user()->is_kyc_verified;
             $status = Auth::user()->status;
@@ -570,6 +574,7 @@ class LoginController extends Controller
         $user['token'] = $token;
         $user['user_virtual_account_list'] = $virtual_account;
         $user['terminal_info'] = terminal_info();
+        $user['tid_config'] = tid_config();
 
 
 

@@ -163,6 +163,7 @@ class ProfileController extends Controller
             $user['token'] = $token;
             $user['user_virtual_account_list'] = $virtual_account;
             $user['terminal_info'] = terminal_info();
+            $user['tid_config'] = tid_config();
 
 
             return response()->json([
