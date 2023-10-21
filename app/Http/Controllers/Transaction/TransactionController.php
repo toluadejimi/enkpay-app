@@ -4523,7 +4523,7 @@ class TransactionController extends Controller
             $terminal = Terminal::where('user_id', Auth::id())
                 ->get();
 
-               $history = Transaction::select('*')
+               $history = Transaction::latest()->select('*')
                 ->where('serial_no', $serial_no)
                 ->whereMonth('created_at', Carbon::now()->month)
                 ->get();
