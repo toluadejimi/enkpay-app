@@ -4527,7 +4527,7 @@ class TransactionController extends Controller
 
                $history = Transaction::select('*')
                 ->where('serial_no', $serial_no)
-                // ->whereMonth('created_at', Carbon::now()->month)
+                ->whereMonth('created_at', Carbon::now()->month)
                 ->get();
 
             return response()->json([
