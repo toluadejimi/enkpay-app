@@ -4516,8 +4516,6 @@ class TransactionController extends Controller
             $total_transactions = Transaction::where('serial_no', $serial_no)->get()
             ->sum('credit');
 
-            dd($total_transactions);
-
 
             $daily_transactions = Transaction::where('serial_no', $serial_no)
                 ->whereday('created_at', Carbon::today())->sum('credit');
