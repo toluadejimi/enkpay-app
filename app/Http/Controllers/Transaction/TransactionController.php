@@ -4518,7 +4518,7 @@ class TransactionController extends Controller
 
 
             $daily_transactions = Transaction::where('serial_no', $serial_no)
-                ->whereday('created_at', Carbon::today())->sum('credit');
+            ->whereday('created_at', Carbon::today())->sum('credit');
 
             $terminal = Terminal::where('user_id', Auth::id())
                 ->get();
@@ -4532,7 +4532,7 @@ class TransactionController extends Controller
 
                 'status' => $this->success,
                 'total_transactions' => $total_transactions,
-                'daily_transactions' => $daily_transactions,
+                'daily_transactions' => (int)$daily_transactions,
                 'history' => $history,
 
 
