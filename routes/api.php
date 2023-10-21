@@ -40,6 +40,9 @@ use Illuminate\Support\Facades\Route;
 Route::post('forgot-password', [RegisterationController::class, 'forgot_password']);
 
 
+Route::post('get-terminal-transaction', [TransactionController::class, 'get_terminal_transaction']);
+
+
 //Registration
 Route::post('verify-phone', [RegisterationController::class, 'phone_verification']);
 Route::post('verify-email', [RegisterationController::class, 'email_verification']);
@@ -220,7 +223,6 @@ Route::post('auth-verify-email', [RegisterationController::class, 'auth_email_ve
     Route::post('self-cash-out', [TransactionController::class, 'self_cash_out']);
 
     Route::get('get-terminals', [TransactionController::class, 'get_terminals']);
-    Route::post('get-terminal-transaction', [TransactionController::class, 'get_terminal_transaction']);
 
 
 

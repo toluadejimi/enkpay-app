@@ -4513,7 +4513,7 @@ class TransactionController extends Controller
             $serial_no = $request->serial_no;
 
             $total_transactions = Transaction::where('serial_no', $serial_no)
-                ->sum('credit');
+            ->sum('credit');
 
 
             $daily_transactions = Transaction::where('serial_no', $serial_no)
@@ -4522,9 +4522,9 @@ class TransactionController extends Controller
             $terminal = Terminal::where('user_id', Auth::id())
                 ->get();
 
-            $history = Transaction::select('*')
+               $history = Transaction::select('*')
                 ->where('serial_no', $serial_no)
-                ->whereMonth('created_at', Carbon::now()->month)
+                // ->whereMonth('created_at', Carbon::now()->month)
                 ->get();
 
             return response()->json([
