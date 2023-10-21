@@ -11,7 +11,12 @@ class Terminal extends Model
 
     protected $casts = [
 
-        'amount' => 'integer'
+        'amount' => 'integer',
+        'serial_no' => 'integer',
+        'transfer_status' => 'integer'
+
+
+
 
     ];
 }
