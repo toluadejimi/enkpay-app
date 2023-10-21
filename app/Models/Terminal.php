@@ -10,7 +10,7 @@ class Terminal extends Model
     use HasFactory;
 
     protected $casts = [
-      
+
         'amount' => 'integer'
 
     ];
