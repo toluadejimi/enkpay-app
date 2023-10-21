@@ -713,8 +713,6 @@ class VirtualaccountController extends Controller
             }
 
             $business_id = VirtualAccount::where('v_account_no', $accountNumber)->first()->business_id ?? null;
-
-
             if (!empty($business_id) || $business_id != null) {
                 $charge_status = Webkey::where('key', $key)->first()->charge_status ?? null;
                 $amt_to_credit = (int)$transactionAmount - (int)$removed_comm;
