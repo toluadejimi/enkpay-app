@@ -793,6 +793,8 @@ class TransactionController extends Controller
                     $ref = sha512($trans_id.$prkey);
 
                     $signature = base64_encode(hex2bin($ref));
+                    $name = Auth::user()->first_name . " " . Auth::user()->last_name;
+
 
 
                     $databody = array(
@@ -800,12 +802,12 @@ class TransactionController extends Controller
                         "Amount" => $amount,
                         "RequestRef" => $trans_id,
                         "CustomerDetails" => array(
-                            "Fullname" => "$receiver_name",
+                            "Fullname" => "ENKWAVE($name)",
                             "MobilePhone" => "",
                             "Email" => ""
                         ),
                         "BeneficiaryDetails" => array(
-                            "Fullname" => "",
+                            "Fullname" => "$receiver_name",
                             "MobilePhone" => "",
                             "Email" => ""
                         ),
