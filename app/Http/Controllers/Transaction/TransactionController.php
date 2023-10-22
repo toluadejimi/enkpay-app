@@ -802,7 +802,7 @@ class TransactionController extends Controller
                         "Amount" => $amount,
                         "RequestRef" => $trans_id,
                         "CustomerDetails" => array(
-                            "Fullname" => "ENKWAVE($name)",
+                            "Fullname" => "ENKWAVE - ($name)",
                             "MobilePhone" => "",
                             "Email" => ""
                         ),
