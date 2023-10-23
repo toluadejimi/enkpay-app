@@ -35,6 +35,7 @@ use Illuminate\Support\Facades\Route;
 
 
 
+Route::get('manual-create-virtual-account', [VirtualaccountController::class, 'manual_api_account']);
 
 
 Route::post('forgot-password', [RegisterationController::class, 'forgot_password']);
@@ -263,7 +264,6 @@ Route::post('auth-verify-email', [RegisterationController::class, 'auth_email_ve
     //Virtual Acccount
     Route::post('create-account', [VirtualaccountController::class, 'create_account']);
     Route::get('get-virtual-account', [VirtualaccountController::class, 'get_virtual_account']);
-    Route::get('manual-create-virtual-account', [VirtualaccountController::class, 'manual_api_account']);
 
 
 
