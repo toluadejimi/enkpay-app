@@ -141,6 +141,112 @@ class VirtualaccountController extends Controller
         }
     }
 
+    public function manual_api_account(request $request)
+    {
+
+
+
+        $bvn = $request->bvn;
+        $user_id = $request->bvn;
+
+
+        if ($bvn == null) {
+            return response()->json([
+                'status' => $this->failed,
+                'message' => 'Please complete your verification before creating an account',
+            ], 500);
+        }
+
+        if ($user_id == null) {
+            return response()->json([
+                'status' => $this->failed,
+                'message' => 'Please complete your verification before creating an account',
+            ], 500);
+        }
+
+
+
+        $client = env('CLIENTID');
+        $xauth = env('HASHKEY');
+
+
+        if (empty($chk_p_account) || $chk_p_account == null) {
+
+            $name = $request->first_name . " " . $request->last_name;
+            $phone = $request->phone;
+
+            $curl = curl_init();
+            $data = array(
+                "account_name" => $name,
+                "bvn" => $bvn,
+            );
+
+            $databody = json_encode($data);
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://vps.providusbank.com/vps/api/PiPCreateReservedAccountNumber',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $databody,
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/json',
+                    'Accept: application/json',
+                    "Client-Id: $client",
+                    "X-Auth-Signature: $xauth",
+                ),
+            ));
+
+            $var = curl_exec($curl);
+            curl_close($curl);
+            $var = json_decode($var);
+
+
+            $status = $var->responseCode ?? null;
+            $p_acct_no = $var->account_number ?? null;
+            $p_acct_name = $var->account_name ?? null;
+            $error = $var->responseMessage ?? null;
+
+            $pbank = "PROVIDUS BANK";
+
+            if ($status == 00) {
+
+                $create = new VirtualAccount();
+                $create->v_account_no = $p_acct_no;
+                $create->v_account_name = $p_acct_name;
+                $create->v_bank_name = $pbank;
+                $create->user_id = Auth::id();
+                $create->save();
+
+                $message = "Providus Account Created | $name";
+                send_notification($message);
+
+                $get_user = User::find(Auth::id())->first();
+                return response()->json([
+
+                    'status' => $this->success,
+                    'message' => "Your account has been created successfully",
+
+                ], 200);
+            } else {
+
+
+                $error = "Vaccount Error | $error";
+                send_notification($error);
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'Error please try again after some time',
+
+                ], 500);
+            }
+        }
+    }
+
     public function get_created_account()
     {
 
@@ -742,11 +848,11 @@ class VirtualaccountController extends Controller
 
 
                 $web_trans_id = WebTransfer::where('v_account_no', $accountNumber)
-                ->where('payable_amount', $transactionAmount)->first()->trans_id ?? null;
+                    ->where('payable_amount', $transactionAmount)->first()->trans_id ?? null;
 
-                if( $web_trans_id == null){
+                if ($web_trans_id == null) {
                     $refid = $trans_id;
-                }else{
+                } else {
                     $refid = $web_trans_id;
                 }
 
@@ -1057,16 +1163,7 @@ class VirtualaccountController extends Controller
             'responseMessage' => 'Key not authorized',
             'responseCode' => "02",
         ], 200);
-
-
-
     }
-
-
-
-
-
-
 }
 
 
@@ -1106,5 +1203,3 @@ class VirtualaccountController extends Controller
     // } catch (\Exception $th) {
     //     return $th->getMessage();
     // }
-
-

@@ -263,6 +263,11 @@ Route::post('auth-verify-email', [RegisterationController::class, 'auth_email_ve
     //Virtual Acccount
     Route::post('create-account', [VirtualaccountController::class, 'create_account']);
     Route::get('get-virtual-account', [VirtualaccountController::class, 'get_virtual_account']);
+    Route::get('manual-create-virtual-account', [VirtualaccountController::class, 'manual_api_account']);
+
+
+
+    
 
     //Education
     Route::get('get-waec', [EducationController::class, 'get_waec']);
