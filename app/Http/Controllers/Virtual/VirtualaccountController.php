@@ -147,7 +147,7 @@ class VirtualaccountController extends Controller
 
 
         $bvn = $request->bvn;
-        $user_id = $request->bvn;
+        $user_id = $request->user_id;
 
 
         if ($bvn == null) {
@@ -218,7 +218,7 @@ class VirtualaccountController extends Controller
                 $create->v_account_no = $p_acct_no;
                 $create->v_account_name = $p_acct_name;
                 $create->v_bank_name = $pbank;
-                $create->user_id = Auth::id();
+                $create->user_id = $user_id;
                 $create->save();
 
                 $message = "Providus Account Created | $name";
