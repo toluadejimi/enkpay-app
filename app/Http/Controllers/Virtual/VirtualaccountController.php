@@ -219,6 +219,8 @@ class VirtualaccountController extends Controller
                 $create->v_account_name = $p_acct_name;
                 $create->v_bank_name = $pbank;
                 $create->user_id = $user_id;
+                $create->serial_no = $request->serial_no;
+
                 $create->save();
 
                 $message = "Providus Account Created | $name";
