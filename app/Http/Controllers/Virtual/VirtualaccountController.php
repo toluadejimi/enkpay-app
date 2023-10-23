@@ -224,7 +224,6 @@ class VirtualaccountController extends Controller
                 $message = "Providus Account Created | $name";
                 send_notification($message);
 
-                $get_user = User::find(Auth::id())->first();
                 return response()->json([
 
                     'status' => $this->success,
