@@ -819,6 +819,14 @@ class VirtualaccountController extends Controller
                 $removed_comm =  $both_commmission;
             }
 
+
+
+            if (preg_match('/\/(\d+)$/', $tranRemarks, $matches)) {
+                $session_id = $matches[1] ?? null;
+            }
+
+
+
             $business_id = VirtualAccount::where('v_account_no', $accountNumber)->first()->business_id ?? null;
             if (!empty($business_id) || $business_id != null) {
                 $charge_status = Webkey::where('key', $key)->first()->charge_status ?? null;
@@ -858,6 +866,9 @@ class VirtualaccountController extends Controller
                 }
 
 
+
+
+
                 //update Transactions
                 $trasnaction = new Transaction();
                 $trasnaction->user_id = $user_id;
@@ -874,7 +885,7 @@ class VirtualaccountController extends Controller
                 $trasnaction->e_charges = $deposit_charges;
                 $trasnaction->enkPay_Cashout_profit = $enkpay_commision_amount;
                 $trasnaction->trx_date = $tranDateTime;
-                $trasnaction->p_sessionId = $sessionId;
+                $trasnaction->p_sessionId = $session_id;
                 $trasnaction->trx_time = $tranDateTime;
                 $trasnaction->sender_name = $from;
                 $trasnaction->sender_bank = $sourceBankName;
@@ -947,7 +958,7 @@ class VirtualaccountController extends Controller
             $trasnaction->e_charges = $deposit_charges;
             $trasnaction->enkPay_Cashout_profit = 10;
             $trasnaction->trx_date = $tranDateTime;
-            $trasnaction->p_sessionId = $sessionId;
+            $trasnaction->p_sessionId = $session_id;
             $trasnaction->trx_time = $tranDateTime;
             $trasnaction->sender_name = $from;
             $trasnaction->sender_bank = $sourceBankName;
