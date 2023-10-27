@@ -821,10 +821,12 @@ class VirtualaccountController extends Controller
 
 
 
-            if (preg_match('/\/(\d+)$/', $tranRemarks, $matches)) {
-                $session_id = $matches[1] ?? null;
-            }
 
+                if (preg_match('/\/(\d+)$/', $tranRemarks, $matches)) {
+                $session_id = $matches[1] ?? null;
+                }else{
+                    $session_id = $sessionId;
+                }
 
 
             $business_id = VirtualAccount::where('v_account_no', $accountNumber)->first()->business_id ?? null;
@@ -866,6 +868,13 @@ class VirtualaccountController extends Controller
                 }
 
 
+
+
+                if (preg_match('/\/(\d+)$/', $tranRemarks, $matches)) {
+                $session_id = $matches[1] ?? null;
+                }else{
+                    $session_id = $sessionId;
+                }
 
 
 
