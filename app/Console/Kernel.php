@@ -40,6 +40,10 @@ class Kernel extends ConsoleKernel
         ->twiceDaily(11, 18);
 
 
+        $schedule->command('send:endmonth')
+        ->monthlyOn(1, '00:00');
+
+
 
     }
 

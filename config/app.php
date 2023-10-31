@@ -181,6 +181,7 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
         Ladumor\OneSignal\OneSignalServiceProvider::class,
+        Barryvdh\DomPDF\ServiceProvider::class,
 
 
         /*
