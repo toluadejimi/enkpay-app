@@ -37,6 +37,10 @@ class RemovePending extends Command
 
         WebTransfer::where('status', 0)->delete();
 
+        $message = "Transaction Deleted";
+
+        send_notification($message)
+
     }
 
 }
