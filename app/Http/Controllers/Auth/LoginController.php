@@ -41,7 +41,7 @@ class LoginController extends Controller
     {
 
 
-        $mytime = Carbon::now();
+        $mytime = Carbon::now()->timezone('Europe/London');
 
 
         $phone = $request->phone;
