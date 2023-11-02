@@ -35,7 +35,7 @@ class RemovePending extends Command
     public function handle()
     {
 
-        WebTransfer::where('status', 0)->where('created_at','<', Carbon::now()->subMinutes(5))->delete();
+        WebTransfer::where('status', 0)->where('created_at','>', Carbon::now()->subMinutes(5))->delete();
 
         $message = "Transaction Deleted";
 
