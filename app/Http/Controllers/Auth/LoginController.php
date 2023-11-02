@@ -41,7 +41,8 @@ class LoginController extends Controller
     {
 
 
-        $mytime = Carbon::now(); echo $mytime->toDateTimeString();
+        $mytime = Carbon::now();
+
 
         $phone = $request->phone;
         $credentials = request(['phone', 'password']);
