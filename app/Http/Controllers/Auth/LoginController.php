@@ -41,7 +41,6 @@ class LoginController extends Controller
     {
 
 
-        $mytime = Carbon::now()->timezone('Africa/Lagos');
 
 
         $phone = $request->phone;
@@ -173,7 +172,6 @@ class LoginController extends Controller
                 'isNewDevice' => false,
                 'setting' => $setting,
                 'tid_config' => $tid_config,
-                'time' => $mytime
 
             ], 200);
 
