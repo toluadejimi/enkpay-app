@@ -69,7 +69,7 @@ return [
     |
     */
 
-    'timezone' => 'Africa/Lagos',
+    'timezone' => 'Europe/London',
     /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration
