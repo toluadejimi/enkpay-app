@@ -28,6 +28,10 @@ class Kernel extends ConsoleKernel
         ->everyFiveMinutes();
 
 
+        $schedule->command('app:pending')
+        ->everyFiveMinutes();
+
+
         $schedule->command('app:auto-birth-day-wish')
         ->dailyAt('12:00');
 
