@@ -39,7 +39,7 @@ class RemovePending extends Command
 
         $message = "Transaction Deleted";
 
-        send_notification($message)
+        send_notification($message);
 
     }
 
