@@ -41,6 +41,8 @@ class LoginController extends Controller
     {
 
 
+        $mytime = Carbon::now(); echo $mytime->toDateTimeString();
+
         $phone = $request->phone;
         $credentials = request(['phone', 'password']);
 
@@ -140,7 +142,7 @@ class LoginController extends Controller
             $user['user_virtual_account_list'] = $virtual_account;
             $user['terminal_info'] = terminal_info();
             $tid_config = tid_config();
-            
+
 
 
             $is_kyc_verified = Auth::user()->is_kyc_verified;
@@ -161,7 +163,7 @@ class LoginController extends Controller
             $setting = Setting::select('google_url', 'ios_url', 'version')
                 ->first();
 
-            
+
 
             return response()->json([
                 'status' => $this->success,
@@ -169,12 +171,11 @@ class LoginController extends Controller
                 'permission' => $feature,
                 'isNewDevice' => false,
                 'setting' => $setting,
-                'tid_config' => $tid_config
-
-
+                'tid_config' => $tid_config,
+                'time' => $mytime
 
             ], 200);
-        
+
     }
 
     public function pin_login(Request $request)
@@ -575,8 +576,8 @@ class LoginController extends Controller
         $user['token'] = $token;
         $user['user_virtual_account_list'] = $virtual_account;
         $user['terminal_info'] = terminal_info();
-        
-        
+
+
         $tid_config = tid_config();
 
 
@@ -600,7 +601,7 @@ class LoginController extends Controller
 
 
 
-      
+
 
         $setting = Setting::select('google_url', 'ios_url', 'version')
             ->first();
@@ -618,7 +619,7 @@ class LoginController extends Controller
 
         ], 200);
 
-      
+
 
     }
 
