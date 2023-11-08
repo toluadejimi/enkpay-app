@@ -798,14 +798,14 @@ class VirtualaccountController extends Controller
             $web_commission = Charge::where('title', 'bwebpay')->first()->amount;
             //Both Commission
             $amount1 = $web_commission / 100;
-            $amount2 = $amount1 * $transactionAmount;
+            $amount2 = $amount1 * $settledAmount;
             $both_commmission = number_format($amount2, 3);
 
 
             //enkpay commission
             $commison_subtract = $web_commission - 0.5;
             $enkPayPaypercent = $commison_subtract / 100;
-            $enkPay_amount = $enkPayPaypercent * $transactionAmount;
+            $enkPay_amount = $enkPayPaypercent * $settledAmount;
             $enkpay_commision_amount = number_format($enkPay_amount, 3);
 
 
