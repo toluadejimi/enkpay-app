@@ -61,12 +61,9 @@ class TransactionController extends Controller
 
                 $name = Auth::user()->first_name . " " . Auth::user()->last_name;
                 $ip = $request->ip();
-                $message = $name . "| Multiple Transaction Detected Mother fuckers";
+                $message = $name . "| Multiple Transaction Detected";
                 $result = "Message========> " . $message . "\n\nIP========> " . $ip;
                 send_notification($result);
-
-                User::where('id', Auth::id())->update(['status' => 7]);
-
 
                 return response()->json([
 
