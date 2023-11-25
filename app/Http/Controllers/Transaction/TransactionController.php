@@ -56,22 +56,7 @@ class TransactionController extends Controller
             }
 
 
-            $ck_ip = User::where('id', Auth::id())->first()->ip_address ?? null;
-            if ($ck_ip != $request->ip()) {
-
-                $name = Auth::user()->first_name . " " . Auth::user()->last_name;
-                $ip = $request->ip();
-                $message = $name . "| Multiple Transaction Detected";
-                $result = "Message========> " . $message . "\n\nIP========> " . $ip;
-                send_notification($result);
-
-                return response()->json([
-
-                    'status' => $this->failed,
-                    'message' => "Multiple Transaction Detected \n\n Account Blocked",
-
-                ], 500);
-            }
+           
 
 
             $pos_trx = Feature::where('id', 1)->first()->pos_transfer ?? null;
@@ -3191,25 +3176,7 @@ class TransactionController extends Controller
             }
 
 
-            $ck_ip = User::where('id', Auth::id())->first()->ip_address ?? null;
-            if ($ck_ip != $request->ip()) {
-
-                $name = Auth::user()->first_name . " " . Auth::user()->last_name;
-                $ip = $request->ip();
-                $message = $name . "| Multiple Transaction Detected Mother fuckers";
-                $result = "Message========> " . $message . "\n\nIP========> " . $ip;
-                send_notification($result);
-
-                User::where('id', Auth::id())->update(['status' => 7]);
-
-
-                return response()->json([
-
-                    'status' => $this->failed,
-                    'message' => "Multiple Transaction Detected \n\n Account Blocked",
-
-                ], 500);
-            }
+        
 
             $phone = $request->phone;
             $amount = $request->amount;
