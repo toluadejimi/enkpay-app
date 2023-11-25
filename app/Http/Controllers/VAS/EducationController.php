@@ -25,6 +25,40 @@ class EducationController extends Controller
 
         try {
 
+
+            if (Auth::user()->status == 7) {
+
+
+                return response()->json([
+
+                    'status' => $this->failed,
+                    'message' => 'You can not make transfer at the moment, Please contact  support',
+
+                ], 500);
+            }
+    
+    
+    
+            $ck_ip = User::where('id', Auth::id())->first()->ip_address ?? null;
+            if ($ck_ip != $request->ip()) {
+    
+                $name = Auth::user()->first_name . " " . Auth::user()->last_name;
+                $ip = $request->ip();
+                $message = $name . "| Multiple Transaction Detected Mother fuckers";
+                $result = "Message========> " . $message . "\n\nIP========> " . $ip;
+                send_notification($result);
+    
+                User::where('id', Auth::id())->update(['status' => 7]);
+    
+    
+                return response()->json([
+    
+                    'status' => $this->failed,
+                    'message' => "Multiple Transaction Detected \n\n Account Blocked",
+    
+                ], 500);
+            }
+
             $account = select_account();
 
             $client = new \GuzzleHttp\Client();
