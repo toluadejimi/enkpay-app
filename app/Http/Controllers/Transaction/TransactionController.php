@@ -56,7 +56,7 @@ class TransactionController extends Controller
             }
 
 
-           
+
 
 
             $pos_trx = Feature::where('id', 1)->first()->pos_transfer ?? null;
@@ -3176,7 +3176,7 @@ class TransactionController extends Controller
             }
 
 
-        
+
 
             $phone = $request->phone;
             $amount = $request->amount;
@@ -4249,6 +4249,12 @@ class TransactionController extends Controller
 
         if ($transaction_type == 'inward') {
 
+
+            return response()->json([
+                'status' => $this->failed,
+                'message' => "Not Available",
+            ], 500);
+
             //Get user ID
             $user_id = Terminal::where('serial_no', $SerialNumber)
                 ->first()->user_id ?? null;
@@ -4426,6 +4432,12 @@ class TransactionController extends Controller
             || ($request->serviceCode == 'BMD5')
         ) {
 
+
+            return response()->json([
+                'status' => $this->failed,
+                'message' => "Not Available",
+            ], 500);
+
             $pos_trx = Feature::where('id', 1)->first()->pos_transfer ?? null;
             if ($pos_trx == 0) {
 
@@ -4544,6 +4556,12 @@ class TransactionController extends Controller
         if ($serviceCode == 'BLE1') {
 
 
+            return response()->json([
+                'status' => $this->failed,
+                'message' => "Not Available",
+            ], 500);
+
+
 
             $pos_trx = Feature::where('id', 1)->first()->pos_transfer ?? null;
             if ($pos_trx == 0) {
@@ -4608,7 +4626,7 @@ class TransactionController extends Controller
     public function transactiion_status(Request $request)
     {
 
-        $erran_api_key = errand_api_key();
+        //$erran_api_key = errand_api_key();
         $epkey = env('EPKEY');
 
 
@@ -4643,7 +4661,7 @@ class TransactionController extends Controller
                 $curl = curl_init();
 
                 curl_setopt_array($curl, array(
-                    CURLOPT_URL => "https://api.errandpay.com/epagentservice/api/v1/GetStatus?reference=$e_ref&businessCode=A00088",
+                   // CURLOPT_URL => "https://api.errandpay.com/epagentservice/api/v1/GetStatus?reference=$e_ref&businessCode=A00088",
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_ENCODING => '',
                     CURLOPT_MAXREDIRS => 10,
@@ -4652,7 +4670,7 @@ class TransactionController extends Controller
                     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                     CURLOPT_CUSTOMREQUEST => 'GET',
                     CURLOPT_HTTPHEADER => array(
-                        "Authorization: Bearer $erran_api_key"
+                       // "Authorization: Bearer $erran_api_key"
                     ),
                 ));
 
@@ -4731,6 +4749,12 @@ class TransactionController extends Controller
 
         try {
 
+
+            return response()->json([
+                'status' => $this->failed,
+                'message' => "Not Available",
+            ], 500);
+
             $SerialNumber = $request->serial_number;
             $pin = $request->pin;
             $transaction_type = "inward";
@@ -4779,12 +4803,12 @@ class TransactionController extends Controller
 
         try {
 
-            $api = errand_api_key();
+            //$api = errand_api_key();
 
             $curl = curl_init();
 
             curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiGetBalance',
+                //CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiGetBalance',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
@@ -4796,7 +4820,7 @@ class TransactionController extends Controller
                     'Accept: application/json',
                     'Content-Type: application/json',
                     'epKey: ep_live_jFrIZdxqSzAdraLqbvhUfVYs',
-                    "Authorization: Bearer $api",
+                   // "Authorization: Bearer $api",
                 ),
             ));
 
@@ -4857,7 +4881,7 @@ class TransactionController extends Controller
 
         try {
 
-            $token = errand_api_key();
+            //$token = errand_api_key();
 
             return response()->json([
 
@@ -5025,7 +5049,7 @@ class TransactionController extends Controller
         if ($pool_b > 250025) {
 
 
-            $erran_api_key = errand_api_key();
+           // $erran_api_key = errand_api_key();
 
             $epkey = env('EPKEY');
 
@@ -5042,7 +5066,7 @@ class TransactionController extends Controller
             $post_data = json_encode($data);
 
             curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
+               // CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
@@ -5052,8 +5076,8 @@ class TransactionController extends Controller
                 CURLOPT_CUSTOMREQUEST => 'POST',
                 CURLOPT_POSTFIELDS => $post_data,
                 CURLOPT_HTTPHEADER => array(
-                    "Authorization: Bearer $erran_api_key",
-                    "EpKey: $epkey",
+                   // "Authorization: Bearer $erran_api_key",
+                   // "EpKey: $epkey",
                     'Content-Type: application/json',
                 ),
             ));
@@ -5084,7 +5108,7 @@ class TransactionController extends Controller
 
             $amount = $pool_b - 25;
 
-            $erran_api_key = errand_api_key();
+            //$erran_api_key = errand_api_key();
 
             $epkey = env('EPKEY');
 
@@ -5101,7 +5125,7 @@ class TransactionController extends Controller
             $post_data = json_encode($data);
 
             curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
+               // CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING => '',
                 CURLOPT_MAXREDIRS => 10,
@@ -5111,7 +5135,7 @@ class TransactionController extends Controller
                 CURLOPT_CUSTOMREQUEST => 'POST',
                 CURLOPT_POSTFIELDS => $post_data,
                 CURLOPT_HTTPHEADER => array(
-                    "Authorization: Bearer $erran_api_key",
+                    //"Authorization: Bearer $erran_api_key",
                     "EpKey: $epkey",
                     'Content-Type: application/json',
                 ),
