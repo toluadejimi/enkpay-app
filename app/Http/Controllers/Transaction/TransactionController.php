@@ -4460,11 +4460,7 @@ class TransactionController extends Controller
         if ($transaction_type == 'inward') {
 
 
-            return response()->json([
-                'status' => $this->failed,
-                'message' => "Not Available",
-            ], 500);
-
+        
             //Get user ID
             $user_id = Terminal::where('serial_no', $SerialNumber)
                 ->first()->user_id ?? null;
@@ -4894,7 +4890,7 @@ class TransactionController extends Controller
                 $status = $result->ResponseCode ?? null;
 
 
-                
+
                 if ($status == 90000) {
 
                     Transaction::where('ref_trans_id', $ref_no)->update([
@@ -4910,9 +4906,9 @@ class TransactionController extends Controller
                     Transaction::where('ref_trans_id', $ref_no)->update([
 
                         'status' => 3,
-    
+
                     ]);
-                   
+
                     User::where('id', $trx->user_id)->increment('main_wallet', $trx->debit);
                     $trasnaction = new Transaction();
                     $trasnaction->user_id = $trx->user_id;
@@ -4928,7 +4924,7 @@ class TransactionController extends Controller
                     $trasnaction->main_type = "Reversal";
                     $trasnaction->status = 3;
                     $trasnaction->save();
-        
+
                     $usr = User::where('id', $trx->user_id)->first();
                     $full_name = $usr->first_name . "  " . $usr->last_name;
                     $message = $trx->e_ref." | Reversed from Hostory  |  NGN". number_format($trx->debit);
@@ -4949,10 +4945,10 @@ class TransactionController extends Controller
                         'note' => $trx->ref_trans_id. " | " .$trx->note,
                         'status' => 3,
                         'message' => "Transaction Reversed",
-        
-        
+
+
                     ], 200);
-        
+
 
                 }
 
