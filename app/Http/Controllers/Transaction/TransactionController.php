@@ -875,7 +875,7 @@ class TransactionController extends Controller
                         ], 500);
                     }
 
-                    if ($status == 11011) {
+                    if ($status == 11011 || $status == 50002) {
                         //update Transactions
                         $trasnaction = new Transaction();
                         $trasnaction->user_id = Auth::id();
@@ -2408,7 +2408,7 @@ class TransactionController extends Controller
                     ], 500);
                 }
 
-                if ($status == 11011) {
+                if ($status == 11011 || $status == 50002) {
                     //update Transactions
                     $trasnaction = new Transaction();
                     $trasnaction->user_id = Auth::id();
@@ -2584,7 +2584,6 @@ class TransactionController extends Controller
                 $trasnaction->save();
 
                 PendingTransaction::where('user_id', Auth::id())->delete() ?? null;
-
 
                 $usr = User::where('id', Auth::id())->first();
                 $message = "Transaction reversed | Our API error";
@@ -4797,7 +4796,7 @@ class TransactionController extends Controller
     {
 
 
-        // try {
+        try {
 
             $ref_no = $request->ref_no;
 
@@ -4812,17 +4811,9 @@ class TransactionController extends Controller
             }
 
 
-            $e_ref = Transaction::where('ref_trans_id', $ref_no)
-            ->first()->ttmfb_api_ref;
+            $trx = Transaction::where('ref_trans_id', $ref_no)->first();
 
-           
-
-
-            $e_ref_status = Transaction::where('ref_trans_id', $ref_no)
-            ->first()->status;
-
-
-            if ($e_ref_status == 0) {
+            if ($trx->status == 0) {
 
                 $trans_id = trx();
                 $username = env('MUSERNAME');
@@ -4842,7 +4833,7 @@ class TransactionController extends Controller
                 $curl = curl_init();
 
                 curl_setopt_array($curl, array(
-                    CURLOPT_URL => "http://magtipon.buildbankng.com/api/v1/transaction/$e_ref",
+                    CURLOPT_URL => "http://magtipon.buildbankng.com/api/v1/transaction/$trx->ttmfb_api_ref",
                     CURLOPT_RETURNTRANSFER => true,
                     CURLOPT_ENCODING => '',
                     CURLOPT_MAXREDIRS => 10,
@@ -4871,57 +4862,91 @@ class TransactionController extends Controller
 
                     ]);
                 }
+
+
+                if ($status == 50004) {
+                   
+                    User::where('id', $trx->user_id)->increment('main_wallet', $trx->debit);
+                    $trasnaction = new Transaction();
+                    $trasnaction->user_id = Auth::id();
+                    $trasnaction->ref_trans_id = trx();
+                    $trasnaction->transaction_type = "Reversal";
+                    $trasnaction->debit = 0;
+                    $trasnaction->amount = $trx->amount;
+                    $trasnaction->serial_no = 0;
+                    $trasnaction->title = "Reversal";
+                    $trasnaction->note = $trx->e_ref. "| Reversal";
+                    $trasnaction->fee = 0;
+                    $trasnaction->balance = $trx->debit;
+                    $trasnaction->main_type = "Reversal";
+                    $trasnaction->status = 3;
+                    $trasnaction->save();
+        
+                    $usr = User::where('id', Auth::id())->first();
+                    $full_name = $usr->first_name . "  " . $usr->last_name;
+                    $message = $trx->e_ref." | Reversed |".$trx->debit;
+
+                    $result = $status . "| Message========> " . $message . "\n\nCustomer Name========> " . $full_name;
+                    send_notification($result);
+
+                    Transaction::where('ref_trans_id', $ref_no)->update([
+                    'status' => 1,
+                    ]);
+
+
+                    return response()->json([
+
+                        'status' => true,
+                        'e_ref' => $trx->p_sessionId,
+                        'amount' => $trx->amount,
+                        'receiver_bank' => $trx->receiver_bank,
+                        'receiver_name' => $trx->receiver_name,
+                        'receiver_account_no' => $trx->receiver_account_no,
+                        'date' => $trx->created_at,
+                        'note' => $trx->ref_trans_id. " | " .$trx->note,
+                        'status' => $trx->status,
+                        'message' => "Transaction Recersed",
+        
+        
+                    ], 200);
+        
+
+                }
+
+
+
+
+
+
+
+
             }
 
-
-            $amount = Transaction::where('ref_trans_id', $ref_no)
-                ->first()->amount;
-
-
-            $ref_trans_id = Transaction::where('ref_trans_id', $ref_no)
-                ->first()->ref_trans_id;
-
-
-            $trx = Transaction::where('ref_trans_id', $ref_no)
-            ->first();
-
-
-            $receiver_bank = Transaction::where('ref_trans_id', $ref_no)
-                ->first()->receiver_bank;
-
-            $receiver_name = Transaction::where('ref_trans_id', $ref_no)
-                ->first()->receiver_name;
-
-            $note = Transaction::where('ref_trans_id', $ref_no)
-                ->first()->note;
-
-            $date = Transaction::where('ref_trans_id', $ref_no)
-                ->first()->created_at;
-
-            $receiver_account_no = Transaction::where('ref_trans_id', $ref_no)
-                ->first()->receiver_account_no;
-
-            $status = Transaction::where('ref_trans_id', $ref_no)
-                ->first()->status;
 
             return response()->json([
 
                 'status' => true,
                 'e_ref' => $trx->p_sessionId,
-                'amount' => $amount,
-                'receiver_bank' => $receiver_bank,
+                'amount' => $trx->amount,
+                'receiver_bank' => $trx->receiver_bank,
                 'receiver_name' => $trx->receiver_name,
                 'receiver_account_no' => $trx->receiver_account_no,
-                'date' => $date,
-                'note' => "$ref_trans_id | $note",
-                'status' => $status,
+                'date' => $trx->created_at,
+                'note' => "$trx->ref_trans_id | $trx->note",
+                'status' => $trx->status,
                 'message' => "If receiver is not credited within 10mins, Please contact us with the EREF ",
 
 
             ], 200);
-        // } catch (\Exception $th) {
-        //     return $th->getMessage();
-        // }
+
+
+
+
+
+
+        } catch (\Exception $th) {
+            return $th->getMessage();
+        }
     }
 
 
