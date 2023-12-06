@@ -1058,8 +1058,10 @@ class TransactionController extends Controller
                     PendingTransaction::where('user_id', Auth::id())->delete() ?? null;
 
 
+                    if($status == 60001){
+
                     $usr = User::where('id', Auth::id())->first();
-                    $message = "Transaction reversed | Our API error";
+                    $message = "Transaction reversed | $status | ".$result->ResponseDescription ?? null;
                     $full_name = $usr->first_name . "  " . $usr->last_name;
 
                     $result = $status . "| Message========> " . $message . "\n\nCustomer Name========> " . $full_name;
@@ -1068,7 +1070,24 @@ class TransactionController extends Controller
 
                     return response()->json([
                         'status' => $this->failed,
-                        'message' => "Transaction Reversed",
+                        'message' => "Transaction Reversed \n Invalid account",
+
+                    ], 500);
+
+
+                    }
+
+                    $usr = User::where('id', Auth::id())->first();
+                    $message = "Transaction reversed | $status";
+                    $full_name = $usr->first_name . "  " . $usr->last_name;
+
+                    $result = $status . "| Message========> " . $message . "\n\nCustomer Name========> " . $full_name;
+                    send_notification($result);
+
+
+                    return response()->json([
+                        'status' => $this->failed,
+                        'message' => "Transaction Reversed \n $result->",
 
                     ], 500);
                 }
@@ -2389,6 +2408,7 @@ class TransactionController extends Controller
                 $session_id = $result->RemoteRef ?? null;
                 $tt_mfb_response = $result->TransactionRef ?? null;
                 $api_ref = $result->RemoteRef ?? null;
+                $r_desc = $result->ResponseDescription ?? null;
 
 
                 curl_close($curl);
@@ -2585,17 +2605,38 @@ class TransactionController extends Controller
 
                 PendingTransaction::where('user_id', Auth::id())->delete() ?? null;
 
+
+                if($status == 60001){
+
+
+                    $usr = User::where('id', Auth::id())->first();
+                    $message = "Transaction reversed | $status | ".$result->ResponseDescription ?? null;
+                    $full_name = $usr->first_name . "  " . $usr->last_name;
+
+                    $result = $status . "| Message========> " . $message . "\n\nCustomer Name========> " . $full_name;
+                    send_notification($result);
+
+
+                    return response()->json([
+                        'status' => $this->failed,
+                        'message' => "Transaction Reversed \n ".$r_desc,
+
+                    ], 500);
+
+
+                }
+
                 $usr = User::where('id', Auth::id())->first();
-                $message = "Transaction reversed | Our API error";
+                $message = "Transaction reversed | $r_desc";
                 $full_name = $usr->first_name . "  " . $usr->last_name;
 
                 $result = $status . "| Message========> " . $message . "\n\nCustomer Name========> " . $full_name;
                 send_notification($result);
 
-
                 return response()->json([
                     'status' => $this->failed,
-                    'message' => "Transaction Reversed",
+                    'message' => "Transaction Reversed \n ".$r_desc,
+
                 ], 500);
             }
         }
@@ -4796,7 +4837,7 @@ class TransactionController extends Controller
     {
 
 
-        try {
+        // try {
 
             $ref_no = $request->ref_no;
 
@@ -4864,11 +4905,17 @@ class TransactionController extends Controller
                 }
 
 
-                if ($status == 50004) {
+                if ($status == 50004 || $status == 60001 || $status == 60002) {
+
+                    Transaction::where('ref_trans_id', $ref_no)->update([
+
+                        'status' => 3,
+    
+                    ]);
                    
                     User::where('id', $trx->user_id)->increment('main_wallet', $trx->debit);
                     $trasnaction = new Transaction();
-                    $trasnaction->user_id = Auth::id();
+                    $trasnaction->user_id = $trx->user_id;
                     $trasnaction->ref_trans_id = trx();
                     $trasnaction->transaction_type = "Reversal";
                     $trasnaction->debit = 0;
@@ -4882,16 +4929,12 @@ class TransactionController extends Controller
                     $trasnaction->status = 3;
                     $trasnaction->save();
         
-                    $usr = User::where('id', Auth::id())->first();
+                    $usr = User::where('id', $trx->user_id)->first();
                     $full_name = $usr->first_name . "  " . $usr->last_name;
-                    $message = $trx->e_ref." | Reversed |".$trx->debit;
+                    $message = $trx->e_ref." | Reversed from Hostory  |  NGN". number_format($trx->debit);
 
                     $result = $status . "| Message========> " . $message . "\n\nCustomer Name========> " . $full_name;
                     send_notification($result);
-
-                    Transaction::where('ref_trans_id', $ref_no)->update([
-                    'status' => 1,
-                    ]);
 
 
                     return response()->json([
@@ -4904,8 +4947,8 @@ class TransactionController extends Controller
                         'receiver_account_no' => $trx->receiver_account_no,
                         'date' => $trx->created_at,
                         'note' => $trx->ref_trans_id. " | " .$trx->note,
-                        'status' => $trx->status,
-                        'message' => "Transaction Recersed",
+                        'status' => 3,
+                        'message' => "Transaction Reversed",
         
         
                     ], 200);
@@ -4944,9 +4987,9 @@ class TransactionController extends Controller
 
 
 
-        } catch (\Exception $th) {
-            return $th->getMessage();
-        }
+        // } catch (\Exception $th) {
+        //     return $th->getMessage();
+        // }
     }
 
 
