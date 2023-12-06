@@ -4459,8 +4459,6 @@ class TransactionController extends Controller
 
         if ($transaction_type == 'inward') {
 
-
-
             //Get user ID
             $user_id = Terminal::where('serial_no', $SerialNumber)
                 ->first()->user_id ?? null;
@@ -4762,7 +4760,6 @@ class TransactionController extends Controller
         if ($serviceCode == 'BLE1') {
 
 
-       
 
 
             $pos_trx = Feature::where('id', 1)->first()->pos_transfer ?? null;
@@ -4992,10 +4989,10 @@ class TransactionController extends Controller
         try {
 
 
-            return response()->json([
-                'status' => $this->failed,
-                'message' => "Not Available",
-            ], 500);
+            // return response()->json([
+            //     'status' => $this->failed,
+            //     'message' => "Not Available",
+            // ], 500);
 
             $SerialNumber = $request->serial_number;
             $pin = $request->pin;
