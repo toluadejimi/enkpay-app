@@ -292,7 +292,8 @@ if (!function_exists('trx')) {
     function trx()
     {
 
-        $refcode = "ENK-" . random_int(10, 99).date('YmdHis');
+        $refcode = "ENK" . random_int(10, 99).date('YmdHis');
+
 
         return $refcode;
 
