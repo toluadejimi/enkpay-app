@@ -542,7 +542,7 @@ class VirtualaccountController extends Controller
                     if ($user_email !== null) {
 
                         $data = array(
-                            'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                            'fromsender' => 'noreply@enkpay.com', 'EnkPay',
                             'subject' => "Virtual Account Credited",
                             'toreceiver' => $user_email,
                             'amount' => $enkpay_debit,
@@ -1146,7 +1146,7 @@ class VirtualaccountController extends Controller
             if ($user_email !== null) {
 
                 $data = array(
-                    'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                    'fromsender' => 'noreply@enkpay.com', 'EnkPay',
                     'subject' => "Virtual Account Credited",
                     'toreceiver' => $user_email,
                     'amount' => $transactionAmount,

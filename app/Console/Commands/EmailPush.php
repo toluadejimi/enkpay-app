@@ -43,7 +43,7 @@ class EmailPush extends Command
             if ($user_email !== null) {
 
                 $data = array(
-                    'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                    'fromsender' => 'noreply@enkpay.com', 'EnkPay',
                     'subject' => "Bank Transfer",
                     'toreceiver' => $mail->receiver_email,
                     'amount' => $mail->amount,

@@ -277,7 +277,7 @@ class RegisterationController extends Controller
 
 
                 // $data = array(
-                //     'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                //     'fromsender' => 'noreply@enkpay.com', 'EnkPay',
                 //     'subject' => "One Time Password",
                 //     'toreceiver' => $email,
                 //     'sms_code' => $sms_code,
@@ -306,7 +306,7 @@ class RegisterationController extends Controller
                     ]);
 
                 $data = array(
-                    'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                    'fromsender' => 'noreply@enkpay.com', 'EnkPay',
                     'subject' => "One Time Password",
                     'toreceiver' => $email,
                     'sms_code' => $sms_code,
@@ -332,7 +332,7 @@ class RegisterationController extends Controller
             ]);
 
             $data = array(
-                'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                'fromsender' => 'noreply@enkpay.com', 'EnkPay',
                 'subject' => "One Time Password",
                 'toreceiver' => $email,
                 'sms_code' => $sms_code,
@@ -397,7 +397,7 @@ class RegisterationController extends Controller
                     ]);
 
                 // $data = array(
-                //     'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                //     'fromsender' => 'noreply@enkpay.com', 'EnkPay',
                 //     'subject' => "One Time Password",
                 //     'toreceiver' => $email,
                 //     'sms_code' => $sms_code,
@@ -480,7 +480,7 @@ class RegisterationController extends Controller
                     ]);
 
                 // $data = array(
-                //     'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                //     'fromsender' => 'noreply@enkpay.com', 'EnkPay',
                 //     'subject' => "One Time Password",
                 //     'toreceiver' => $email,
                 //     'sms_code' => $sms_code,
@@ -751,7 +751,7 @@ class RegisterationController extends Controller
                     ]);
 
                 // $data = array(
-                //     'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                //     'fromsender' => 'noreply@enkpay.com', 'EnkPay',
                 //     'subject' => "One Time Password",
                 //     'toreceiver' => $email,
                 //     'sms_code' => $sms_code,
@@ -1111,7 +1111,7 @@ class RegisterationController extends Controller
                 $date = str_replace('/', '-', $request->dob);
                 $dob = date('Y-m-d', strtotime($date));
 
-                
+
                 $create->gender = $gender;
                 $create->email = $email;
                 $create->email = $device_id;
@@ -1231,7 +1231,7 @@ class RegisterationController extends Controller
 
                 //send email
                 $data = array(
-                    'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                    'fromsender' => 'noreply@enkpay.com', 'EnkPay',
                     'subject' => "Reset Password",
                     'toreceiver' => $email,
                     'first_name' => $first_name,

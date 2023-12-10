@@ -1352,7 +1352,7 @@ class TransactionController extends Controller
                     if ($user_email !== null) {
 
                         $data = array(
-                            'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                            'fromsender' => 'noreply@enkpay.com', 'EnkPay',
                             'subject' => "Bank Transfer",
                             'toreceiver' => $user_email,
                             'amount' => $amount,
@@ -1613,7 +1613,7 @@ class TransactionController extends Controller
                     if ($user_email !== null) {
 
                         $data = array(
-                            'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                            'fromsender' => 'noreply@enkpay.com', 'EnkPay',
                             'subject' => "Bank Transfer",
                             'toreceiver' => $user_email,
                             'amount' => $amount,
@@ -2028,7 +2028,7 @@ class TransactionController extends Controller
                 if ($user_email !== null) {
 
                     $data = array(
-                        'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                        'fromsender' => 'noreply@enkpay.com', 'EnkPay',
                         'subject' => "Bank Transfer",
                         'toreceiver' => $user_email,
                         'amount' => $amount,
@@ -2889,7 +2889,7 @@ class TransactionController extends Controller
                 if ($user_email !== null) {
 
                     $data = array(
-                        'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                        'fromsender' => 'noreply@enkpay.com', 'EnkPay',
                         'subject' => "Bank Transfer",
                         'toreceiver' => $user_email,
                         'amount' => $amount,
@@ -3158,7 +3158,7 @@ class TransactionController extends Controller
                 if ($user_email !== null) {
 
                     $data = array(
-                        'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                        'fromsender' => 'noreply@enkpay.com', 'EnkPay',
                         'subject' => "Bank Transfer",
                         'toreceiver' => $user_email,
                         'amount' => $amount,
@@ -3611,7 +3611,7 @@ class TransactionController extends Controller
             if (!empty(user_email())) {
 
                 $data = array(
-                    'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                    'fromsender' => 'noreply@enkpay.com', 'EnkPay',
                     'subject' => "Debit Notification",
                     'toreceiver' => user_email(),
                     'first_name' => first_name(),
@@ -3632,7 +3632,7 @@ class TransactionController extends Controller
             if (!empty($receiver_email)) {
 
                 $data = array(
-                    'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                    'fromsender' => 'noreply@enkpay.com', 'EnkPay',
                     'subject' => "Credit Notification",
                     'toreceiver' => $receiver_email,
                     'first_name' => $receiver_f_name,
@@ -5115,23 +5115,7 @@ class TransactionController extends Controller
         }
     }
 
-    public function get_token(Request $request)
-    {
 
-        try {
-
-            //$token = errand_api_key();
-
-            return response()->json([
-
-                'status' => $this->success,
-                'data' => $token,
-
-            ]);
-        } catch (\Exception $th) {
-            return $th->getMessage();
-        }
-    }
 
     public function pos(Request $request)
     {

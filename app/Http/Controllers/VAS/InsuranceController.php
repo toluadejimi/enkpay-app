@@ -35,9 +35,9 @@ class InsuranceController extends Controller
 
                 ], 500);
             }
-    
-    
-        
+
+
+
 
             $account = select_account();
 
@@ -365,7 +365,7 @@ class InsuranceController extends Controller
                 if (!empty(user_email())) {
 
                     $data = array(
-                        'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                        'fromsender' => 'noreply@enkpay.com', 'EnkPay',
                         'subject' => "Low Balance",
                         'toreceiver' => user_email(),
                         'first_name' => first_name(),
@@ -484,7 +484,7 @@ class InsuranceController extends Controller
                 if (!empty(user_email())) {
                     //send email
                     $data = array(
-                        'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                        'fromsender' => 'noreply@enkpay.com', 'EnkPay',
                         'subject' => "Airtime Purchase",
                         'toreceiver' => user_email(),
                         'first_name' => first_name(),

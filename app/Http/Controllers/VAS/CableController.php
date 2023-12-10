@@ -28,7 +28,7 @@ class CableController extends Controller
 
 
 
-           
+
 
             $account = select_account();
 
@@ -93,10 +93,10 @@ class CableController extends Controller
 
                 ], 500);
             }
-    
-    
-    
-            
+
+
+
+
 
             if (Auth::user()->status != 2) {
 
@@ -281,7 +281,7 @@ class CableController extends Controller
                 if (!empty(user_email())) {
                     //send email
                     $data = array(
-                        'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                        'fromsender' => 'noreply@enkpay.com', 'EnkPay',
                         'subject' => "Cable Purchase",
                         'toreceiver' => user_email(),
                         'first_name' => first_name(),

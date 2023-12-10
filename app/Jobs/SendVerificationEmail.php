@@ -31,7 +31,7 @@ class SendVerificationEmail implements ShouldQueue
     {
 
         $data = array(
-            'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+            'fromsender' => 'noreply@enkpay.com', 'EnkPay',
             'subject' => "Electricity Receipt",
             'toreceiver' => $this->data['email'],
             // 'recepit' => $recepit,

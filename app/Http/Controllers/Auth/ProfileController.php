@@ -483,7 +483,7 @@ class ProfileController extends Controller
         $error = $var->message ?? $result ?? null;
         $status = $var->status ?? null;
 
-       
+
 
 
         if($error == "The cardholders name doesn't match the name on the BVN provided"){
@@ -728,7 +728,7 @@ class ProfileController extends Controller
 
                 //send email
                 $data = array(
-                    'fromsender' => 'noreply@enkpayapp.enkwave.com', 'EnkPay',
+                    'fromsender' => 'noreply@enkpay.com', 'EnkPay',
                     'subject' => "Reset Pin",
                     'toreceiver' => $email,
                     'first_name' => $first_name,
