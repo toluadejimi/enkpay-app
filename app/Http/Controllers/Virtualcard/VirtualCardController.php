@@ -206,7 +206,7 @@ class VirtualCardController extends Controller
 
         if (Auth::user()->status != 2) {
 
-            $message = Auth::user()->first_name. " ".Auth::user()->last_name. " | Unverified Account trying to func card";
+            $message = Auth::user()->first_name . " " . Auth::user()->last_name . " | Unverified Account trying to func card";
             send_notification($message);
 
             return response()->json([
@@ -229,7 +229,7 @@ class VirtualCardController extends Controller
 
 
 
-        if (Auth::user()->main_wallet < $amount_to_charge ) {
+        if (Auth::user()->main_wallet < $amount_to_charge) {
 
             return response()->json([
                 'status' => false,
@@ -242,7 +242,7 @@ class VirtualCardController extends Controller
 
 
 
-        $ref = "CAD-".random_int(1000000, 9999999);
+        $ref = "CAD-" . random_int(1000000, 9999999);
 
         //fund card
         $get_card_id = VCard::select('*')->where('user_id', Auth::id())->first()->card_id;
@@ -292,7 +292,7 @@ class VirtualCardController extends Controller
 
 
             $balance = $user_wallet - $amount_to_charge;
-            User::where('id', Auth::id())->decrement('main_wallet', $amount_to_charge );
+            User::where('id', Auth::id())->decrement('main_wallet', $amount_to_charge);
 
             $trasnaction = new Transactions();
             $trasnaction->user_id = Auth::id();
@@ -302,7 +302,7 @@ class VirtualCardController extends Controller
             $trasnaction->title = "USD Card Funding";
             $trasnaction->type = "CardFunding";
             $trasnaction->amount = $amount_to_charge;
-            $trasnaction->note = "USD CARD FUNDING | USD ".$amount_in_usd /100;
+            $trasnaction->note = "USD CARD FUNDING | USD " . $amount_in_usd / 100;
             $trasnaction->fee = 0;
             $trasnaction->e_charges = 0;
             $trasnaction->balance = $balance;
@@ -314,8 +314,6 @@ class VirtualCardController extends Controller
                 'message' => 'Your card has been funded successfully | USD $' . number_format($amount_in_usd / 100, 2),
 
             ], 200);
-
-
         } else {
 
             send_notification($message);
@@ -465,7 +463,7 @@ class VirtualCardController extends Controller
 
         if (Auth::user()->status != 2) {
 
-            $message = Auth::user()->first_name. " ".Auth::user()->last_name. " | Unverified Account trying to liqidate card";
+            $message = Auth::user()->first_name . " " . Auth::user()->last_name . " | Unverified Account trying to liqidate card";
             send_notification($message);
 
             return response()->json([
@@ -589,7 +587,7 @@ class VirtualCardController extends Controller
 
         if (Auth::user()->status != 2) {
 
-            $message = Auth::user()->first_name. " ".Auth::user()->last_name. " | Unverified Account trying to create card";
+            $message = Auth::user()->first_name . " " . Auth::user()->last_name . " | Unverified Account trying to create card";
             send_notification($message);
 
             return response()->json([
@@ -713,78 +711,60 @@ class VirtualCardController extends Controller
         $card = Vcard::where('user_id', Auth::id())->first() ?? null;
 
 
-        if ($card->masked_card == null) {
+        if ($card != null) {
 
-            $card_details = [];
+            $key = env('BKEY');
+            $curl = curl_init();
 
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => "https://issuecards-api-bridgecard-co.relay.evervault.com/v1/issuing/cards/get_card_details?card_id=$card_id",
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'GET',
+                CURLOPT_HTTPHEADER => array(
 
-        }
+                    "Content-Type: application/json",
+                    "token: Bearer $key",
 
-
-        $key = env('BKEY');
-
-
-        $curl = curl_init();
-
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://issuecards-api-bridgecard-co.relay.evervault.com/v1/issuing/cards/get_card_details?card_id=$card_id",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-            CURLOPT_HTTPHEADER => array(
-
-                "Content-Type: application/json",
-                "token: Bearer $key",
-
-            ),
-        ));
+                ),
+            ));
 
 
-        $var = curl_exec($curl);
-        curl_close($curl);
-        $var = json_decode($var);
-        $amount = $var->data->balance ?? null;
-
-        if ($card->masked_card == null) {
-
-            Vcard::where('card_id', $card_id)->update([
-
-                'masked_card' => $var->data->card_number,
-                'cvv' => $var->data->cvv,
-                'expiration' => $var->data->expiry_month. " / " .$var->data->expiry_year,
-                'card_type' => $var->data->brand,
-                'name_on_card' => $var->data->card_name,
-                'amount' => $var->data->balance/100,
-                'city' => $var->data->billing_address->billing_city,
-                'state' => $var->data->billing_address->state,
-                'address' => $var->data->billing_address->billing_address1,
-                'zip_code' => $var->data->billing_address->billing_zip_code,
-                'status' => 1
-
-            ]);
-        }
+            $var = curl_exec($curl);
+            curl_close($curl);
+            $var = json_decode($var);
+            $amount = $var->data->balance ?? null;
 
 
+            if ($card->masked_card != null) {
 
-        if ($card->masked_card != null) {
+                Vcard::where('card_id', $card_id)->update([
+                    'amount' => $var->data->balance / 100
 
-            Vcard::where('card_id', $card_id)->update([
-                'amount' => $var->data->balance/100
+                ]);
+            } else {
 
-            ]);
-        }
+                Vcard::where('card_id', $card_id)->update([
 
+                    'masked_card' => $var->data->card_number,
+                    'cvv' => $var->data->cvv,
+                    'expiration' => $var->data->expiry_month . " / " . $var->data->expiry_year,
+                    'card_type' => $var->data->brand,
+                    'name_on_card' => $var->data->card_name,
+                    'amount' => $var->data->balance / 100,
+                    'city' => $var->data->billing_address->billing_city,
+                    'state' => $var->data->billing_address->state,
+                    'address' => $var->data->billing_address->billing_address1,
+                    'zip_code' => $var->data->billing_address->billing_zip_code,
+                    'status' => 1
 
-        if ($card->masked_card == null) {
+                ]);
+            }
 
-            $card_details = [];
-
-
-        } else {
 
             $card_details = array([
                 'card_number' => $card->masked_card,
@@ -799,14 +779,7 @@ class VirtualCardController extends Controller
                 'zip_code' => $card->zip_code,
                 'status' => $card->status,
             ]);
-        }
 
-
-
-
-
-
-        if ($card_id != null) {
 
 
             $curl = curl_init();
@@ -829,27 +802,32 @@ class VirtualCardController extends Controller
             curl_close($curl);
             $var = json_decode($var);
             $card_data = $var->data->transactions ?? null;
+            $data = $card_data;
 
+            return response()->json([
+                'status' => true,
+                'creation_charge' => $set->virtual_createcharge,
+                'rate' => "$set->ngn_rate",
+                'w_rate' => $set->w_rate,
+                'card_transaction' => $data,
+                'card_details' => $card_details,
 
-            if ($card_data == null) {
-                $data =  [];
-            } else {
-                $data = $card_data;
-            }
+            ], 200);
+
         } else {
 
+            $card_details = [];
             $data = [];
+
+            return response()->json([
+                'status' => true,
+                'creation_charge' => $set->virtual_createcharge,
+                'rate' => "$set->ngn_rate",
+                'w_rate' => $set->w_rate,
+                'card_transaction' => $data,
+                'card_details' => $card_details,
+
+            ], 200);
         }
-
-
-        return response()->json([
-            'status' => true,
-            'creation_charge' => $set->virtual_createcharge,
-            'rate' => "$set->ngn_rate",
-            'w_rate' => $set->w_rate,
-            'card_transaction' => $data,
-            'card_details' => $card_details,
-
-        ], 200);
     }
 }
