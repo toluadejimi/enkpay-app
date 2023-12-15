@@ -713,6 +713,14 @@ class VirtualCardController extends Controller
         $card = Vcard::where('user_id', Auth::id())->first() ?? null;
 
 
+        if ($card->masked_card == null) {
+
+            $card_details = [];
+
+
+        }
+
+
         $key = env('BKEY');
 
 
@@ -771,7 +779,7 @@ class VirtualCardController extends Controller
         }
 
 
-        if ($card == null) {
+        if ($card->masked_card == null) {
 
             $card_details = [];
 
