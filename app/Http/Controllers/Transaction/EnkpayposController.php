@@ -31,12 +31,14 @@ class EnkpayposController extends Controller
         $expireDate = $request->expireDate;
         $message = $request->message;
         $pan = $request->pan;
-        $responseCode = $request->responseCode;
+        $responseCode = $request->respCode;
         $terminalID = $request->terminalID;
         $transactionType = $request->transactionType;
         $cardName = $request->cardName;
         $userID = $request->UserID;
         $DataKey = env('DATAKEY');
+
+
 
 
         if($key == null){
@@ -87,12 +89,13 @@ class EnkpayposController extends Controller
           $trasnaction->user_id = $userID;
           $trasnaction->e_ref = $RRN;
           $trasnaction->transaction_type = $transactionType;
-          $trasnaction->title = "POS Transasction Log";
+          $trasnaction->title = "POS Transaction Log";
           $trasnaction->amount = $amount;
           $trasnaction->sender_name = $pan;
           $trasnaction->serial_no = $terminalID;
           $trasnaction->sender_account_no = $pan;
-          $trasnaction->status = 1;
+          $trasnaction->status = 0;
+          $trasnaction->note = "Initiated";
           $trasnaction->save();
 
 
@@ -113,20 +116,23 @@ class EnkpayposController extends Controller
 
 
 
+
         $key = $request->header('dataKey');
         $RRN = $request->RRN;
         $userID = $request->UserID;
+        $serialNO=$request->serialNO;
         $STAN = $request->STAN;
         $amount = $request->amount;
         $expireDate = $request->expireDate;
-        $message = $request->message;
+        $message = $request->responseMessage;
         $pan = $request->pan;
-        $responseCode = $request->responseCode;
+        $responseCode = $request->respCode;
         $terminalID = $request->terminalID;
         $transactionType = $request->transactionType;
         $cardName = $request->cardName;
         $DataKey = env('DATAKEY');
 
+        $amount = PosLog::where('e_ref', $RRN)->first()->amount ?? null;
 
 
         if($key == null){
@@ -156,42 +162,31 @@ class EnkpayposController extends Controller
 
 
 
+        $userID = Terminal::where('serial_no', $serialNO)->first()->user_id ?? null;
+        if($userID == null){
 
-        // $encryptedStr = $request->data;
-        // $encrypted =  decryption($encryptedStr);
-        // $resust = json_decode($encrypted);
-        // $jsonData = trim($encrypted, "\x04\x03\x02\x01\x00\x05\x06\x07\x08\x09");
-        // $jsonString = iconv('UTF-8', 'ISO-8859-1//IGNORE', $jsonData);
-        // $decodedData = json_decode($jsonString, true);
+            $result = "No user found | for this serial $serialNO";
+            send_notification($result);
 
-        // $RRN = $decodedData['RRN'];
-        // $userID = $decodedData['UserID'];
-        // $STAN = $decodedData['STAN'];
-        // $amount = $decodedData['amount'];
-        // $expireDate = $decodedData['expireDate'];
-        // $message = $decodedData['message'];
-        // $pan = $decodedData['pan'];
-        // $responseCode = $decodedData['responseCode'];
-        // $terminalID = $decodedData['terminalID'];
-        // $transactionType = $decodedData['transactionType'];
-        // $cardName = $decodedData['cardName'];
+            return response()->json([
+                'status' => false,
+                'message' => "No user found with this serial | $serialNO",
+            ], 500);
+
+
+        }
+
+
 
 
 
 
 
         $trans_id = trx();
-
-        //$verify1 = hash('sha512', $key);
-
         $comission = Charge::where('title', 'both_commission')
             ->first()->amount;
-
-        // if ($eip == $ip) {
-
-        //Get user ID
         $user_id = $userID;
-        //Main Wallet
+
         $main_wallet = User::where('id', $user_id)
             ->first()->main_wallet ?? null;
 
@@ -247,6 +242,14 @@ class EnkpayposController extends Controller
                     'main_wallet' => $updated_amount,
                 ]);
 
+
+            PosLog::where('e_ref', $RRN)->update([
+
+                'status' => 1,
+                'note' => "Successful | $pan | $amount"
+
+            ]);
+
             //update Transactions
             $trasnaction = new Transaction();
             $trasnaction->user_id = $user_id;
@@ -286,6 +289,15 @@ class EnkpayposController extends Controller
 
         }else{
             //update Transactions
+
+            PosLog::where('e_ref', $RRN)->update([
+
+                'status' => 4,
+                'note' => "Failed | $message"
+
+            ]);
+
+
             $trasnaction = new Transaction();
             $trasnaction->user_id = $user_id;
             $trasnaction->ref_trans_id = $trans_id;
@@ -309,7 +321,7 @@ class EnkpayposController extends Controller
 
             $ip = $request->ip();
             $amount4 = number_format($removed_comission, 2);
-            $result = $f_name . " " . $l_name . "| fund NGN " . $amount4 . " | Failed on ENKPAY POS" . "\n\nIP========> " . $ip;
+            $result = $f_name . " " . $l_name . "| fund NGN " . $amount . " | Failed on ENKPAY POS" . "\n\nIP========> " . $ip;
             send_notification($result);
 
 
