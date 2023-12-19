@@ -25,8 +25,8 @@ class EnkpayposController extends Controller
 
         $key = $request->header('dataKey');
         $RRN = $request->RRN;
-        $userID = $request->UserID;
         $STAN = $request->STAN;
+        $serialNO=$request->serialNO;
         $amount = $request->amount;
         $expireDate = $request->expireDate;
         $message = $request->message;
@@ -63,6 +63,23 @@ class EnkpayposController extends Controller
             ], 500);
 
         }
+
+
+        $userID = Terminal::where('serial_no', $serialNO)->first()->user_id ?? null;
+        if($userID == null){
+
+
+            $result = "No user found | for this serial $serialNO";
+            send_notification($result);
+
+            return response()->json([
+                'status' => false,
+                'message' => "No user found with this serial | $serialNO",
+            ], 500);
+
+
+        }
+
 
 
           //update Transactions
