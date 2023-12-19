@@ -161,6 +161,10 @@ Route::group(['middleware' => ['auth:api', 'acess']], function () {
 
     //Fogot Pin
     Route::post('forgot-pin', [ProfileController::class, 'forgot_pin']);
+    Route::post('eod', [EnkpayposController::class, 'eod_transactions']);
+
+
+
 
     //Profile
     Route::get('user-info', [ProfileController::class, 'user_info']);
@@ -267,7 +271,7 @@ Route::post('auth-verify-email', [RegisterationController::class, 'auth_email_ve
 
 
 
-    
+
 
     //Education
     Route::get('get-waec', [EducationController::class, 'get_waec']);

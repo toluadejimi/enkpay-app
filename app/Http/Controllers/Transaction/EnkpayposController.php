@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers\Transaction;
 
-use App\Http\Controllers\Controller;
+use Carbon\Carbon;
+use App\Models\User;
 use App\Models\Charge;
 use App\Models\PosLog;
-use App\Models\Terminal;
-use App\Models\Transaction;
-use App\Models\User;
-use Illuminate\Http\Request;
-use Defuse\Crypto\Crypto;
 use Defuse\Crypto\Key;
+use App\Models\Terminal;
+use Defuse\Crypto\Crypto;
+use App\Models\Transaction;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class EnkpayposController extends Controller
@@ -334,4 +336,57 @@ class EnkpayposController extends Controller
 
 
     }
+
+
+    public function eod_transactions(request $request)
+    {
+
+
+        $today = Carbon::now()->toDateString();
+        $transaction= Transaction::where('user_id', Auth::id())->whereDate('created_at', $today)->get();
+        $terminalNo = Terminal::where('user_id', Auth::id())->first()->serial_no;
+        $merchantName = Terminal::where('user_id', Auth::id())->first()->merchantName;
+        $merchantNo = Terminal::where('user_id', Auth::id())->first()->merchantNo;
+        $totalTransaction = Transaction::where('user_id', Auth::id())->whereDate('created_at', $today)->count();
+        $totalSuccess = Transaction::whereDate('created_at', $today)
+        ->where([
+            'user_id' => Auth::id(),
+            'status' => 1
+        ])->count();
+        $totalFail = Transaction::whereDate('created_at', $today)
+        ->where([
+            'user_id' => Auth::id(),
+            'status' => 4
+        ])->count();
+
+        $totalPurchaseAmount = Transaction::whereDate('created_at', $today)
+        ->where([
+            'user_id' => Auth::id(),
+            'status' => 1
+        ])->sum('amount');
+
+
+
+
+
+        return response()->json([
+            'status' => true,
+            'reportDatetime' => date('d-m-y h:i:s'),
+            'terminalNo' => $terminalNo,
+            'merchantName' => $merchantName,
+            'merchantNo' => $merchantNo,
+            'totalTransaction' => $totalTransaction,
+            'totalSuccess' => $totalSuccess,
+            'totalFail' => $totalFail,
+            'totalPurchaseAmount' => $totalPurchaseAmount,
+            'transaction' => $transaction
+
+        ], 200);
+
+
+
+    }
+
+
+
 }
