@@ -40,9 +40,6 @@ class LoginController extends Controller
     public function phone_login(Request $request)
     {
 
-
-
-
         $phone = $request->phone;
         $credentials = request(['phone', 'password']);
 

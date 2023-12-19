@@ -207,6 +207,7 @@ class TransactionController extends Controller
 
                 $user_pin = Auth()->user()->pin;
 
+
                 if (Hash::check($pin, $user_pin) == false) {
 
                     return response()->json([

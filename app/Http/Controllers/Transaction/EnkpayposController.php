@@ -96,7 +96,7 @@ class EnkpayposController extends Controller
 
 
 
-        $key = $request->header('API_KEY');
+        $key = $request->header('dataKey');
         $RRN = $request->RRN;
         $userID = $request->UserID;
         $STAN = $request->STAN;

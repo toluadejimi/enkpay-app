@@ -409,9 +409,6 @@ if (!function_exists('get_banks')) {
 
 
 
-
-
-
         $set = Setting::where('id', 1)->first();
         if ($set->bank == 'vfd') {
             $get_banks = VfdBank::select('bankName', 'code')->get();
