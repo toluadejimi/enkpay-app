@@ -343,7 +343,7 @@ class EnkpayposController extends Controller
 
 
         $today = Carbon::now()->toDateString();
-        $transaction= Transaction::where('user_id', Auth::id())->whereDate('created_at', $today)->get();
+        $transaction= Transaction::select('e_ref', 'amount','sender_name','created_at', )->where('user_id', Auth::id())->whereDate('created_at', $today)->get();
         $terminalNo = Terminal::where('user_id', Auth::id())->first()->serial_no;
         $merchantName = Terminal::where('user_id', Auth::id())->first()->merchantName;
         $merchantNo = Terminal::where('user_id', Auth::id())->first()->merchantNo;
