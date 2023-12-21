@@ -361,21 +361,22 @@ class EnkpayposController extends Controller
         $merchantNo = Terminal::where('user_id', $request->user_id)->first()->merchantNo;
         $totalTransaction = Transaction::where('user_id', $request->user_id)->whereDate('created_at', $today)->count();
         $totalSuccess = Transaction::whereDate('created_at', $today)
-
-
         ->where([
-            'user_id' => Auth::id(),
+            'user_id' => $request->user_id,
             'status' => 1
         ])->count();
+
+
+
         $totalFail = Transaction::whereDate('created_at', $today)
         ->where([
-            'user_id' => Auth::id(),
+            'user_id' => $request->user_id,
             'status' => 4
         ])->count();
 
         $totalPurchaseAmount = Transaction::whereDate('created_at', $today)
         ->where([
-            'user_id' => Auth::id(),
+            'user_id' => $request->user_id,
             'status' => 1
         ])->sum('amount');
 
