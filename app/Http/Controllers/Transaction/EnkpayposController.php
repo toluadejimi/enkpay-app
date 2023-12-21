@@ -390,7 +390,7 @@ class EnkpayposController extends Controller
             'terminalNo' => $terminalNo,
             'merchantName' => $merchantName,
             'merchantNo' => $merchantNo,
-            'totalTransaction' => $totalTransaction,
+            'totalTransaction' => (int)$totalTransaction,
             'totalSuccess' => $totalSuccess,
             'totalFail' => $totalFail,
             'totalPurchaseAmount' => $totalPurchaseAmount,
