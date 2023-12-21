@@ -355,7 +355,7 @@ class EnkpayposController extends Controller
 
 
         $today = $request->date;
-        $transaction= Transaction::select('e_ref', 'amount','sender_name','created_at', )->where('user_id', $request->user_id)->whereDate('created_at', $today)->get();
+        $transaction= Transaction::select('e_ref', 'amount','sender_name','created_at','status')->where('user_id', $request->user_id)->whereDate('created_at', $today)->get();
         $terminalNo = Terminal::where('user_id', $request->user_id)->first()->serial_no;
         $merchantName = Terminal::where('user_id', $request->user_id)->first()->merchantName;
         $merchantNo = Terminal::where('user_id', $request->user_id)->first()->merchantNo;
