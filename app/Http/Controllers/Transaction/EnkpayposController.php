@@ -117,8 +117,6 @@ class EnkpayposController extends Controller
     {
 
 
-
-
         $key = $request->header('dataKey');
         $RRN = $request->RRN;
         $userID = $request->UserID;
@@ -342,13 +340,29 @@ class EnkpayposController extends Controller
     {
 
 
-        $today = Carbon::now()->toDateString();
-        $transaction= Transaction::select('e_ref', 'amount','sender_name','created_at', )->where('user_id', Auth::id())->whereDate('created_at', $today)->get();
-        $terminalNo = Terminal::where('user_id', Auth::id())->first()->serial_no;
-        $merchantName = Terminal::where('user_id', Auth::id())->first()->merchantName;
-        $merchantNo = Terminal::where('user_id', Auth::id())->first()->merchantNo;
-        $totalTransaction = Transaction::where('user_id', Auth::id())->whereDate('created_at', $today)->count();
+        if($request->date == null || $request->user_id == null){
+
+
+            return response()->json([
+                'status' => false,
+                'message' => "Date or User_id Can not be null"
+
+            ], 500);
+
+        }
+
+
+
+
+        $today = $request->date;
+        $transaction= Transaction::select('e_ref', 'amount','sender_name','created_at', )->where('user_id', $request->user_id)->whereDate('created_at', $today)->get();
+        $terminalNo = Terminal::where('user_id', $request->user_id)->first()->serial_no;
+        $merchantName = Terminal::where('user_id', $request->user_id)->first()->merchantName;
+        $merchantNo = Terminal::where('user_id', $request->user_id)->first()->merchantNo;
+        $totalTransaction = Transaction::where('user_id', $request->user_id)->whereDate('created_at', $today)->count();
         $totalSuccess = Transaction::whereDate('created_at', $today)
+
+
         ->where([
             'user_id' => Auth::id(),
             'status' => 1

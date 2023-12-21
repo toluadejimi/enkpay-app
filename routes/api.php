@@ -33,6 +33,7 @@ use Illuminate\Support\Facades\Route;
 // });
 
 
+Route::post('eod', [EnkpayposController::class, 'eod_transactions']);
 
 
 Route::post('manual-create-virtual-account', [VirtualaccountController::class, 'manual_api_account']);
@@ -161,7 +162,6 @@ Route::group(['middleware' => ['auth:api', 'acess']], function () {
 
     //Fogot Pin
     Route::post('forgot-pin', [ProfileController::class, 'forgot_pin']);
-    Route::post('eod', [EnkpayposController::class, 'eod_transactions']);
 
 
 
