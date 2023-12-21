@@ -386,7 +386,7 @@ class EnkpayposController extends Controller
 
         return response()->json([
             'status' => true,
-            'reportDatetime' => date('d-m-y h:i:s'),
+            'reportDatetime' => date('Y-m-d h:i:s'),
             'terminalNo' => $terminalNo,
             'merchantName' => $merchantName,
             'merchantNo' => $merchantNo,
