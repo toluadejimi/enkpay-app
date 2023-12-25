@@ -204,12 +204,12 @@ if (!function_exists('tid_config')) {
     function tid_config()
     {
 
-        $tm = TidConfig::select('ip', 'port', 'ssl', 'compKey1', 'compKey2')->first() ?? null;
+        $tm = TidConfig::select('ip', 'port', 'ssl', 'compKey1', 'compKey2', 'baseUrl', 'logoUrl')->first() ?? null;
         if ($tm != null) {
             return $tm;
         }
 
-        return $tm;
+        return [];
     }
 
 
