@@ -183,25 +183,25 @@ class VirtualCardController extends Controller
 
 
 
-        $ck_ip = User::where('id', Auth::id())->first()->ip_address ?? null;
-        if ($ck_ip != $request->ip()) {
+        // $ck_ip = User::where('id', Auth::id())->first()->ip_address ?? null;
+        // if ($ck_ip != $request->ip()) {
 
-            $name = Auth::user()->first_name . " " . Auth::user()->last_name;
-            $ip = $request->ip();
-            $message = $name . "| Multiple Transaction Detected Mother fuckers";
-            $result = "Message========> " . $message . "\n\nIP========> " . $ip;
-            send_notification($result);
+        //     $name = Auth::user()->first_name . " " . Auth::user()->last_name;
+        //     $ip = $request->ip();
+        //     $message = $name . "| Multiple Transaction Detected Mother fuckers";
+        //     $result = "Message========> " . $message . "\n\nIP========> " . $ip;
+        //     send_notification($result);
 
-            User::where('id', Auth::id())->update(['status' => 7]);
+        //     User::where('id', Auth::id())->update(['status' => 7]);
 
 
-            return response()->json([
+        //     return response()->json([
 
-                'status' => $this->failed,
-                'message' => "Multiple Transaction Detected \n\n Account Blocked",
+        //         'status' => false,
+        //         'message' => "Multiple Transaction Detected \n\n Account Blocked",
 
-            ], 500);
-        }
+        //     ], 500);
+        // }
 
 
         if (Auth::user()->status != 2) {
