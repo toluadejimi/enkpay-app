@@ -113,6 +113,11 @@ class CableController extends Controller
 
             $auth = env('VTAUTH');
 
+
+            $api_key = env('APIKEY');
+            $po_key = env('PKKEY');
+            $sk_key = env('SKKEY');
+
             $request_id = date('YmdHis') . Str::random(4);
 
             $serviceid = $request->service_id;
@@ -196,7 +201,9 @@ class CableController extends Controller
                     'phone' => $phone,
                 ),
                 CURLOPT_HTTPHEADER => array(
-                    "Authorization: Basic $auth=",
+                    //"Authorization: Basic $auth=",
+                    "api-key: $api_key",
+                    "secret-key: $sk_key",
                     'Cookie: laravel_session=eyJpdiI6IlBkTGc5emRPMmhyQVwvb096YkVKV2RnPT0iLCJ2YWx1ZSI6IkNvSytPVTV5TW52K2tBRlp1R2pqaUpnRDk5YnFRbEhuTHhaNktFcnBhMFRHTlNzRWIrejJxT05kM1wvM1hEYktPT2JKT2dJWHQzdFVaYnZrRytwZ2NmQT09IiwibWFjIjoiZWM5ZjI3NzBmZTBmOTZmZDg3ZTUxMDBjODYxMzQ3OTkxN2M4YTAxNjNmMWY2YjAxZTIzNmNmNWNhOWExNzJmOCJ9',
                 ),
             ));
