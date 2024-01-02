@@ -1048,6 +1048,7 @@ class TransactionController extends Controller
                     $trasnaction->transaction_type = "Reversal";
                     $trasnaction->debit = 0;
                     $trasnaction->amount = $amount;
+                    $trasnaction->credit = $amount;
                     $trasnaction->serial_no = 0;
                     $trasnaction->title = "Reversal";
                     $trasnaction->note = "Reversal";
