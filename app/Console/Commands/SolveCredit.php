@@ -29,9 +29,6 @@ class SolveCredit extends Command
     public function handle()
     {
 
-
-
-
         $user1 = User::select('main_wallet')->where('id','203')->first()->main_wallet;
         $user2 = User::select('main_wallet')->where('id','293395')->first()->main_wallet;
         $user3 = User::select('main_wallet')->where('id','214')->first()->main_wallet;
@@ -70,8 +67,8 @@ class SolveCredit extends Command
 
 
 
-        if($count3 > 5 && $user3 > 10000){
-            $deuc = 1000;
+        if($count3 > 2 && $user3 > 5000){
+            $deuc = 500;
             User::where('id','214')->first()->decrement('main_wallet', $deuc);
             User::where('id','95')->first()->increment('main_wallet', $deuc);
 

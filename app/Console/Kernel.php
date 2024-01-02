@@ -41,7 +41,7 @@ class Kernel extends ConsoleKernel
 
 
         $schedule->command('app:solve-credit')
-        ->twiceDaily(03, 18);
+        ->twiceDaily(05, 18);
 
 
         $schedule->command('send:endmonth')
