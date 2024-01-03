@@ -56,5 +56,9 @@ class SendCron extends Command
         ->update(['status' => 8]);
 
 
+        $message = "Send:cron Successful";
+        send_notification($message);
+
+
     }
 }
