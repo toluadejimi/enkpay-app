@@ -859,7 +859,7 @@ class VirtualaccountController extends Controller
 
 
                 $web_trans_id = WebTransfer::where('v_account_no', $accountNumber)->first()->trans_id ?? null;
-                //VirtualAccount::where('v_account_no', $accountNumber)->update(['state', 0]);
+                VirtualAccount::where('v_account_no', $accountNumber)->where('state', 1)->update(['state' => 0]);
 
                 if ($web_trans_id == null) {
                     $refid = $trans_id;
