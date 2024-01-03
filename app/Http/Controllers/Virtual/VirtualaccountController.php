@@ -858,8 +858,8 @@ class VirtualaccountController extends Controller
 
 
 
-                $web_trans_id = WebTransfer::where('v_account_no', $accountNumber)
-                    ->where('payable_amount', $transactionAmount)->first()->trans_id ?? null;
+                $web_trans_id = WebTransfer::where('v_account_no', $accountNumber)->first()->trans_id ?? null;
+                VirtualAccount::where('v_account_no', $accountNumber)->update(['state', 0]);
 
                 if ($web_trans_id == null) {
                     $refid = $trans_id;
@@ -877,36 +877,10 @@ class VirtualaccountController extends Controller
                 }
 
 
-                // $ck = Transaction::where('receiver_account_no' == $accountNumber)->where('status', 9)->first() ?? null;
-                // if($ck != null){
-                //     Transaction::where('receiver_account_no' == $accountNumber)
-                //     ->where('status', 9)
-                //     ->update([
-                //         'credit' => $amt_to_credit,
-                //         'note' => "$from | Web Pay",
-                //         'e_charges' => $deposit_charges,
-                //         'enkPay_Cashout_profit' => $enkpay_commision_amount,
-                //         'trx_date' => $tranDateTime,
-                //         'p_sessionId' => $session_id,
-                //         'trx_time' => $tranDateTime,
-                //         'sender_name' => $from,
-                //         'sender_bank' => $sourceBankName,
-                //         'serial_no' => $SerialNumber,
-                //         'sender_account_no' => $sourceAccountNumber,
-                //         'receiver_account_no' => $accountNumber,
-                //         'balance' => $balance,
-                //         'status' => 1
-                //     ]);
-    
-                //     VirtualAccount::where('v_account_no', $accountNumber)->where('state', 1)->update(['state' => 0]);
-
-                // }
-
-
                 //update Transactions
                 $trasnaction = new Transaction();
                 $trasnaction->user_id = $user_id;
-                $trasnaction->ref_trans_id = $refid;
+                $trasnaction->ref_trans_id = $web_trans_id;
                 $trasnaction->e_ref = $settlementId;
                 $trasnaction->type = "webpay";
                 $trasnaction->transaction_type = "VirtualFundWallet";
