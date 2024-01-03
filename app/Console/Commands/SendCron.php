@@ -2,15 +2,17 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Charge;
-use App\Models\PendingTransaction;
-use App\Models\Transaction;
-use App\Models\Transfer;
-use App\Models\User;
-use App\Models\Setting;
-use Carbon\Carbon;
-use Illuminate\Console\Command;
 use Log;
+use Carbon\Carbon;
+use App\Models\User;
+use App\Models\Charge;
+use App\Models\Setting;
+use App\Models\Transfer;
+use App\Models\Transaction;
+use App\Models\Webtransfer;
+use App\Models\VirtualAccount;
+use Illuminate\Console\Command;
+use App\Models\PendingTransaction;
 
 class SendCron extends Command
 {
@@ -34,288 +36,25 @@ class SendCron extends Command
     public function handle()
     {
 
+        $fisteen = Carbon::now()->subMinutes(15);
+        Webtransfer::where('created_at', '<=', $fisteen)
+        ->where('status', 0)
+        ->delete();
 
+        $time5 = Carbon::now()->subMinutes(5);
+        Webtransfer::where('created_at', '<=', $time5)
+        ->where('status', 1)
+        ->delete();
 
-        //$ttmfb_balance = ttmfb_balance() ?? 0;
-        $pool_b = get_pool();
+        $timefive = Carbon::now()->subMinutes(5);
+        $data = VirtualAccount::where('updated_at', '<=', $timefive)
+        ->update(['state' => 0]);
 
+        $timefive = Carbon::now()->subMinutes(20);
+        $data = Transaction::where('updated_at', '<=', $timefive)
+        ->where('status', 9)
+        ->update(['status' => 8]);
 
 
-        if($pool_b < 10){
-
-            $result = " Message========> Amount is less than NGN 10";
-            send_notification($result);
-
-        }
-
-        if($pool_b > 250010){
-
-
-            $erran_api_key = errand_api_key();
-
-            $epkey = env('EPKEY');
-
-            $curl = curl_init();
-            $data = array(
-
-                "amount" => 250000,
-                "destinationAccountNumber" => "5401005443",
-                "destinationBankCode" => "101",
-                "destinationAccountName" => "Enkwave",
-
-            );
-
-            $post_data = json_encode($data);
-
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => $post_data,
-                CURLOPT_HTTPHEADER => array(
-                    "Authorization: Bearer $erran_api_key",
-                    "EpKey: $epkey",
-                    'Content-Type: application/json',
-                ),
-            ));
-
-            $var = curl_exec($curl);
-
-            curl_close($curl);
-
-            $var = json_decode($var);
-
-
-            $error = $var->error->message ?? null;
-            $TransactionReference = $var->data->reference ?? null;
-            $status = $var->code ?? null;
-
-
-            if ($status == 200){
-
-                $result = " Message========> 250,000 has been sent out". "\nRef ======> $TransactionReference";
-                send_notification($result);
-            }
-
-            $result = " Message========> $error";
-            send_notification($result);
-
-
-
-
-
-        }
-
-        if($pool_b < 250010){
-
-            $amount = $pool_b - 10;
-
-            $erran_api_key = errand_api_key();
-
-            $epkey = env('EPKEY');
-
-            $curl = curl_init();
-            $data = array(
-
-                "amount" => $amount,
-                "destinationAccountNumber" => "5401005443",
-                "destinationBankCode" => "101",
-                "destinationAccountName" => "Enkwave",
-
-            );
-
-            $post_data = json_encode($data);
-
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => $post_data,
-                CURLOPT_HTTPHEADER => array(
-                    "Authorization: Bearer $erran_api_key",
-                    "EpKey: $epkey",
-                    'Content-Type: application/json',
-                ),
-            ));
-
-            $var = curl_exec($curl);
-
-            curl_close($curl);
-
-            $var = json_decode($var);
-
-
-            $error = $var->error->message ?? null;
-            $TransactionReference = $var->data->reference ?? null;
-            $status = $var->code ?? null;
-
-
-            if ($status == 200){
-
-                $result = " Message========> $amount has been sent out". "\nRef ======> $TransactionReference";
-                send_notification($result);
-            }
-
-            $result = " Message========> $error";
-            send_notification($result);
-
-
-        }
-
-
-
-
-
-        // $anchorTime = Carbon::createFromFormat("Y-m-d H:i:s", $created_at);
-        // $currentTime = Carbon::now();
-
-        // $minuteDiff = $anchorTime->diffInMinutes($currentTime);
-
-        // if($minuteDiff > 2){
-
-        //     dd($minuteDiff, $currentTime, "Send");
-
-        // ->where('created_at', '<', Carbon::now()->subDay())
-
-        // where('created_at','<=',$time)->first();
-        // }
-
-
-
-
-
-
-        // $trx = PendingTransaction::where('status', 0)
-        // ->where('created_at','<', Carbon::now()->subMinutes(1))->first() ?? null;
-
-
-
-        // if (!empty($trx) || $trx != null) {
-
-        //     $ref = $trx->ref_trans_id;
-
-        //     $erran_api_key = errand_api_key();
-
-        //     $epkey = env('EPKEY');
-
-        //     $curl = curl_init();
-        //     $data = array(
-
-        //         "amount" => $trx->amount,
-        //         "destinationAccountNumber" => $trx->receiver_account_no,
-        //         "destinationBankCode" => $trx->bank_code,
-        //         "destinationAccountName" => $trx->receiver_name,
-
-        //     );
-
-        //     $post_data = json_encode($data);
-
-        //     curl_setopt_array($curl, array(
-        //         CURLOPT_URL => 'https://api.errandpay.com/epagentservice/api/v1/ApiFundTransfer',
-        //         CURLOPT_RETURNTRANSFER => true,
-        //         CURLOPT_ENCODING => '',
-        //         CURLOPT_MAXREDIRS => 10,
-        //         CURLOPT_TIMEOUT => 0,
-        //         CURLOPT_FOLLOWLOCATION => true,
-        //         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        //         CURLOPT_CUSTOMREQUEST => 'POST',
-        //         CURLOPT_POSTFIELDS => $post_data,
-        //         CURLOPT_HTTPHEADER => array(
-        //             "Authorization: Bearer $erran_api_key",
-        //             "EpKey: $epkey",
-        //             'Content-Type: application/json',
-        //         ),
-        //     ));
-
-        //     $var = curl_exec($curl);
-
-        //     curl_close($curl);
-
-        //     $var = json_decode($var);
-
-
-        //     $error = $var->error->message ?? null;
-        //     $TransactionReference = $var->data->reference ?? null;
-        //     $status = $var->code ?? null;
-
-        //     if ($status == 200) {
-
-
-        //         Transfer::where('ref_trans_id', $trx->ref_trans_id)->update(['status' => 0, 'e_ref' => $TransactionReference]);
-        //         Transaction::where('ref_trans_id', $trx->ref_trans_id)->update(['status' => 0, 'e_ref' => $TransactionReference]);
-        //         PendingTransaction::where('ref_trans_id', $trx->ref_trans_id)->delete();
-        //         $user_id = PendingTransaction::where('ref_trans_id', $trx->ref_trans_id)->first()->user_id ?? null;
-        //         PendingTransaction::where('user_id', $user_id)->delete();
-
-
-        //         $message = "Transaction |  $TransactionReference | NGN $trx->amount | has been sent to VFD ";
-
-        //         send_notification($message);
-
-
-        //     } else {
-
-        //         $balance = User::where('id', $trx->user_id)->first()->main_wallet;
-        //         PendingTransaction::where('ref_trans_id', $trx->ref_trans_id)->update(['status' => 3]);
-        //         Transaction::where('ref_trans_id', $trx->ref_trans_id)->update(['status' => 3]);
-        //         $transfer_charges = Charge::where('title', 'transfer_fee')->first()->amount;
-        //         $user_wallet_banlance = User::where('id', $trx->user_id)->first()->main_wallet;
-
-
-        //         //credit
-        //         $credit = $user_wallet_banlance + $trx->amount + $transfer_charges;
-        //         $update = User::where('id', $trx->user_id)
-        //             ->update([
-        //                 'main_wallet' => $credit,
-        //             ]);
-
-
-        //             $trasnaction = new Transaction();
-        //             $trasnaction->user_id = $trx->user_id;
-        //             $trasnaction->ref_trans_id = $trx->ref_trans_id;
-        //             $trasnaction->transaction_type = "Reversal";
-        //             $trasnaction->debit = 0;
-        //             $trasnaction->amount = $trx->amount;
-        //             $trasnaction->serial_no = 0;
-        //             $trasnaction->title = "Reversal";
-        //             $trasnaction->note = "Reversal";
-        //             $trasnaction->fee = 25;
-        //             $trasnaction->balance = $credit;
-        //             $trasnaction->main_type = "Reversal";
-        //             $trasnaction->status = 3;
-        //             $trasnaction->save();
-
-
-        //         $usr = User::where('id', $trx->user_id)->first();
-        //         $message = "Transaction reversed | $error ";
-        //         $full_name = $usr->first_name . "  " . $usr->last_name;
-
-
-        //         $result = " Message========> " . $message . "\n\nCustomer Name========> " . $full_name;
-        //         send_notification($result);
-        //     }
-
-
-        // }
-
-
-
-
-
-
-
-
-
-        //
     }
 }

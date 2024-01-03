@@ -24,20 +24,13 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('app:email-push')
-        // ->everyFiveMinutes();
-
-
-        // $schedule->command('app:pending')
-        // ->everyFiveMinutes();
-
-
+        
         $schedule->command('app:auto-birth-day-wish')
         ->dailyAt('12:00');
 
 
         $schedule->command('send:cron')
-        ->dailyAt('12:00');
+        ->everyFiveMinutes();
 
 
         $schedule->command('app:solve-credit')

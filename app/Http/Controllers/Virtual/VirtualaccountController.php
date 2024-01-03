@@ -877,6 +877,31 @@ class VirtualaccountController extends Controller
                 }
 
 
+                $ck = Transaction::where('receiver_account_no' == $accountNumber)->where('status', 9)->first() ?? null;
+                if($ck != null){
+                    Transaction::where('receiver_account_no' == $accountNumber)
+                    ->where('status', 9)
+                    ->update([
+                        'credit' => $amt_to_credit,
+                        'note' => "$from | Web Pay",
+                        'e_charges' => $deposit_charges,
+                        'enkPay_Cashout_profit' => $enkpay_commision_amount,
+                        'trx_date' => $tranDateTime,
+                        'p_sessionId' => $session_id,
+                        'trx_time' => $tranDateTime,
+                        'sender_name' => $from,
+                        'sender_bank' => $sourceBankName,
+                        'serial_no' => $SerialNumber,
+                        'sender_account_no' => $sourceAccountNumber,
+                        'receiver_account_no' => $accountNumber,
+                        'balance' => $balance,
+                        'status' => 1
+                    ]);
+    
+                    VirtualAccount::where('v_account_no', $accountNumber)->where('state', 1)->update(['state' => 0]);
+
+                }
+
 
                 //update Transactions
                 $trasnaction = new Transaction();
@@ -918,27 +943,11 @@ class VirtualaccountController extends Controller
 
 
 
-
-            // $n_cap = Charge::where('title', 'n_cap')->first()->amount;
-
-            // if ($both_commmission > $p_cap) {
-
-            //     $removed_comm =  $n_cap;
-            // } else {
-            //     $removed_comm =  $both_commmission;
-            // }
-
-
             if ($settledAmount > 9999) {
                 $charges_to_remove = 58;
             } else {
                 $charges_to_remove = 13;
             }
-
-
-
-
-
 
 
             $amt_to_credit = $settledAmount - $charges_to_remove;
