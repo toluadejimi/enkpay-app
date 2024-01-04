@@ -866,7 +866,6 @@ class VirtualaccountController extends Controller
 
 
 
-
                 if (preg_match('/\/(\d+)$/', $tranRemarks, $matches)) {
                 $session_id = $matches[1] ?? null;
                 }else{

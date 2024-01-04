@@ -56,8 +56,8 @@ class SendCron extends Command
         ->delete();
 
 
-        $message = "Send:cron Successful";
-        send_notification($message);
+        // $message = "Send:cron Successful";
+        // send_notification($message);
 
 
     }
