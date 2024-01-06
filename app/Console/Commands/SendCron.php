@@ -41,7 +41,7 @@ class SendCron extends Command
         ->where('status', 0)
         ->delete();
 
-        $time5 = Carbon::now()->subHours(3);
+        $time5 = Carbon::now()->subHours(12);
         Webtransfer::where('created_at', '<=', $time5)
         ->where('status', 1)
         ->delete();
