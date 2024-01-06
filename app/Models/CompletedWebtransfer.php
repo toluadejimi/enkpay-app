@@ -32,7 +32,7 @@ class CompletedWebtransfer extends Model
         'webhook',
         'key',
         'data',
-        'advideReference',
+        'adviceReference',
         'ref',
 
     ];
