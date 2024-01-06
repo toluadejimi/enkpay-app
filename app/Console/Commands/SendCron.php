@@ -13,6 +13,7 @@ use App\Models\Webtransfer;
 use App\Models\VirtualAccount;
 use Illuminate\Console\Command;
 use App\Models\PendingTransaction;
+use App\Models\CompletedWebtransfer;
 
 class SendCron extends Command
 {
@@ -36,18 +37,28 @@ class SendCron extends Command
     public function handle()
     {
 
-        $fisteen = Carbon::now()->subMinutes(45);
+        $fisteen = Carbon::now()->subMinutes(15);
         Webtransfer::where('created_at', '<=', $fisteen)
         ->where('status', 0)
         ->delete();
 
-        $time5 = Carbon::now()->subHours(12);
-        Webtransfer::where('created_at', '<=', $time5)
+       
+        $time5 = Carbon::now()->subMinutes(5);
+        $dataToMove =  Webtransfer::where('created_at', '>=', $time5)
+        ->where('status', 1)->get();
+        foreach ($dataToMove as $item) {
+            CompletedWebtransfer::updateOrCreate(['id' => $item->id], $item->toArray());
+        }
+
+        $data =  Webtransfer::where('created_at', '<=', $time5)
         ->where('status', 1)
         ->delete();
 
+
+
+
         $timefive = Carbon::now()->subMinutes(5);
-        $data = VirtualAccount::where('updated_at', '>=', $timefive)
+        VirtualAccount::where('updated_at', '>=', $timefive)
         ->update(['state' => 0]);
 
 
