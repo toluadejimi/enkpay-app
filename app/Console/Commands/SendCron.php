@@ -50,14 +50,10 @@ class SendCron extends Command
         $data = VirtualAccount::where('updated_at', '<=', $timefive)
         ->update(['state' => 0]);
 
-        $timefive = Carbon::now()->subMinutes(30);
-        $data = Transaction::where('created_at', '<=', $timefive)
-        ->where('status', 9)
-        ->delete();
 
 
-        // $message = "Send:cron Successful";
-        // send_notification($message);
+        $message = $data;
+        send_notification($message);
 
 
     }
