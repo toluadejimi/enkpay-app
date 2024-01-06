@@ -48,11 +48,8 @@ class SendCron extends Command
           CompletedWebtransfer::updateOrCreate(['id' => $item->id], $item->toArray());
         }
 
-         Webtransfer::where('status', 1);
-        //->delete();
-
-
-
+         Webtransfer::where('status', 1)
+        ->delete();
 
         $timefive = Carbon::now()->subMinutes(5);
         VirtualAccount::where('updated_at', '>=', $timefive)
@@ -60,10 +57,10 @@ class SendCron extends Command
 
 
 
-        $data =  $dataToMove =  Webtransfer::where('status', 1)->count();
+        // $data =  $dataToMove =  Webtransfer::where('status', 1)->count();
 
-        $message = $data;
-        send_notification($message);
+        // $message = $data;
+        // send_notification($message);
 
 
     }
