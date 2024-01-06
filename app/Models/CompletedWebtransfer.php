@@ -12,6 +12,7 @@ class CompletedWebtransfer extends Model
     protected $fillable = [
         'id',
         'trans_id',
+        'user_id',
         'status',
         'amount',
         'v_account_no',
