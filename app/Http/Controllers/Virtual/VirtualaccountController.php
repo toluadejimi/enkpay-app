@@ -846,16 +846,12 @@ class VirtualaccountController extends Controller
 
 
                 $status = WebTransfer::latest()->where([
-
                     'v_account_no' => $accountNumber,
                     'payable_amount' => $transactionAmount,
                     'status' => 0,
-
-
                 ])->update(['status' => 1]) ?? null;
 
-
-                $web_trans_id = WebTransfer::where('v_account_no', $accountNumber)->first()->trans_id ?? null;
+                $web_trans_id = WebTransfer::where('v_account_no', $accountNumber)->where('status', 1)->first()->trans_id ?? null;
                 VirtualAccount::where('v_account_no', $accountNumber)->where('state', 1)->update(['state' => 0]);
 
                 if ($web_trans_id == null) {
