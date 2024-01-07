@@ -886,7 +886,7 @@ class VirtualaccountController extends Controller
                 $trasnaction->title = "Wallet Funding";
                 $trasnaction->main_type = "Transfer";
                 $trasnaction->credit = $amt_to_credit;
-                $trasnaction->note = "$from | Web Pay";
+                $trasnaction->note = "$from | Web Pay | $tranRemarks";
                 $trasnaction->fee = $feeAmount;
                 $trasnaction->amount = $transactionAmount;
                 $trasnaction->e_charges = $deposit_charges;
