@@ -207,7 +207,7 @@ class VirtualaccountController extends Controller
             curl_close($curl);
             $var = json_decode($var);
 
-            dd($var);
+            dd($var, $databody);
 
 
             $status = $var->responseCode ?? null;
