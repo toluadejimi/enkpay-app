@@ -123,7 +123,7 @@ Route::post('get-lga', [RegisterationController::class, 'get_lga']);
 
 //ENKPAY POS
 Route::post('pos', [EnkpayposController::class, 'enkpayPos']);
-Route::post('pos-logs', [EnkpayposController::class, 'enkpayPosLogs']);
+Route::any('pos-logs', [EnkpayposController::class, 'enkpayPosLogs']);
 
 
 
