@@ -263,24 +263,37 @@ class LoginController extends Controller
             }
 
 
-
             $feature = Feature::where('id', 1)->first();
             $token = auth()->user()->createToken('API Token')->accessToken;
             $virtual_account = virtual_account();
+
             $user = Auth()->user();
             $user['token'] = $token;
             $user['user_virtual_account_list'] = $virtual_account;
             $user['terminal_info'] = terminal_info();
+            $tid_config = tid_config();
+
+
+
+            $is_kyc_verified = Auth::user()->is_kyc_verified;
+            $status = Auth::user()->status;
+            $is_phone_verified = Auth::user()->is_phone_verified;
+            $is_email_verified = Auth::user()->is_email_verified;
+            $is_identification_verified = Auth::user()->is_identification_verified;
+
+
             $setting = Setting::select('google_url', 'ios_url', 'version')
                 ->first();
+
+
 
             return response()->json([
                 'status' => $this->success,
                 'data' => $user,
                 'permission' => $feature,
                 'isNewDevice' => false,
-                'setting' => $setting
-
+                'setting' => $setting,
+                'tid_config' => $tid_config,
 
             ], 200);
 
