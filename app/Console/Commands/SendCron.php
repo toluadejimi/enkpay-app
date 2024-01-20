@@ -37,7 +37,7 @@ class SendCron extends Command
     public function handle()
     {
 
-        $fisteen = Carbon::now()->subMinutes(15);
+        $fisteen = Carbon::now()->subMinutes(30);
         Webtransfer::where('created_at', '>=', $fisteen)
         ->where('status', 0)
         ->delete();
