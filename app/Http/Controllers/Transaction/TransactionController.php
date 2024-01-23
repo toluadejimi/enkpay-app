@@ -3961,10 +3961,12 @@ class TransactionController extends Controller
                 if ($TransactionType == 'CashOut') {
 
 
+                    $under_id = User::where('id', $user_id)->first()->register_under_id ?? null;
 
                     //update Transactions
                     $trasnaction = new Transaction();
                     $trasnaction->user_id = $user_id;
+                    $trasnaction->register_under_id = $under_id;
                     $trasnaction->ref_trans_id = $trans_id;
                     $trasnaction->e_ref = $TransactionReference;
                     $trasnaction->transaction_type = $TransactionType;

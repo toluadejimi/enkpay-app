@@ -185,6 +185,11 @@ class EnkpayposController extends Controller
         $trans_id = trx();
         $comission = Charge::where('title', 'both_commission')
             ->first()->amount;
+
+
+      
+
+
         $user_id = $userID;
 
         $main_wallet = User::where('id', $user_id)
@@ -193,11 +198,55 @@ class EnkpayposController extends Controller
         $type = User::where('id', $user_id)
             ->first()->type ?? null;
 
+        $businessID = Terminal::where('serial_no', $serialNO)->first()->business_id ?? null;
+        $super_agent = User::where('business_id', $businessID)->first() ?? null;
+
+
+
+        if($super_agent != null){
+
+            $super_agent_charge = User::where('business_id', $businessID)->first()->comission_charge ?? null;
+
+            $amount1 = $super_agent_charge / 100;
+            $amount2 = $amount1 * $amount;
+            $both_commmission = number_format($amount2, 3);
+
+
+                $business_commission_cap = Charge::where('title', 'business_cap')
+                    ->first()->amount;
+
+                $agent_commission_cap = Charge::where('title', 'agent_cap')
+                    ->first()->amount;
+
+                if ($both_commmission >= $agent_commission_cap && $type == 1) {
+
+                    $removed_comission = $amount - $agent_commission_cap;
+
+                    $enkpay_profit = $agent_commission_cap - 75;
+                } elseif ($both_commmission >= $business_commission_cap && $type == 3) {
+
+                    $removed_comission = $amount - $business_commission_cap;
+
+                    $enkpay_profit = $business_commission_cap - 75;
+                } else {
+
+                    $removed_comission = $amount - $both_commmission;
+
+                    $enkpay_profit = $both_commmission;
+                }
+
+
+
+
+
+        }
+
+
         if ($main_wallet == null && $user_id == null) {
 
             return response()->json([
                 'status' => false,
-                'message' => 'Customer not registred on Enkpay',
+                'message' => 'Customer not registered on Enkpay',
             ], 500);
         }
 
@@ -209,6 +258,8 @@ class EnkpayposController extends Controller
 
         $business_commission_cap = Charge::where('title', 'business_cap')
             ->first()->amount;
+
+
 
         $agent_commission_cap = Charge::where('title', 'agent_cap')
             ->first()->amount;
@@ -229,6 +280,12 @@ class EnkpayposController extends Controller
 
             $enkpay_profit = $both_commmission;
         }
+
+
+
+
+
+        
 
 
 
@@ -298,8 +355,11 @@ class EnkpayposController extends Controller
             ]);
 
 
+            $under_id = User::where('id', $user_id)->first()->register_under_id ?? null;
+            
             $trasnaction = new Transaction();
             $trasnaction->user_id = $user_id;
+            $trasnaction->register_under_id = $under_id;
             $trasnaction->ref_trans_id = $trans_id;
             $trasnaction->e_ref = $RRN;
             $trasnaction->transaction_type = $transactionType;
