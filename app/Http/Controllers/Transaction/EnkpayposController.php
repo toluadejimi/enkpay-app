@@ -204,6 +204,15 @@ class EnkpayposController extends Controller
 
         if($super_agent != null){
 
+
+            if ($main_wallet == null && $user_id == null) {
+
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Customer not registered on Enkpay',
+                ], 500);
+            }
+
             $super_agent_pos_charge = SuperAgent::where('user_id', $super_agent->id)->first()->pos_charge ?? null;
             $main_pos_charge = Charge::where('user_id', $super_agent->id)->first()->amount ?? null;
 
