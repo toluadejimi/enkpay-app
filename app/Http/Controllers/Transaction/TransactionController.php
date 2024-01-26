@@ -2,31 +2,32 @@
 
 namespace App\Http\Controllers\Transaction;
 
-use App\Http\Controllers\Controller;
-use App\Models\Charge;
-use App\Models\EmailSend;
-use App\Models\ErrandKey;
-use App\Models\FailedTransaction;
-use App\Models\Feature;
-use App\Models\PendingTransaction;
-use App\Models\Setting;
-use App\Models\Terminal;
-use App\Models\Transaction;
-use App\Models\Transfer;
-use App\Models\Ttmfb;
-use App\Models\User;
-use App\Models\VfdBank;
 use DB;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Ladumor\OneSignal\OneSignal;
 use Mail;
 use Carbon\Carbon;
-use GuzzleHttp\Client as GuzzleClient;
-use Illuminate\Http\Response;
+use App\Models\User;
+use App\Models\Ttmfb;
+use App\Models\Charge;
+use App\Models\Feature;
+use App\Models\Setting;
+use App\Models\VfdBank;
+use App\Models\Terminal;
+use App\Models\Transfer;
+use App\Models\EmailSend;
+use App\Models\ErrandKey;
 use App\Events\NewMessage;
+use App\Models\SuperAgent;
+use App\Models\Transaction;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Ladumor\OneSignal\OneSignal;
+use App\Models\FailedTransaction;
+use App\Models\PendingTransaction;
 use App\Notifications\DepositAlert;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use GuzzleHttp\Client as GuzzleClient;
 use App\Notifications\SampleNotification;
 use Illuminate\Support\Facades\Notification;
 
@@ -3271,8 +3272,24 @@ class TransactionController extends Controller
             $account = select_account();
 
 
-            $transfer_charge = Charge::where('title', 'transfer_fee')
+            $under_id  = User::where('id', Auth::id())->first()->register_under_id ?? null;
+            $charge = SuperAgent::where('register_under_id', $under_id)->first()->transfer_charge ?? null;
+
+            if($under_id != null){
+
+                $get_transfer_charge = Charge::where('title', 'transfer_fee')
                 ->first()->amount;
+
+                $transfer_charge = $get_transfer_charge + $charge;
+
+            }else{
+
+                $transfer_charge = Charge::where('title', 'transfer_fee')
+                ->first()->amount;
+
+            }
+            
+            
 
             $status = 200;
 
