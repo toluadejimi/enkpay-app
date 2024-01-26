@@ -8,4 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class Charge extends Model
 {
     use HasFactory;
+
+
+    protected $casts = [
+       
+        'amount' => 'integer',
+       
+
+    ];
+
 }
