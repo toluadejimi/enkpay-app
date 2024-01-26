@@ -13,6 +13,7 @@ class Charge extends Model
     protected $casts = [
        
         'amount' => 'string',
+        'transfer_fee' => 'int',
        
     ];
 
