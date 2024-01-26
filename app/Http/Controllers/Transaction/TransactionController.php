@@ -3279,8 +3279,8 @@ class TransactionController extends Controller
 
                 $get_transfer_charge = Charge::where('title', 'transfer_fee')
                 ->first()->amount;
-
-                $transfer_charge = $get_transfer_charge + $charge;
+                $ggtransfer_charge = $get_transfer_charge + $charge;
+                $transfer_charge  = strval($ggtransfer_charge);
 
             }else{
 
@@ -3289,11 +3289,8 @@ class TransactionController extends Controller
 
             }
             
-            
-
+        
             $status = 200;
-
-
             if ($status == 200) {
 
                 return response()->json([
