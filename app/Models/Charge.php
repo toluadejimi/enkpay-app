@@ -12,9 +12,8 @@ class Charge extends Model
 
     protected $casts = [
        
-        'amount' => 'integer',
+        'amount' => 'string',
        
-
     ];
 
 }
