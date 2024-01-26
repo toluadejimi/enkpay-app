@@ -9,6 +9,7 @@ use App\Models\PosLog;
 use Defuse\Crypto\Key;
 use App\Models\Terminal;
 use Defuse\Crypto\Crypto;
+use App\Models\SuperAgent;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -131,7 +132,6 @@ class EnkpayposController extends Controller
         $transactionType = $request->transactionType;
         $cardName = $request->cardName;
         $DataKey = env('DATAKEY');
-
         $amount = PosLog::where('e_ref', $RRN)->first()->amount ?? null;
 
 
@@ -202,14 +202,29 @@ class EnkpayposController extends Controller
         $super_agent = User::where('business_id', $businessID)->first() ?? null;
 
 
-
         if($super_agent != null){
 
-            $super_agent_charge = User::where('business_id', $businessID)->first()->comission_charge ?? null;
+            $super_agent_pos_charge = SuperAgent::where('user_id', $super_agent->id)->first()->pos_charge ?? null;
+            $main_pos_charge = Charge::where('user_id', $super_agent->id)->first()->amount ?? null;
 
-            $amount1 = $super_agent_charge / 100;
+            $both_commissions =  $super_agent_pos_charge + $main_pos_charge;
+
+            $amount1 = $both_commissions / 100;
             $amount2 = $amount1 * $amount;
             $both_commmission = number_format($amount2, 3);
+
+            $samount1 = $super_agent_pos_charge / 100;
+            $samount2 = $samount1 * $amount;
+            $scommmission = number_format($samount2, 3);
+
+
+            $eamount1 = $main_pos_charge / 100;
+            $eamount2 = $eamount1 * $amount;
+            $ecommmission = number_format($eamount2, 3);
+
+        
+
+        
 
 
                 $business_commission_cap = Charge::where('title', 'business_cap')
@@ -220,20 +235,94 @@ class EnkpayposController extends Controller
 
                 if ($both_commmission >= $agent_commission_cap && $type == 1) {
 
-                    $removed_comission = $amount - $agent_commission_cap;
+                    $amount_after_comission = $amount - $agent_commission_cap;
+                    $samount_after_comission = 50;
+                    $enkpay_profit = 150;
 
-                    $enkpay_profit = $agent_commission_cap - 75;
+
+            
+
                 } elseif ($both_commmission >= $business_commission_cap && $type == 3) {
 
-                    $removed_comission = $amount - $business_commission_cap;
+                    $amount_after_comission = $amount - $business_commission_cap;
+                    $samount_after_comission = 50;
+                    $enkpay_profit = 100;
 
-                    $enkpay_profit = $business_commission_cap - 75;
+
+
+
                 } else {
 
-                    $removed_comission = $amount - $both_commmission;
+                    $amount_after_comission = $amount - $both_commmission;
+                    $samount_after_comission = $scommmission;
+                    $enkpay_profit = $ecommmission;
 
-                    $enkpay_profit = $both_commmission;
+
                 }
+
+                 $updated_amount = $main_wallet + $amount_after_comission;
+
+                 $status = PosLog::where('e_ref', $RRN)->first()->status ?? null;
+
+                 if($status == 2){
+
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Transaction already completed',
+                    ], 500);
+        
+                 }
+
+
+
+                User::where('id', $user_id)
+                ->update([
+                    'main_wallet' => $updated_amount,
+                ]);
+
+                User::where('id', $super_agent->id)->increment('main_wallet', $samount_after_comission);
+                PosLog::where('e_ref', $RRN)->update([
+
+                    'status' => 2,
+                    'note' => "Successful | $pan | $amount"
+
+                ]);
+
+            //update Transactions
+            $trasnaction = new Transaction();
+            $trasnaction->user_id = $user_id;
+            $trasnaction->ref_trans_id = $trans_id;
+            $trasnaction->e_ref = $RRN;
+            $trasnaction->transaction_type = $transactionType;
+            $trasnaction->credit = round($amount_after_comission, 2);
+            $trasnaction->e_charges = $enkpay_profit;
+            $trasnaction->title = "POS Transaction";
+            $trasnaction->note = "ENKPAY POS | $cardName | $pan | $message";
+            $trasnaction->amount = $amount;
+            $trasnaction->enkPay_Cashout_profit = round($enkpay_profit, 2);
+            $trasnaction->balance = $updated_amount;
+            $trasnaction->sender_name = $pan;
+            $trasnaction->serial_no = $terminalID;
+            $trasnaction->sender_account_no = $pan;
+            $trasnaction->status = 1;
+            $trasnaction->save();
+
+
+            $f_name = User::where('id', $user_id)->first()->first_name ?? null;
+            $l_name = User::where('id', $user_id)->first()->last_name ?? null;
+
+            $ip = $request->ip();
+            $amount4 = number_format($amount_after_comission, 2);
+            $result = $f_name . " " . $l_name . "| fund NGN " . $amount4 . " | using ENKPPAY POS" . "\n\nIP========> " . $ip;
+            send_notification($result);
+
+
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Transaction Successful',
+            ], 200);
+
 
 
 
