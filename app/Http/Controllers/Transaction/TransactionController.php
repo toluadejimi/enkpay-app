@@ -3267,13 +3267,11 @@ class TransactionController extends Controller
             }
 
             $banks = get_banks($data);
-
-
             $account = select_account();
-
 
             $under_id  = User::where('id', Auth::id())->first()->register_under_id ?? null;
             $charge = SuperAgent::where('register_under_id', $under_id)->first()->transfer_charge ?? null;
+
 
             if($under_id != null){
 
@@ -3281,6 +3279,8 @@ class TransactionController extends Controller
                 ->first()->amount;
                 $ggtransfer_charge = $get_transfer_charge + $charge;
                 $transfer_charge  = strval($ggtransfer_charge);
+
+
 
             }else{
 
