@@ -226,6 +226,7 @@ class EnkpayposController extends Controller
             }
 
             $super_agent_pos_charge = SuperAgent::where('user_id', $super_agent->id)->first()->pos_charge ?? null;
+            $register_under_id = SuperAgent::where('user_id', $super_agent->id)->first()->register_under_id ?? null;
             $main_pos_charge = Charge::where('user_id', $super_agent->id)->first()->amount ?? null;
 
             $both_commissions =  $super_agent_pos_charge + $main_pos_charge;
@@ -333,6 +334,7 @@ class EnkpayposController extends Controller
             $trasnaction->sender_name = $pan;
             $trasnaction->serial_no = $terminalID;
             $trasnaction->sender_account_no = $pan;
+            $trasnaction->register_under_id = $register_under_id;
             $trasnaction->status = 1;
             $trasnaction->save();
 
