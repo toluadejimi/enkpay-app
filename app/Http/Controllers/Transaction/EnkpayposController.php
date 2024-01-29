@@ -332,7 +332,7 @@ class EnkpayposController extends Controller
             $trasnaction->note = "ENKPAY POS | $cardName | $pan | $message";
             $trasnaction->amount = $amount;
             $trasnaction->enkPay_Cashout_profit = round($enkpay_profit, 2);
-            $trasnaction->e_charge = round($samount_after_comission, 2);
+            $trasnaction->e_charges = round($samount_after_comission, 2);
             $trasnaction->balance = $updated_amount;
             $trasnaction->sender_name = $pan;
             $trasnaction->serial_no = $terminalID;
