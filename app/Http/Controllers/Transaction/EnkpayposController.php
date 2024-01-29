@@ -44,6 +44,8 @@ class EnkpayposController extends Controller
 
 
 
+
+
         if($key == null){
 
             $result = "No Key Passed";
@@ -84,6 +86,22 @@ class EnkpayposController extends Controller
 
 
         }
+
+
+        $rrn = PosLog::where('e_ref', $RRN)->first()->e_ref ?? null;
+
+        if($rrn == $RRN){
+
+
+            return response()->json([
+                'status' => false,
+                'message' => "Transaction already exist",
+            ], 500);
+
+
+        }
+
+        
 
 
 
@@ -178,16 +196,9 @@ class EnkpayposController extends Controller
 
 
 
-
-
-
-
         $trans_id = trx();
         $comission = Charge::where('title', 'both_commission')
             ->first()->amount;
-
-
-      
 
 
         $user_id = $userID;
@@ -200,6 +211,7 @@ class EnkpayposController extends Controller
 
         $businessID = Terminal::where('serial_no', $serialNO)->first()->business_id ?? null;
         $super_agent = User::where('business_id', $businessID)->first() ?? null;
+
 
 
         if($super_agent != null){
@@ -290,6 +302,14 @@ class EnkpayposController extends Controller
                 ]);
 
                 User::where('id', $super_agent->id)->increment('main_wallet', $samount_after_comission);
+
+                $user = User::where('id', $super_agent->id)->first();
+
+
+                $result = $user->first_name . " " . $user->last_name . "| got NGN " . $samount_after_comission;
+                send_notification($result);
+
+
                 PosLog::where('e_ref', $RRN)->update([
 
                     'status' => 2,
@@ -324,6 +344,8 @@ class EnkpayposController extends Controller
             $amount4 = number_format($amount_after_comission, 2);
             $result = $f_name . " " . $l_name . "| fund NGN " . $amount4 . " | using ENKPPAY POS" . "\n\nIP========> " . $ip;
             send_notification($result);
+
+          
 
 
 
