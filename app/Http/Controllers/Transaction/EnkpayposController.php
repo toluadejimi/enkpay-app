@@ -227,13 +227,16 @@ class EnkpayposController extends Controller
 
             $super_agent_pos_charge = SuperAgent::where('user_id', $super_agent->id)->first()->pos_charge ?? null;
             $register_under_id = SuperAgent::where('user_id', $super_agent->id)->first()->register_under_id ?? null;
-            $main_pos_charge = Charge::where('user_id', $super_agent->id)->first()->amount ?? null;
+            $main_pos_charge = Charge::where('user_id', $super_agent->id)->where('title', 'pos_charge')->first()->amount ?? null;
 
             $both_commissions =  $super_agent_pos_charge + $main_pos_charge;
 
             $amount1 = $both_commissions / 100;
             $amount2 = $amount1 * $amount;
             $both_commmission = number_format($amount2, 3);
+
+
+            dd($both_commissions, $both_commmission);
 
             $samount1 = $super_agent_pos_charge / 100;
             $samount2 = $samount1 * $amount;
