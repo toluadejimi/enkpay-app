@@ -243,43 +243,37 @@ class EnkpayposController extends Controller
             $eamount2 = $eamount1 * $amount;
             $ecommmission = number_format($eamount2, 3);
 
-        
-
-        
-
-
+    
                 $business_commission_cap = Charge::where('title', 'business_cap')
                     ->first()->amount;
 
                 $agent_commission_cap = Charge::where('title', 'agent_cap')
                     ->first()->amount;
 
-                if ($both_commmission >= $agent_commission_cap && $type == 1) {
 
-                    $amount_after_comission = $amount - $agent_commission_cap;
+
+              
+
+                if ($both_commmission >= 200) {
+                    $amount_after_comission = $amount - 200;
                     $samount_after_comission = 50;
                     $enkpay_profit = 150;
 
 
-            
-
-                } elseif ($both_commmission >= $business_commission_cap && $type == 3) {
-
-                    $amount_after_comission = $amount - $business_commission_cap;
-                    $samount_after_comission = 50;
-                    $enkpay_profit = 100;
+                }else{
 
 
-
-
-                } else {
-
-                    $amount_after_comission = $amount - $both_commmission;
-                    $samount_after_comission = $scommmission;
-                    $enkpay_profit = $ecommmission;
+                $amount_after_comission = $amount - $both_commmission;
+                $samount_after_comission = $scommmission;
+                $enkpay_profit = $ecommmission;
 
 
                 }
+
+
+
+                
+
 
                  $updated_amount = $main_wallet + $amount_after_comission;
 
