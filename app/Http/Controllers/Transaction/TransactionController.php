@@ -737,12 +737,28 @@ class TransactionController extends Controller
                 $status = 200;
                 $enkpay_profit = $transfer_charges - 10;
 
-                $debited_amount = $transfer_charges + $amount;
-                //$trans_id = trx();
+                $under_id = User::where('id', Auth::id())->first()->register_under_id ?? null;
+                if($under_id != null){
 
+                $charge = SuperAgent::where('register_under_id', $under_id)->first()->transfer_charge ?? null;
+                $get_transfer_charge = Charge::where('title', 'transfer_fee')->first()->amount;
+                $scharge = $get_transfer_charge + $charge;
+
+                $debited_amount = $scharge + $amount;
+
+                $agent_user_id = SuperAgent::where('register_under_id', $under_id)->first()->user_id ?? null;
+                $sbalance = User::where('id', $agent_user_id)->first()->main_wallet;
+
+                }else{
+
+                    $debited_amount = $transfer_charges + $amount;
+
+                }
+
+
+       
 
                 $chk_bal = ttmfb_balance() ?? 0;
-
                 if ($chk_bal < $debited_amount) {
 
                     $name = Auth::user()->first_name . " " . Auth::user()->last_name;
@@ -756,6 +772,12 @@ class TransactionController extends Controller
 
                     ], 500);
                 }
+
+
+             
+
+
+
 
                 if ($status == 200) {
 
@@ -776,7 +798,7 @@ class TransactionController extends Controller
                     //update Transactions
                     $trasnaction = new PendingTransaction();
                     $trasnaction->user_id = Auth::id();
-                    $trasnaction->ref_trans_id = trx();
+                    $trasnaction->ref_trans_id = $referenceCode;
                     $trasnaction->debit = $amoutCharges;
                     $trasnaction->amount = $amount;
                     $trasnaction->bank_code = $destinationBankCode;
@@ -882,7 +904,7 @@ class TransactionController extends Controller
                         //update Transactions
                         $trasnaction = new Transaction();
                         $trasnaction->user_id = Auth::id();
-                        $trasnaction->ref_trans_id = trx();
+                        $trasnaction->ref_trans_id = $referenceCode;
                         $trasnaction->e_ref = $tt_mfb_response;
                         $trasnaction->ttmfb_api_ref = $api_ref;
                         $trasnaction->type = "InterBankTransfer";
@@ -903,7 +925,7 @@ class TransactionController extends Controller
                         //Transfers
                         $trasnaction = new Transfer();
                         $trasnaction->user_id = Auth::id();
-                        $trasnaction->ref_trans_id = trx();
+                        $trasnaction->ref_trans_id = $referenceCode;
                         $trasnaction->e_ref = $tt_mfb_response;
                         $trasnaction->type = "TTBankTransfer";
                         $trasnaction->main_type = "Transfer";
@@ -918,6 +940,8 @@ class TransactionController extends Controller
                         $trasnaction->balance = $balance;
                         $trasnaction->status = 0;
                         $trasnaction->save();
+
+
 
                         $email = new EmailSend();
                         $email->receiver_email = Auth::user()->email;
@@ -947,7 +971,7 @@ class TransactionController extends Controller
                         $trasnaction = new Transaction();
                         $trasnaction->user_id = Auth::id();
                         $trasnaction->ttmfb_api_ref = $api_ref;
-                        $trasnaction->ref_trans_id = trx();
+                        $trasnaction->ref_trans_id = $referenceCode;
                         $trasnaction->e_ref = $tt_mfb_response;
                         $trasnaction->type = "InterBankTransfer";
                         $trasnaction->main_type = "Transfer";
@@ -968,7 +992,7 @@ class TransactionController extends Controller
                         //Transfers
                         $trasnaction = new Transfer();
                         $trasnaction->user_id = Auth::id();
-                        $trasnaction->ref_trans_id = trx();
+                        $trasnaction->ref_trans_id = $referenceCode;
                         $trasnaction->e_ref = $tt_mfb_response;
                         $trasnaction->type = "TTBankTransfer";
                         $trasnaction->main_type = "Transfer";
@@ -988,13 +1012,30 @@ class TransactionController extends Controller
 
 
 
+
+                        $under_id = User::where('id', Auth::id())->first()->register_under_id ?? null;
+                        if($under_id != null){
+                        User::where('id', $agent_user_id)->increment('main_wallet', $charge);
+                        //Agent
+                        $trasnaction = new Transaction();
+                        $trasnaction->user_id = $agent_user_id;
+                        $trasnaction->ref_trans_id = $referenceCode;
+                        $trasnaction->transaction_type = "BankTransfer";
+                        $trasnaction->credit = $charge;
+                        $trasnaction->title = "Commission";
+                        $trasnaction->note = "ENKPAY Transfer | Commission";
+                        $trasnaction->amount = $charge;
+                        $trasnaction->balance = $sbalance;
+                        $trasnaction->status = 1;
+                        $trasnaction->save();
+                        }
+
+
                         $email = new EmailSend();
                         $email->receiver_email = Auth::user()->email;
                         $email->amount = $amount;
                         $email->first_name = $first_name;
                         $email->save();
-
-
 
 
                         $wallet = Auth::user()->main_wallet - $amount;
@@ -1008,6 +1049,7 @@ class TransactionController extends Controller
                         PendingTransaction::where('user_id', Auth::id())->delete() ?? null;
 
                         User::where('id', Auth::id())->increment('bonus_wallet', 1);
+
 
 
                         return response()->json([
@@ -1045,7 +1087,7 @@ class TransactionController extends Controller
 
                     $trasnaction = new Transaction();
                     $trasnaction->user_id = Auth::id();
-                    $trasnaction->ref_trans_id = trx();
+                    $trasnaction->ref_trans_id = $referenceCode;
                     $trasnaction->transaction_type = "Reversal";
                     $trasnaction->debit = 0;
                     $trasnaction->amount = $amount;

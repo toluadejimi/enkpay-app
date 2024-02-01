@@ -230,18 +230,18 @@ class EnkpayposController extends Controller
             $both_commissions =  $super_agent_pos_charge + $main_pos_charge;
             $amount1 = $both_commissions / 100;
             $amount2 = $amount1 * $amount;
-            $both_commmission = number_format($amount2, 3);
+            $both_commmission = round($amount2, 2);
 
 
 
             $samount1 = $super_agent_pos_charge / 100;
             $samount2 = $samount1 * $amount;
-            $scommmission = number_format($samount2, 3);
+            $scommmission = round($samount2, 2);
 
 
             $eamount1 = $main_pos_charge / 100;
             $eamount2 = $eamount1 * $amount;
-            $ecommmission = number_format($eamount2, 3);
+            $ecommmission = round($eamount2, 2);
 
     
                 $business_commission_cap = Charge::where('title', 'business_cap')
@@ -263,16 +263,12 @@ class EnkpayposController extends Controller
                 }else{
 
 
-                $amount_after_comission = $amount - $both_commmission;
+                $amount_after_comission = (int)$amount - (int)$both_commmission;
                 $samount_after_comission = $scommmission;
                 $enkpay_profit = $ecommmission;
 
 
                 }
-
-
-
-                
 
 
                  $updated_amount = $main_wallet + $amount_after_comission;
@@ -295,7 +291,24 @@ class EnkpayposController extends Controller
                     'main_wallet' => $updated_amount,
                 ]);
 
-                User::where('id', $super_agent->id)->increment('main_wallet', $samount_after_comission);
+                User::where('id', $super_agent->id)->increment('main_wallet', (int)$samount_after_comission);
+                $balance = User::where('id', $super_agent->id)->first()->main_wallet;
+
+
+                $trasnaction = new Transaction();
+                $trasnaction->user_id = $super_agent->id;
+                $trasnaction->ref_trans_id = $trans_id;
+                $trasnaction->e_ref = $RRN;
+                $trasnaction->transaction_type = $transactionType;
+                $trasnaction->credit = round($samount_after_comission, 2);
+                $trasnaction->title = "Commission";
+                $trasnaction->note = "ENKPAY POS | Commission";
+                $trasnaction->amount = $samount_after_comission;
+                $trasnaction->balance = $balance;
+                $trasnaction->serial_no = $terminalID;
+                $trasnaction->sender_account_no = $pan;
+                $trasnaction->status = 1;
+                $trasnaction->save();
 
                 $user = User::where('id', $super_agent->id)->first();
 
