@@ -42,7 +42,7 @@ class TransactionController extends Controller
     public function bank_transfer(Request $request)
     {
 
-        try {
+        // try {
 
 
             if (Auth::user()->status == 7) {
@@ -747,7 +747,7 @@ class TransactionController extends Controller
                 $debited_amount = $scharge + $amount;
 
                 $agent_user_id = SuperAgent::where('register_under_id', $under_id)->first()->user_id ?? null;
-                $sbalance = User::where('id', $agent_user_id)->first()->main_wallet;
+                $sbalance = User::where('id', $agent_user_id)->first()->main_wallet ?? null;
 
                 }else{
 
@@ -1015,10 +1015,10 @@ class TransactionController extends Controller
 
                         $under_id = User::where('id', Auth::id())->first()->register_under_id ?? null;
                         if($under_id != null){
-                        User::where('id', $agent_user_id)->increment('main_wallet', $charge);
+                        User::where('id', $agent_user_id)->increment('main_wallet', (int)$charge);
                         //Agent
                         $trasnaction = new Transaction();
-                        $trasnaction->user_id = $agent_user_id;
+                        $trasnaction->user_id = $agent_user_id ?? 0;
                         $trasnaction->ref_trans_id = $referenceCode;
                         $trasnaction->transaction_type = "BankTransfer";
                         $trasnaction->credit = $charge;
@@ -1730,9 +1730,9 @@ class TransactionController extends Controller
                     ], 500);
                 }
             }
-        } catch (\Exception $th) {
-            return $th->getMessage();
-        }
+        // } catch (\Exception $th) {
+        //     return $th->getMessage();
+        // }
     }
 
     public function self_cash_out(Request $request)
