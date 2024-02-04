@@ -5633,7 +5633,7 @@ class TransactionController extends Controller
             'email' => $request->email
         );
 
-        $site_url = $url."/e_check";
+        $site_url = $url."/e-check";
 
         $post_data = json_encode($databody);
 
