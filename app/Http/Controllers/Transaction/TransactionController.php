@@ -29,7 +29,6 @@ use App\Notifications\DepositAlert;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Http;
 use GuzzleHttp\Client as GuzzleClient;
 use App\Notifications\SampleNotification;
 use Illuminate\Support\Facades\Notification;
@@ -5625,25 +5624,38 @@ class TransactionController extends Controller
 
     public function service_check(request $request){
 
+       
         $id = $request->id;
 
-        $surl = ApiService::where('id', $id)->first()->url;
+        $url = ApiService::where('id', $id)->first()->url;
 
-        $csrfToken = $request->session()->token();
-        $url = $surl."/e-check";
-
-        $data = [
+        $databody = array(
             'email' => $request->email
-        ];
+        );
 
-        $var = Http::withHeaders([
-            'X-CSRF-TOKEN' => $csrfToken,
-            'Content-Type' => 'application/json',
-        ])->post($url, $data);
+        $site_url = $url."/e-check";
 
+        $post_data = json_encode($databody);
 
 
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $site_url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => $post_data,
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json',
+            ),
+        ));
 
+        $var = curl_exec($curl);
+        curl_close($curl);
         $var = json_decode($var);
         $status = $var->status ?? null;
 
@@ -5675,9 +5687,10 @@ class TransactionController extends Controller
 
        
 
-      
 
        
+
+
 
 
     }
