@@ -5656,9 +5656,12 @@ class TransactionController extends Controller
 
         $var = curl_exec($curl);
 
+        dd($var,$post_data );
+
         curl_close($curl);
         $var = json_decode($var);
         $status = $var->status ?? null;
+
 
 
         if($status == false){
