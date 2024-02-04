@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Ttmfb;
 use App\Models\Charge;
+use App\Models\Webkey;
 use App\Models\Feature;
 use App\Models\Setting;
 use App\Models\VfdBank;
@@ -16,6 +17,7 @@ use App\Models\Transfer;
 use App\Models\EmailSend;
 use App\Models\ErrandKey;
 use App\Events\NewMessage;
+use App\Models\ApiService;
 use App\Models\SuperAgent;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
@@ -3131,9 +3133,6 @@ class TransactionController extends Controller
             $enkpay_profit = $transfer_charges - 10;
 
 
-
-
-
             if ($wallet == 'main_account') {
 
                 $update = User::where('id', Auth::id())
@@ -3336,6 +3335,7 @@ class TransactionController extends Controller
             if ($status == 200) {
 
                 return response()->json([
+
 
                     'account' => $account,
                     'transfer_charge' => $transfer_charge,
@@ -5605,4 +5605,296 @@ class TransactionController extends Controller
         $result = " Message========> " . $message . "\n\nCustomer Name========> " . $full_name;
         send_notification($result);
     }
+
+
+
+
+    public function service_properties(request $request){
+
+        $account = select_account();
+
+        $service = ApiService::select('id','service_name', 'url')->get();
+        return response()->json([
+            'account' => $account,
+            'service' => $service,
+        ], 200);
+
+
+    }
+
+    public function service_check(request $request){
+
+       
+        $id = $request->id;
+
+        $url = ApiService::where('id', $id)->first()->url;
+
+        $databody = array(
+            'email' => $request->email
+        );
+
+        $site_url = $url."/e_check";
+
+        $post_data = json_encode($databody);
+
+
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $site_url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => $post_data,
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json',
+            ),
+        ));
+
+        $var = curl_exec($curl);
+        curl_close($curl);
+        $var = json_decode($var);
+        $status = $var->status ?? null;
+
+        if($status == false){
+            return response()->json([
+                'status' => false,
+                'message' => $var->message,
+            ], 500);
+
+        }
+
+        if($status == null){
+            return response()->json([
+                'status' => false,
+                'message' => "Something went wrong",
+            ], 500);
+
+        }
+
+        if($status == true){
+            return response()->json([
+                'status' => true,
+                'user' => $var->user,
+            ], 200);
+
+        }
+
+       
+
+
+       
+
+
+
+
+    }
+
+
+    public function service_fund(request $request){
+
+
+        $ck = User::where('id', Auth::id())->first()->main_wallet;
+
+
+        if($ck < $request->amount){
+
+            return response()->json([
+                'status' => false,
+                'message' => "Insufficent Funds, Fund your wallet",
+            ], 500);
+
+
+        }
+       
+        $id = $request->id;
+
+        $url = ApiService::where('id', $id)->first()->url;
+
+        $databody = array(
+            'email' => $request->email,
+            'amount' => $request->amount
+
+        );
+
+        $site_url = $url."/e_fund";
+
+        $post_data = json_encode($databody);
+
+
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $site_url,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => $post_data,
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json',
+            ),
+        ));
+
+        $var = curl_exec($curl);
+        curl_close($curl);
+        $var = json_decode($var);
+        $status = $var->status ?? null;
+
+        User::where('id', Auth::id())->decrement('main_wallet', $request->amount);
+
+        if($status == false){
+            return response()->json([
+                'status' => false,
+                'message' => $var->message,
+            ], 500);
+
+        }
+
+        if($status == null){
+            return response()->json([
+                'status' => false,
+                'message' => "Something went wrong",
+            ], 500);
+
+        }
+
+        if($status == true){
+
+            //Business Information
+            $web_commission = Charge::where('title', 'bwebpay')->first()->amount;
+            //Both Commission
+            $amount1 = $web_commission / 100;
+            $amount2 = $amount1 * $request->amount;
+            $both_commmission = number_format($amount2, 3);
+
+
+            //enkpay commission
+            $commison_subtract = $web_commission - 0.5;
+            $enkPayPaypercent = $commison_subtract / 100;
+            $enkPay_amount = $enkPayPaypercent * $request->amount;
+            $enkpay_commision_amount = number_format($enkPay_amount, 3);
+
+
+            $p_cap = Charge::where('title', 'p_cap')
+                ->first()->amount;
+
+            if ($both_commmission > $p_cap) {
+
+                $removed_comm =  $p_cap;
+            } else {
+                $removed_comm =  $both_commmission;
+            }
+
+
+            $business_id = ApiService::where('id', $id)->first()->business_id ?? null;
+            if (!empty($business_id) || $business_id != null) {
+                $amt_to_credit = (int)$request->amount - (int)$removed_comm;
+                $amt1 = (int)$amt_to_credit - 2;
+
+                User::where('business_id', $business_id)->increment('main_wallet', $amt1);
+                User::where('id', 95)->increment('bonus_wallet', 2);
+                User::where('id', 109)->increment('bonus_wallet', 2);
+
+
+                $first_name = User::where('business_id', $business_id)->first()->first_name ?? null;
+                $last_name = User::where('business_id', $business_id)->first()->last_name ?? null;
+                $balance = User::where('business_id', $business_id)->first()->main_wallet;
+                $user_id = User::where('business_id', $business_id)->first()->id;
+
+
+
+                $service_name = ApiService::where('id', $id)->first()->service_name;
+
+
+
+
+                $usr = User::where('id', Auth::id())->first();
+
+
+                //user Transactions
+                $trasnaction = new Transaction();
+                $trasnaction->user_id = Auth::id();
+                $trasnaction->ref_trans_id = trx();
+                $trasnaction->type = "E-Service";
+                $trasnaction->transaction_type = "Eservice";
+                $trasnaction->title = "Wallet Funding";
+                $trasnaction->main_type = "Eservice";
+                $trasnaction->debit = $request->amount;
+                $trasnaction->note = "Eservice  | $service_name";
+                $trasnaction->amount = $request->amount;
+                $trasnaction->enkPay_Cashout_profit = $enkpay_commision_amount;
+                $trasnaction->sender_name = $usr->first_name." ".$usr->last_name ;
+                $trasnaction->sender_account_no = $usr->phone;
+                $trasnaction->balance = $usr->main_wallet;
+                $trasnaction->status = 1;
+                $trasnaction->save();
+
+
+                //business Transactions
+                $trasnaction = new Transaction();
+                $trasnaction->user_id = $user_id;
+                $trasnaction->ref_trans_id = trx();
+                $trasnaction->type = "E-Service";
+                $trasnaction->transaction_type = "Eservice";
+                $trasnaction->title = "Wallet Funding";
+                $trasnaction->main_type = "Eservice";
+                $trasnaction->credit = $amt_to_credit;
+                $trasnaction->note = "Eservice | $usr->first_name  $usr->last_name  | $service_name";
+                $trasnaction->amount = $request->amount;
+                $trasnaction->enkPay_Cashout_profit = $enkpay_commision_amount;
+                $trasnaction->sender_name = $usr->first_name." ".$usr->last_name ;
+                $trasnaction->sender_account_no = $usr->phone;
+                $trasnaction->balance = $balance;
+                $trasnaction->status = 1;
+                $trasnaction->save();
+
+                $message = "Business funded | $amt_to_credit | $first_name " . " " . $last_name;
+                send_notification($message);
+
+
+                $message = "E-Service | $request->amount | $service_name | $usr->first_name " . " " . $usr->last_name;
+                send_notification($message);
+
+                return response()->json([
+                    'status' => true,
+                    'message' => $var->message,
+                ], 200);
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            return response()->json([
+                'status' => true,
+                'user' => $var->user,
+            ], 200);
+
+        }
+
+
+    }
+
+
+
+
+
+
 }

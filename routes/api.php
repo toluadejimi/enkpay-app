@@ -191,6 +191,20 @@ Route::get('card-details', [VirtualCardController::class, 'card_details']);
 
 
 
+//Service
+
+Route::any('service-check', [TransactionController::class, 'service_check']);
+Route::any('service-properties', [TransactionController::class, 'service_properties']);
+Route::any('service-fund', [TransactionController::class, 'service_fund']);
+
+
+
+
+
+
+
+
+
 
 
 
