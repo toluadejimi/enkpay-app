@@ -5722,7 +5722,7 @@ class TransactionController extends Controller
 
         );
 
-        $site_url = $url."/e_fund";
+        $site_url = $url."/e-fund";
 
         $post_data = json_encode($databody);
 
