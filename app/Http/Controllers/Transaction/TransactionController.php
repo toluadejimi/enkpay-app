@@ -5655,11 +5655,12 @@ class TransactionController extends Controller
         ));
 
         $var = curl_exec($curl);
+        dd($var, $site_url);
+
         curl_close($curl);
         $var = json_decode($var);
         $status = $var->status ?? null;
 
-        dd($var);
 
         if($status == false){
             return response()->json([
