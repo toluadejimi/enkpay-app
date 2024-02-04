@@ -27,6 +27,8 @@ class Feature extends Model
     "ticket"=> 'integer',
     "v_card"=> 'integer',
     "pos_transfer"=> 'integer',
+    "api_service"=> 'integer',
+
 
 
 
