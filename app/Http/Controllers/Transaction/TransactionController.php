@@ -5624,7 +5624,8 @@ class TransactionController extends Controller
 
     public function service_check(request $request){
 
-       
+        $csrfToken = $request->session()->token();
+
         $id = $request->id;
 
         $url = ApiService::where('id', $id)->first()->url;
@@ -5651,6 +5652,8 @@ class TransactionController extends Controller
             CURLOPT_POSTFIELDS => $post_data,
             CURLOPT_HTTPHEADER => array(
                 'Content-Type: application/json',
+                'X-CSRF-TOKEN' => $csrfToken,
+
             ),
         ));
 
