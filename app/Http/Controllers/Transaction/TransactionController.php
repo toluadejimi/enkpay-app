@@ -5642,7 +5642,7 @@ class TransactionController extends Controller
         ])->post($url, $data);
 
 
-        dd($var);
+        dd($var, $url, $data);
 
 
         $var = json_decode($var);
