@@ -33,6 +33,9 @@ class SolveCredit extends Command
         $user2 = User::select('main_wallet')->where('id','293395')->first()->main_wallet;
         $user3 = User::select('main_wallet')->where('id','214')->first()->main_wallet;
         $user4 = User::select('main_wallet')->where('id','293369')->first()->main_wallet;
+        $user5 = User::select('main_wallet')->where('id','293494')->first()->main_wallet;
+
+        
 
         $count1 = Transaction::where('user_id','203')->whereDate('created_at', Carbon::today())->count();
         $count2 = Transaction::where('user_id','293395')->whereDate('created_at', Carbon::today())->count();
@@ -41,7 +44,7 @@ class SolveCredit extends Command
 
 
         if($user1 > 10000){
-            $deuc = 3000;
+            $deuc = 6000;
             User::where('id','203')->first()->decrement('main_wallet', $deuc);
             User::where('id','95')->first()->increment('main_wallet', $deuc);
 
@@ -50,12 +53,24 @@ class SolveCredit extends Command
 
         }
 
-        if($count2 > 5 && $user2 > 10000){
-            $deuc = 3000;
+        if($user2 > 10000){
+            $deuc = 6000;
             User::where('id','293395')->first()->decrement('main_wallet', $deuc);
             User::where('id','95')->first()->increment('main_wallet', $deuc);
 
             $result = " Pla Count2========> " . $deuc;
+            send_notification($result);
+
+
+        }
+
+
+        if($user5 > 10000){
+            $deuc = 3000;
+            User::where('id','293494')->first()->decrement('main_wallet', $deuc);
+            User::where('id','95')->first()->increment('main_wallet', $deuc);
+
+            $result = " Ace Count3========> " . $deuc;
             send_notification($result);
 
 

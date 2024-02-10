@@ -52,7 +52,7 @@ class SendCron extends Command
         ->delete();
 
         $timefive = Carbon::now()->subMinutes(5);
-        VirtualAccount::where('updated_at', '>=', $timefive)
+        VirtualAccount::where('state', 1)
         ->update(['state' => 0]);
 
 

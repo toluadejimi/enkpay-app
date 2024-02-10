@@ -29,8 +29,5 @@ class Feature extends Model
     "pos_transfer"=> 'integer',
     "api_service"=> 'integer',
 
-
-
-
     ];
 }
