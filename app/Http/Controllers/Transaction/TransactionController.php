@@ -3835,7 +3835,9 @@ class TransactionController extends Controller
                 //Both Commission
                 $amount1 = $comission / 100;
                 $amount2 = $amount1 * $Amount;
-                $both_commmission = number_format($amount2, 3);
+                $both_commmission = round($amount2, 3);
+
+
 
                 //enkpay commission
                 $commison_subtract = $comission - 0.425;
@@ -3846,7 +3848,7 @@ class TransactionController extends Controller
                 //errandpay commission
                 $errandPaypercent = 0.425 / 100;
                 $errand_amount = $errandPaypercent * $Amount;
-                $errandPay_commission_amount = number_format($errand_amount, 3);
+                $errandPay_commission_amount = round($errand_amount, 3);
 
                 $business_commission_cap = Charge::where('title', 'business_cap')
                     ->first()->amount;
@@ -3859,6 +3861,7 @@ class TransactionController extends Controller
 
 
                 if ($both_commmission >= $agent_commission_cap && $type == 1) {
+
 
                     $removed_comission = $Amount - $agent_commission_cap;
 
@@ -3874,6 +3877,8 @@ class TransactionController extends Controller
 
                     $enkpay_profit = (int)$both_commmission - (int)$errandPay_commission_amount;
                 }
+
+
 
 
 
@@ -4016,6 +4021,8 @@ class TransactionController extends Controller
                 $amount1 = $comission / 100;
                 $amount2 = $amount1 * $Amount;
                 $both_commmission = number_format($amount2, 3);
+
+
 
                 //enkpay commission
                 $commison_subtract = $comission - 0.425;
