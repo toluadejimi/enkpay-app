@@ -3988,6 +3988,27 @@ class TransactionController extends Controller
                 $agent_commission_cap = Charge::where('title', 'agent_cap')
                     ->first()->amount;
 
+
+
+                $ttrx = Transaction::where('e_ref', $TransactionReference)->first() ?? null;
+
+                if($ttrx != null){
+
+
+                    $ip = $request->ip();
+                    $result = $TransactionReference. " | Already Confirmed " . "\n\nIP========> " . $ip;
+                    send_notification($result);
+    
+    
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Tranasaction already approved',
+                    ], 200);
+
+
+
+                }
+
                 if ($both_commmission >= $agent_commission_cap && $type == 1) {
 
                     $removed_comission = $Amount - $agent_commission_cap;
@@ -4016,6 +4037,7 @@ class TransactionController extends Controller
 
                 if ($TransactionType == 'CashOut') {
 
+                    
 
                     $under_id = User::where('id', $user_id)->first()->register_under_id ?? null;
 
@@ -5624,23 +5646,20 @@ class TransactionController extends Controller
 
     public function service_check(request $request){
 
-       
-        $id = $request->id;
 
-        $url = ApiService::where('id', $id)->first()->url;
+        //palash and verify
+        $url1 = ApiService::where('id', 1)->first()->url;
+        $data1 = ApiService::select('id', 'service_name')->where('id', 1)->get();
 
         $databody = array(
             'email' => $request->email
         );
 
-        $site_url = $url."/e-check";
-
+        $site_url1 = $url1."/e-check";
         $post_data = json_encode($databody);
-
-
         $curl = curl_init();
         curl_setopt_array($curl, array(
-            CURLOPT_URL => $site_url,
+            CURLOPT_URL => $site_url1,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
@@ -5657,38 +5676,160 @@ class TransactionController extends Controller
         $var = curl_exec($curl);
         curl_close($curl);
         $var = json_decode($var);
-        $status = $var->status ?? null;
+        $status1 = $var->status ?? null;
 
 
 
-        if($status == false){
-            return response()->json([
-                'status' => false,
-                'message' => $var->message,
-            ], 500);
 
-        }
+            $url2 = ApiService::where('id', 2)->first()->url;
+            $data2 = ApiService::select('id', 'service_name')->where('id', 2)->get();
 
-        if($status == null){
-            return response()->json([
-                'status' => false,
-                'message' => "Something went wrong",
-            ], 500);
+            $databody = array(
+                'email' => $request->email
+            );
+    
+            $site_url1 = $url2."/e-check";
+            $post_data = json_encode($databody);
+            $curl = curl_init();
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => $site_url1,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => $post_data,
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/json',
+                ),
+            ));
+    
+            $var = curl_exec($curl);
+            curl_close($curl);
+            $var = json_decode($var);
+            $status2 = $var->status ?? null;
 
-        }
 
-        if($status == true){
-            return response()->json([
-                'status' => true,
-                'user' => $var->user,
-            ], 200);
+                $url3 = ApiService::where('id', 3)->first()->url;
+                $data3= ApiService::select('id', 'service_name')->where('id', 3)->get();
 
-        }
+                $databody = array(
+                    'email' => $request->email
+                );
+        
+                $site_url3 = $url3."/e-check";
+                $post_data = json_encode($databody);
+                $curl = curl_init();
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => $site_url1,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'POST',
+                    CURLOPT_POSTFIELDS => $post_data,
+                    CURLOPT_HTTPHEADER => array(
+                        'Content-Type: application/json',
+                    ),
+                ));
+        
+                $var = curl_exec($curl);
+                curl_close($curl);
+                $var2 = json_decode($var);
+                $status3 = $var2->status ?? null;
 
-       
 
 
-       
+    
+
+                    $url4 = ApiService::where('id', 4)->first()->url;
+                    $data4 = ApiService::select('id', 'service_name')->where('id', 4)->get();
+
+                    $databody = array(
+                        'email' => $request->email
+                    );
+            
+                    $site_url3 = $url4."/e-check";
+                    $post_data = json_encode($databody);
+                    $curl = curl_init();
+                    curl_setopt_array($curl, array(
+                        CURLOPT_URL => $site_url3,
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_ENCODING => '',
+                        CURLOPT_MAXREDIRS => 10,
+                        CURLOPT_TIMEOUT => 0,
+                        CURLOPT_FOLLOWLOCATION => true,
+                        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                        CURLOPT_CUSTOMREQUEST => 'POST',
+                        CURLOPT_POSTFIELDS => $post_data,
+                        CURLOPT_HTTPHEADER => array(
+                            'Content-Type: application/json',
+                        ),
+                    ));
+            
+                    $var = curl_exec($curl);
+                    curl_close($curl);
+                    $var = json_decode($var);
+                    $status4 = $var->status ?? null;
+
+
+
+                    dd($status1,$status2, $status3, $status4);
+
+
+                    if($status1  == true && $status2 == true){
+
+                        $datap = null;
+
+                    }else{
+
+                        $datap = $data2;
+                    }
+
+                    if($status1  == true ){
+                        $result['data'] = $data1 ?? null;
+                    }
+
+
+                    if($datap != null){
+
+                        $result['data2'] = $datap ?? null;
+
+
+                    }
+
+
+                    if($status3  == true ){
+                        $result['data3'] = $data3 ?? null;
+                    }
+
+
+                    if($status4  == true ){
+                        $result['data4'] = $data4 ?? null;
+                    }
+
+
+              
+
+
+                return response()->json([
+                    'status' => true,
+                    'service' => $result,
+                ], 200);
+        
+
+
+            if($status1  == false || $status2 == false || $status3 == false || $status4 == false){
+                return response()->json([
+                    'status' => false,
+                    'message' => "No service found for email",
+                ], 500);
+    
+            }
 
 
 
