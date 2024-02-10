@@ -3781,6 +3781,26 @@ class TransactionController extends Controller
             $TerminalID = $request->AdditionalDetails['TerminalID'];
             $MaskedPAN = $request->AdditionalDetails['MaskedPAN'];
 
+
+
+            $ttrx = Transaction::where('e_ref', $TransactionReference)->first() ?? null;
+
+            if($ttrx != null){
+                $ip = $request->ip();
+                $result = $TransactionReference. " | Already Confirmed " . "\n\nIP========> " . $ip;
+                send_notification($result);
+
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Tranasaction already approved',
+                ], 200);
+
+
+
+            }
+
+
             $eip = env('EIP');
             //$eip = '127.0.0.1';
 
@@ -3834,6 +3854,10 @@ class TransactionController extends Controller
                 $agent_commission_cap = Charge::where('title', 'agent_cap')
                     ->first()->amount;
 
+
+
+
+
                 if ($both_commmission >= $agent_commission_cap && $type == 1) {
 
                     $removed_comission = $Amount - $agent_commission_cap;
@@ -3851,6 +3875,8 @@ class TransactionController extends Controller
                     $enkpay_profit = (int)$both_commmission - (int)$errandPay_commission_amount;
                 }
 
+
+
                 //$enkpay_cashOut_fee = $amount - $enkpay_commision_amount ;
 
                 $updated_amount = $main_wallet + $removed_comission;
@@ -3860,7 +3886,9 @@ class TransactionController extends Controller
                         'main_wallet' => $updated_amount,
                     ]);
 
+
                 if ($TransactionType == 'Purchase') {
+
 
                     //update Transactions
                     $trasnaction = new Transaction();
@@ -3935,6 +3963,24 @@ class TransactionController extends Controller
             $TerminalID = $request->AdditionalDetails['TerminalID'];
             $MaskedPAN = $request->AdditionalDetails['MaskedPAN'];
 
+
+            $ttrx = Transaction::where('e_ref', $TransactionReference)->first() ?? null;
+
+            if($ttrx != null){
+                $ip = $request->ip();
+                $result = $TransactionReference. " | Already Confirmed " . "\n\nIP========> " . $ip;
+                send_notification($result);
+
+
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Tranasaction already approved',
+                ], 200);
+
+
+
+            }
+
             $eip = env('EIP');
             //$eip = '127.0.0.1';
 
@@ -3987,27 +4033,6 @@ class TransactionController extends Controller
 
                 $agent_commission_cap = Charge::where('title', 'agent_cap')
                     ->first()->amount;
-
-
-
-                $ttrx = Transaction::where('e_ref', $TransactionReference)->first() ?? null;
-
-                if($ttrx != null){
-
-
-                    $ip = $request->ip();
-                    $result = $TransactionReference. " | Already Confirmed " . "\n\nIP========> " . $ip;
-                    send_notification($result);
-    
-    
-                    return response()->json([
-                        'status' => true,
-                        'message' => 'Tranasaction already approved',
-                    ], 200);
-
-
-
-                }
 
                 if ($both_commmission >= $agent_commission_cap && $type == 1) {
 
