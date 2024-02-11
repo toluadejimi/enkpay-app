@@ -481,7 +481,9 @@ class EnkpayposController extends Controller
 
             $ip = $request->ip();
             $amount4 = number_format($removed_comission, 2);
-            $result = $f_name . " " . $l_name . "| fund NGN " . $amount . " | Failed on ENKPAY POS" . "\n\nIP========> " . $ip;
+            $message = $f_name . " " . $l_name . "| fund NGN " . $amount . " | Failed on ENKPAY POS" . "\n\nIP========> " . $ip;
+            $parametersJson = json_encode($request->all());
+            $result = "Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
             send_notification($result);
 
 
