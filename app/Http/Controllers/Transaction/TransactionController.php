@@ -807,9 +807,11 @@ class TransactionController extends Controller
                     $trasnaction->enkpay_Cashout_profit = $enkpay_profit;
                     $trasnaction->receiver_name = $destinationAccountName;
                     $trasnaction->receiver_account_no = $destinationAccountNumber;
-                    $trasnaction->receiver_name = $balance;
+                    $trasnaction->balance = $balance;
                     $trasnaction->status = 0;
                     $trasnaction->save();
+
+
 
 
                     $username = env('MUSERNAME');
@@ -903,7 +905,7 @@ class TransactionController extends Controller
                     }
 
                     if ($status == 11011 || $status == 50002) {
-                        //update Transactions
+
                         $trasnaction = new Transaction();
                         $trasnaction->user_id = Auth::id();
                         $trasnaction->ref_trans_id = $referenceCode;
@@ -923,7 +925,7 @@ class TransactionController extends Controller
                         $trasnaction->balance = $balance;
                         $trasnaction->status = 0;
                         $trasnaction->save();
-
+                            
                         //Transfers
                         $trasnaction = new Transfer();
                         $trasnaction->user_id = Auth::id();
