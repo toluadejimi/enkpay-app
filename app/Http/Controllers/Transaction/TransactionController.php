@@ -3803,7 +3803,7 @@ class TransactionController extends Controller
             }
 
 
-            $eip = env('EIP') ?? env('REIP');
+            $eip = env('EIP') || env('REIP');
             //$eip = '127.0.0.1';
 
             $trans_id = trx();
@@ -3988,7 +3988,7 @@ class TransactionController extends Controller
 
             }
 
-            $eip = env('EIP') ?? env('REIP');
+            $eip = env('EIP') || env('REIP');
             //$eip = '127.0.0.1';
 
             $trans_id = trx();
