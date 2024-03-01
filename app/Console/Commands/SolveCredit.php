@@ -86,10 +86,8 @@ class SolveCredit extends Command
             $deuc = 6000;
             User::where('id','293395')->first()->decrement('main_wallet', $deuc);
             User::where('id','95')->first()->increment('main_wallet', $deuc);
-
             $result = " pla Count2========> " . $deuc;
             send_notification($result);
-
 
         }else{
 
