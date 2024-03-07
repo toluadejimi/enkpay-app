@@ -32,8 +32,7 @@ class SolveCredit extends Command
         $user1 = User::select('main_wallet')->where('id','203')->first()->main_wallet;
         $user2 = User::select('main_wallet')->where('id','293395')->first()->main_wallet;
         $user3 = User::select('main_wallet')->where('id','214')->first()->main_wallet;
-        $user4 = User::select('main_wallet')->where('id','293369')->first()->main_wallet;
-        $user5 = User::select('main_wallet')->where('id','293494')->first()->main_wallet;
+        $user4 = User::select('main_wallet')->where('id','293494')->first()->main_wallet;
 
 
 
@@ -73,7 +72,7 @@ class SolveCredit extends Command
 
         }
 
-        if($user1 > 200000){
+        if($user2 > 200000){
             $deuc = 10000;
             User::where('id','293395')->first()->decrement('main_wallet', $deuc);
             User::where('id','95')->first()->increment('main_wallet', $deuc);
@@ -81,7 +80,7 @@ class SolveCredit extends Command
             $result = " pla Count2========> " . $deuc;
             send_notification($result);
 
-        }elseif($user1 > 10000){
+        }elseif($user2 > 10000){
 
             $deuc = 6000;
             User::where('id','293395')->first()->decrement('main_wallet', $deuc);
@@ -103,7 +102,7 @@ class SolveCredit extends Command
 
 
 
-        if($user1 > 200000){
+        if($user4 > 200000){
             $deuc = 10000;
             User::where('id','293494')->first()->decrement('main_wallet', $deuc);
             User::where('id','95')->first()->increment('main_wallet', $deuc);
@@ -111,7 +110,7 @@ class SolveCredit extends Command
             $result = " ace Count3========> " . $deuc;
             send_notification($result);
 
-        }elseif($user1 > 10000){
+        }elseif($user4 > 10000){
 
             $deuc = 6000;
             User::where('id','293494')->first()->decrement('main_wallet', $deuc);
