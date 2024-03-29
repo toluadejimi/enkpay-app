@@ -5081,13 +5081,11 @@ class TransactionController extends Controller
                 'receiver_account_no' => $trx->receiver_account_no,
                 'date' => $trx->created_at,
                 'note' => "$trx->ref_trans_id | $trx->note",
-                'rrn' => $rrn,
-                'card_pan' => $card_pan,
-                'status' => $trx->status,
-                'response_code' => $trx->status,
+                'rrn' => $rrn ?? null,
+                'card_pan' => $card_pan ?? null,
+                'status' => $trx->status ?? null,
+                'response_code' => $trx->status ?? null,
                 'message' => "If receiver is not credited within 10mins, Please contact us with the EREF",
-
-
             ], 200);
 
 
