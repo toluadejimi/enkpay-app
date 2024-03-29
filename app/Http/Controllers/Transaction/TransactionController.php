@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Transaction;
 
+use App\Models\PosLog;
 use DB;
 use Mail;
 use Carbon\Carbon;
@@ -70,10 +71,6 @@ class TransactionController extends Controller
                     'message' => "Transfer is not available at the moment, \n\n Please try again after some time",
                 ], 500);
             }
-
-
-
-
 
             $set = Setting::where('id', 1)->first();
 
@@ -758,7 +755,7 @@ class TransactionController extends Controller
                 }
 
 
-       
+
 
                 $chk_bal = ttmfb_balance() ?? 0;
                 if ($chk_bal < $debited_amount) {
@@ -776,7 +773,7 @@ class TransactionController extends Controller
                 }
 
 
-             
+
 
 
 
@@ -925,7 +922,7 @@ class TransactionController extends Controller
                         $trasnaction->balance = $balance;
                         $trasnaction->status = 0;
                         $trasnaction->save();
-                            
+
                         //Transfers
                         $trasnaction = new Transfer();
                         $trasnaction->user_id = Auth::id();
@@ -3331,8 +3328,8 @@ class TransactionController extends Controller
                 ->first()->amount;
 
             }
-            
-        
+
+
             $status = 200;
             if ($status == 200) {
 
@@ -4071,7 +4068,7 @@ class TransactionController extends Controller
 
                 if ($TransactionType == 'CashOut') {
 
-                    
+
 
                     $under_id = User::where('id', $user_id)->first()->register_under_id ?? null;
 
@@ -4958,7 +4955,11 @@ class TransactionController extends Controller
             }
 
 
+
             $trx = Transaction::where('ref_trans_id', $ref_no)->first();
+            $rrn = Transaction::where('ref_trans_id', $ref_no)->first()->e_ref ?? null;
+            $card_pan =Transaction::where('ref_trans_id', $ref_no)->first()->sender_account_no ?? null;
+
 
             if ($trx->status == 0) {
 
@@ -5045,7 +5046,6 @@ class TransactionController extends Controller
 
                     return response()->json([
 
-                        'status' => true,
                         'e_ref' => $trx->p_sessionId,
                         'amount' => $trx->amount,
                         'receiver_bank' => $trx->receiver_bank,
@@ -5074,7 +5074,6 @@ class TransactionController extends Controller
 
             return response()->json([
 
-                'status' => true,
                 'e_ref' => $trx->p_sessionId,
                 'amount' => $trx->amount,
                 'receiver_bank' => $trx->receiver_bank,
@@ -5082,8 +5081,11 @@ class TransactionController extends Controller
                 'receiver_account_no' => $trx->receiver_account_no,
                 'date' => $trx->created_at,
                 'note' => "$trx->ref_trans_id | $trx->note",
+                'rrn' => $rrn,
+                'card_pan' => $card_pan,
                 'status' => $trx->status,
-                'message' => "If receiver is not credited within 10mins, Please contact us with the EREF ",
+                'response_code' => $trx->status,
+                'message' => "If receiver is not credited within 10mins, Please contact us with the EREF",
 
 
             ], 200);
@@ -5721,7 +5723,7 @@ class TransactionController extends Controller
             $databody = array(
                 'email' => $request->email
             );
-    
+
             $site_url1 = $url2."/e-check";
             $post_data = json_encode($databody);
             $curl = curl_init();
@@ -5739,7 +5741,7 @@ class TransactionController extends Controller
                     'Content-Type: application/json',
                 ),
             ));
-    
+
             $var = curl_exec($curl);
             curl_close($curl);
             $var = json_decode($var);
@@ -5752,7 +5754,7 @@ class TransactionController extends Controller
                 $databody = array(
                     'email' => $request->email
                 );
-        
+
                 $site_url3 = $url3."/e-check";
                 $post_data = json_encode($databody);
                 $curl = curl_init();
@@ -5770,7 +5772,7 @@ class TransactionController extends Controller
                         'Content-Type: application/json',
                     ),
                 ));
-        
+
                 $var = curl_exec($curl);
                 curl_close($curl);
                 $var2 = json_decode($var);
@@ -5778,7 +5780,7 @@ class TransactionController extends Controller
 
 
 
-    
+
 
                     $url4 = ApiService::where('id', 4)->first()->url;
                     $data4 = ApiService::select('id', 'service_name')->where('id', 4)->get();
@@ -5786,7 +5788,7 @@ class TransactionController extends Controller
                     $databody = array(
                         'email' => $request->email
                     );
-            
+
                     $site_url3 = $url4."/e-check";
                     $post_data = json_encode($databody);
                     $curl = curl_init();
@@ -5804,7 +5806,7 @@ class TransactionController extends Controller
                             'Content-Type: application/json',
                         ),
                     ));
-            
+
                     $var = curl_exec($curl);
                     curl_close($curl);
                     $var = json_decode($var);
@@ -5847,14 +5849,14 @@ class TransactionController extends Controller
                     }
 
 
-              
+
 
 
                 return response()->json([
                     'status' => true,
                     'service' => $result,
                 ], 200);
-        
+
 
 
             if($status1  == false || $status2 == false || $status3 == false || $status4 == false){
@@ -5862,7 +5864,7 @@ class TransactionController extends Controller
                     'status' => false,
                     'message' => "No service found for email",
                 ], 500);
-    
+
             }
 
 
@@ -5886,7 +5888,7 @@ class TransactionController extends Controller
 
 
         }
-       
+
         $id = $request->id;
 
         $url = ApiService::where('id', $id)->first()->url;
