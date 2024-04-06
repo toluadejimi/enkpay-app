@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Transaction;
 
+use App\Models\Beneficiary;
 use App\Models\PosLog;
 use DB;
 use Mail;
@@ -132,12 +133,39 @@ class TransactionController extends Controller
                 $receiver_name = $request->customer_name;
                 $get_description = $request->narration;
                 $pin = $request->pin;
+                $beneficiary = $request->beneficiary;
+
+
+                //Beneficiary
+                if($beneficiary == true){
+
+                    $ck = Beneficiary::where([
+                        'bank_code' => $destinationBankCode,
+                        'acct_no' => $destinationAccountNumber,
+                        'user_id' => Auth::id(),
+                    ]);
+
+                    if($ck != null){
+                        $ben = new Beneficiary();
+                        $ben->name = $destinationAccountName;
+                        $ben->bank_code = $destinationBankCode;
+                        $ben->acct_no = $destinationAccountNumber;
+                        $ben->user_id = Auth::id();
+                        $ben->save();
+                    }
+
+                }
+
+                //dd("hello");
 
                 $referenceCode = trx();
 
                 $transfer_charges = Charge::where('title', 'transfer_fee')->first()->amount;
                 $bank_name = VfdBank::select('bankName')->where('code', $destinationBankCode)->first()->bankName ?? null;
                 $amoutCharges = $amount + $transfer_charges;
+
+
+
 
 
 
@@ -416,7 +444,9 @@ class TransactionController extends Controller
                         $trasnaction->receiver_account_no = $destinationAccountNumber;
                         $trasnaction->receiver_bank = $bank_name;
                         $trasnaction->balance = $balance;
-                        $trasnaction->status = 0;
+                        $trasnaction->status = 1;
+                        $trasnaction->longitude = $longitude;
+                        $trasnaction->latitude = $latitude;
                         $trasnaction->save();
 
 
@@ -566,6 +596,30 @@ class TransactionController extends Controller
                 $receiver_name = $request->customer_name;
                 $get_description = $request->narration;
                 $pin = $request->pin;
+                $beneficiary = $request->beneficiary;
+
+
+
+                //Beneficiary
+                if($beneficiary == true){
+
+                    $ck = Beneficiary::where([
+                        'bank_code' => $destinationBankCode,
+                        'acct_no' => $destinationAccountNumber,
+                        'user_id' => Auth::id(),
+                    ]) ?? null;
+
+                    if($ck != null){
+                        $ben = new Beneficiary();
+                        $ben->name = $destinationAccountName;
+                        $ben->bank_code = $destinationBankCode;
+                        $ben->acct_no = $destinationAccountNumber;
+                        $ben->user_id = Auth::id();
+                        $ben->save();
+                    }
+
+                }
+
 
                 $referenceCode = trx();
 
@@ -939,7 +993,9 @@ class TransactionController extends Controller
                         $trasnaction->receiver_account_no = $destinationAccountNumber;
                         $trasnaction->receiver_bank = $bank_name;
                         $trasnaction->balance = $balance;
-                        $trasnaction->status = 0;
+                        $trasnaction->status = 1;
+                        $trasnaction->longitude = $longitude;
+                        $trasnaction->latitude = $latitude;
                         $trasnaction->save();
 
 
@@ -3330,6 +3386,11 @@ class TransactionController extends Controller
             }
 
 
+            $bens = Beneficiary::select('id','name', 'bank_code', 'acct_no')->where('user_id', Auth::id())->get() ?? [];
+
+
+
+
             $status = 200;
             if ($status == 200) {
 
@@ -3339,6 +3400,8 @@ class TransactionController extends Controller
                     'account' => $account,
                     'transfer_charge' => $transfer_charge,
                     'banks' => $banks,
+                    'beneficariy' => $bens,
+
 
                 ], 200);
             }

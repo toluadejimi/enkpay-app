@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Beneficiary;
 use App\Models\Contact;
 use App\Models\DeletedUser;
 use App\Models\ErrandKey;
+use App\Models\Feature;
+use App\Models\Setting;
 use App\Models\User;
 use App\Models\Verification;
 use Illuminate\Http\Request;
@@ -22,6 +25,50 @@ class ProfileController extends Controller
 
     public $success = true;
     public $failed = false;
+
+
+
+    public function get_beneficary()
+    {
+
+        $bens = Beneficiary::select('id','name', 'bank_code', 'acct_no')->where('user_id', Auth::id())->get() ?? [];
+
+        return response()->json([
+            'status' => $this->success,
+            'data' => $bens,
+            ], 200);
+
+    }
+
+    public function update_beneficary(request $request)
+    {
+        Beneficiary::where('id', $request->id)->update([
+            'name'=> $request->customer_name,
+            'bank_code'=> $request->code,
+            'acct_no'=> $request->account_number,
+        ]);
+
+        return response()->json([
+            'status' => $this->success,
+            'message' => "Beneficiary Updated Successfully",
+        ], 200);
+
+    }
+
+
+    public function delete_beneficary(request $request)
+    {
+        Beneficiary::where('id', $request->id)->delete();
+
+        return response()->json([
+            'status' => $this->success,
+            'message' => "Beneficiary Deleted Successfully",
+        ], 200);
+
+    }
+
+
+
 
     public function contact()
     {
@@ -41,26 +88,57 @@ class ProfileController extends Controller
     }
 
 
+    public function add_beneficiary(request $request)
+    {
+
+        if (Auth::user()->status == 7) {
+
+
+            return response()->json([
+
+                'status' => $this->failed,
+                'message' => 'You can not make transfer at the moment, Please contact support',
+
+            ], 500);
+        }
+
+
+        $pos_trx = Feature::where('id', 1)->first()->pos_transfer ?? null;
+        if ($pos_trx == 0) {
+
+            return response()->json([
+                'status' => $this->failed,
+                'message' => "Transfer is not available at the moment, \n\n Please try again after some time",
+            ], 500);
+        }
+
+        $set = Setting::where('id', 1)->first();
+
+
+
+    }
+
+
+
 
 
 
 
     public function reset_pin(request $request)
     {
-
         $email = $request->email;
-
-
         return view('reset-pin', compact('email'));
     }
 
 
+
+
+
+
+
     public function reset_password(request $request)
     {
-
         $email = $request->email;
-
-
         return view('reset-password', compact('email'));
     }
 
