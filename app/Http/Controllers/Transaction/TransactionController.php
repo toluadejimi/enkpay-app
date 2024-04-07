@@ -1085,7 +1085,6 @@ class TransactionController extends Controller
                                 'user_id' => Auth::id(),
                             ])->first() ?? null;
 
-                            dd($ck);
 
                             if($ck == null){
                                 $ben = new Beneficiary();
