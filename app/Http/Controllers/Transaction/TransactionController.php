@@ -1083,7 +1083,7 @@ class TransactionController extends Controller
                                 'bank_code' => $destinationBankCode,
                                 'acct_no' => $destinationAccountNumber,
                                 'user_id' => Auth::id(),
-                            ]) ?? null;
+                            ])->first() ?? null;
 
                             dd($ck);
 
