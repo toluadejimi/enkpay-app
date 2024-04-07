@@ -36,6 +36,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('eod', [EnkpayposController::class, 'eod_transactions']);
 
 
+
 Route::post('manual-create-virtual-account', [VirtualaccountController::class, 'manual_api_account']);
 
 
@@ -182,6 +183,7 @@ Route::group(['middleware' => ['auth:api', 'acess']], function () {
     Route::post('update-bank-info', [ProfileController::class, 'update_bank_info']);
     Route::post('verify-identity', [ProfileController::class, 'verify_identity']);
     Route::post('upload-identity', [ProfileController::class, 'upload_identity']);
+    Route::any('transaction-history', [TransactionController::class, 'transaction_history']);
 
 
 //Virtual Card
