@@ -136,25 +136,6 @@ class TransactionController extends Controller
                 $beneficiary = $request->beneficiary;
 
 
-                //Beneficiary
-                if($beneficiary == true){
-
-                    $ck = Beneficiary::where([
-                        'bank_code' => $destinationBankCode,
-                        'acct_no' => $destinationAccountNumber,
-                        'user_id' => Auth::id(),
-                    ]);
-
-                    if($ck == null){
-                        $ben = new Beneficiary();
-                        $ben->name = $destinationAccountName;
-                        $ben->bank_code = $destinationBankCode;
-                        $ben->acct_no = $destinationAccountNumber;
-                        $ben->user_id = Auth::id();
-                        $ben->save();
-                    }
-
-                }
 
                 //dd("hello");
 
@@ -458,6 +439,26 @@ class TransactionController extends Controller
                         $email->save();
 
 
+                        //Beneficiary
+                        if($beneficiary == true){
+
+                            $ck = Beneficiary::where([
+                                'bank_code' => $destinationBankCode,
+                                'acct_no' => $destinationAccountNumber,
+                                'user_id' => Auth::id(),
+                            ]) ?? null;
+
+                            if($ck == null){
+                                $ben = new Beneficiary();
+                                $ben->name = $destinationAccountName;
+                                $ben->bank_code = $destinationBankCode;
+                                $ben->acct_no = $destinationAccountNumber;
+                                $ben->user_id = Auth::id();
+                                $ben->save();
+                            }
+
+                        }
+
 
 
                         $wallet = Auth::user()->main_wallet;
@@ -599,27 +600,6 @@ class TransactionController extends Controller
                 $beneficiary = $request->beneficiary;
 
 
-
-                //Beneficiary
-                if($beneficiary == true){
-
-
-                    $ck = Beneficiary::where([
-                        'bank_code' => $destinationBankCode,
-                        'acct_no' => $destinationAccountNumber,
-                        'user_id' => Auth::id(),
-                    ]) ?? null;
-
-                    if($ck == null){
-                        $ben = new Beneficiary();
-                        $ben->name = $destinationAccountName;
-                        $ben->bank_code = $destinationBankCode;
-                        $ben->acct_no = $destinationAccountNumber;
-                        $ben->user_id = Auth::id();
-                        $ben->save();
-                    }
-
-                }
 
 
                 $referenceCode = trx();
@@ -1094,6 +1074,27 @@ class TransactionController extends Controller
                         $email->amount = $amount;
                         $email->first_name = $first_name;
                         $email->save();
+
+
+                        //Beneficiary
+                        if($beneficiary == true){
+
+                            $ck = Beneficiary::where([
+                                'bank_code' => $destinationBankCode,
+                                'acct_no' => $destinationAccountNumber,
+                                'user_id' => Auth::id(),
+                            ]) ?? null;
+
+                            if($ck == null){
+                                $ben = new Beneficiary();
+                                $ben->name = $destinationAccountName;
+                                $ben->bank_code = $destinationBankCode;
+                                $ben->acct_no = $destinationAccountNumber;
+                                $ben->user_id = Auth::id();
+                                $ben->save();
+                            }
+
+                        }
 
 
                         $wallet = Auth::user()->main_wallet - $amount;
