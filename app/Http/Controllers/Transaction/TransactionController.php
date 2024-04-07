@@ -145,7 +145,7 @@ class TransactionController extends Controller
                         'user_id' => Auth::id(),
                     ]);
 
-                    if($ck != null){
+                    if($ck == null){
                         $ben = new Beneficiary();
                         $ben->name = $destinationAccountName;
                         $ben->bank_code = $destinationBankCode;
@@ -603,13 +603,14 @@ class TransactionController extends Controller
                 //Beneficiary
                 if($beneficiary == true){
 
+
                     $ck = Beneficiary::where([
                         'bank_code' => $destinationBankCode,
                         'acct_no' => $destinationAccountNumber,
                         'user_id' => Auth::id(),
                     ]) ?? null;
 
-                    if($ck != null){
+                    if($ck == null){
                         $ben = new Beneficiary();
                         $ben->name = $destinationAccountName;
                         $ben->bank_code = $destinationBankCode;
@@ -6106,19 +6107,6 @@ class TransactionController extends Controller
                     'message' => $var->message,
                 ], 200);
             }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
