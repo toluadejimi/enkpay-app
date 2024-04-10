@@ -6126,6 +6126,16 @@ class TransactionController extends Controller
 
             }
 
+            else{
+                return response()->json([
+
+                    'status' => $this->success,
+                    'data' => $transactions,
+
+                ], 200);
+
+            }
+
         }
     }
 
