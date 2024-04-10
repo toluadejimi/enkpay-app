@@ -85,8 +85,6 @@ Route::post('v1/wallet-check', [TransactionController::class, 'balance_webhook']
 Route::post('v1/transfer-request', [TransactionController::class, 'transfer_request']);
 
 Route::post('v1/merchant-details', [ProfileController::class, 'view_agent_account']);
-Route::any('delete-beneficiary', [ProfileController::class, 'delete_beneficary']);
-Route::any('update-beneficiary', [ProfileController::class, 'update_beneficary']);
 
 
 
@@ -171,6 +169,8 @@ Route::group(['middleware' => ['auth:api', 'acess']], function () {
     Route::any('get-beneficiary', [ProfileController::class, 'get_beneficary']);
 
 
+    Route::any('update-beneficiary', [ProfileController::class, 'update_beneficary']);
+    Route::any('delete-beneficiary', [ProfileController::class, 'delete_beneficary']);
 
     //Profile
     Route::get('user-info', [ProfileController::class, 'user_info']);
