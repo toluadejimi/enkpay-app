@@ -44,8 +44,6 @@ class ProfileController extends Controller
     {
         Beneficiary::where('id', $request->id)->update([
             'name'=> $request->customer_name,
-            'bank_code'=> $request->code,
-            'acct_no'=> $request->account_number,
         ]);
 
         return response()->json([
