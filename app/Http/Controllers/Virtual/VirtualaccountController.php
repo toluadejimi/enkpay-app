@@ -241,7 +241,7 @@ class VirtualaccountController extends Controller
                 return response()->json([
 
                     'status' => $this->failed,
-                    'message' => 'Error please try again after some time',
+                    'data' => $var
 
                 ], 500);
             }
@@ -307,7 +307,6 @@ class VirtualaccountController extends Controller
         try {
 
             $header = $request->header('errand-pay-header');
-
             $StatusCode = $request->StatusCode;
             $StatusDescription = $request->StatusDescription;
             $VirtualCustomerAccount = $request->VirtualCustomerAccount;
