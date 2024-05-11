@@ -201,7 +201,8 @@ if (!function_exists('tid_config')) {
         $tm = TidConfig::select('ip', 'port', 'ssl', 'compKey1', 'compKey2', 'baseUrl', 'logoUrl')->where('user_id', Auth::id())->first() ?? null;
         if ($tm != null) {
             return $tm;
-        }return [];
+        }
+        return $tm;
     }
 }
 

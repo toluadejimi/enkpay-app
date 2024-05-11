@@ -129,11 +129,6 @@ class ProfileController extends Controller
     }
 
 
-
-
-
-
-
     public function reset_password(request $request)
     {
         $email = $request->email;
