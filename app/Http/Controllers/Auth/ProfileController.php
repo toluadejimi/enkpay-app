@@ -27,7 +27,6 @@ class ProfileController extends Controller
     public $failed = false;
 
 
-
     public function get_beneficary()
     {
 
