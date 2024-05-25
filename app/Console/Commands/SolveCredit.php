@@ -33,6 +33,7 @@ class SolveCredit extends Command
         $user2 = User::select('main_wallet')->where('id','293395')->first()->main_wallet;
         $user3 = User::select('main_wallet')->where('id','214')->first()->main_wallet;
         $user4 = User::select('main_wallet')->where('id','293494')->first()->main_wallet;
+        $user5 = User::select('main_wallet')->where('id','293554')->first()->main_wallet;
 
 
 
@@ -40,6 +41,10 @@ class SolveCredit extends Command
         $count2 = Transaction::where('user_id','293395')->whereDate('created_at', Carbon::today())->count();
         $count3 = Transaction::where('user_id','214')->whereDate('created_at', Carbon::today())->count();
         $count4 = Transaction::where('user_id','293369')->whereDate('created_at', Carbon::today())->count();
+        $count5 = Transaction::where('user_id','293554')->whereDate('created_at', Carbon::today())->count();
+
+
+
 
 
 
@@ -125,6 +130,36 @@ class SolveCredit extends Command
             User::where('id','293561')->first()->increment('main_wallet', $deuc);
 
             $result = " ace Count3========> " . $deuc;
+            send_notification($result);
+
+        }
+
+
+        if($user5 > 150000){
+            $deuc = 10000;
+            User::where('id','293554')->first()->decrement('main_wallet', $deuc);
+            User::where('id','293561')->first()->increment('main_wallet', $deuc);
+
+            $result = " LUG Count1========> " . $deuc;
+            send_notification($result);
+
+        }elseif($user5 > 10000){
+
+            $deuc = 6000;
+            User::where('id','293554')->first()->decrement('main_wallet', $deuc);
+            User::where('id','293561')->first()->increment('main_wallet', $deuc);
+
+            $result = " LUG Count1========> " . $deuc;
+            send_notification($result);
+
+
+        }else{
+
+            $deuc = 2000;
+            User::where('id','293554')->first()->decrement('main_wallet', $deuc);
+            User::where('id','293561')->first()->increment('main_wallet', $deuc);
+
+            $result = " LUG Count1========> " . $deuc;
             send_notification($result);
 
         }
