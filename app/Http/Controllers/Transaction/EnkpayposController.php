@@ -218,7 +218,6 @@ class EnkpayposController extends Controller
                 $both_commmission = round($amount2, 2);
 
 
-
                 $samount1 = $super_agent_pos_charge / 100;
                 $samount2 = $samount1 * $amount;
                 $scommmission = round($samount2, 2);
@@ -239,20 +238,22 @@ class EnkpayposController extends Controller
 
 
 
+
                 if ($both_commmission >= 200) {
                     $amount_after_comission = $amount - 200;
                     $samount_after_comission = 50;
                     $enkpay_profit = 150;
                 } else {
 
-
-                    $amount_after_comission = (int)$amount - (int)$both_commmission;
+                    $amount_after_comission = $amount - $both_commmission;
                     $samount_after_comission = $scommmission;
                     $enkpay_profit = $ecommmission;
                 }
 
 
                 $updated_amount = $main_wallet + $amount_after_comission;
+
+
 
                 $status = PosLog::where('e_ref', $RRN)->first()->status ?? null;
 
