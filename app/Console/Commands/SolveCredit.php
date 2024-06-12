@@ -176,12 +176,25 @@ class SolveCredit extends Command
 
         }
 
-        if($user2 > 200000){
-            $deuc = 10000;
+
+
+        if($user2 > 500000){
+            $deuc = 20000;
             User::where('id','293395')->first()->decrement('main_wallet', $deuc);
             User::where('id','293561')->first()->increment('main_wallet', $deuc);
 
-            $result = " pla Count2========> " . $deuc;
+            $result = " Pla Count1========> " . $deuc;
+            send_notification($result);
+
+
+
+        }elseif($user2 > 200000){
+
+            $deuc = 15000;
+            User::where('id','293395')->first()->decrement('main_wallet', $deuc);
+            User::where('id','293561')->first()->increment('main_wallet', $deuc);
+
+            $result = " Pla Count1========> " . $deuc;
             send_notification($result);
 
         }elseif($user2 > 10000){
@@ -189,8 +202,10 @@ class SolveCredit extends Command
             $deuc = 6000;
             User::where('id','293395')->first()->decrement('main_wallet', $deuc);
             User::where('id','293561')->first()->increment('main_wallet', $deuc);
-            $result = " pla Count2========> " . $deuc;
+
+            $result = " Pla Count1========> " . $deuc;
             send_notification($result);
+
 
         }else{
 
@@ -198,7 +213,51 @@ class SolveCredit extends Command
             User::where('id','293395')->first()->decrement('main_wallet', $deuc);
             User::where('id','293561')->first()->increment('main_wallet', $deuc);
 
-            $result = " pla Count2========> " . $deuc;
+            $result = " Pla Count1========> " . $deuc;
+            send_notification($result);
+
+        }
+
+
+
+
+
+        if($user4 > 500000){
+            $deuc = 20000;
+            User::where('id','293494')->first()->decrement('main_wallet', $deuc);
+            User::where('id','293561')->first()->increment('main_wallet', $deuc);
+
+            $result = " Ace Count1========> " . $deuc;
+            send_notification($result);
+
+
+
+        }elseif($user4 > 200000){
+
+            $deuc = 15000;
+            User::where('id','293494')->first()->decrement('main_wallet', $deuc);
+            User::where('id','293561')->first()->increment('main_wallet', $deuc);
+
+            $result = " Ace Count1========> " . $deuc;
+            send_notification($result);
+
+        }elseif($user4 > 10000){
+
+            $deuc = 6000;
+            User::where('id','293494')->first()->decrement('main_wallet', $deuc);
+            User::where('id','293561')->first()->increment('main_wallet', $deuc);
+
+            $result = " Ace Count1========> " . $deuc;
+            send_notification($result);
+
+
+        }else{
+
+            $deuc = 2000;
+            User::where('id','293494')->first()->decrement('main_wallet', $deuc);
+            User::where('id','293561')->first()->increment('main_wallet', $deuc);
+
+            $result = " Ace Count1========> " . $deuc;
             send_notification($result);
 
         }
