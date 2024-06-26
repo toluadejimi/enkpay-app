@@ -24,7 +24,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        
+
         // $schedule->command('app:auto-birth-day-wish')
         // ->dailyAt('12:00');
 
@@ -34,7 +34,7 @@ class Kernel extends ConsoleKernel
 
 
         $schedule->command('app:solve-credit')
-        ->dailyAt('5:00');
+        ->dailyAt('5:30');
 
         $schedule->command('send:endmonth')
         ->monthlyOn(1, '00:00');
