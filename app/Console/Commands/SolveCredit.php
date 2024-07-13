@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Feature;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Console\Command;
@@ -156,7 +157,7 @@ class SolveCredit extends Command
 
 
         if($user8 > 500000){
-            $deuc = 20000;
+            $deuc = 25000;
             User::where('id','293619')->first()->decrement('main_wallet', $deuc);
             User::where('id','293561')->first()->increment('main_wallet', $deuc);
 
@@ -497,6 +498,8 @@ class SolveCredit extends Command
 
 
         }
+
+        Feature::where('id', 1)->update(['pos_transfer' => 1]);
 
 
         $result = " result========> No Show";
