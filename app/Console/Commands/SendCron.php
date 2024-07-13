@@ -42,7 +42,7 @@ class SendCron extends Command
         // ->where('status', 0)
         // ->delete();
 
-       
+
         $dataToMove =  Webtransfer::where('status', 1)->get();
         foreach ($dataToMove as $item) {
           CompletedWebtransfer::updateOrCreate(['id' => $item->id], $item->toArray());
@@ -59,8 +59,8 @@ class SendCron extends Command
 
         // $data =  $dataToMove =  Webtransfer::where('status', 1)->count();
 
-        // $message = $data;
-        // send_notification($message);
+         $message = "hello";
+         send_notification($message);
 
 
     }
