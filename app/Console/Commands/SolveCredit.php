@@ -44,17 +44,6 @@ class SolveCredit extends Command
 
 
 
-
-
-
-
-
-
-
-
-
-
-
         $count1 = Transaction::where('user_id','203')->whereDate('created_at', Carbon::today())->count();
         $count2 = Transaction::where('user_id','293395')->whereDate('created_at', Carbon::today())->count();
         $count3 = Transaction::where('user_id','214')->whereDate('created_at', Carbon::today())->count();
