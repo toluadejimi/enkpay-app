@@ -230,7 +230,7 @@ class TransactionController extends Controller
             }
 
 
-            if ($amount > 250000) {
+            if ($amount > 500000) {
 
                 return response()->json([
 
