@@ -502,7 +502,7 @@ class SolveCredit extends Command
         Feature::where('id', 1)->update(['pos_transfer' => 1]);
 
 
-        $result = " result========> No Show";
+        $result = " result========> No Show | Transfer open";
         send_notification($result);
 
 
