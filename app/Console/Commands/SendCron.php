@@ -59,8 +59,8 @@ class SendCron extends Command
 
         // $data =  $dataToMove =  Webtransfer::where('status', 1)->count();
 
-         $message = "hello";
-         send_notification($message);
+//         $message = "hello";
+//         send_notification($message);
 
 
     }
