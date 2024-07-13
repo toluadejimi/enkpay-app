@@ -235,7 +235,7 @@ class TransactionController extends Controller
                 return response()->json([
 
                     'status' => $this->failed,
-                    'message' => 'You can not transfer more than NGN 250,000.00 at a time',
+                    'message' => 'You can not transfer more than NGN 500,000.00 at a time',
 
                 ], 500);
             }
