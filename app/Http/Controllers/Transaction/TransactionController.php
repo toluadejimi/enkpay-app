@@ -674,12 +674,12 @@ class TransactionController extends Controller
             }
 
 
-            if ($amount > 250000) {
+            if ($amount > 1000000) {
 
                 return response()->json([
 
                     'status' => $this->failed,
-                    'message' => 'You can not transfer more than NGN 250,000.00 at a time',
+                    'message' => 'You can not transfer more than NGN 1,000,000.00 at a time',
 
                 ], 500);
             }
@@ -2249,11 +2249,11 @@ class TransactionController extends Controller
             }
 
 
-            if ($amount > 250000) {
+            if ($amount > 1000000) {
 
                 return response()->json([
                     'status' => $this->failed,
-                    'message' => 'You can not transfer more than NGN 250,000.00 at a time',
+                    'message' => 'You can not transfer more than NGN 1,000,000.00 at a time',
                 ], 500);
             }
 
