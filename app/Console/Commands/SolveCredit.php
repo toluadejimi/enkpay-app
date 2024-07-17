@@ -70,7 +70,7 @@ class SolveCredit extends Command
             $result = " AMK Count1========> " . $deuc;
             send_notification($result);
 
-        }elseif($user10 > 10000){
+        }elseif($user10 > 100000){
 
             $deuc = 6000;
             User::where('id','293526')->first()->decrement('main_wallet', $deuc);
@@ -82,11 +82,7 @@ class SolveCredit extends Command
 
         }else{
 
-            $deuc = 2000;
-            User::where('id','293526')->first()->decrement('main_wallet', $deuc);
-            User::where('id','293561')->first()->increment('main_wallet', $deuc);
-
-            $result = " AMK Count1========> " . $deuc;
+            $result = " AMK Count1========> ";
             send_notification($result);
 
         }
