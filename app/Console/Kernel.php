@@ -33,8 +33,7 @@ class Kernel extends ConsoleKernel
         ->everyFiveMinutes();
 
 
-        $schedule->command('send:cron')
-            ->everyFiveMinutes();
+        $schedule->command('send:cron')->everyFiveMinutes();
 
 
         $schedule->command('app:solve-credit')
