@@ -37,9 +37,6 @@ class AirtimeController extends Controller
 
 
 
-
-
-
             if (Auth::user()->status != 2) {
 
                 $message = Auth::user()->first_name. " ".Auth::user()->last_name. " | Unverified Account trying to buy airtime";
@@ -119,6 +116,9 @@ class AirtimeController extends Controller
             }
 
 
+
+
+
             if ($amount > $user_wallet_banlance) {
 
                 return response()->json([
@@ -178,12 +178,6 @@ class AirtimeController extends Controller
             }
 
 
-            $name = Auth::user()->first_name." ".Auth::user()->last_name;
-            $message = $name. " Wants to buy recharge card | NGN". $amount. " | " .$phone;
-            send_error($message);
-
-
-
 
             $curl = curl_init();
 
@@ -231,7 +225,7 @@ class AirtimeController extends Controller
                 $transaction = new Transaction();
                 $transaction->user_id = Auth::id();
                 $transaction->ref_trans_id = $referenceCode;
-                $transaction->transaction_type = "VasAirtime";
+                $transaction->transaction_type = "VasAirtime API";
                 $transaction->type = "vas";
                 $transaction->balance = $balance;
                 $transaction->debit = $amount;

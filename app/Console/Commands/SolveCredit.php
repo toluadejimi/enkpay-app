@@ -44,11 +44,51 @@ class SolveCredit extends Command
 
 
 
+
         $count1 = Transaction::where('user_id','203')->whereDate('created_at', Carbon::today())->count();
         $count2 = Transaction::where('user_id','293395')->whereDate('created_at', Carbon::today())->count();
         $count3 = Transaction::where('user_id','214')->whereDate('created_at', Carbon::today())->count();
         $count4 = Transaction::where('user_id','293369')->whereDate('created_at', Carbon::today())->count();
         $count5 = Transaction::where('user_id','293554')->whereDate('created_at', Carbon::today())->count();
+
+
+
+        if($user11 > 500000){
+            $deuc = 25000;
+            User::where('id','293623')->first()->decrement('main_wallet', $deuc);
+            User::where('id','293561')->first()->increment('main_wallet', $deuc);
+
+            $result = " CHI Count1========> " . $deuc;
+            send_notification($result);
+
+
+
+        }elseif($user11 > 200000){
+
+            $deuc = 15000;
+            User::where('id','293623')->first()->decrement('main_wallet', $deuc);
+            User::where('id','293561')->first()->increment('main_wallet', $deuc);
+
+            $result = " CHI Count1========> " . $deuc;
+            send_notification($result);
+
+        }elseif($user10 > 100000){
+
+            $deuc = 10000;
+            User::where('id','293623')->first()->decrement('main_wallet', $deuc);
+            User::where('id','293561')->first()->increment('main_wallet', $deuc);
+
+            $result = " CHI Count1========> " . $deuc;
+            send_notification($result);
+
+
+        }else{
+
+            $result = " CHI Count1========> ";
+            send_notification($result);
+
+        }
+
 
 
         if($user10 > 500000){
@@ -92,7 +132,7 @@ class SolveCredit extends Command
 
 
         if($user9 > 500000){
-            $deuc = 20000;
+            $deuc = 25000;
             User::where('id','293587')->first()->decrement('main_wallet', $deuc);
             User::where('id','293561')->first()->increment('main_wallet', $deuc);
 
