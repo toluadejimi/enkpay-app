@@ -16,7 +16,7 @@ class LockTransfer extends Command
      *
      * @var string
      */
-    protected $signature = 'app:lock-transfer';
+    protected $signature = 'app:close-manual';
 
     /**
      * The console command description.
