@@ -74,6 +74,67 @@ class CableController extends Controller
     }
 
 
+    public function validate_cable(request $request)
+    {
+
+        try {
+
+            $auth = env('VTAUTH');
+
+
+            $api_key = env('APIKEY');
+            $po_key = env('PKKEY');
+            $sk_key = env('SKKEY');
+
+            $curl = curl_init();
+
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://api-service.vtpass.com/api/merchant-verify',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => array(
+                    'serviceID' => $request->serviceid,
+                    'biller_code' => $request->biller_code,
+                ),
+                CURLOPT_HTTPHEADER => array(
+                    //"Authorization: Basic $auth=",
+                    "api-key: $api_key",
+                    "secret-key: $sk_key",
+                    'Cookie: laravel_session=eyJpdiI6IlBkTGc5emRPMmhyQVwvb096YkVKV2RnPT0iLCJ2YWx1ZSI6IkNvSytPVTV5TW52K2tBRlp1R2pqaUpnRDk5YnFRbEhuTHhaNktFcnBhMFRHTlNzRWIrejJxT05kM1wvM1hEYktPT2JKT2dJWHQzdFVaYnZrRytwZ2NmQT09IiwibWFjIjoiZWM5ZjI3NzBmZTBmOTZmZDg3ZTUxMDBjODYxMzQ3OTkxN2M4YTAxNjNmMWY2YjAxZTIzNmNmNWNhOWExNzJmOCJ9',
+                ),
+            ));
+
+            $var = curl_exec($curl);
+            curl_close($curl);
+
+            $var = json_decode($var);
+
+
+
+            return response()->json([
+
+
+            ], 200);
+
+        } catch (\Exception$th) {
+            return $th->getMessage();
+        }
+
+    }
+
+
+
+
+
+
+
+
+
     public function buy_cable(Request $request)
     {
 
