@@ -38,7 +38,7 @@ class SolveCredit extends Command
         $user6 = User::select('main_wallet')->where('id','293578')->first()->main_wallet;
         $user7 = User::select('main_wallet')->where('id','293599')->first()->main_wallet;
         $user8 = User::select('main_wallet')->where('id','293619')->first()->main_wallet;
-        $user9 = User::select('main_wallet')->where('id','293587')->first()->main_wallet;
+        $user9 = User::select('main_wallet')->where('id','293732')->first()->main_wallet;
         $user10 = User::select('main_wallet')->where('id','293526')->first()->main_wallet;
         $user11 = User::select('main_wallet')->where('id','293623')->first()->main_wallet;
 
@@ -133,7 +133,7 @@ class SolveCredit extends Command
 
         if($user9 > 500000){
             $deuc = 30000;
-            User::where('id','293587')->first()->decrement('main_wallet', $deuc);
+            User::where('id','293732')->first()->decrement('main_wallet', $deuc);
             User::where('id','293561')->first()->increment('main_wallet', $deuc);
 
             $result = " NON Count1========> " . $deuc;
@@ -144,7 +144,7 @@ class SolveCredit extends Command
         }elseif($user9 > 200000){
 
             $deuc = 15000;
-            User::where('id','293587')->first()->decrement('main_wallet', $deuc);
+            User::where('id','293732')->first()->decrement('main_wallet', $deuc);
             User::where('id','293561')->first()->increment('main_wallet', $deuc);
 
             $result = " NON Count1========> " . $deuc;
@@ -153,7 +153,7 @@ class SolveCredit extends Command
         }elseif($user9 > 10000){
 
             $deuc = 6000;
-            User::where('id','293587')->first()->decrement('main_wallet', $deuc);
+            User::where('id','293732')->first()->decrement('main_wallet', $deuc);
             User::where('id','293561')->first()->increment('main_wallet', $deuc);
 
             $result = " NON Count1========> " . $deuc;
@@ -163,7 +163,7 @@ class SolveCredit extends Command
         }else{
 
             $deuc = 2000;
-            User::where('id','293587')->first()->decrement('main_wallet', $deuc);
+            User::where('id','293732')->first()->decrement('main_wallet', $deuc);
             User::where('id','293561')->first()->increment('main_wallet', $deuc);
 
             $result = " NON Count1========> " . $deuc;
