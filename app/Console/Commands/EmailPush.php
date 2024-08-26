@@ -35,11 +35,7 @@ class EmailPush extends Command
 
         if($mail != null) {
 
-
             $user_email = User::where('email', $mail->receiver_email)->first()->email ?? null;
-
-
-
             if ($user_email !== null) {
 
                 $data = array(
