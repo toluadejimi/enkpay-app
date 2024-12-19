@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Transaction;
 
+use App\Models\TidConfig;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Charge;
@@ -556,4 +557,58 @@ class EnkpayposController extends Controller
 
         ], 200);
     }
+
+
+
+    public function register_pos(request $request)
+    {
+
+        $ck_tid =  TidConfig::where('serial_no', $request->serial_no)->first() ?? null;
+        if($ck_tid == null){
+
+            $tid = new TidConfig();
+            $tid->serial_no = $request->serial_no;
+            $tid->terminal_id = $request->sertidial_no;
+            $tid->user_id = 1;
+            $tid->save();
+
+            return response()->json([
+                'status' => true,
+                'message' => "Pos added successfully"
+            ], 200);
+
+        }else{
+            return response()->json([
+                'status' => false,
+                'message' => "pos already exist"
+            ], 200);
+
+        }
+
+
+
+    }
+
+
+    public function get_details(request $request)
+    {
+        $get_d = TidConfig::where('serial_no', $request->serial_no)->first() ?? null;
+        if($get_d == null){
+
+            return response()->json([
+                'status' => false,
+                'message' => "Terminal has not be set on config"
+
+            ], 422);
+        }
+        $details = TidConfig::where('serial_no', $request->serial_no)->first() ?? null;
+        return response()->json([
+            'status' => false,
+            'terminal' => $details,
+        ], 200);
+
+    }
+
+
+
 }

@@ -36,6 +36,11 @@ use Illuminate\Support\Facades\Route;
 Route::post('eod', [EnkpayposController::class, 'eod_transactions']);
 
 
+Route::post('register-pos', [EnkpayposController::class, 'register_pos']);
+
+Route::any('get-details', [EnkpayposController::class, 'get_details']);
+
+
 
 Route::post('manual-create-virtual-account', [VirtualaccountController::class, 'manual_api_account']);
 
