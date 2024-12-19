@@ -592,7 +592,9 @@ class EnkpayposController extends Controller
 
     public function get_details(request $request)
     {
-        $get_d = TidConfig::where('serial_no', $request->serial_no)->first() ?? null;
+
+        $SerialNo = $request->header('serialnumber');
+        $get_d = TidConfig::where('serial_no', $SerialNo)->first() ?? null;
         if($get_d == null){
 
             return response()->json([
@@ -600,12 +602,15 @@ class EnkpayposController extends Controller
                 'message' => "Terminal has not be set on config"
 
             ], 422);
+        }else{
+
+            $details = TidConfig::where('serial_no', $SerialNo)->first()->makeHidden(['created_at', 'updated_at']) ?? null;
+            return response()->json([
+                'status' => true,
+                'terminal' => $details,
+            ], 200);
         }
-        $details = TidConfig::where('serial_no', $request->serial_no)->first() ?? null;
-        return response()->json([
-            'status' => false,
-            'terminal' => $details,
-        ], 200);
+
 
     }
 
