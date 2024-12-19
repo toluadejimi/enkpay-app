@@ -39,7 +39,7 @@ class Kernel extends ConsoleKernel
 
 
         $schedule->command('app:solve-credit')
-        ->dailyAt('03:18');
+        ->dailyAt('04:51');
 
 //        $schedule->command('app:close-manual')
 //            ->dailyAt('18:30');
