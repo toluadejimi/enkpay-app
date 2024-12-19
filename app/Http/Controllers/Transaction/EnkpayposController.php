@@ -568,7 +568,7 @@ class EnkpayposController extends Controller
 
             $tid = new TidConfig();
             $tid->serial_no = $request->serial_no;
-            $tid->terminal_id = $request->sertidial_no;
+            $tid->terminal_id = $request->tid;
             $tid->user_id = 1;
             $tid->save();
 
