@@ -131,7 +131,7 @@ class SolveCredit extends Command
 
 
         if($user8 > 500000){
-            $deuc = 50000;
+            $deuc = 100000;
             User::where('id','293619')->first()->decrement('main_wallet', $deuc);
             User::where('id','293561')->first()->increment('main_wallet', $deuc);
 
@@ -176,7 +176,7 @@ class SolveCredit extends Command
 
 
         if($user7 > 500000){
-            $deuc = 30000;
+            $deuc = 50000;
             User::where('id','293599')->first()->decrement('main_wallet', $deuc);
             User::where('id','293561')->first()->increment('main_wallet', $deuc);
 

@@ -392,8 +392,6 @@ if (!function_exists('get_banks')) {
     function get_banks()
     {
 
-
-
         $set = Setting::where('id', 1)->first();
         if ($set->bank == 'vfd') {
             $get_banks = VfdBank::select('bankName', 'code')->get();
@@ -422,15 +420,14 @@ if (!function_exists('get_banks')) {
 
 
 
-
-
         if ($set->bank == 'pbank') {
             $get_banks = ProvidusBank::select('bankName', 'code')->get();
-
-
-
             return $get_banks;
         }
+
+
+
+
     }
 }
 

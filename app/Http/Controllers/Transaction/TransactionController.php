@@ -122,7 +122,7 @@ class TransactionController extends Controller
             $longitude = $request->longitude;
             $latitude = $request->latitude;
             $receiver_name = $request->customer_name;
-            $get_description = $request->narration;
+            $get_description = $request->narration ?? $request->customer_name;
             $pin = $request->pin;
             $beneficiary = $request->beneficiary;
 
@@ -760,7 +760,7 @@ class TransactionController extends Controller
             $longitude = $request->longitude;
             $latitude = $request->latitude;
             $receiver_name = $request->customer_name;
-            $get_description = $request->narration;
+            $get_description = $request->narration ?? $request->customer_name;
             $pin = $request->pin;
             $beneficiary = $request->beneficiary;
 
