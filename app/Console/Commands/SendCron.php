@@ -65,12 +65,11 @@ class SendCron extends Command
 
                if ($status == 4) {
 
-                   $ref=$trx->ref_trans_id;
-                   $url = url('')."/success?trans_id=$ref&amount=$amount";
-                   return [
-                       'url' => $url,
-                       'code' => 4
-                   ];
+                   $message = "Transaction already funded";
+                   send_notification($message);
+
+                   return "Transaction already funded";
+
 
                }
 
@@ -86,6 +85,9 @@ class SendCron extends Command
 
                    $message = "No Transaction Found";
                    send_notification($message);
+
+                   return "No account found";
+
 
                }
 
@@ -161,6 +163,8 @@ class SendCron extends Command
 
                        $message = "Repush ====>  Funding of | $amount | successful | $user_email | on | $site_name" ;
                        send_notification($message);
+
+                       return "funded";
 
                    }
 
