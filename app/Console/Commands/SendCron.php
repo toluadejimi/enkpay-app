@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Transactioncheck;
 use App\Models\Transfertransaction;
+use App\Models\Webhook;
 use App\Models\Webkey;
 use Log;
 use Carbon\Carbon;
@@ -17,7 +18,6 @@ use App\Models\VirtualAccount;
 use Illuminate\Console\Command;
 use App\Models\PendingTransaction;
 use App\Models\CompletedWebtransfer;
-use Pusher\Webhook;
 
 class SendCron extends Command
 {
@@ -84,10 +84,8 @@ class SendCron extends Command
 
                if ($trx == null) {
 
-                   return response()->json([
-                       'status' => false,
-                       'message' => "Account Not found in our database",
-                   ]);
+                   $message = "No Transaction Found";
+                   send_notification($message);
 
                }
 
@@ -185,18 +183,18 @@ class SendCron extends Command
 
 
 
-
-        $dataToMove =  Webtransfer::where('status', 1)->get();
-        foreach ($dataToMove as $item) {
-          CompletedWebtransfer::updateOrCreate(['id' => $item->id], $item->toArray());
-        }
-
-         Webtransfer::where('status', 1)
-        ->delete();
-
-        $timefive = Carbon::now()->subMinutes(5);
-        VirtualAccount::where('state', 1)
-        ->update(['state' => 0]);
+//
+//        $dataToMove =  Webtransfer::where('status', 1)->get();
+//        foreach ($dataToMove as $item) {
+//          CompletedWebtransfer::updateOrCreate(['id' => $item->id], $item->toArray());
+//        }
+//
+//         Webtransfer::where('status', 1)
+//        ->delete();
+//
+//        $timefive = Carbon::now()->subMinutes(5);
+//        VirtualAccount::where('state', 1)
+//        ->update(['state' => 0]);
 
 
 
