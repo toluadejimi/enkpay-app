@@ -81,10 +81,8 @@ class SendCron extends Command
 
 
                if ($trx == null) {
-
                    //4 means no account created
                    Webhook::where('account_no', $acc_no)->update(['status' => 4]);
-
                    $message = "No Transaction Found | $acc_no";
                    send_notification($message);
 
@@ -163,7 +161,7 @@ class SendCron extends Command
                        $type = "epayment";
                        $fund = credit_user_wallet($url , $user_email, $amount, $order_id, $type, $session_id);
 
-                       $message = "Repush ====>  Funding of | $amount | successful | $user_email | on | $site_name" ;
+                       $message = "Repush ====>  Funding of | $amount | successful | $user_email | on | $site_name | $acc_no" ;
                        send_notification($message);
 
                        return "funded";
