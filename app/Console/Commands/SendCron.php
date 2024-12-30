@@ -74,7 +74,6 @@ class SendCron extends Command
                }
 
 
-
                $trx = Transfertransaction::where('account_no', $acc_no)
                    ->where([
                        'status' => 0
@@ -82,6 +81,9 @@ class SendCron extends Command
 
 
                if ($trx == null) {
+
+                   //4 means no account created
+                   Webhook::where('account_no', $acc_no)->update(['status' => 4]);
 
                    $message = "No Transaction Found | $acc_no";
                    send_notification($message);
