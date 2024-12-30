@@ -180,7 +180,8 @@ class SendCron extends Command
 
        }
 
-
+        $message = "Repush ====>  No trx to repush" ;
+        send_notification($message);
 
 
 
