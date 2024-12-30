@@ -83,7 +83,7 @@ class SendCron extends Command
 
                if ($trx == null) {
 
-                   $message = "No Transaction Found";
+                   $message = "No Transaction Found | $acc_no";
                    send_notification($message);
 
                    return "No account found";
