@@ -43,6 +43,47 @@ class SendCron extends Command
 
 
 
+        function send_notification2($message)
+        {
+
+            $boturl = env('BOTURL2');
+            $chat_id = env('BOTID');
+
+            $curl = curl_init();
+
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => $boturl,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => array(
+                    'chat_id' => $chat_id,
+                    'text' => $message,
+
+                ),
+                CURLOPT_HTTPHEADER => array(),
+            ));
+
+            $var = curl_exec($curl);
+            curl_close($curl);
+
+            $var = json_decode($var);
+        }
+
+
+
+
+        $message = Webhook::where('status', 0)->first()->account_no ?? null;
+        send_notification2($message);
+
+
+
+
+
 
 //       $trx_webhoook =  Webhook::where('status', 0)->first() ?? null;
 //       if($trx_webhoook != null){
