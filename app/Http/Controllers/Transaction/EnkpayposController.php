@@ -26,6 +26,9 @@ class EnkpayposController extends Controller
     public function enkpayPosLogs(request $request)
     {
 
+        $message2 = json_encode($request->all());
+        send_notification($message2);
+
 
         $key = $request->header('dataKey');
         $RRN = $request->RRN;
@@ -125,7 +128,7 @@ class EnkpayposController extends Controller
     public function enkpayPos(request $request)
     {
 
-        $message2 = $request->all();
+        $message2 = json_encode($request->all());
         send_notification($message2);
 
         $key = $request->header('dataKey');
