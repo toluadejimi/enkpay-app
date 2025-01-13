@@ -1472,3 +1472,62 @@ if (!function_exists('credit_user_wallet')) {
 
 }
 
+
+function woven_create($first_name, $last_name, $bvn, $nin)
+{
+
+
+    $key = env('WOVENKEY');
+    $databody = array(
+        "customer_reference" => $last_name . "_" . $first_name.random_int(0000, 9999),
+        "name" => $last_name . " " . $first_name,
+        "email" => Auth::user()->email,
+        "mobile_number" => Auth::user()->phone,
+        "bvn" => 22488666334,//22166141096,
+        "nin" => 45512527139,//98399716687,
+        "callback_url" => url('') . "/api/callback-woven",
+        "collection_bank" => "000017",
+    );
+
+    $post_data = json_encode($databody);
+    $curl = curl_init();
+
+
+    curl_setopt_array($curl, array(
+        CURLOPT_URL => 'https://api.woven.finance/v2/api/vnubans/create_customer',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'POST',
+        CURLOPT_POSTFIELDS => $post_data,
+        CURLOPT_HTTPHEADER => array(
+            'Content-Type: application/json',
+            "api_secret: $key"
+        ),
+    ));
+    $var = curl_exec($curl);
+    curl_close($curl);
+    $var = json_decode($var);
+
+
+    dd($var, $post_data);
+
+
+    $status = $var->message ?? null;
+
+
+    if ($status == "The process was completed successfully") {
+        $data['account_no'] = $var->data->vnuban;
+        $data['bank_name'] = "WEMA";
+        $data['account_name'] = "TEAMX";
+        return $data;
+    }
+
+
+
+
+}
+

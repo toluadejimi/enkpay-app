@@ -7,16 +7,13 @@ use App\Models\Charge;
 use App\Models\Terminal;
 use App\Models\Transaction;
 use App\Models\User;
-use App\Models\Validtransfer;
 use App\Models\VirtualAccount;
 use App\Models\Webkey;
 use App\Models\Webtransfer;
 use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use SebastianBergmann\Type\NullType;
 
 class VirtualaccountController extends Controller
 {
@@ -27,8 +24,6 @@ class VirtualaccountController extends Controller
     {
 
         try {
-
-
 
 
             $bvn = user_bvn() ?? null;
@@ -43,99 +38,54 @@ class VirtualaccountController extends Controller
             }
 
 
-
             $client = env('CLIENTID');
             $xauth = env('HASHKEY');
 
             $user_id = User::where('bvn', $bvn)->first()->id ?? null;
             $chk_p_account = VirtualAccount::where('user_id', $user_id)->where('v_bank_name', 'PROVIDUS BANK')->first() ?? null;
-            if (empty($chk_p_account) || $chk_p_account == null) {
 
-                if (Auth::user()->b_name == null) {
-                    $name = first_name() . " " . last_name();
-                } else {
-                    $name = Auth::user()->b_name;
-                }
+            $first_name = Auth::user()->first_name;
+            $last_name =  Auth::user()->last_name;
+            $bvn = Auth::user()->bvn;
+            $nin = Auth::user()->identification_number;
 
-                if (Auth::user()->b_phone == null) {
-                    $phone = Auth::user()->phone;
-                } else {
-                    $phone = Auth::user()->b_phone;
-                }
-
-                $curl = curl_init();
-                $data = array(
-                    "account_name" => $name,
-                    "bvn" => $bvn,
-                );
+            $account = woven_create($first_name, $last_name, $bvn, $nin);
 
 
+            if ($status == 00) {
 
-                $databody = json_encode($data);
-                curl_setopt_array($curl, array(
-                    CURLOPT_URL => 'https://vps.providusbank.com/vps/api/PiPCreateReservedAccountNumber',
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING => '',
-                    CURLOPT_MAXREDIRS => 10,
-                    CURLOPT_TIMEOUT => 0,
-                    CURLOPT_FOLLOWLOCATION => true,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST => 'POST',
-                    CURLOPT_POSTFIELDS => $databody,
-                    CURLOPT_HTTPHEADER => array(
-                        'Content-Type: application/json',
-                        'Accept: application/json',
-                        "Client-Id: $client",
-                        "X-Auth-Signature: $xauth",
-                    ),
-                ));
+                $create = new VirtualAccount();
+                $create->v_account_no = $p_acct_no;
+                $create->v_account_name = $p_acct_name;
+                $create->v_bank_name = $pbank;
+                $create->user_id = Auth::id();
+                $create->save();
 
-                $var = curl_exec($curl);
-                curl_close($curl);
-                $var = json_decode($var);
+                $message = "Providus Account Created | $name";
+                send_notification($message);
+
+                $get_user = User::find(Auth::id())->first();
+                return response()->json([
+
+                    'status' => $this->success,
+                    'message' => "Your account has been created successfully",
+                    'data' => $get_user,
+
+                ], 200);
+            } else {
 
 
-                $status = $var->responseCode ?? null;
-                $p_acct_no = $var->account_number ?? null;
-                $p_acct_name = $var->account_name ?? null;
-                $error = $var->responseMessage ?? null;
+                $error = "Vaccount Error | $error";
+                send_notification($error);
 
-                $pbank = "PROVIDUS BANK";
+                return response()->json([
 
-                if ($status == 00) {
+                    'status' => $this->failed,
+                    'message' => 'Error please try again after some time',
 
-                    $create = new VirtualAccount();
-                    $create->v_account_no = $p_acct_no;
-                    $create->v_account_name = $p_acct_name;
-                    $create->v_bank_name = $pbank;
-                    $create->user_id = Auth::id();
-                    $create->save();
-
-                    $message = "Providus Account Created | $name";
-                    send_notification($message);
-
-                    $get_user = User::find(Auth::id())->first();
-                    return response()->json([
-
-                        'status' => $this->success,
-                        'message' => "Your account has been created successfully",
-                        'data' => $get_user,
-
-                    ], 200);
-                } else {
-
-
-                    $error = "Vaccount Error | $error";
-                    send_notification($error);
-
-                    return response()->json([
-
-                        'status' => $this->failed,
-                        'message' => 'Error please try again after some time',
-
-                    ], 500);
-                }
+                ], 500);
             }
+
         } catch (\Exception $th) {
             return $th->getMessage();
         }
@@ -143,7 +93,6 @@ class VirtualaccountController extends Controller
 
     public function manual_api_account(request $request)
     {
-
 
 
         $bvn = $request->bvn;
@@ -163,7 +112,6 @@ class VirtualaccountController extends Controller
                 'message' => 'Please complete your verification before creating an account',
             ], 500);
         }
-
 
 
         $client = env('CLIENTID');
@@ -604,41 +552,6 @@ class VirtualaccountController extends Controller
         }
     }
 
-    // public function virtual_acct_history(Request $request)
-    // {
-
-    //     try {
-
-    //         $errand_key = errand_api_key();
-
-    //         $b_code = env('BCODE');
-
-    //         $acct_no = $request->acct_no;
-
-    //         $curl = curl_init();
-
-    //         curl_setopt_array($curl, array(
-    //             CURLOPT_URL => "https://api.errandpay.com/epagentservice/api/v1/GetSubAccountHistory?businessCode=$b_code&accountNumber=$acct_no&pageNumber=1&pageSize=50",
-    //             CURLOPT_RETURNTRANSFER => true,
-    //             CURLOPT_ENCODING => '',
-    //             CURLOPT_MAXREDIRS => 10,
-    //             CURLOPT_TIMEOUT => 0,
-    //             CURLOPT_FOLLOWLOCATION => true,
-    //             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-    //             CURLOPT_CUSTOMREQUEST => 'GET',
-    //             CURLOPT_HTTPHEADER => array(
-    //                 "Authorization: Bearer $errand_key",
-    //             ),
-    //         ));
-
-    //         $var = curl_exec($curl);
-
-    //         curl_close($curl);
-    //         $var = json_decode($var);
-    //     } catch (\Exception $th) {
-    //         return $th->getMessage();
-    //     }
-    // }
 
     //PROVIDUS VIRTUAL ACCOUNT
 
@@ -656,7 +569,6 @@ class VirtualaccountController extends Controller
 
         $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
         send_notification($result);
-
 
 
         $key = env('HASHKEY');
@@ -691,7 +603,6 @@ class VirtualaccountController extends Controller
             $sourceBankName = $request->sourceBankName;
             $channelId = $request->channelId;
             $tranDateTime = $request->tranDateTime;
-
 
 
             if ($sourceAccountName == 'null' || $sourceAccountName == "null" || $sourceAccountName == null) {
@@ -757,7 +668,6 @@ class VirtualaccountController extends Controller
                 send_notification($result);
 
 
-
                 return response()->json([
                     'requestSuccessful' => true,
                     'sessionId' => $sessionId,
@@ -813,19 +723,17 @@ class VirtualaccountController extends Controller
 
             if ($both_commmission > $p_cap) {
 
-                $removed_comm =  $p_cap;
+                $removed_comm = $p_cap;
             } else {
-                $removed_comm =  $both_commmission;
+                $removed_comm = $both_commmission;
             }
 
 
-
-
-                if (preg_match('/\/(\d+)$/', $tranRemarks, $matches)) {
+            if (preg_match('/\/(\d+)$/', $tranRemarks, $matches)) {
                 $session_id = $matches[1] ?? null;
-                }else{
-                    $session_id = $sessionId;
-                }
+            } else {
+                $session_id = $sessionId;
+            }
 
 
             $business_id = VirtualAccount::where('v_account_no', $accountNumber)->first()->business_id ?? null;
@@ -851,11 +759,11 @@ class VirtualaccountController extends Controller
                 ])->update(['status' => 1]) ?? null;
 
                 $web_trans_id = WebTransfer::where('v_account_no', $accountNumber)
-                ->where([
-                    'v_account_no' => $accountNumber,
-                    'payable_amount' => $transactionAmount,
-                    'status' => 1,])
-                ->first()->trans_id ?? null;
+                    ->where([
+                        'v_account_no' => $accountNumber,
+                        'payable_amount' => $transactionAmount,
+                        'status' => 1,])
+                    ->first()->trans_id ?? null;
 
 
                 VirtualAccount::where('v_account_no', $accountNumber)->where('state', 1)->update(['state' => 0]);
@@ -867,10 +775,9 @@ class VirtualaccountController extends Controller
                 }
 
 
-
                 if (preg_match('/\/(\d+)$/', $tranRemarks, $matches)) {
-                $session_id = $matches[1] ?? null;
-                }else{
+                    $session_id = $matches[1] ?? null;
+                } else {
                     $session_id = $sessionId;
                 }
 
@@ -912,7 +819,6 @@ class VirtualaccountController extends Controller
                     'responseCode' => "00",
                 ], 200);
             }
-
 
 
             if ($settledAmount > 9999) {
@@ -966,7 +872,6 @@ class VirtualaccountController extends Controller
             $acct_no = $request->acct_no;
 
 
-
             // Send to Andriod Phones
             if ($device_id != null) {
 
@@ -1017,7 +922,6 @@ class VirtualaccountController extends Controller
             }
 
 
-
             // Send to Iphones
             if ($device_id != null) {
 
@@ -1027,7 +931,7 @@ class VirtualaccountController extends Controller
 
                     "notification" => [
                         "title" => "Incoming Transfer",
-                        "body" =>  $from . "| sent | NGN" . number_format($transactionAmount),
+                        "body" => $from . "| sent | NGN" . number_format($transactionAmount),
                         "icon" => "ic_notification",
                         "click_action" => "OPEN_CHAT_ACTIVITY",
 
@@ -1066,8 +970,6 @@ class VirtualaccountController extends Controller
                 //dd($get_response, $dataString, $headers);
                 curl_close($ch);
             }
-
-
 
 
             //Send to Terminal
@@ -1168,40 +1070,3 @@ class VirtualaccountController extends Controller
     }
 }
 
-
-
-
-
-
-
-    // $sessionId = $request->sessionId;
-    // $accountNumber = $request->accountNumber;
-    // $tranRemarks = $request->tranRemarks;
-    // $settledAmount = $request->settledAmount;
-    // $transactionAmount = $request->transactionAmount;
-    // $feeAmount = $request->feeAmount;
-    // $TransactionTime = $request->TransactionTime;
-    // $initiationTranRef = $request->initiationTranRef;
-    // $settlementId = $request->settlementId;
-    // $sourceAccountNumber = $request->sourceAccountNumber;
-    // $PostingType = $request->PostingType;
-    // $TransactionReference = $request->TransactionReference;
-    // $sourceAccountName = $request->sourceAccountName;
-    // $sourceBankName = $request->sourceBankName;
-    // $channelId = $request->channelId;
-    // $tranDateTime = $request->tranDateTime;
-
-
-    // $parametersJson = json_encode($request->all());
-    // $headers = json_encode($request->headers->all());
-    // $message = 'Key not Authorized';
-    // $ip = $request->ip();
-
-    // $result = " Header========> " . $headers . "\n\n Body========> " . $parametersJson . "\n\n Message========> " . $message . "\n\nIP========> " . $ip;
-    // send_notification($result);
-
-
-
-    // } catch (\Exception $th) {
-    //     return $th->getMessage();
-    // }

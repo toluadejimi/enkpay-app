@@ -125,6 +125,8 @@ class EnkpayposController extends Controller
     public function enkpayPos(request $request)
     {
 
+        $message2 = $request->all();
+        send_notification($message2);
 
         $key = $request->header('dataKey');
         $RRN = $request->RRN;
