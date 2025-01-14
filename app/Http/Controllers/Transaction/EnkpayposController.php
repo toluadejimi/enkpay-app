@@ -129,12 +129,15 @@ class EnkpayposController extends Controller
     {
 
 
+        $message2 = "POS====>>>>". json_encode($request->all());
+        send_notification($message2);
+
         $key = $request->header('dataKey');
         $RRN = $request->RRN;
         $userID = $request->UserID;
         $serialNO = $request->serialNO;
         $STAN = $request->STAN;
-        $amount = $request->amount;
+        $tamount = $request->amount;
         $expireDate = $request->expireDate;
         $message = $request->responseMessage;
         $pan = $request->pan;
@@ -345,8 +348,6 @@ class EnkpayposController extends Controller
         }
 
 
-        dd($request->all());
-
         if ($main_wallet == null && $user_id == null) {
             return response()->json([
                 'status' => false,
@@ -356,7 +357,7 @@ class EnkpayposController extends Controller
 
         //Both Commission
         $amount1 = $comission / 100;
-        $amount2 = $amount1 * $amount;
+        $amount2 = $amount1 * $amount ?? $tamount;
         $both_commmission = number_format($amount2, 3);
 
 
@@ -368,17 +369,17 @@ class EnkpayposController extends Controller
 
         if ($both_commmission >= $agent_commission_cap && $type == 1) {
 
-            $removed_comission = $amount - $agent_commission_cap;
+            $removed_comission = $amount ?? $tamount - $agent_commission_cap;
 
             $enkpay_profit = $agent_commission_cap - 75;
         } elseif ($both_commmission >= $business_commission_cap && $type == 3) {
 
-            $removed_comission = $amount - $business_commission_cap;
+            $removed_comission = $amount ?? $tamount - $business_commission_cap;
 
             $enkpay_profit = $business_commission_cap - 75;
         } else {
 
-            $removed_comission = $amount - $both_commmission;
+            $removed_comission = $amount ?? $tamount - $both_commmission;
 
             $enkpay_profit = $both_commmission;
         }
@@ -396,16 +397,16 @@ class EnkpayposController extends Controller
                 ]);
 
 
+            $amttt = $amount ?? $tamount;
+
             PosLog::where('e_ref', $RRN)->update([
 
                 'status' => 1,
-                'note' => "Successful | $pan | $amount"
+                'note' => "Successful | $pan | $amttt "
 
             ]);
 
 
-            $message2 = json_encode($request->all());
-            send_notification($message2);
 
 
 
@@ -419,7 +420,7 @@ class EnkpayposController extends Controller
             $trasnaction->e_charges = $enkpay_profit;
             $trasnaction->title = "POS Transasction";
             $trasnaction->note = "ENKPAY POS | $cardName | $pan | $message";
-            $trasnaction->amount = $amount;
+            $trasnaction->amount = $amount ?? $tamount;
             $trasnaction->enkPay_Cashout_profit = round($enkpay_profit, 2);
             $trasnaction->balance = $updated_amount;
             $trasnaction->sender_name = $pan;
@@ -437,7 +438,7 @@ class EnkpayposController extends Controller
             $l_name = User::where('id', $user_id)->first()->last_name ?? null;
 
             $ip = $request->ip();
-            $amount4 = number_format($removed_comission, 2);
+            $amount4 = number_format($removed_comission ?? $tamount, 2);
             $result = $f_name . " " . $l_name . "| fund NGN " . $amount4 . " | using ENKPPAY POS" . "\n\nIP========> " . $ip;
             send_notification($result);
 
