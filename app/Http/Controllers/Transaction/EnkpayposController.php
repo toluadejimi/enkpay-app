@@ -262,8 +262,6 @@ class EnkpayposController extends Controller
 
                     $updated_amount = $main_wallet + $amount_after_comission;
 
-
-
                     $status = PosLog::where('e_ref', $RRN)->first()->status ?? null;
                     if ($status == 2) {
 
@@ -289,7 +287,7 @@ class EnkpayposController extends Controller
                     $trasnaction->credit = round($samount_after_comission, 2);
                     $trasnaction->title = "Commission";
                     $trasnaction->note = "ENKPAY POS | Commission";
-                    $trasnaction->amount = $samount_after_comission;
+                    $trasnaction->amount = $tamount;
                     $trasnaction->balance = $balance;
                     $trasnaction->serial_no = $terminalID;
                     $trasnaction->sender_account_no = $pan;
