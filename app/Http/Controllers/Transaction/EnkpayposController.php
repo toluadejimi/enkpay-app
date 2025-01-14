@@ -184,7 +184,6 @@ class EnkpayposController extends Controller
         }
 
 
-
         $trans_id = trx();
         $comission = Charge::where('title', 'both_commission')
             ->first()->amount;
@@ -200,6 +199,8 @@ class EnkpayposController extends Controller
 
         $businessID = Terminal::where('serial_no', $serialNO)->first()->business_id ?? null;
         $super_agent = User::where('business_id', $businessID)->first() ?? null;
+
+        dd($super_agent);
 
 
         if ($responseCode == 00 && $super_agent != null) {
