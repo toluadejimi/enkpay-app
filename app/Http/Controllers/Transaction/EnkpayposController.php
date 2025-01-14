@@ -202,7 +202,7 @@ class EnkpayposController extends Controller
         $super_agent = User::where('business_id', $businessID)->first() ?? null;
 
 
-        if ($responseCode == 00) {
+        if ($responseCode == 00 && $super_agent != null) {
             if ($super_agent != null) {
 
                 if ($main_wallet == null && $user_id == null) {
@@ -345,9 +345,7 @@ class EnkpayposController extends Controller
         }
 
 
-
         if ($main_wallet == null && $user_id == null) {
-
             return response()->json([
                 'status' => false,
                 'message' => 'Customer not registered on Enkpay',
