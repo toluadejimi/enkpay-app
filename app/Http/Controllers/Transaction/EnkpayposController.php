@@ -128,8 +128,6 @@ class EnkpayposController extends Controller
     public function enkpayPos(request $request)
     {
 
-        $message2 = json_encode($request->all());
-        send_notification($message2);
 
         $key = $request->header('dataKey');
         $RRN = $request->RRN;
@@ -208,7 +206,6 @@ class EnkpayposController extends Controller
             if ($super_agent != null) {
 
                 if ($main_wallet == null && $user_id == null) {
-
                     return response()->json([
                         'status' => false,
                         'message' => 'Customer not registered on Enkpay',
@@ -239,9 +236,6 @@ class EnkpayposController extends Controller
 
                 $agent_commission_cap = Charge::where('title', 'agent_cap')
                     ->first()->amount;
-
-
-
 
 
 
@@ -369,8 +363,6 @@ class EnkpayposController extends Controller
         $business_commission_cap = Charge::where('title', 'business_cap')
             ->first()->amount;
 
-
-
         $agent_commission_cap = Charge::where('title', 'agent_cap')
             ->first()->amount;
 
@@ -394,12 +386,6 @@ class EnkpayposController extends Controller
 
 
 
-
-
-
-
-
-
         if ($responseCode == 00) {
 
             $updated_amount = $main_wallet + $removed_comission;
@@ -416,6 +402,12 @@ class EnkpayposController extends Controller
                 'note' => "Successful | $pan | $amount"
 
             ]);
+
+
+            $message2 = json_encode($request->all());
+            send_notification($message2);
+
+
 
             //update Transactions
             $trasnaction = new Transaction();
@@ -435,6 +427,10 @@ class EnkpayposController extends Controller
             $trasnaction->sender_account_no = $pan;
             $trasnaction->status = 1;
             $trasnaction->save();
+
+
+
+
 
 
             $f_name = User::where('id', $user_id)->first()->first_name ?? null;
