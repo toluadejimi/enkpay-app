@@ -277,16 +277,13 @@ class EnkpayposController extends Controller
                     }
 
 
-                    dd($amount_after_comission);
-
-                    User::where('id', $user_id)
-                        ->update([
-                            'main_wallet' => $updated_amount,
-                        ]);
+                    dd($updated_amount, $amount_after_comission);
 
 
 
 
+
+                    User::where('id', $user_id)->increment('main_wallet', $amount_after_comission);
                     User::where('id', $super_agent->id)->increment('main_wallet', (int)$samount_after_comission);
                     $balance = User::where('id', $super_agent->id)->first()->main_wallet;
 
