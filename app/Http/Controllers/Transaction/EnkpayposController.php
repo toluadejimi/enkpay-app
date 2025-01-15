@@ -157,7 +157,6 @@ class EnkpayposController extends Controller
 
 
 
-
         if($amount ==  null){
 
 
@@ -199,6 +198,8 @@ class EnkpayposController extends Controller
             }
 
 
+
+
             $trans_id = trx();
             $comission = Charge::where('title', 'both_commission')
                 ->first()->amount;
@@ -209,6 +210,7 @@ class EnkpayposController extends Controller
             $type = User::where('id', $user_id)->first()->type ?? null;
             $businessID = Terminal::where('serial_no', $serialNO)->first()->business_id ?? null;
             $super_agent = User::where('business_id', $businessID)->first() ?? null;
+
 
 
             if ($responseCode == 00 && $super_agent != null) {
@@ -247,6 +249,10 @@ class EnkpayposController extends Controller
                         ->first()->amount;
 
 
+                    dd($super_agent_pos_charge);
+
+
+
 
                     if ($both_commmission >= 200) {
                         $amount_after_comission = $tamount - 200;
@@ -258,6 +264,8 @@ class EnkpayposController extends Controller
                         $samount_after_comission = $scommmission;
                         $enkpay_profit = $ecommmission;
                     }
+
+
 
 
                     $updated_amount = $main_wallet + $amount_after_comission;
