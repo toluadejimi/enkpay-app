@@ -263,6 +263,8 @@ class EnkpayposController extends Controller
 
 
 
+                    dd($both_commmission, $amount_after_comission);
+
 
 
                     $updated_amount = $main_wallet + $amount_after_comission;
@@ -277,7 +279,6 @@ class EnkpayposController extends Controller
                     }
 
 
-                    dd($updated_amount, $amount_after_comission);
 
 
 
