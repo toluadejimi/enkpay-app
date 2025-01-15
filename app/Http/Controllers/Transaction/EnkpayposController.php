@@ -263,7 +263,6 @@ class EnkpayposController extends Controller
 
 
 
-                    dd($both_commmission, $amount_after_comission);
 
 
 
@@ -277,9 +276,6 @@ class EnkpayposController extends Controller
                             'message' => 'Transaction already completed',
                         ], 500);
                     }
-
-
-
 
 
 
@@ -399,12 +395,7 @@ class EnkpayposController extends Controller
 
                 $updated_amount = $main_wallet + $removed_comission;
 
-                $main_wallet = User::where('id', $user_id)
-                    ->update([
-                        'main_wallet' => $updated_amount,
-                    ]);
-
-
+                User::where('id', $user_id)->increment('main_wallet', $removed_comission);
 
                 PosLog::where('e_ref', $RRN)->update([
 
