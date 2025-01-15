@@ -249,10 +249,6 @@ class EnkpayposController extends Controller
                         ->first()->amount;
 
 
-                    dd($super_agent_pos_charge);
-
-
-
 
                     if ($both_commmission >= 200) {
                         $amount_after_comission = $tamount - 200;
@@ -268,6 +264,7 @@ class EnkpayposController extends Controller
 
 
 
+
                     $updated_amount = $main_wallet + $amount_after_comission;
 
                     $status = PosLog::where('e_ref', $RRN)->first()->status ?? null;
@@ -279,10 +276,16 @@ class EnkpayposController extends Controller
                         ], 500);
                     }
 
+
+                    dd($samount_after_comission);
+
                     User::where('id', $user_id)
                         ->update([
                             'main_wallet' => $updated_amount,
                         ]);
+
+
+
 
                     User::where('id', $super_agent->id)->increment('main_wallet', (int)$samount_after_comission);
                     $balance = User::where('id', $super_agent->id)->first()->main_wallet;
