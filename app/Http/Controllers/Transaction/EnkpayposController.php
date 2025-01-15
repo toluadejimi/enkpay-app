@@ -277,7 +277,7 @@ class EnkpayposController extends Controller
                     }
 
 
-                    dd($samount_after_comission);
+                    dd($amount_after_comission);
 
                     User::where('id', $user_id)
                         ->update([
