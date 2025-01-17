@@ -33,6 +33,9 @@ return [
     |
      */
 
+
+
+
     'connections' => [
 
         'sqlite' => [
@@ -41,6 +44,31 @@ return [
             'database' => env('DB_DATABASE', database_path('database.sqlite')),
             'prefix' => '',
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
+        ],
+
+        'mysql_source' => [
+            'driver' => 'mysql',
+            'url' => env('DATABASE_URL'),
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '3306'),
+            'database' => env('DB_DATABASE', 'forge'),
+            'username' => env('DB_USERNAME', 'forge'),
+            'password' => env('DB_PASSWORD', ''),
+            'unix_socket' => env('DB_SOURCE_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+        ],
+
+        'mysql_dest' => [
+            'driver' => 'mysql',
+            'host' => env('DB_DEST_HOST', '209.74.80.245'),
+            'port' => env('DB_DEST_PORT', '3306'),
+            'database' => env('DB_DEST_DATABASE', 'enkpay'),
+            'username' => env('DB_DEST_USERNAME', 'root'),
+            'password' => env('DB_DEST_PASSWORD', 'Tolulope2580@'),
+            'unix_socket' => env('DB_DEST_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
         ],
 
         'mysql' => [
@@ -191,6 +219,8 @@ return [
 
 
     ],
+
+
 
 
 
