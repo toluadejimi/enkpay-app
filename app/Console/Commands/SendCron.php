@@ -77,8 +77,9 @@ class SendCron extends Command
 
 
 
-        $message = Webhook::where('status', 0)->first()->account_no ?? null;
+        $message ="hello";
         send_notification2($message);
+
 
 
 
