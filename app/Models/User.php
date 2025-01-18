@@ -51,6 +51,8 @@ class User extends Authenticatable
         'bonus_wallet' => 'integer',
         'status' => 'integer',
         'role' => 'string',
+        'type' => 'string',
+
 
 
 
