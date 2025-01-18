@@ -8,4 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class TidConfig extends Model
 {
     use HasFactory;
+
+    protected $casts = [
+        'port' => 'string',
+    ];
 }
